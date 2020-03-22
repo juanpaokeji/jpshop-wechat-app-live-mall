@@ -1,0 +1,2 @@
+controller   ∑≈÷√js
+view   ∑≈÷√ ”Õº

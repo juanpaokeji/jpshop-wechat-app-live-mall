@@ -1,0 +1,46 @@
+<title>门店商品添加</title>
+<div class="layui-fluid">
+    <form class="layui-form" id="add_edit_form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">打印机名称</label>
+            <div class="layui-input-inline">
+                <input name="name" required lay-verify="required" placeholder="请输入打印机名称" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">API密钥</label>
+            <div class="layui-input-inline">
+                <input name="apikey" required lay-verify="required" placeholder="请输入API密钥" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">打印机终端号</label>
+            <div class="layui-input-inline">
+                <input name="machine_code" required lay-verify="required" placeholder="请输入打印机终端号" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">打印机终端密钥</label>
+            <div class="layui-input-inline">
+                <input name="msign" required lay-verify="required" placeholder="请输入打印机终端密钥" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">易联云用户id</label>
+            <div class="layui-input-inline">
+                <input name="partner" required lay-verify="required" placeholder="请输入易联云用户id" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" id="btn" lay-submit lay-filter="sub">保存</a>
+                <!--<button type="reset" class="layui-btn layui-btn-primary">重置</button>-->
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript" src="./src/lib/common.js"></script>
+<!--添加/编辑签名-->
+<script type="text/javascript">
+    layui.use('yly/info', layui.factory('yly/info'));
+</script>

@@ -1,0 +1,85 @@
+<title>小程序支付配置</title>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <form class="layui-form">
+                <div class="first_page">
+                    <div class="layui-form-item layui-row">
+                        <label class="layui-form-label">公众号名称</label>
+                        <div class="layui-input-inline">
+                            <input name="name" required lay-verify="required" placeholder="请输入公众号名称"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">公众号类型</label>
+                        <div class="layui-input-inline">
+                            <select name="type" id="type" required lay-verify="required">
+                                <option value="">请选择公众号类型</option>
+                                <option value="订阅号">订阅号</option>
+                                <option value="认证订阅号">认证订阅号</option>
+                                <option value="服务号">服务号</option>
+                                <option value="认证服务号/认证政府订阅号/认证媒体订阅号">认证服务号/认证政府订阅号/认证媒体订阅号</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">AppID</label>
+                        <div class="layui-input-inline">
+                            <input name="AppID" required lay-verify="required" placeholder="请输入微信公众号平台的AppID"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">AppSecret</label>
+                        <div class="layui-input-inline">
+                            <input name="AppSecret" required lay-verify="required" placeholder="请输入微信公众号平台的AppSecret"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">头像</label>
+                        <div class="layui-input-inline">
+                            <span class="layui-col-md12" style="position:relative; display:block;">
+                                <a class="layui-btn layui-col-md4">上传</a>
+                                <input id="addHeadImg" type="file">
+                            </span>
+                            <img id="headImg">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">二维码</label>
+                        <div class="layui-input-inline">
+                            <span class="layui-col-md12" style="position:relative; display:block;">
+                                <a class="layui-btn layui-col-md4">上传</a>
+                                <input id="addQrCodeImg" type="file">
+                            </span>
+                            <img id="qrCodeImg">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-inline">
+                            <a class="layui-btn" lay-submit="" lay-filter="next">下一步</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="second_page" style="display: none;">
+                    <div class="layui-form-item layui-row">
+                        1231231313
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-inline">
+                            <a class="layui-btn" lay-submit="" lay-filter="previous">上一步</a>
+                            <a class="layui-btn" lay-submit="" lay-filter="sub">保存</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use('miniprogram/pay', layui.factory('miniprogram/pay'));
+</script>

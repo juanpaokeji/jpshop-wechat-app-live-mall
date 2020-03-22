@@ -1,0 +1,289 @@
+<title>小程序支付配置</title>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="title"><span>顶部导航栏效果</span></div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"></label>
+                <label class="layui-form-label">主题文字颜色</label>
+                <div class="layui-input-block">
+                    <div class="theme_text">
+                        <input type="radio" name="theme_text" value="black" title="黑色" checked/>黑色
+                    </div>
+
+                    <div class="theme_text">
+                        <input type="radio" name="theme_text" value="white" title="白色"/>白色
+                    </div>
+
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"></label>
+                <label class="layui-form-label">主题颜色</label>
+                <div class="layui-input-inline" style="width: 5vw">
+                    <input type="radio" name="theme" value="#ff5903" checked/>默认
+                    <img class="theme_img" style="background-color: #ff5903;"/>
+                    <!--<img class="theme_img" style="background: linear-gradient(to bottom right, #ab42fc , #8a00ea); "/>-->
+                </div>
+                <div class="layui-input-inline" style="width: 5vw">
+                    <input type="radio" name="theme" value="#fb4b4b"/>
+                    <img class="theme_img" style="background-color: #fb4b4b;"/>
+                </div>
+                <div class="layui-input-inline" style="width: 5vw">
+                    <input type="radio" name="theme" value="#389ee9"/>
+                    <img class="theme_img" style="background-color: #389ee9;"/>
+                </div>
+                <div class="layui-input-inline" style="width: 5vw">
+                    <input type="radio" name="theme" value="#39cc85"/>
+                    <img class="theme_img" style="background-color: #39cc85"/>
+                </div>
+                <div class="layui-input-inline" style="width: 5vw">
+                    <input type="radio" name="theme" value="#af71ee"/>
+                    <img class="theme_img" style="background-color: #af71ee"/>
+                </div>
+                <div class="layui-input-inline" style="width: 5vw">
+                    <input type="radio" name="theme" value="#f25151"/>
+                    <img class="theme_img" style="background-color: #f25151"/>
+                </div>
+                <div class="layui-input-inline" style="width: 5vw">
+                    <input type="radio" name="theme" value="#ef889d"/>
+                    <img class="theme_img" style="background-color: #ef889d"/>
+                </div>
+                <div class="layui-input-inline" style="width: 5vw">
+                    <input type="radio" name="theme" value="#fe1619"/>
+                    <img class="theme_img" style="background-color: #fe1619"/>
+                </div>
+                <div class="layui-input-inline" style="width: 5vw">
+                    <input type="radio" name="theme" value="#2b79ff"/>
+                    <img class="theme_img" style="background-color: #2b79ff"/>
+                </div>
+                <div class="layui-input-inline" style="width: 5vw">
+                    <input type="radio" name="theme" value="#00b800"/>
+                    <img class="theme_img" style="background-color: #00b800"/>
+                </div>
+            </div>
+            <div class="title" style="margin-top: 2vw"><span>底部导航栏效果</span></div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"></label>
+                <label class="layui-form-label">底部导航图标</label>
+                <div class="layui-input-block">
+                    <div class="icon_img icon_img_delete" ondrop="drop(event,this)" ondragover="allowDrop(event)" draggable="true" ondragstart="drag(event, this)">
+                        <span class="save_value" style="display: none;"></span>
+                        <img src="./src/images/add_icon.png"/><br/>
+                        <span>未设置</span>
+                        <div class="icon_img_operation" style="display: none;">
+                            <a class="edit" href="javascript:void(0)">编辑</a>
+                            <a class="delete" href="javascript:void(0)">删除</a>
+                        </div>
+                    </div>
+                    <div class="icon_img icon_img_delete" ondrop="drop(event,this)" ondragover="allowDrop(event)" draggable="true" ondragstart="drag(event, this)">
+                        <span class="save_value" style="display: none;"></span>
+                        <img src="./src/images/add_icon.png"/><br/>
+                        <span>未设置</span>
+                        <div class="icon_img_operation" style="display: none;">
+                            <a class="edit" href="javascript:void(0)">编辑</a>
+                            <a class="delete" href="javascript:void(0)">删除</a>
+                        </div>
+                    </div>
+                    <div class="icon_img">
+                        <a href="javascript:void(0)">
+                            <img class="add_icon" src="./src/images/add_icon.png"
+                                 style="width: 3.5vw; height: 3.5vw"/>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"></label>
+                <label class="layui-form-label">底部文字颜色</label>
+                <div class="layui-input-inline">
+                    <input id="bottom_text" required lay-verify="required" value="#fff" class="layui-input"/>
+                    <div class="colorpicker" id="bottom_text_colorpicker" style="display: none;"></div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"></label>
+                <label class="layui-form-label">文字选中颜色</label>
+                <div class="layui-input-inline">
+                    <input id="text_selection" required lay-verify="required" value="#fff" class="layui-input"/>
+                    <div class="colorpicker" id="text_selection_colorpicker" style="display: none;"></div>
+                </div>
+            </div>
+            <div class="layui-form-item" style="text-align: center;">
+                <label class="layui-form-label"></label>
+                <div class="layui-input-inline">
+                    <a class="layui-btn" lay-submit lay-filter="sub">保存</a>
+                </div>
+            </div>
+            <!--底部导航图标弹出层-->
+            <form class="layui-form" style='display:none;' id="add_edit_form">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">图标</label>
+                    <div class="layui-input-inline">
+					<span class="layui-col-md12" style="position:relative; display:block;">
+						<a class="layui-btn layui-col-md6">上传</a>
+						<input id="addImgPut" type="file">
+					</span>
+                        <img id="image"/>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">选中状态图标</label>
+                    <div class="layui-input-inline">
+					<span class="layui-col-md12" style="position:relative; display:block;">
+						<a class="layui-btn layui-col-md6">上传</a>
+						<input id="addImgPutSelection" type="file">
+					</span>
+                        <img id="imageSelection"/>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">名称</label>
+                    <div class="layui-input-inline">
+                        <input name="name" required lay-verify="required" placeholder="请输入名称" class="layui-input">
+                    </div>
+                </div>
+                <!--<div class="layui-form-item">-->
+                    <!--<label class="layui-form-label">文字选中颜色</label>-->
+                    <!--<div class="layui-input-inline">-->
+                        <!--<input id="text_selection_form" required lay-verify="required" value="#fff"-->
+                               <!--class="layui-input"/>-->
+                        <!--<div class="colorpicker" id="text_selection_form_colorpicker" style="display: none;"></div>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <!--<div class="layui-form-item">-->
+                    <!--<label class="layui-form-label">文字未选中颜色</label>-->
+                    <!--<div class="layui-input-inline">-->
+                        <!--<input id="text_un_selection_form" required lay-verify="required" value="#fff"-->
+                               <!--class="layui-input"/>-->
+                        <!--<div class="colorpicker" id="text_un_selection_form_colorpicker" style="display: none;"></div>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <div class="layui-form-item">
+                    <label class="layui-form-label">页面</label>
+                    <div class="layui-input-inline">
+                        <input name="choice_page_name_view" disabled class="layui-input">
+                        <input class="choice_page_type" name="choice_page_type" style="display: none;"/>
+                        <input name="choice_page_name" style="display: none;">
+                        <input name="choice_app_id" style="display: none;"/>
+                        <input name="choice_page_url" style="display: none;"/>
+                    </div>
+                    <a class="choice_page layui-btn" style="width: 60px;text-align: left;" href="javascript:void(0)">选择</a>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <a class="layui-btn" lay-submit lay-filter="form_sub">确认</a>
+                    </div>
+                </div>
+            </form>
+            <div id="choicePageUrl" style="display: none;"></div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="./src/lib/farbtastic/farbtastic.js"></script>
+<link rel="styleSheet" href="./src/lib/farbtastic/farbtastic.css"/>
+
+<script>
+    layui.use('miniProgram/theme', layui.factory('miniProgram/theme'));
+</script>
+<script type="text/javascript" src="./src/lib/common.js"></script>
+<style>
+    /* 顶底部导航栏 div */
+    .title {
+        margin: 1vw 1vw 2vw 5vw;
+        font-size: 0.8vw;
+        color: black;
+    }
+
+    /* 主题文字颜色 */
+    .theme_text {
+        float: left;
+        width: 5.5vw;
+    }
+
+    /* 主题颜色间距 */
+    .layui-form-item .layui-input-inline {
+        width: 8vw;
+    }
+
+    /* 设置弹窗中左侧宽度 */
+    .layui-form-label {
+        width: 100px;
+    }
+
+    /* 顶底部导航栏 div 中的 文字 */
+    .title span {
+        border: 0.02vw solid gainsboro;
+        padding: 0.3vw 2vw 0.3vw 2vw;
+        box-shadow: -0.1vw 0.1vw 0.50vw lightgrey;
+        border-radius: 0.05vw
+    }
+
+    /* 主题颜色中的图片  */
+    .theme_img {
+        width: 2vw;
+        height: 2vw;
+    }
+
+    /* 底部导航图标 div  */
+    .icon_img {
+        border: 0.02vw solid gainsboro;
+        width: 5vw;
+        height: 5vw;
+        margin-left: 0.5vw;
+        margin-right: 0.5vw;
+        float: left;
+        text-align: center;
+        position: relative;
+    }
+
+    /* 底部导航图标 div 中的图片  */
+    .icon_img img {
+        width: 2vw;
+        height: 2vw;
+        margin-top: 0.8vw;
+    }
+
+    /* 底部导航图标 div 中的 添加按钮 图片  */
+    .icon_img .add_icon {
+        text-align: center;
+    }
+
+    /* 底部导航图标 div 中的操作框 div  */
+    .icon_img .icon_img_operation {
+        width: 5vw;
+        position: absolute;
+        bottom: 0;
+        border: 0.001vw solid gainsboro;
+        text-align: center;
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* 底部导航图标 div 中的操作框 div  */
+    .icon_img .icon_img_operation a:hover {
+        color: #1e90ff;
+    }
+
+    /* 弹出窗图片的样式 */
+    #image, #imageSelection {
+        height: 100px;
+        width: 100px;
+        margin-top: 10px;
+        border: 1px solid #e5e5e5;
+    }
+
+    input[id=addImgPut], input[id=addImgPutSelection] {
+        border: 0px solid red;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        opacity: 0;
+        height: 36px;
+        width: 200px;
+    }
+
+    input[id=addImgPut] :hover, input[id=addImgPutSelection] :hover {
+        cursor: pointer;
+    }
+</style>

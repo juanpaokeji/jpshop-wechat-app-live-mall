@@ -1,0 +1,308 @@
+<title>小程序基本配置</title>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12 choice_type">
+            <div class="layui-row panel-padding">
+                <!--<div class="layui-col-md6">-->
+                <!--<div class="title">-->
+                <!--<span class="img-pen"></span>-->
+                <!--添加小程序-->
+                <!--</div>-->
+                <!--<div class="con">-->
+                <!--手动绑定需同步微信接口，在小程序后台，基本设置可以获取appid和appsecret，绑定成功后，将获取的服务器配置接口绑定到微信后台（切记：绑定过程中，一定要注意保持接口参数一致）-->
+                <!--</div>-->
+                <!--<div>-->
+                <!--<a class="layui-btn manual">手动添加小程序</a>-->
+                <!--</div>-->
+                <!--</div>-->
+                <div class="layui-col-md6">
+                    <div class="title" style="text-align: center;"><span>授权添加小程序</span></div>
+                    <div class="con">请使用小程序管理员微信号扫码授权小程序，授权时请勿修改权限，<a class="color-default">以免影响使用</a></div>
+					<div style="text-align: center;"><a class="layui-btn authorization">点击授权</a></div>
+					<div style="position: absolute;top:5.9375rem;left: 15.625rem;" id="authorizeText">&nbsp;<span></span></div>
+                    <div class="add-form">
+						<form class="layui-form" style="margin-left: 14rem;margin-top: 3.125rem;" lay-filter="data">
+						    <div class="layui-form-item layui-row">
+						        <label class="layui-form-label">APPID</label>
+						        <div class="layui-input-inline">
+						            <input name="app_id" placeholder="请输入APPID"
+						                   autocomplete="off" class="layui-input">
+						        </div>
+						    </div>
+							<div class="wechat">
+								<div class="layui-form-item layui-row">
+								    <label class="layui-form-label">商户号</label>
+								    <div class="layui-input-inline">
+								        <input name="mch_id" placeholder="请输入商户号"
+								               autocomplete="off" class="layui-input">
+								    </div>
+								</div>
+								<div class="layui-form-item">
+								    <label class="layui-form-label">秘钥</label>
+								    <div class="layui-input-inline">
+								        <input name="pay_key" placeholder="请输入秘钥"
+								               autocomplete="off" class="layui-input">
+								    </div>
+								</div>
+							</div>
+							
+							<div class="sao" style="display: none;">
+								<!-- <div class="layui-form-item layui-row">
+								    <label class="layui-form-label">商户号</label>
+								    <div class="layui-input-inline">
+								        <input name="mch_id" placeholder="请输入商户号"
+								               autocomplete="off" class="layui-input">
+								    </div>
+								</div>
+								<div class="layui-form-item">
+								    <label class="layui-form-label">秘钥</label>
+								    <div class="layui-input-inline">
+								        <input name="pay_key" placeholder="请输入秘钥"
+								               autocomplete="off" class="layui-input">
+								    </div>
+								</div> -->
+								
+								<div class="layui-form-item layui-row saobei">
+								    <label class="layui-form-label">商户号</label>
+								    <div class="layui-input-inline">
+								        <input name="merchant_no" placeholder="请输入扫呗商户号"
+								               autocomplete="off" class="layui-input">
+								    </div>
+								</div>
+								<div class="layui-form-item layui-row saobei">
+								    <label class="layui-form-label">终端号</label>
+								    <div class="layui-input-inline">
+								        <input name="terminal_id" placeholder="请输入扫呗终端号"
+								               autocomplete="off" class="layui-input">
+								    </div>
+								</div>
+								<div class="layui-form-item layui-row saobei">
+								    <label class="layui-form-label">令牌</label>
+								    <div class="layui-input-inline">
+								        <input name="saobei_access_token" placeholder="请输入扫呗令牌"
+								               autocomplete="off" class="layui-input">
+								    </div>
+								</div>
+							</div>
+							
+							<div class="layui-form-item">
+							    <label class="layui-form-label">支付方式</label>
+							    <div class="layui-input-block">
+									<input class="wechat_radio" type="radio" name="pay" value="1" checked title="微信支付">
+									<input type="radio" name="pay" value="2" title="微信支付服务商">
+								</div>
+							</div>
+							<div class="layui-form-item wechat">
+								<label class="layui-form-label">证书CERT</label>
+								<div class="layui-input-inline">
+									<input type="file" class="layui-btn certificate" id="cert_path" name="cert_path" />
+									<span class="cert_path"></span>
+								</div>
+							</div>
+							<div class="layui-form-item wechat">
+								<label class="layui-form-label">证书KEY</label>
+								<div class="layui-input-inline">
+									<input type="file" class="layui-btn certificate" id="key_path" name="key_path" />
+									<span class="key_path"></span>
+								</div>
+							</div>
+							
+						    <div class="layui-form-item" style="text-align: center;">
+						        <div class="layui-input-inline" style="margin-left: 8.75rem;">
+						            <a class="layui-btn" lay-submit="" lay-filter="sub">保存</a>
+						        </div>
+						    </div>
+						</form>
+					</div>
+					<section id="uicut-app">
+						<section class="uc-section61">
+							<div class="box">
+								<div class="other">
+									<p>请将以下2个域名添加到小程序后台--开发--开发设置---服务器域名里    <a href="http://www.juanpao.com/help/pc/index.html" class="orange" target="_blank">添加教程</a></p>
+									<p><span class="brother">api.juanpao.com</span> <a class="green">点击复制</a></p>
+									<p><span class="brother">imgs.juanpao.com</span> <a class="green">点击复制</a></p>
+								</div>
+							</div>
+						</section>
+					</section>
+					<!-- <section id="uicut-app">
+                    	<section class="uc-section61">
+                    		<div class="box">
+                    			<ul class="form">
+                    				<li><span class="tt">商户号</span><input type="text" class="input"></li>
+                    				<li><span class="tt">支付密钥</span><input type="text" class="input"></li>
+                    				<li><span class="tt line-two">微信支付<br>apiclient_cert.pem</span><input type="text" class="input">
+                    					<div class="upload">
+                    						上传
+                    						<input type="file" name="" id="">
+                    					</div>
+                    				</li>
+                    				<li><span class="tt line-two">微信支付<br>apiclient_key.pem</span><input type="text" class="input">
+                    					<div class="upload">
+                    						上传
+                    						<input type="file" name="" id="">
+                    					</div>
+                    				</li>
+                    			</ul>
+                    			<div class="operate">
+                    				<a href="" class="btn">保 存</a>
+                    			</div>
+                    			<div class="other">
+                    				<p>请将以下2个域名添加到小程序后台--开发--开发设置---服务器域名里    <a href="" class="orange">添加教程</a></p>
+                    				<p>api2.juanpao.com <a href="" class="green">点击复制</a></p>
+                    				<p>api2.juanpao.com <a href="" class="green">点击复制</a></p>
+                    			</div>
+                    		</div>
+                    	</section>
+                    </section> -->
+					
+					
+					<!-- <div class="authorization_Add">
+                        <div class="show_authorized">
+                            <a class="untying">解绑</a>
+                        </div>
+                        <span class="authorized"></span>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+        <!--<div class="layui-col-md12 base_info" style="display: none">-->
+        <!--<form class="layui-form">-->
+        <!--<div class="first_page">-->
+        <!--<div class="layui-form-item layui-row">-->
+        <!--<label class="layui-form-label">小程序名称</label>-->
+        <!--<div class="layui-input-inline">-->
+        <!--<input name="name" required lay-verify="required" placeholder="请输入小程序名称" class="layui-input">-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--<div class="layui-form-item">-->
+        <!--<label class="layui-form-label">小程序ID</label>-->
+        <!--<div class="layui-input-inline">-->
+        <!--<input name="app_id" required lay-verify="required" placeholder="请输入小程序ID" class="layui-input">-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--<div class="layui-form-item">-->
+        <!--<label class="layui-form-label">小程序应用密钥</label>-->
+        <!--<div class="layui-input-inline">-->
+        <!--<input name="app_secret" required lay-verify="required" placeholder="请输入微信小程序应用密钥" class="layui-input">-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--<div class="layui-form-item">-->
+        <!--<label class="layui-form-label">微信支付商户号</label>-->
+        <!--<div class="layui-input-inline">-->
+        <!--<input name="MCHID" required lay-verify="required" placeholder="请输入微信支付商户号" class="layui-input">-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--<div class="layui-form-item">-->
+        <!--<label class="layui-form-label">微信支付密钥</label>-->
+        <!--<div class="layui-input-inline">-->
+        <!--<input name="pay_key" required lay-verify="required" placeholder="请输入微信支付密钥" class="layui-input">-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--<div class="layui-form-item">-->
+        <!--<label class="layui-form-label">支付类型</label>-->
+        <!--<div class="layui-input-inline">-->
+        <!--<input type="radio" name="pay_type" value="1" title="普通支付" checked />-->
+        <!--&lt;!&ndash;<input type="radio" name="radios" title="2" value="服务商支付"/>&ndash;&gt;-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--<div class="layui-form-item">-->
+        <!--<div class="layui-input-inline">-->
+        <!--<a class="layui-btn" lay-submit="" lay-filter="sub">保存</a>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--</form>-->
+        <!--</div>-->
+    </div>
+</div>
+
+
+
+<script type="text/javascript" src="./jquery.min.js"></script>
+<link type="text/css" rel="styleSheet" href="./src/style/wechat/base.css" />
+<link type="text/css" rel="stylesheet" href="./group/css/main.css" />
+<script type="text/javascript" src="./src/lib/common.js"></script>
+<script>
+    layui.use('miniProgram/base', layui.factory('miniProgram/base'));
+</script>
+<style>
+	a{cursor: pointer;}
+	.add-form .layui-form-item{margin-bottom: 1.25rem;}
+    .con {
+        margin-bottom: 20px;
+    }
+
+    .authorization_Add {
+        display: flex;
+        justify-content: center;
+        margin-top: 2vw;
+        position: relative;
+    }
+
+    .save_authorized {
+        display: block;
+        width: 400px;
+        height: 328px;
+        background: url(./src/images/authorization.png);
+        background-size: 100% 100%;
+    }
+
+    .authorized {
+        position: absolute;
+        top: 126px;
+        left: 198px;
+        width: 400px;
+        height: 328px;
+        background: url(./src/images/unauthorization.png);
+        background-size: 100% 100%;
+        display: none;
+    }
+
+    .head_portrait {
+        display: inline-block;
+        width: 36px;
+        height: 36px;
+        background: url(./src/images/logo.png);
+        background-size: 100% 100%;
+    }
+
+    .unifie {
+        padding: 8px;
+        font-size: 1.0rem;
+    }
+
+    .head_img {
+        width: 36px;
+        height: 36px;
+    }
+    .show_authorized{
+        display: none;
+    }
+    .untying{
+        font-size: 1rem;
+        color:red;
+    }
+	.certificate {
+		display: inline-block;
+		height: 34px;
+		line-height: 34px;
+		padding: 0 18px;
+		background-color: #FBFBFB !important;
+		color: #aaa;
+		white-space: nowrap;
+		text-align: center;
+		font-size: 14px;
+		border: none;
+		border-radius: 2px;
+		cursor: pointer;
+	}
+	.certificate:hover{
+		color: #aaa;
+	}
+	.cert_path, .key_path{
+		margin-left: 20px;
+	}
+
+</style>

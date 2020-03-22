@@ -1,0 +1,70 @@
+<title>model</title>
+<div class="layui-fluid">
+    <div class="layui-col-md12">
+        <form class="layui-form layui-col-md11">
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <input name="searchName" placeholder="请输入名称" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-input-inline">
+                    <a class="layui-btn" lay-submit lay-filter="find">查询</a>
+                </div>
+            </div>
+        </form>
+        <a class="layui-btn layui-col-md1" lay-submit lay-filter="showAdd">新增</a>
+    </div>
+    <!--弹出层-->
+    <form class="layui-form" style='display:none;' id="add_edit_form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">退款电话</label>
+            <div class="layui-input-inline">
+                <input name="after_phone" required lay-verify="required|number" placeholder="请输入退款电话"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">退款地址</label>
+            <div class="layui-input-block">
+                <textarea name="after_addr" required lay-verify="required" placeholder="请输入退款地址"
+                          class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-block">
+                <input type="checkbox" name="add_edit_status" checked lay-skin="switch" lay-text="开启|关闭">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" id="btn" lay-submit lay-filter="sub">提交</a>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+    <!--数据表格-->
+    <div class="layui-col-md12">
+        <table id="pageTable" lay-filter="pageTable" lay-data="{id: 'pageTable'}">
+        </table>
+    </div>
+</div>
+<!--添加/编辑-->
+<script type="text/javascript">
+    layui.use('info/list', layui.factory('info/list'));
+</script>
+<script type="text/html" id="operations">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+</script>
+<!--图片模板-->
+<script type="text/html" id="imgTpl">
+    <img class="layui-upload-img" style="width:40px; height:40px"
+         src={{ d.pic_url }}>
+</script>
+<!--状态码模板-->
+<script type="text/html" id="statusTpl">
+    <input type="checkbox" value="{{d.id}}" lay-skin="switch" lay-text="开启|关闭" lay-filter="statusTpl" {{
+           d.status== 1 ? 'checked' : '' }}>
+</script>
+<link type="text/css" rel="styleSheet" href="./src/style/model.css"/>
+

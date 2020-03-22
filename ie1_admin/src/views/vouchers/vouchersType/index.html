@@ -1,0 +1,136 @@
+<title>抵用券类型</title>
+
+<div class="layui-fluid">
+	<!--弹出框-->
+	<div class="layui-col-md12" style="display:none;" id="formm">
+		
+	</div>
+	
+	<!--body-->
+	<div class="layui-row">
+		<div class="layui-tab">
+			<ul class="layui-tab-title">
+				<li class="layui-this" id="lia">抵用券类型列表</li>
+				<li id="lib">抵用券类型操作</li>
+			</ul>
+			<div class="layui-tab-content">
+				<div class="layui-tab-item layui-show" id="tt">
+					<!--查询-->
+					<div class="layui-col-md12">
+						<form class="layui-form">
+							<div class="layui-form-item">
+								<div class="layui-input-inline">
+									<input type="text" name="title" required  lay-verify="required" placeholder="请输入id" autocomplete="off" class="layui-input">
+								</div>
+								<div class="layui-input-inline">
+									<a class="layui-btn" lay-submit lay-filter="find">查询</a>
+								</div>
+							</div>
+						</form>
+					</div>
+					<hr>
+					<!--数据表格-->
+					<div class="layui-col-md12">
+						<table id="views_vouchers_vouchersType" lay-filter="views_vouchers_vouchersType" lay-data="{id: 'views_vouchers_vouchersType'}"></table>
+					</div>
+				</div>
+				<div class="layui-tab-item" id="opt">
+					<form class="layui-form">
+						<div class="layui-form-item">
+							<label class="layui-form-label">抵用券类型</label>
+							<div class="layui-input-inline">
+								<input type="text" name="name" required  lay-verify="required" placeholder="请输入抵用券类型" autocomplete="off" class="layui-input">
+							</div>
+							
+							<label class="layui-form-label">面值</label>
+							<div class="layui-input-inline">
+								<input type="text" name="price" required  lay-verify="required" placeholder="请输入面值" autocomplete="off" class="layui-input">
+							</div>
+							
+							<label class="layui-form-label">满减条件</label>
+							<div class="layui-input-inline">
+								<input type="text" name="full_price" required  lay-verify="required" placeholder="满减金额,0为无要求" autocomplete="off" class="layui-input">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">发放总量</label>
+							<div class="layui-input-inline">
+								<input type="text" name="count" required  lay-verify="required" placeholder="请输入发放总量" autocomplete="off" class="layui-input">
+							</div>
+							
+							<label class="layui-form-label">有效期</label>
+							<div class="layui-input-inline">
+								<input type="text" name="days" required  lay-verify="required" placeholder="领取后有效期,单位/天" autocomplete="off" class="layui-input">
+							</div>
+							
+							<label class="layui-form-label">活动</label>
+							<div class="layui-input-inline">
+								<select name="act_id" lay-filter="applicationgroup">
+									<option value="">请选择</option>
+								</select>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">开始时间</label>
+							<div class="layui-input-inline">
+								<input type="text" class="layui-input" id="start" name="from_date">
+							</div>
+							<label class="layui-form-label">结束时间</label>
+							<div class="layui-input-inline">
+								<input type="text" class="layui-input" id="end" name="to_date">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">状态</label>
+							<div class="layui-input-block">
+								<input type="radio" name="status" value="0" title="不启用">
+								<input type="radio" name="status" value="1" title="启用" checked>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<div class="layui-input-block">
+								<a class="layui-btn" id="btn" lay-submit lay-filter="add">立即提交</a>
+								<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!--表格工具条-->
+<script type="text/html" id="opreationes">
+  <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+
+<!--状态码模板-->
+<script type="text/html" id="statusTpl">
+  <input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="开启|关闭" lay-filter="sexDemo" {{ d.status == 1 ? 'checked' : '' }}>
+</script>
+<!--图片模板-->
+<script type="text/html" id="imgTpl">
+  <img class="layui-upload-img" style="width:40px; height:40px" id="tableimg" src={{ 'http://192.168.188.12'+d.pic_url }}>
+</script>
+<!--金额模板-->
+<script type="text/html" id="moneyTpl">
+  <span>{{d.money}}&nbsp;元</span>
+</script>
+<!--应用类型模板-->
+<script type="text/html" id="ApplicationTypeTpl">
+  {{#  if(d.status === '1'){ }}
+		<span class="layui-col-md8 layui-col-md-offset2">微信</span>
+  {{#  } else	if(d.status === '2'){ }}
+    <span class="layui-col-md8 layui-col-md-offset2">小程序</span>
+  {{#  } else	{ }}
+    <span class="layui-col-md8 layui-col-md-offset2">微信&小程序</span>
+  {{#  } }}
+</script>
+<script>
+layui.use('views_vouchers_vouchersType', layui.factory('views_vouchers_vouchersType'));
+</script>
+<style>
+
+</style>

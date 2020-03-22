@@ -1,0 +1,206 @@
+<title>佣金流水</title>
+<div class="layui-fluid">
+    <div class="layui-col-md12">
+        <form class="layui-form layui-col-md12">
+            <div class="layui-form-item">
+                <label class="layui-form-label">时间范围：</label>
+                <div class="layui-input-inline" style="width: 160px;">
+                    <input id="datetime" name="datetime" placeholder="选择日期范围" class="layui-input">
+                </div>
+                <div class="layui-input-inline" style="width: 80px;">
+                    <a class="layui-btn layui-btn-danger" lay-submit lay-filter="clear_date">清除</a>
+                </div>
+                <label class="layui-form-label">佣金状态：</label>
+                <div class="layui-input-inline" style="width: 100px;">
+                    <select name="balance_status" id="balance_status">
+                        <option value="">全部</option>
+                        <option value="0">待结算</option>
+                        <option value="1">已结算</option>
+                        <option value="2">已拒绝</option>
+                    </select>
+                </div>
+                <label class="layui-form-label">订单状态：</label>
+                <div class="layui-input-inline" style="width: 100px;">
+                    <select name="order_status" id="order_status">
+                        <option value="">所有订单</option>
+                        <option value="0">待发货</option>
+                        <option value="1">待团长收货</option>
+                        <option value="2">待用户取货</option>
+                        <option value="1">已退款</option>
+                        <option value="2">已完成</option>
+                    </select>
+                </div>
+                <label class="layui-form-label">所属团长：</label>
+                <div class="layui-input-inline" style="width: 100px;">
+                    <input name="searchName" placeholder="团长姓名" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-input-inline" style="width: 80px;">
+                    <a class="layui-btn select-head" lay-submit lay-filter="choice_group">选择团长</a>
+                </div>
+                <div class="layui-input-inline" style="width: 80px;">
+                    <a class="layui-btn layui-btn-danger" lay-submit lay-filter="clear_group">清除</a>
+                </div>
+                <label class="layui-form-label">订单号：</label>
+                <div class="layui-input-inline">
+                    <input name="order_sn" placeholder="订单号" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-input-inline" style="width: 80px;margin-left: 50px;">
+                    <a class="layui-btn" lay-submit lay-filter="find">查询</a>
+                </div>
+            </div>
+            <div class="layui-input-inline" style="width: 160px;float: right;">
+                <a class="layui-btn" lay-submit lay-filter="export">导出佣金流水</a>
+            </div>
+        </form>
+    </div>
+    <!--数据表格-->
+    <div class="layui-col-md12">
+        <table id="pageTable" lay-filter="pageTable" lay-data="{id: 'pageTable'}"></table>
+    </div>
+	<!-- 弹出框 选择团长 -->
+	<div class="selectHead" style="display: none;">
+		<div class="head-search">
+			<label>团长名称：</label>
+			<input type="text" class="head-input" placeholder="请输入团长姓名"/>
+			<button type="button" class="layui-btn-normal layui-btn searchHead">搜索</button>
+		</div>
+		<ul class="select-ul">
+			<li class="tableHead">
+				<div class="theader">
+					<div>ID</div>
+					<div>姓名</div>
+					<div>自提点地址</div>
+					<div>操作</div>
+				</div>
+			</li>
+		</ul>
+		<div id="page"></div>
+	</div>
+</div>
+<!--添加/编辑签名-->
+<script type="text/javascript">
+    layui.use('finance/record', layui.factory('finance/record'));
+</script>
+<script type="text/html" id="operations">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+</script>
+<!--图片模板-->
+<script type="text/html" id="imgTpl">
+    <img class="layui-upload-img" style="width:40px; height:40px"
+         src={{ d.avatar }}>
+</script>
+<!--佣金类型模板-->
+<script type="text/html" id="typeTpl">
+    {{#  if(d.type == '0'){ }}
+    <span class="layui-col-md8">默认</span>
+    {{#  } else if(d.type == '1'){ }}
+    <span class="layui-col-md8">团长佣金</span>
+    {{#  } else if(d.type == '2'){ }}
+    <span class="layui-col-md8">推荐团长佣金</span>
+    {{#  } else if(d.type == '3'){ }}
+    <span class="layui-col-md8">自提点佣金</span>
+    {{#  } else if(d.type == '4'){ }}
+    <span class="layui-col-md8">推荐佣金</span>
+    {{#  } else { }}
+    <span class="layui-col-md8">类型错误</span>
+    {{#  } }}
+</script>
+<!--状态模板 状态 1=已结算,0=结算中,2=已拒绝-->
+<script type="text/html" id="statusTpl">
+    {{#  if(d.status == '0'){ }}
+    <span class="layui-col-md8">结算中</span>
+    {{#  } else if(d.status == '1'){ }}
+    <span class="layui-col-md8">已结算</span>
+    {{#  } else if(d.status == '2'){ }}
+    <span class="layui-col-md8">已拒绝</span>
+    {{#  } else { }}
+    <span class="layui-col-md8">类型错误</span>
+    {{#  } }}
+</script>
+<!--订单状态模板-->
+<!--状态 0=待付款 1=待发货 2=已取消(24小时未支付) 3=已发货 4=已退款 5=退款中 6=待评价 7=已完成(评价后)  8=已删除  9一键退款-->
+<script type="text/html" id="order_statusTpl">
+    {{#  if(d.order_status == '0'){ }}
+    <span class="layui-col-md8">待付款</span>
+    {{#  } else if(d.order_status == '1'){ }}
+    <span class="layui-col-md8">待发货</span>
+    {{#  } else if(d.order_status == '2'){ }}
+    <span class="layui-col-md8">已取消</span>
+    {{#  } else if(d.order_status == '3'){ }}
+    <span class="layui-col-md8">已发货</span>
+    {{#  } else if(d.order_status == '4'){ }}
+    <span class="layui-col-md8">已退款</span>
+    {{#  } else if(d.order_status == '5'){ }}
+    <span class="layui-col-md8">退款中</span>
+    {{#  } else if(d.order_status == '6'){ }}
+    <span class="layui-col-md8">待评价</span>
+    {{#  } else if(d.order_status == '7'){ }}
+    <span class="layui-col-md8">已完成</span>
+    {{#  } else if(d.order_status == '8'){ }}
+    <span class="layui-col-md8">已删除</span>
+    {{#  } else if(d.order_status == '9'){ }}
+    <span class="layui-col-md8">一键退款</span>
+    {{#  } else { }}
+    <span class="layui-col-md8">类型错误</span>
+    {{#  } }}
+</script>
+
+<style>
+	#page{margin: 0 1.25rem;}
+	.selectHead{height: 31.25rem;}
+	.head-input{width: 50%;padding: 0.3125rem 0.625rem 0.5rem;margin-right: 1.25rem;}
+	.head-search{width: 100%;height: 2.1875rem;padding: 1.25rem 0;}
+	.head-search label{margin-left: 6.25rem;}
+	.select-ul{list-style: none;margin: 0 1.25rem 1.25rem;border: 0.0625rem solid #E7E7E7;}
+	.select-ul .tableHead,.tbodyCol{width: 100%;height: 2.1875rem;}
+	.theader{width: 100%;height: 100%;background-color: #F0F3F5;}
+	.theader div,.tbodyCol div{float: left;height: 100%;line-height: 2.125rem;text-align: center;}
+	.tbodyCol div:nth-child(1),.theader div:nth-child(1){width: 20%;}
+	.tbodyCol div:nth-child(2),.theader div:nth-child(2){width: 20%;}
+	.tbodyCol div:nth-child(3),.theader div:nth-child(3){width: 50%;}
+	.tbodyCol div:nth-child(4),.theader div:nth-child(4){width: 10%;}
+	.shorten{white-space:nowrap;overflow:hidden; text-overflow:ellipsis;}
+	.oddNumber{background-color: #FFFFFF;}
+	.others{background-color: #F9F9F9;}
+	.operated a{cursor: pointer;color:#47B34F;}
+	.tbodyCol:hover{background-color: #F1F7F2;}
+    /*列表展示图片时需要添加*/
+    .layui-table-cell {
+        height: auto;
+    }
+
+    #add_edit_form {
+        margin-top: 20px;
+        margin-right: 20px;
+    }
+
+    #image {
+        height: 200px;
+        width: 200px;
+        margin-top: 10px;
+        border: 1px solid #e5e5e5;
+    }
+
+    input[id=addImgPut] {
+        border: 0px solid red;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        opacity: 0;
+        height: 36px;
+        width: 200px;
+    }
+
+    input[id=addImgPut] :hover {
+        cursor: pointer;
+    }
+
+    .layui-form-label {
+        width: 60px;
+    }
+
+    .layui-form-item .layui-input-inline {
+        margin-right: 0px;
+    }
+</style>

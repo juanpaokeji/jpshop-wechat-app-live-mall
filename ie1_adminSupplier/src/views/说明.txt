@@ -1,0 +1,5 @@
+ApplicationGroup
+    应用模块
+SMSManagement	    短信模块
+StaffManagement	    后台用户模块
+UserManagement	    商户模块

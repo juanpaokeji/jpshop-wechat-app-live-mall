@@ -1,0 +1,244 @@
+<title>砍价</title>
+<div class="layui-fluid">
+    <div class="layui-tab" lay-filter="assemble_list">
+        <ul class="layui-tab-title">
+            <li class="layui-this" lay-id="1">砍价配置</li>
+            <li lay-id="2">活动管理</li>
+            <li lay-id="3">发起砍价记录</li>
+            <li lay-id="4">订单管理</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <div class="layui-fluid">
+                    <div class="layui-col-md12">
+                        <form class="layui-form" id="add_edit_form">
+                            <div class="layui-form-item layui-col-md10 pic">
+                                <label class="layui-form-label">
+                                    <span class="asterisk">*</span>轮播图
+                                </label>
+                                <div class="layui-input-block">
+                                    <span class="layui-col-md12 Commodity_figure">
+                                        <a id="putAddBtn" href="javascript: void(0)">
+                                            <i class="layui-icon layui-icon-face-smile">&#xe61f;</i>
+                                            添加图片
+                                        </a>
+                                        <img id="image">
+                                        <div class="layui-upload-list" id="images"
+                                             style="display: flex;flex-direction: row;justify-content: flex-start;">
+                                        </div>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <span style="margin-left:5.6vw;">建议尺寸：750*750，最多上传 5 张</span>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">海报图</label>
+                                <div class="layui-input-block">
+                                    <a class="layui-btn layui-col-md1 addImgPut">上传</a>
+                                    <p style="height: 40px;"></p>
+                                    <div id="image1"></div>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <a class="layui-btn" id="btn" lay-submit lay-filter="sub_config">保存</a>
+                                    <!--<button type="reset" class="layui-btn layui-btn-primary">重置</button>-->
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-tab-item">
+                <div class="layui-fluid">
+                    <div class="layui-col-md12">
+                        <form class="layui-form layui-col-md11">
+                            <div class="layui-form-item">
+                                <div class="layui-input-inline">
+                                    <input type="text" name="searchName" placeholder="请输入" autocomplete="off"
+                                           class="layui-input">
+                                </div>
+                                <div class="layui-input-inline">
+                                    <a class="layui-btn" lay-submit lay-filter="find">查询</a>
+                                </div>
+                            </div>
+                        </form>
+                        <a class="layui-btn layui-col-md1" lay-submit lay-filter="showAdd">新增</a>
+                    </div>
+                    <!--数据表格-->
+                    <div class="layui-col-md12">
+                        <table id="pageTable1" lay-filter="pageTable1" lay-data="{id: 'pageTable1'}">
+                        </table>
+                    </div>
+                    <!--商品数据表格-->
+                    <div class="layui-col-md12 goods_div" style="display: none;">
+                        <table id="pageTableGoods" lay-filter="pageTableGoods" lay-data="{id: 'pageTableGoods'}">
+                        </table>
+                        <a class="layui-btn" lay-submit lay-filter="add_goods_info">填写砍价信息</a>
+                    </div>
+                    <!--砍价信息-->
+                    <form class="layui-form" id="goods_info" style="margin-top: 20px">
+                        <div class="bargain_info"></div>
+                        <div class="layui-input-inline" style="margin-bottom: 20px;">
+                            <a class="layui-btn" lay-submit lay-filter="sub_goods" style="margin-left: 110px;">保存</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="layui-tab-item">
+                <div class="layui-tab-item layui-show">
+                    <div class="layui-fluid">
+                        <div class="layui-col-md12">
+                            <form class="layui-form layui-col-md11">
+                                <div class="layui-form-item">
+                                    <div class="layui-input-inline">
+                                        <input type="text" name="searchName" placeholder="请输入名称"
+                                               autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-input-inline">
+                                        <a class="layui-btn" lay-submit lay-filter="find">查询</a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <!--数据表格-->
+                        <div class="layui-col-md12">
+                            <table id="pageTable2" lay-filter="pageTable2" lay-data="{id: 'pageTable2'}"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--弹出层-->
+            <form class="layui-form" style='display:none;' id="pageTable2_form">
+                <!--数据表格-->
+                <div class="layui-col-md12">
+                    <table id="pageTable21" lay-filter="pageTable21" lay-data="{id: 'pageTable21'}"></table>
+                </div>
+            </form>
+            <div class="layui-tab-item">
+                <div class="layui-tab-item layui-show">
+                    <div class="layui-fluid">
+                        <div class="layui-col-md12">
+                            <form class="layui-form layui-col-md11">
+                                <div class="layui-form-item">
+                                    <div class="layui-input-inline">
+                                        <input type="text" name="searchName" placeholder="请输入名称"
+                                               autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-input-inline">
+                                        <a class="layui-btn" lay-submit lay-filter="find">查询</a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <!--数据表格-->
+                        <div class="layui-col-md12">
+                            <table id="pageTable3" lay-filter="pageTable3" lay-data="{id: 'pageTable3'}">
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="introduce_images"></div>
+<script type="text/javascript" src="./src/lib/common.js"></script>
+<script type="text/javascript">
+    layui.use('voucher/bargain', layui.factory('voucher/bargain'));
+</script>
+<!--状态码模板-->
+<script type="text/html" id="statusTp3">
+    {{#  if(d.status == '0'){ }}
+    <span class="layui-col-md8">待付款</span>
+    {{#  } else if(d.status == '1'){ }}
+    <span class="layui-col-md8">待发货</span>
+    {{#  } else if(d.status == '2'){ }}
+    <span class="layui-col-md8">已取消</span>
+    {{#  } else if(d.status == '3'){ }}
+    <span class="layui-col-md8">已发货</span>
+    {{#  } else if(d.status == '4'){ }}
+    <span class="layui-col-md8">已退款</span>
+    {{#  } else if(d.status == '5'){ }}
+    <span class="layui-col-md8">退款中</span>
+    {{#  } else if(d.status == '6'){ }}
+    <span class="layui-col-md8">待评价</span>
+    {{#  } else if(d.status == '7'){ }}
+    <span class="layui-col-md8">已完成</span>
+    {{#  } else if(d.status == '8'){ }}
+    <span class="layui-col-md8">已删除</span>
+    {{#  } else if(d.status == '9'){ }}
+    <span class="layui-col-md8">退款成功</span>
+    {{#  } else if(d.status == '11'){ }}
+    <span class="layui-col-md8">拼团中</span>
+    {{#  } else { }}
+    <span class="layui-col-md8">类型错误</span>
+    {{#  } }}
+</script>
+<!--发起砍价记录图片模板-->
+<script type="text/html" id="imgTpl">
+    <img class="layui-upload-img" style="width:40px; height:40px"
+         src={{ d.pic_url }}>
+</script>
+<!--帮砍记录图片模板-->
+<script type="text/html" id="avatarImg">
+    <img class="layui-upload-img" style="width:40px; height:40px"
+         src={{ d.avatar }}>
+</script>
+<!-- 发起砍价记录操作 -->
+<script type="text/html" id="operations">
+    <a class="layui-btn layui-btn-xs" lay-event="record">帮砍记录</a>
+</script>
+<!-- 发起砍价记录操作 -->
+<script type="text/html" id="operations_goods">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>
+    <a class="layui-btn layui-btn-xs" lay-event="del">删除</a>
+</script>
+<style>
+    /*列表展示图片时需要添加*/
+    .layui-table-cell {
+        height: auto;
+    }
+
+    .images {
+        width: 160px;
+        margin: 0 10px 0 10px;
+    }
+    .bargainImg {
+        width: 150px;
+        height: 150px;
+        cursor: pointer;
+    }
+
+    .deleteIcon {
+        position: absolute;
+        cursor: pointer;
+        color: black;
+    }
+
+    #image1 {
+        height: 150px;
+        width: 150px;
+        margin-top: 10px;
+        border: 1px solid #e5e5e5;
+    }
+
+    input[id=addImgPut1] {
+        border: 0px solid red;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        opacity: 0;
+        height: 36px;
+        width: 200px;
+    }
+
+    input[id=addImgPut1] :hover {
+        cursor: pointer;
+    }
+
+    #pageTable2_form .layui-table-cell {
+        width: 150px;
+    }
+</style>

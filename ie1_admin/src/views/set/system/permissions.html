@@ -1,0 +1,131 @@
+<title>网站设置</title>
+  
+<div class="layui-fluid">
+	<div class="layui-tab">
+		<ul class="layui-tab-title">
+			<li class="layui-this">权限列表</li>
+			<li>添加/编辑权限</li>
+		</ul>
+		
+		<div class="layui-tab-content">
+			<div class="layui-tab-item layui-show">
+				<table id="views_set_system_permissions_table" lay-filter="views_set_system_permissions_table" lay-data="{id: 'views_set_system_permissions_table'}"></table>
+			</div>
+			<div class="layui-tab-item">
+				<div class="layui-card">
+					<form class="layui-form">
+						<div class="layui-form-item">
+							<label class="layui-form-label">权限名称</label>
+							<div class="layui-input-block">
+								 <input type="text" name="name" required lay-verify="required" placeholder="权限名称" autocomplete="off" class="layui-input">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">权限标题</label>
+							<div class="layui-input-block">
+								 <input type="text" name="title" required lay-verify="required" placeholder="权限标题" autocomplete="off" class="layui-input">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">菜单路由</label>
+							<div class="layui-input-block">
+								 <input type="text" name="Router" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">权限类型</label>
+							<div class="layui-input-block">
+								<select required lay-verify="required" name="rule_type">
+									<option value="">请选择权限类型</option>
+									<option value="1">操作</option>
+									<option value="2">页面</option>
+									<option value="3">模块</option>
+								</select>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">父级权限</label>
+							<div class="layui-input-block">
+								 <select  name="parentpermission">
+									<option value="">请选择父级权限</option>
+									<option value="1">操作</option>
+									<option value="2">页面</option>
+									<option value="3">模块</option>
+								</select>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">排序权重</label>
+							<div class="layui-input-block">
+								 <input type="text" name="Sort" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">类型</label>
+							<div class="layui-input-block">
+								 <input type="text" name="type" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">状态</label>
+							<div class="layui-input-block">
+								<input type="checkbox" name="Status" value='1' lay-skin="switch" lay-text="开启|关闭">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">图标</label>
+							<div class="layui-input-inline">
+								<input type="text" name="icon" required lay-verify="required" placeholder="请输入图标对应的class" autocomplete="off" class="layui-input">
+							</div>
+							<div class="layui-form-mid layui-word-aux"><a href="./icon.html" target="_blank" style="color:#999">图标对应class参考地址:icon</a></div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">触发条件</label>
+							<div class="layui-input-block">
+								<input type="text" name="Conditions" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+							</div>
+						</div>
+						<!--提交按钮-->
+						<div class="layui-form-item">
+							<div class="layui-input-block">
+								<div class="layui-footer">
+									<a class="layui-btn" lay-submit lay-filter="sub">立即提交</a>
+									<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!--表格工具条-->
+<script type="text/html" id="opreationes">
+  <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+<!--类型模板-->
+<script type="text/html" id="statusTpl">
+  {{#  if(d.status === '0'){ }}
+    <span >操作</span>
+	{{# } else if(d.status === '1'){ }}
+    <span >页面</span>
+  {{#  } else { }}
+    <span >模块</span>
+  {{#  } }}
+</script>
+
+<!--状态码模板-->
+<script type="text/html" id="statusTpl">
+  {{#  if(d.status === '1'){ }}
+    <span class="layui-btn layui-btn-xs layui-col-md8 layui-col-md-offset2">启用</span>
+  {{#  } else { }}
+    <span class="layui-btn layui-btn-xs layui-col-md8 layui-col-md-offset2 layui-btn-disabled">未启用</span>
+  {{#  } }}
+</script>
+
+<script>
+layui.use('views_set_system_permissions', layui.factory('views_set_system_permissions'));
+</script>

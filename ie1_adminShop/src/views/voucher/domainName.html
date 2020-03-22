@@ -1,0 +1,21 @@
+<title>自定义域名</title>
+<div class="layui-fluid">
+    <form class="layui-form" id="add_edit_form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">文本</label>
+            <div class="layui-input-inline">
+                <input name="name" required lay-verify="required" placeholder="请输入文本名称" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" id="btn" lay-submit lay-filter="sub">提交</a>
+            </div>
+        </div>
+    </form>
+</div>
+<!--添加/编辑签名-->
+<script type="text/javascript">
+    layui.use('voucher/domainName', layui.factory('voucher/domainName'));
+</script>
+<link type="text/css" rel="styleSheet" href="./src/style/model.css"/>

@@ -1,0 +1,395 @@
+<title>model</title>
+<div class="layui-fluid">
+    <div class="layui-col-md12">
+        <div class="ivu-card-body">
+            <form autocomplete="off" class="ivu-form ivu-form-label-right ivu-form-inline layui-form">
+                <div class="ivu-form-item">
+                    <!---->
+                    <div class="ivu-form-item-content" style="margin-left: 1px;">
+                        <div class="search-keyword ivu-input-wrapper ivu-input-wrapper-default ivu-input-type ivu-input-group ivu-input-group-default ivu-input-group-with-prepend"
+                            style="width: 338px;">
+                            <div class="ivu-input-group-prepend" style="">
+                                <div class="keyword-type ivu-select ivu-select-single ivu-select-default">
+                                    <div tabindex="0" class="ivu-select-selection">
+                                        <input type="hidden" value="order_no">
+                                        <div>
+                                            <span class="ivu-select-selected-value">
+                                                <select name="searchNameType" id="searchNameType">
+                                                    <option value="1">订单号</option>
+                                                    <option value="2">姓名</option>
+                                                    <option value="3">手机号</option>
+                                                </select>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!---->
+                            <i class="ivu-icon ivu-icon-ios-loading ivu-load-loop ivu-input-icon ivu-input-icon-validate"></i>
+                            <input autocomplete="off" spellcheck="false" type="text" placeholder="" class="ivu-input ivu-input-default">
+                            <!---->
+                        </div>
+                        <!---->
+                    </div>
+                </div>
+                <div class="ivu-form-item">
+                    <label class="ivu-form-item-label" style="width: 70px;">商品名称</label>
+                    <div class="ivu-form-item-content" style="margin-left: 70px;">
+                        <div class="width-270 ivu-input-wrapper ivu-input-wrapper-default ivu-input-type">
+                            <!---->
+                            <!---->
+                            <i class="ivu-icon ivu-icon-ios-loading ivu-load-loop ivu-input-icon ivu-input-icon-validate"></i>
+                            <input name="searchName" autocomplete="off" spellcheck="false" type="text" placeholder="请输入商品标题"
+                                class="ivu-input ivu-input-default">
+                            <!---->
+                        </div>
+                        <!---->
+                    </div>
+                </div>
+                <!--<div class="ivu-form-item">-->
+                <!--<label class="ivu-form-item-label" style="width: 70px;">订单状态(退款中)</label>-->
+                <!--<div class="ivu-form-item-content" style="margin-left: 70px;">-->
+                <!--<div class="width-270 ivu-select ivu-select-single ivu-select-default">-->
+                <!--<div tabindex="0" class="ivu-select-selection">-->
+                <!--&lt;!&ndash;<input type="hidden" value="">&ndash;&gt;-->
+                <!--<div>-->
+                <!--<span class="ivu-select-placeholder">-->
+                <!--<select name="status" id="status">-->
+                <!--<option value="">未选定</option>-->
+                <!--<option value="0">待付款</option>-->
+                <!--<option value="1">待发货</option>-->
+                <!--<option value="2">已关闭</option>-->
+                <!--<option value="3">已发货</option>-->
+                <!--<option value="5">退款中</option>-->
+                <!--<option value="6">已完成</option>-->
+                <!--</select>-->
+                <!--</span>-->
+                <!--&lt;!&ndash;&ndash;&gt; &lt;!&ndash;&ndash;&gt;-->
+                <!--</div>-->
+                <!--</div>-->
+                <!--</div> &lt;!&ndash;&ndash;&gt;-->
+                <!--</div>-->
+                <!--</div>-->
+
+                <div class="ivu-form-item">
+                    <label class="ivu-form-item-label" style="width: 70px;">退款状态</label>
+                    <div class="ivu-form-item-content" style="margin-left: 70px;">
+                        <div class="width-270 ivu-select ivu-select-single ivu-select-default">
+                            <div tabindex="0" class="ivu-select-selection">
+                                <input type="hidden" value="">
+                                <div>
+                                    <span class="ivu-select-placeholder">
+                                        <select name="after_sale" id="after_sale">
+                                            <option value="">未选定</option>
+                                            <option value="0">退款中</option>
+                                            <option value="1">退款成功</option>
+                                            <option value="2">退款失败</option>
+                                        </select>
+                                    </span>
+                                    <!---->
+                                    <!---->
+                                </div>
+                            </div>
+                        </div>
+                        <!---->
+                    </div>
+                </div>
+                <div>
+                    <div class="ivu-form-item">
+                        <!---->
+                        <div class="ivu-form-item-content" style="margin-left: 1px;">
+                            <div class="date-search clearfix">
+                                <div class="select search-sendType ivu-select ivu-select-single ivu-select-default"
+                                    style="width:77px;margin-left: 15px;">
+                                    <label class="ivu-form-item-label" style="width: 70px;">下单时间</label>
+                                </div>
+                                <div class="ivu-date-picker" style="width: 230px;">
+                                    <div class="ivu-date-picker-rel">
+                                        <div class="ivu-input-wrapper ivu-input-wrapper-default ivu-input-type ivu-date-picker-editor">
+                                            <!---->
+                                            <i class="ivu-icon ivu-icon-ios-calendar-outline ivu-input-icon ivu-input-icon-normal"></i>
+                                            <!---->
+                                            <input name="start_time" id="start_time" autocomplete="off" spellcheck="false"
+                                                type="text" placeholder="开始时间" class="ivu-input ivu-input-default">
+                                            <!---->
+                                        </div>
+                                    </div>
+                                    <!---->
+                                </div>
+                            </div>
+                            <!---->
+                        </div>
+                    </div>
+                    <span class="to">至</span>
+                    <div class="ivu-form-item">
+                        <!---->
+                        <div class="ivu-form-item-content" style="margin-left: 1px;">
+                            <div class="ivu-date-picker" style="width: 230px;">
+                                <div class="ivu-date-picker-rel">
+                                    <div class="ivu-input-wrapper ivu-input-wrapper-default ivu-input-type ivu-date-picker-editor">
+                                        <!---->
+                                        <i class="ivu-icon ivu-icon-ios-calendar-outline ivu-input-icon ivu-input-icon-normal"></i>
+                                        <!---->
+                                        <input name="end_time" id="end_time" autocomplete="off" spellcheck="false" type="text"
+                                            placeholder="结束时间" class="ivu-input ivu-input-default">
+                                        <!---->
+                                    </div>
+                                </div>
+                                <!---->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ivu-form-item">
+                        <!---->
+                        <div class="ivu-form-item-content" style="margin-left: 1px;">
+                            <div class="date-search clearfix">
+                                <div class="select search-sendType ivu-select ivu-select-single ivu-select-default"
+                                    style="width:117px;">
+                                    <a class="recently seven_day">近7天</a>
+                                    <a class="recently thirty_day">近30天</a>
+                                </div>
+                            </div>
+                            <!---->
+                        </div>
+                    </div>
+                    <a class="layui-btn" lay-submit lay-filter="find">查询</a>
+                </div>
+            </form>
+        </div>
+        <!--数据表格-->
+        <div class="layui-col-md12">
+            <table id="pageTable" lay-filter="pageTable" lay-data="{id: 'pageTable'}"></table>
+        </div>
+        <!--子订单数据表格-->
+        <div class="layui-col-md12" style="display: none" id="suborder">
+            <!--买家：Hans  订单总价：100  优惠金额：10  付款总额：90  下单时间：2018-11-06 19:21:30-->
+            <!--订单状态：待付款  售后状态：未售后  备注：123123  管理员备注：12312-->
+            <div class="childOrders">
+                <div class="orderChilds">
+                    <div class="buyers">
+                        <h5>买家：</h5>
+                        <span class="buyersData" id="su_nickname"></span>
+                    </div>
+                    <div class="buyers">
+                        <h5>订单总价：</h5>
+                        <span class="buyersData" id="total_price"></span>
+                    </div>
+                    <div class="buyers">
+                        <h5>优惠金额：</h5>
+                        <span class="buyersData" id="sv_price"></span>
+                    </div>
+                    <div class="buyers">
+                        <h5> 付款总额： </h5>
+                        <span class="buyersData" id="payment_money"></span>
+                    </div>
+                    <div class="buyers">
+                        <h5>下单时间：</h5>
+                        <span class="buyersData" id="create_time"></span>
+                    </div>
+                </div>
+                <div class="orderStatus">
+                    <div class="buyers">
+                        <h5>订单状态：</h5>
+                        <span class="buyersData" id="order_status"></span>
+                    </div>
+                    <div class="buyers">
+                        <h5>退款状态： </h5>
+                        <span class="buyersData" id="order_after_sale"></span>
+                    </div>
+                    <div class="buyers">
+                        <h5>备注： </h5>
+                        <span class="buyersData" id="remark"></span>
+                    </div>
+                    <div class="managementNote">
+                        <h5>管理员备注：</h5>
+                        <span class="buyersData" id="admin_remark"></span>
+                    </div>
+                </div>
+            </div>
+            <table id="suborderPageTable" lay-filter="suborderPageTable" lay-data="{id: 'suborderPageTable'}"></table>
+        </div>
+        <!--发货页面-->
+        <form class="layui-form" style='display:none;width:30vw;padding-top:10px;' id="send_form">
+            <div class="layui-form-item">
+                <label class="layui-form-label">快递名称</label>
+                <div class="layui-input-block">
+                    <select name="express_id" id="express_id"> </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">快递单号</label>
+                <div class="layui-input-block">
+                    <input name="express_number" required lay-verify="required" placeholder="请输入快递单号" class="layui-input"
+                        style="width: 50%;">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <a class="layui-btn" lay-submit lay-filter="expressSub">提交</a>
+                </div>
+            </div>
+        </form>
+        <!--退款详情页面 需要展示申请退款信息-->
+        <form class="layui-form" style='display:none;width:30vw;padding-top:10px;' id="after_sale_form">
+            <div class="layui-form-item">
+                <label class="layui-form-label">退款类型</label>
+                <div class="layui-input-block">
+                    <span id="after_type"></span>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">退款理由</label>
+                <div class="layui-input-block">
+                    <span id="after_remark"></span>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">退款图片</label>
+                <div class="layui-input-block">
+                    <span id="after_imgs"></span>
+                </div>
+            </div>
+            <!--已发货同意退款-->
+            <div class="after_sale_agree_info" style="display: none;">
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <a class="layui-btn" lay-submit lay-filter="confirmation_of_receipt">确认收货</a>
+                    </div>
+                </div>
+            </div>
+            <!--拒绝退款-->
+            <div class="after_sale_refuse_info" style="display: none;">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">拒绝说明</label>
+                    <div class="layui-input-block">
+                        <span id="after_admin_remark"></span>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">拒绝图片</label>
+                    <div class="layui-input-block">
+                        <span id="after_admin_imgs"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item after_sale_operation">
+                <div class="layui-input-block">
+                    <a class="layui-btn" lay-submit lay-filter="agree_refund">同意退款</a>
+                    <a class="layui-btn" lay-submit lay-filter="refuse_refund">拒绝退款</a>
+                </div>
+            </div>
+        </form>
+        <!--拒绝页面弹窗-->
+        <form class="layui-form refused_page" id="refuse_form">
+            <div class="layui-form-item">
+                <label class="layui-form-label">拒绝说明</label>
+                <div class="layui-input-block">
+                    <textarea name="after_admin_remark" required lay-verify="required" placeholder="请输入拒绝说明" class="layui-input text_area"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item layui-col-md10 layui-col-md-offset2 pic">
+                <label class="layui-form-label">拒绝图片</label>
+                <div class="layui-input-block">
+                    <a id="putAddBtn">
+                        <i class="layui-icon layui-icon-face-smile">&#xe61f;</i>
+                        添加图片</a>
+                    <span class="layui-col-md6 refused_pictures">
+                        <img id="image">
+                        <div class="layui-upload-list refuse_picture" id="images"></div>
+                    </span>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <a class="layui-btn" lay-submit lay-filter="refuse">确定</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!--添加/编辑签名-->
+<script type="text/javascript">
+    layui.use('order/safeguardingRights', layui.factory('order/safeguardingRights'));
+</script>
+<!-- 全部 对应的菜单 -->
+<script type="text/html" id="operations">
+    <!--需要加判断显示功能 操作对应下方的状态模板 -->
+    {{#  if(d.status == '0'){ }}
+    <a class="layui-btn layui-btn-xs" lay-event="show">查看</a>
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="cancel">取消订单</a>
+    {{#  } else if(d.status == '1'){ }}
+    <a class="layui-btn layui-btn-xs" lay-event="show">查看</a>
+    <a class="layui-btn layui-btn-xs" lay-event="send">发货</a>
+    {{#  } else if(d.status == '2'){ }}
+    <a class="layui-btn layui-btn-xs" lay-event="show">查看</a>
+    {{#  } else if(d.status == '3'){ }}
+    <a class="layui-btn layui-btn-xs" lay-event="show">查看</a>
+    {{#  } else if(d.status == '4'){ }}
+    <a class="layui-btn layui-btn-xs" lay-event="show">查看</a>
+    {{#  } else if(d.status == '5'){ }}
+    <a class="layui-btn layui-btn-xs" lay-event="show_after_sale">退款详情</a>
+    {{#  } else if(d.status == '6'){ }}
+    <a class="layui-btn layui-btn-xs" lay-event="show">查看</a>
+    {{#  } else if(d.status == '7'){ }}
+    <a class="layui-btn layui-btn-xs" lay-event="show">查看</a>
+    {{#  } else { }}
+    <span class="layui-col-md8">类型错误</span>
+    {{#  } }}
+</script>
+<!--退款模板-->
+<script type="text/html" id="afterSaleTpl">
+    {{#  if(d.after_sale == '-1'){ }}
+    <span class="layui-col-md8">未退款</span>
+    {{#  } else if(d.after_sale == '0'){ }}
+    <span class="layui-col-md8">退款中</span>
+    {{#  } else if(d.after_sale == '1'){ }}
+    <span class="layui-col-md8">退款成功</span>
+    {{#  } else if(d.after_sale == '2'){ }}
+    <span class="layui-col-md8">退款失败</span>
+    {{#  } else { }}
+    <span class="layui-col-md8">类型错误</span>
+    {{#  } }}
+</script>
+<!--主订单状态模板-->
+<script type="text/html" id="statusTpl">
+    {{#  if(d.status == '0'){ }}
+    <span class="layui-col-md8">待付款</span>
+    {{#  } else if(d.status == '1'){ }}
+    <span class="layui-col-md8">待发货</span>
+    {{#  } else if(d.status == '2'){ }}
+    <span class="layui-col-md8">已取消</span>
+    {{#  } else if(d.status == '3'){ }}
+    <span class="layui-col-md8">已发货</span>
+    {{#  } else if(d.status == '4'){ }}
+    <span class="layui-col-md8">已退款</span>
+    {{#  } else if(d.status == '5'){ }}
+    <span class="layui-col-md8">退款中</span>
+    {{#  } else if(d.status == '6'){ }}
+    <span class="layui-col-md8">待评价</span>
+    {{#  } else if(d.status == '7'){ }}
+    <span class="layui-col-md8">已完成</span>
+    {{#  } else { }}
+    <span class="layui-col-md8">类型错误</span>
+    {{#  } }}
+</script>
+<!--实付金额模板-->
+<script type="text/html" id="paymentMoneyTpl">
+    <span class="layui-col-md8">{{ parseFloat(d.payment_money) }}</span>
+</script>
+<!--总额模板-->
+<script type="text/html" id="totalPriceTpl">
+    <span class="layui-col-md8">{{ parseFloat(d.total_price) }}</span>
+</script>
+<!--优惠金额模板-->
+<script type="text/html" id="svPriceTpl">
+    <span class="layui-col-md8">{{ parseFloat(d.sv_price) }}</span>
+</script>
+<!--图片模板-->
+<script type="text/html" id="imgTpl">
+    <img class="layui-upload-img" style="width:40px; height:40px"
+         src={{ d.pic_urls }}>
+</script>
+
+<link type="text/css" rel="styleSheet" href="./src/style/order/list.css" />
+<link type="text/css" rel="styleSheet" href="./src/style/order/safeguardingRights.css" />
+<script type="text/javascript" src="./src/lib/common.js"></script>

@@ -1,0 +1,73 @@
+<title>公众号支付配置</title>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <form class="layui-form">
+                <div class="layui-form-item layui-row">
+                    <label class="layui-form-label">标题</label>
+                    <div class="layui-input-inline">
+                        <input name="title" required lay-verify="required" placeholder="请输入标题"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">支付方式</label>
+                    <div class="layui-input-block">
+                        <input type="radio" name="pay_type" value="1" title="微信" checked/>
+                        <!--<input type="radio" name="pay_type" value="2" title="支付宝"/>-->
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">商户类型</label>
+                    <div class="layui-input-block">
+                        <input type="radio" name="merchant_type" value="1" title="普通商户" checked/>
+                        <!--<input type="radio" name="merchant_type" value="2" title="子商户"/>-->
+                    </div>
+                </div>
+                <div class="layui-form-item layui-row">
+                    <label class="layui-form-label">公众账号appid</label>
+                    <div class="layui-input-inline">
+                        <input name="APPID" required lay-verify="required" placeholder="请输入公众账号appid"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item layui-row">
+                    <label class="layui-form-label">商户号</label>
+                    <div class="layui-input-inline">
+                        <input name="MCHID" required lay-verify="required" placeholder="请输入商户号"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">支付密钥</label>
+                    <div class="layui-input-inline">
+                        <input name="pay_key" required lay-verify="required" placeholder="请输入支付密钥"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">证书CERT</label>
+                    <div class="layui-input-inline">
+                        <input type="file" class="layui-btn" id="SSLCERT_PATH" name="SSLCERT_PATH"/>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">证书KEY</label>
+                    <div class="layui-input-inline">
+                        <input type="file" class="layui-btn" id="SSLKEY_PATH" name="SSLKEY_PATH"/>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-inline">
+                        <a class="layui-btn" lay-submit="" lay-filter="sub">保存</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use('wechat/pay', layui.factory('wechat/pay'));
+</script>

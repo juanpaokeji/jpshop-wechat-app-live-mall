@@ -1,0 +1,181 @@
+<title>小程序上传发布</title>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="applet_state">
+            小程序状态：<span class="status"></span>
+            <a class="withdraw" style="display: none; margin-left: 10px; font-size: 1rem; color: #1e90ff;" href="javascript: void(0)">撤回审核</a>
+        </div>
+        <div class="applet_state">
+            当前为：<span class="localVersion">无</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            最新为：<span class="serverVersion">无</span>
+        </div>
+        <div class="layui-col-md4 upload_status_l">
+            <div>
+                <img src="./src/images/wechat/上传.png"/>
+            </div>
+            <a class="upload">上传 </a>
+        </div>
+        <div class="layui-col-md4 upload_status_m">
+            <div>
+                <img src="./src/images/wechat/审核.png"/>
+            </div>
+            <a class="examine">提交审核</a>
+        </div>
+        <div class="layui-col-md4 upload_status_r">
+            <div>
+                <img src="./src/images/wechat/发布.png"/>
+            </div>
+            <a class="release">发布</a>
+        </div>
+        <div class="applet_states">
+            <img style="width: 150px; height: 150px;" class="qrCodeImg"/>
+            <a class="qrCode">点击获取</a>
+            上传成功后可点此处获取临时体验码
+        </div>
+    </div>
+    <!--弹出层-->
+    <form class="layui-form" style='display:none;' id="add_edit_form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">版本描述</label>
+            <div class="layui-input-inline">
+                <textarea name="describe" required lay-verify="required" placeholder="请输入版本描述"
+                          class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" id="btn" lay-submit lay-filter="sub">提交</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    layui.use('miniProgram/formal', layui.factory('miniProgram/formal'));
+</script>
+<script type="text/javascript" src="./src/lib/common.js"></script>
+<script type="text/javascript" src="./jquery.min.js"></script>
+<link type="text/css" rel="styleSheet" href="./src/style/wechat/base.css"/>
+<style>
+    .applet_state {
+        display: flex;
+        justify-content: center;
+        font-size: 1.2rem;
+        margin-top: 50px;
+        color: #000;
+    }
+
+    .upload_status_l {
+        text-align: right;
+        margin-top: 50px;
+    }
+
+    .upload_status_l img {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 20px;
+    }
+
+    .upload_status_m {
+        text-align: center;
+        margin-top: 50px;
+    }
+
+    .upload_status_m img {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 20px;
+    }
+
+    .upload_status_r {
+        text-align: left;
+        margin-top: 50px;
+    }
+
+    .upload_status_r img {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 20px;
+    }
+
+    .upload {
+        padding-right: 38px;
+        border: 1px solid #ddd;
+        padding: 10px 35px;
+        border-radius: 4px;
+        background: #eee;
+    }
+
+    .upload:hover {
+        padding-right: 38px;
+        border: 1px solid #1e90ff;
+        padding: 10px 35px;
+        border-radius: 4px;
+        background: #1e90ff;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .examine {
+        border: 1px solid #ddd;
+        padding: 10px 35px;
+        border-radius: 4px;
+        background: #eee;
+    }
+
+    .examine:hover {
+        border: 1px solid #1e90ff;
+        padding: 10px 35px;
+        border-radius: 4px;
+        background: #1e90ff;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .release {
+        padding-left: 38px;
+        border: 1px solid #ddd;
+        padding: 10px 35px;
+        border-radius: 4px;
+        background: #eee;
+    }
+
+    .release:hover {
+        padding-left: 38px;
+        border: 1px solid #1e90ff;
+        padding: 10px 35px;
+        border-radius: 4px;
+        background: #1e90ff;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .applet_states {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        font-size: 1.2rem;
+        /* margin-top:200px; */
+        color: #000;
+        align-items: center;
+        height: 15vw;
+        margin-top: 14vw;
+        cursor: pointer;
+    }
+
+    .applet_states a {
+        padding-right: 38px;
+        border: 1px solid #1e90ff;
+        padding: 10px 35px;
+        border-radius: 4px;
+        background: #1e90ff;
+        color: #fff;
+        font-size: 1rem;
+    }
+
+    #add_edit_form {
+        margin-top: 20px;
+        margin-right: 20px;
+    }
+</style>

@@ -1,0 +1,92 @@
+<title>打印模板</title>
+<div class="layui-fluid">
+    <div class="layui-tab layui-tab-brief" lay-filter="tab">
+        <ul class="layui-tab-title">
+            <li class="layui-this">我的模板</li>
+            <li>系统模板</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+				<div class="template-content">
+					<div class="search-template">
+						<form class="layui-form">
+							<div class="layui-form-item">
+								<div class="search-content">
+									<label class="layui-form-label">模板标签:</label>
+									<div class="layui-input-inline">
+										<input type="text" name="name" lay-verify="name" autocomplete="off" placeholder="请输入模板标签" class="layui-input myName">
+									</div>
+									<label class="search-templates mySearch">
+										<i class="layui-icon layui-icon-search"></i>
+									</label>
+								</div>
+								
+							</div>
+						</form>
+					</div>
+					<div class="template-liist">
+						<ul class="layui-row myTempltes">							
+						</ul>
+					</div>
+				</div>
+			</div>
+            <div class="layui-tab-item">
+				
+				<div class="template-content">
+					<div class="search-template">
+						<form class="layui-form">
+							<div class="layui-form-item">
+								<div class="search-content">
+									<label class="layui-form-label">模板标签:</label>
+									<div class="layui-input-inline">
+										<input type="text" name="name" lay-verify="name" autocomplete="off" placeholder="请输入模板标签" class="layui-input sysName">
+									</div>
+									<label class="search-templates sysSearch">
+										<i class="layui-icon layui-icon-search"></i>
+									</label>
+								</div>
+								
+							</div>
+						</form>
+					</div>
+					<div class="template-liist">
+						<ul class="layui-row sysTemplates">							
+						</ul>
+					</div>
+				</div>
+				
+			</div>
+        </div>
+    </div>
+</div>
+<!--添加/编辑签名-->
+<script type="text/javascript">
+    layui.use('decoration', layui.factory('decoration'));
+</script>
+<style>
+	.template-content{width: 100%;height: 100%;}
+	/* 模板查询 */
+	.search-template{width: 100%;height: 4.375rem;}
+	.search-content{height: 2.375rem;width: 31.25rem;margin-left: 37.5rem;}
+	.search-content .layui-form-label{line-height: 1.25rem;}
+	.search-templates{width: 2.125rem;height: 2.125rem;float: left;border: 0.0625rem solid #DEDFE3;background-color: #EBEBEB;border-radius: 0.1875rem;cursor: pointer;}
+	.search-templates i{font-size: 1.25rem;line-height: 2.125rem;margin-left: 0.4375rem;}
+	.template-liist{width: 100%;height: auto;}
+	.template-liist ul{padding-left: 0.625rem;}
+	.template-liist ul li{list-style: none;margin: 1.25rem 2.8125rem;width: 14.625rem;height: 30.625rem;float: left;}
+	.template-liist ul li img{width:100%;height: 100%;overflow: hidden;}
+	.mask{width: 14.75rem;height: 28.125rem;position: relative;z-index: 10000;top: -29.75rem;display: inline-block;border-radius: 1.4375rem;}
+	.layui-row li a:hover{background:rgba(0,0,0,0.5)}
+	.btnGroup{width: 100%;height: 100%;display: none;}
+	.img-border{margin: 0.0625rem;height: 28.125rem;width: 100%;background: no-repeat;background-size: 104% 104%;background-position: -7px -6px;}
+	.enable-text{display: inline-block;position: relative;top: -3.125rem;left: 10.625rem;border: 0 solid !important;z-index: 10000;visibility:hidden;font-size: 1.125rem;color: #5CC435;transform: rotate(-45deg);}
+	.able-border{border: 0.0625rem solid #5CC435;border-radius: 1.4375rem 1.4375rem 1.5625rem 1.5625rem;}
+	.Active{display: none;}
+	/* 编辑、删除模板 */
+	.btnGroup{padding-top: 8.75rem;}
+	.btnGroup .edit,.btnGroup .del,.btnGroup .enable,.btnGroup .selects{margin-left: 4.5rem;margin-top: 1.25rem;}
+	.selects{background-color: #6671E4;}
+	/* 选用模板 */
+	.btnGroup .select{margin-top: 10.625rem;margin-left: 4.5rem;}
+	.title{text-align: center;height: 1.25rem;font-size: 1rem;line-height: 1.25rem;margin-bottom: 1.25rem;}
+</style>

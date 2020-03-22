@@ -1,0 +1,105 @@
+<section id="uicut-app">
+    <section class="uc-section91">
+        <div class="title">编辑团长信息</div>
+        <ul class="form">
+            <li><span class="tt">头像 ：</span>
+                <div class="r">
+                    <img src="" id="avatar" alt="" class="face">
+                </div>
+            </li>
+            <li><span class="tt">昵称 ：</span>
+                <div class="r">
+                    <span class="nickname"></span>
+                </div>
+            </li>
+            <li><span class="tt">性别 ：</span>
+                <div class="r">
+                    <span class="sex"></span>
+                </div>
+            </li>
+            <li><span class="tt">手机号码 ：</span>
+                <div class="r">
+                    <input type="text" class="input" name="phone">
+                </div>
+            </li>
+            <li><span class="tt">真实姓名 ：</span>
+                <input type="text" class="input" name="realname">
+            </li>
+            <!--<li><span class="tt">微信号：</span>-->
+            <!--<input type="text" class="input" value="12563">-->
+            <!--</li>-->
+            <li><span class="tt">团员数量 ：</span>
+                <div class="r">
+                    <span class="group_num">未设置</span>
+                </div>
+            </li>
+            <li><span class="tt">上级团长 ：</span>
+                <i class="green">无（未设置）</i>
+                <!--<a href="" class="btn btn-green">更换</a>-->
+                <!--<a href="" class="btn btn-red">取消</a>-->
+            </li>
+            <li><span class="tt">自提点地区 ：</span>
+                <select name="province" id="province" class="select w33 region"></select>
+                <select name="city" id="city" class="select w33 region"></select>
+                <select name="area" id="area" class="select w33 region"></select>
+            </li>
+            <li><span class="tt">自提点小区 ：</span>
+                <input type="text" class="input" name="area_name">
+            </li>
+            <li><span class="tt">自提点地址 ：</span>
+                <input type="text" name="addr">
+                <a href="javascript:void(0)" class="btn btn-white search_map">搜索地图</a>
+            </li>
+            <li><span class="tt">自提点坐标 ：</span>
+                <input type="text" name="longitude" class="w50" disabled>
+                <input type="text" name="latitude" class="w50" disabled>
+            </li>
+            <li><span class="tt">地图定位：</span>
+                <div class="map-box">
+                    <!--<img src="group/images/map91.jpg" alt="">-->
+                    <div style="width:500px;height:450px;border:#ccc solid 1px;font-size:12px" id="map"></div>
+                </div>
+            </li>
+            <li><span class="tt">注册时间 ：</span><span id="create_time"></span></li>
+            <li><span class="tt">积分 ：</span>未设置</li>
+            <li><span class="tt">销售额 ：</span>未设置</li>
+            <li><span class="tt">是否自提 ：</span><a href="javascript:void(0)" id="is_self" class="btn-switch"></a>是/否</li>
+            <li><span class="tt">送货上门 ：</span><a href="javascript:void(0)" id="is_tuan_express_info" class="btn-switch"></a>关闭/开启</li>
+            <li><span class="tt">仓库 ：</span>
+                <select name="warehouse_id" id="warehouse_id" class="select w33 region"></select>
+            </li>
+            <li>
+                <span class="tt">配送费 ：</span>
+                <input type="text" name="tuan_express_fee">
+            </li>
+        </ul>
+        <div class="title">团长财务信息</div>
+        <ul class="form">
+            <li><span class="tt">支付宝 ：</span>
+                <input type="text" name="pay_info_ali">
+            </li>
+            <li><span class="tt">银行卡所在行 ：</span>
+                <input type="text" name="pay_info_pay_name">
+            </li>
+            <li><span class="tt">持卡姓名 ：</span>
+                <input type="text" name="pay_info_pay_realname">
+            </li>
+            <li><span class="tt">卡号 ：</span>
+                <input type="text" name="pay_info_pay_number">
+            </li>
+        </ul>
+        <div class="operate">
+            <a href="javascript:void(0)" class="btn btn-blue save">保存</a>
+        </div>
+    </section>
+</section>
+<script>
+    $("body").on('click', '.radio', function (event) {
+        event.preventDefault();
+        $(this).addClass('on').siblings().removeClass('on')
+    });
+    $("body").on('click', '.btn-switch', function (event) {
+        event.preventDefault();
+        $(this).toggleClass('on');
+    });
+</script>

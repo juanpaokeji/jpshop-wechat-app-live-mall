@@ -1,0 +1,265 @@
+
+#add_edit_form {
+    margin-top: 20px;
+    margin-right: 20px;
+}
+.asterisk{
+    color:red;
+}
+.layui-input, .layui-textarea{
+display: inline-block;
+width: 38%;
+padding-left: 10px;
+}
+/*<!--子订单数据表格-->*/
+.childOrders{
+    padding-left: 1vw;
+}
+.orderChilds{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    height: 30px;
+    line-height: 30px;
+    margin:.5vw 0;
+}
+.buyers{
+    width:19%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    height: 30px;
+    line-height: 30px;
+    border-left: 1px solid #ddd;
+    padding-left: 0.3vw;
+
+}
+.orderStatus{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    height: 30px;
+    line-height: 30px;
+
+}
+.managementNote{
+    width:30%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    height: 30px;
+    line-height: 30px;
+    border-left: 1px solid #ddd;
+    padding-left: 0.3vw;
+}
+.layui-form-select .layui-edge {
+    position: absolute;
+    left: 32%;
+    top: 50%;
+    margin-top: -3px;
+    cursor: pointer;
+    border-width: 6px;
+    border-top-color: #c2c2c2;
+    border-top-style: solid;
+    transition: all .3s;
+    -webkit-transition: all .3s;
+}
+.layui-table-cell {
+    height: 40px;
+    line-height: 40px;
+    padding: 0 15px;
+    position: relative;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+/*<!--拒绝页面弹窗-->*/
+.refused_page{
+    display:none;
+    width:30vw;
+    height:20vw;
+    padding-top:10px;
+}
+.text_area{
+    width: 16vw;
+    height: 6vw;
+    line-height: 1.5;
+    padding-top: .5vw;
+}
+#images{
+    width:100px;
+    height:100px;
+}
+.goodsImg{
+    width:100px;
+    height:100px;
+    margin: 0 5px;
+}
+.images{
+    position: relative;
+}
+.refused_pictures{
+    display:block;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    width:100%;
+}
+.refuse_picture{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+.deleteIcon{
+    position: absolute;
+    top: -14px;
+    right: 0;
+    cursor:pointer;
+}
+.layui-table-edit{
+    width:100%
+}
+
+
+/* 更改后的订单列表样式 */
+.table-choose{
+    text-align:center;
+    padding-left:0px;
+    padding-right:0px;
+    width:35px;
+}
+.table-choose-frist{
+    text-align:center;padding-left:0px;padding-right:0px;width:40px;
+}
+.table-choose-two{
+    text-align:center;padding-left:0px;padding-right:0px;width:50px;
+}
+.table-choose-three{
+    text-align:center;padding-left:0px;padding-right:0px;width:200px;
+}
+
+.table-choose-four{
+    text-align:center;padding-left:0px;padding-right:0px;width:80px;
+}
+.table-choose-five{
+    text-align:center;padding-left:0px;padding-right:0px;width:100px;
+}
+.child-title{
+    height:30px;
+}
+.child-title-td{
+      border:0;font-size: 12px; color:#6b6c6e;background: #f4f7f9
+}
+.img-list-frist{
+    letter-spacing:5px;text-align:right;display: inline-block;
+}
+.img-list-two{
+    letter-spacing:5px;text-align:right;display: inline-block;
+}
+.img-list-three{
+    letter-spacing:5px;text-align:right;display: inline-block;
+}
+.img-list-four{
+    letter-spacing:5px;text-align:right;display: inline-block;
+}
+.img-list-five{
+    letter-spacing:5px;text-align:right;display: inline-block;
+}
+/*.table#list, .table.category_table, .table#applyList, .table#HandSlideDatagrid, .table#typeDatagrid, .table#shopDatagrid, .table#topicGrid, .table#listAutoReplay, .table#productList {*/
+    /*margin-bottom: 60px;*/
+/*}*/
+.container .table {
+    margin: 0;
+    background-color: #fff;
+    color: #494e52;
+    font-size: 13px;
+}
+.table thead {
+    background-color: #f0f3f5;
+    color: #494e52;
+    font-size: 13px;
+}
+.container .table>thead>tr>th, .table>tbody>tr>td {
+    vertical-align: middle;
+}
+.container .table thead th {
+    height: 45px;
+    font-weight: normal;
+}
+
+.container .table > tbody > tr > td {
+    padding: 20px 5px;
+}
+.table>tbody>tr>td {
+    border-top: 0;
+    border-bottom: 1px solid #f0f3f5;
+}
+.container .table>thead>tr>th, .table>tbody>tr>td {
+    vertical-align: middle;
+}
+.img-list:last-child {
+    margin-bottom: -12px;
+}
+.img-list:first-child {
+    margin-top: -12px;
+}
+.img-list {
+    text-align: left;
+    padding: 5px 0;
+    overflow: hidden;
+}
+.ftx-04 {
+    color: #ff6600;
+}
+
+.hiMallDatagrid-cell .btn-a a.border-right {
+    border-right: 1px solid #dedede;
+    padding-right: 7px;
+    margin-right: 4px;
+}
+.hiMallDatagrid-cell .btn-a a {
+    padding: 0 4px;
+    white-space: nowrap;
+}
+.btn-a a, .btn-a .good-share {
+    cursor: pointer;
+    transition: all linear .2s;
+    padding: 0 5px;
+}
+.table#list .hiMallDatagrid-cell img {
+    float: left;
+}
+.table > tbody > tr > td img {
+    border-radius: 5px;
+}
+.img-list img {
+    width: 45px;
+    height: 45px;
+    margin-top: 0!important;
+}
+.table img {
+    margin-right: 10px;
+    max-width: 600px;
+}
+.hiMallDatagrid-cell {
+    text-align: center;
+}
+.td-operates{
+    text-align:center;
+    padding-left:0px;
+    padding-right:0px;
+    width:120px;
+}
+
+.overflow-ellipsis {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 280px;
+    /* float: left; */
+    display: inline-block;
+    vertical-align: middle;
+}

@@ -1,0 +1,50 @@
+<title>UU跑腿</title>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <form class="layui-form">
+                    <div class="layui-card-header">设置UU跑腿信息</div>
+                    <div class="layui-card-body" pad15>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">appid</label>
+                            <div class="layui-input-inline">
+                                <input name="appid" required lay-verify="required" placeholder="请输入appid"
+                                       class="layui-input layui-unselect">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">appkey</label>
+                            <div class="layui-input-inline">
+                                <input name="appkey" required lay-verify="required" placeholder="请输入appkey"
+                                       class="layui-input layui-unselect">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">openid</label>
+                            <div class="layui-input-inline">
+                                <input name="openid" required lay-verify="required" placeholder="请输入openid"
+                                       class="layui-input layui-unselect">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <a class="layui-btn" lay-submit lay-filter="setInfo">确认修改</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="introduce_images"></div>
+<script>
+    layui.use('appSet/uu', layui.factory('appSet/uu'));
+</script>
+
+<style>
+    .layui-form-label {
+        width: 100px
+    }
+</style>

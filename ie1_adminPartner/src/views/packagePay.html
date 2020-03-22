@@ -1,0 +1,35 @@
+<title>model</title>
+<div class="layui-fluid">
+    <div class="layui-col-md12">
+        <div class="title">
+            请选择支付方式
+        </div>
+        <div style="text-align: center; font-size: 1vw; margin-top: 1vw;">
+            支付金额： <span class="payPrice"></span> 元
+        </div>
+    </div>
+    <div class="layui-row layui-col-md12">
+        <div class="payType layui-col-md10 layui-col-md-offset4 layui-col-xs-offset0">
+            <img class="aliPay pic1 layui-col-md2 layui-col-xs5"/>
+            <img class="wxPay pic1 layui-col-md2 layui-col-xs5 layui-col-md-offset1 layui-col-xs-offset2"/>
+        </div>
+    </div>
+    <!--弹出层-->
+    <form class="layui-form" style='display:none;' id="wxCode">
+        <div class="layui-form-item">
+            <img class="wxCode" src="" alt="微信扫描二维码" style="height: 400px;width: 400px;"/>
+            <div class="layui-input-block">
+                <a class="layui-btn" id="btn" lay-submit lay-filter="sub">完成支付</a>
+            </div>
+        </div>
+    </form>
+</div>
+<!--添加/编辑签名-->
+<script type="text/javascript">
+    layui.use('packagePay', layui.factory('packagePay'));
+</script>
+<link type="text/css" rel="styleSheet"  href="./src/style/app/add/payType.css" />
+<style type="text/css">
+	.pic1{height: 100%;}
+	.payType{height: 6.25rem;}
+</style>

@@ -1,0 +1,107 @@
+<title>model</title>
+<div class="layui-fluid">
+    <div class="layui-col-md12">
+        <form class="layui-form layui-col-md11">
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <input name="searchName" placeholder="请输入名称" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-input-inline">
+                    <a class="layui-btn" lay-submit lay-filter="find">查询</a>
+                </div>
+            </div>
+        </form>
+        <a class="layui-btn layui-col-md1" lay-href="/logistics/add">创建模板</a>
+    </div>
+    <!--弹出层-->
+    <form class="layui-form" style='display:none;' id="add_edit_form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">文本</label>
+            <div class="layui-input-inline">
+                <input name="name" required lay-verify="required" placeholder="请输入文本名称" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">不固定下拉</label>
+            <div class="layui-input-inline">
+                <select name="unfixedSelects" id="unfixedSelects"> </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">固定下拉</label>
+            <div class="layui-input-inline">
+                <select name="fixedSelects" id="fixedSelects"> </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">图片</label>
+            <div class="layui-input-block">
+					<span class="layui-col-md12" style="position:relative; display:block;">
+						<a class="layui-btn layui-col-md4">上传</a>
+						<input id="addImgPut" type="file">
+					</span>
+                <img id="image">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">文本域</label>
+            <div class="layui-input-block">
+                <textarea name="textarea" required lay-verify="required" placeholder="请输入详细说明"
+                          class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">单选框</label>
+            <div class="layui-input-block">
+                <input type="radio" name="radios" value="1" title="微信" checked/>
+                <input type="radio" name="radios" value="2" title="小程序"/>
+                <input type="radio" name="radios" value="3" title="微信&小程序"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-block">
+                <input type="checkbox" name="add_edit_status" checked lay-skin="switch" lay-text="开启|关闭">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" id="btn" lay-submit lay-filter="sub">提交</a>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+    <!--数据表格-->
+    <div class="layui-col-md12">
+        <table id="pageTable" lay-filter="pageTable" lay-data="{id: 'pageTable'}">
+        </table>
+    </div>
+</div>
+<!--添加/编辑签名-->
+<script type="text/javascript">
+    layui.use('logistics/express', layui.factory('logistics/express'));
+</script>
+<script type="text/html" id="operations">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+</script>
+<!--状态码模板-->
+<script type="text/html" id="statusTpl">
+    {{# if(d.status != 1) { }}
+    <a class="layui-btn layui-btn-xs status_open" data="{{ d.id }}">开启</a>
+    {{# } else { }}
+    <span class="layui-col-md8">已开启</span>
+    {{# } }}
+</script>
+<!--计费方式模板-->
+<script type="text/html" id="typeTpl">
+    {{#  if(d.type == '1'){ }}
+    <span class="layui-col-md8">计件</span>
+    {{#  } else if(d.type == '2'){ }}
+    <span class="layui-col-md8">记重</span>
+    {{#  } else { }}
+    <span class="layui-col-md8">类型错误</span>
+    {{#  } }}
+</script>
+<link type="text/css" rel="styleSheet"  href="./src/style/model.css" />
+

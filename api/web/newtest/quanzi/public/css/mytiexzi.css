@@ -1,0 +1,9 @@
+.tiezi-item{
+	padding:2vw 2vw 2vw 2vw;
+	background:#fff;
+}
+.tiezi-item-head{
+	width:20vw;
+	height:20vw;
+	border-radius:50%;
+}

@@ -1,0 +1,194 @@
+<div class="layui-layout layui-layout-admin">
+
+    <!-- 侧边菜单 -->
+
+    <div class="layui-logo">
+        <img class="logoImg">
+        <!--<span class="layui-logo-right">卷泡后台管理系统</span>-->
+    </div>
+    <!-- 第二种方法 -->
+    <div class="left-fixed-nav">
+        <nav class="admin-sideNav-first">
+            <ul class="sideNav-menu menu_ul" style="display: none;">
+                <li class="active sideNav-menu-li"><a class="parent_menu" lay-href="decoration"><img
+                        src="./src/images/csz.png" alt=""></i>店铺装修</a>
+                </li>
+                <li class="sideNav-menu-li"><a class="parent_menu" lay-href="goods/list"><img
+                        src="./src/images/csp.png" alt=""></i>商品列表</a>
+                </li>
+                <li class="sideNav-menu-li"><a class="parent_menu" lay-href="miniProgram/theme">
+                    <img src="./src/images/cxcx.png" alt="">主题配色</a>
+                </li>
+                <li class="sideNav-menu-li"><a class="parent_menu" lay-href="logistics/express"><img
+                        src="./src/images/csz.png" alt=""></i>运费模板</a>
+                </li>
+                <li class="sideNav-menu-li"><a class="parent_menu" lay-href="appSet/uu"><img
+                        src="./src/images/csz.png" alt=""></i>UU跑腿</a>
+                </li>
+                <li class="sideNav-menu-li"><a class="parent_menu go_to_new"><img
+                        src="./src/images/csz.png" alt=""></i>返回商城</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- 页面标签 -->
+    <script type="text/html" template lay-done="layui.element.render('nav', 'layadmin-pagetabs-nav')">
+        {{# if(layui.setter.pageTabs){ }}
+        <div class="layadmin-pagetabs" id="LAY_app_tabs">
+            <div class="layui-icon layadmin-tabs-control layui-icon-prev" layadmin-event="leftPage"></div>
+            <div class="layui-icon layadmin-tabs-control layui-icon-next" layadmin-event="rightPage"></div>
+            <div class="layui-icon layadmin-tabs-control layui-icon-down">
+                <ul class="layui-nav layadmin-tabs-select" lay-filter="layadmin-pagetabs-nav">
+                    <li class="layui-nav-item" lay-unselect>
+                        <a href="javascript:;"></a>
+                        <dl class="layui-nav-child layui-anim-fadein">
+                            <dd layadmin-event="closeThisTabs"><a href="javascript:;">关闭当前标签页</a></dd>
+                            <dd layadmin-event="closeOtherTabs"><a href="javascript:;">关闭其它标签页</a></dd>
+                            <dd layadmin-event="closeAllTabs"><a href="javascript:;">关闭全部标签页</a></dd>
+                        </dl>
+                    </li>
+                </ul>
+            </div>
+            <div class="layui-tab" lay-unauto lay-allowClose="true" lay-filter="layadmin-layout-tabs">
+                <ul class="layui-tab-title" id="LAY_app_tabsheader">
+                    <li lay-id="/"><i class="layui-icon layui-icon-home"></i></li>
+                </ul>
+            </div>
+        </div>
+        {{# } }}
+    </script>
+
+    <!-- 主体内容 -->
+    <div class="layui-body" id="LAY_app_body">
+        <div class="layadmin-tabsbody-item layui-show"></div>
+    </div>
+    <!-- 辅助元素，一般用于移动设备下遮罩 -->
+    <div class="layadmin-body-shade" layadmin-event="shade"></div>
+</div>
+<link type="text/css" rel="styleSheet" href="./src/style/layout.css"/>
+<script type="text/javascript" src="./jquery.min.js"></script>
+<script type="text/javascript" src="./src/lib/common.js"></script>
+<script>
+    var admin = layui.admin;
+    var setter = layui.setter;//配置
+    var baseUrl = setter.baseUrl;
+    var errorMsg = setter.errorMsg;//错误提示
+    var timeOutCode = setter.timeOutCode;//token错误代码
+    var timeOutMsg = setter.timeOutMsg;//token错误提示
+    var headers = {'Access-Token': layui.data(setter.tableName).access_token};
+    var loading;//定义加载效果
+    var loadType = 1;//layer.open 类型
+    var loadShade = {shade: 0.3};//layer.open shade属性
+    sessionStorage.setItem('saa_key', 'ccvWPn');
+    var saa_key = sessionStorage.getItem('saa_key');
+    //第一次进入页面需要获取的一系列数据，暂时只需要获取订单购买的版本，如果已存在，则获取之前保存的数据，减少api请求
+    var header_save_order_version = sessionStorage.getItem('header_save_order_version_' + saa_key);
+    //暂时只有订单版本，当还有其他的时候，用 && 进行追加判断
+    if (!header_save_order_version) {
+        $.ajax({
+            url: baseUrl + '/MerchantHeader?key=' + saa_key,
+            type: "get",
+            headers: headers,
+            beforeSend: function () {
+                loading = layer.load(loadType, loadShade);//显示加载图标
+            },
+            success: function (res) {
+                layer.close(loading);
+                if (res.status == timeOutCode) {
+                    layer.msg(timeOutMsg);
+                    admin.exit();
+                    return false;
+                }
+                if (res.status !== 200) {
+                    return false;
+                }
+                if (res && res.data) {
+                    //设置订单版本
+                    if (res.data.order_version) {
+                        $('.packagePurchaseOrderVersion').html(res.data.order_version);
+                        sessionStorage.setItem('header_save_order_version_' + saa_key, res.data.order_version);
+                    }
+                } else {
+                    //虽然肯定有数据，但保不齐api错误，所以加个提示
+                    layer.msg('api返回数据错误', {icon: 1, time: 1000});
+                }
+            },
+            error: function () {
+                layer.msg(errorMsg);
+                layer.close(loading);
+            }
+        });
+    } else {
+        $('.packagePurchaseOrderVersion').html(header_save_order_version);
+    }
+
+    var is_admin_login = localStorage.getItem('is_admin_login');//是否商户登录 1是 0否
+    if (is_admin_login === '1') {
+        localStorage.removeItem('login_rule');
+        $('.supplier').parent().remove();//删除门店菜单
+        $('.menu_ul').show();
+    } else {
+        var login_rule = localStorage.getItem('login_rule');//登录权限，仅当 is_admin_login 为 0 时才需要判断
+        if (login_rule === '1') {
+            //login_rule=1时为门店，需要删除其他菜单，只留门店菜单
+            var supplier = $('.supplier').parent();
+            $('.menu_ul').empty().append(supplier).show();
+            supplier.show();
+            location.hash = '/supplier/goods';
+        } else {
+            $('.supplier').parent().remove();//删除门店菜单
+            $('.menu_ul').show();
+        }
+    }
+    var obj = JSON.parse(sessionStorage.getItem('logoImg'))
+
+    if (obj instanceof Object && obj.key == saa_key) {
+        $('.logoImg').attr('src', obj.src)
+    } else {
+        res = getAjaxReturnKey({method: 'merchantAppInfo', type: 'get'})
+        if (res.data.pic_url == undefined) {
+            $('.logoImg').attr('src', '');
+        } else {
+            $('.logoImg').attr('src', res.data.pic_url ? res.data.pic_url : '')
+            sessionStorage.setItem('logoImg', JSON.stringify({
+                key: saa_key,
+                src: res.data.pic_url ? res.data.pic_url : ''
+            }))
+        }
+
+    }
+
+    //刷新页面时显示对应的一级和二级菜单
+    var href = window.location.href;
+    href = href.split('#');
+
+    // if (href.length == 2) {
+    //     href = href[1].substr(1, href[1].length);
+    //     //循环查找当前页面路由对应的子菜单路由
+    //     $('.id_menu').find('a').each(function (index, j) {
+    //         var lay_href = $(j).attr('lay-href');
+    //         //当当前页面路由等于这个子菜单路由时，设置一级和二级背景色
+    //         if (href === lay_href) {
+    //             var parent = $(this).parent().parent().parent();
+    //             parent.show();//显示当前菜单的兄弟菜单
+    //             $(this).parent().addClass('current').siblings().removeClass("current");//设置当前二级菜单的背景
+    //             parent.parent().eq(0).addClass("active").siblings().removeClass("active");//设置当前一级菜单的背景
+    //         }
+    //     })
+    // }
+
+    //点击一级菜单事件
+    $(document).off('click', '.parent_menu').on('click', '.parent_menu', function () {
+        //点击菜单更换背景色
+        $(this).parent().eq(0).addClass("active").siblings().removeClass("active");
+    });
+
+    //点击进入新系统
+    $(document).off('click', '.go_to_new').on('click', '.go_to_new', function () {
+      location.href = '/#/dashboard';
+    })
+
+</script>
+<script type="text/javascript" src="./jquery.min.js"></script>
+<script type="text/javascript" src="./src/lib/common.js"></script>

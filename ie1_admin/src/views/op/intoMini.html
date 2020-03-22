@@ -1,0 +1,18 @@
+<script src="./jquery.min.js"></script>
+<script>
+    layui.use(['admin', 'user'], function () {
+        var $ = layui.$;
+        var arr, res;
+        //token，传递到小程序后台
+        arr = {
+            method: 'appToken',
+            type: 'post',
+        };
+        res = getAjaxReturn(arr);
+        if (res && res.data) {
+            //将获取到的token 和 username存到cookie中
+            document.cookie = 'username=' + localStorage.getItem('name') + ';Access-Token=' + res.data;
+            window.open('http://ceshi.juanpao.cn');
+        }
+    });
+</script>

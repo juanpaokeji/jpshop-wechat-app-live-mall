@@ -1,0 +1,34 @@
+
+#add_edit_form {
+    margin-top: 20px;
+    margin-right: 20px;
+}
+
+tbody > tr {
+    height: 60px;
+}
+
+/*列表展示图片时需要添加*/
+.layui-table-cell {
+    height: auto;
+}
+
+#image {
+    height: 200px;
+    width: 200px;
+    margin-top: 10px;
+    border: 1px solid #e5e5e5;
+}
+
+input[id=addImgPut] {
+    border: 0px solid red;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    opacity: 0;
+    height: 36px;
+    width: 200px;
+}
+input[id=addImgPut] :hover {
+    cursor: pointer;
+}

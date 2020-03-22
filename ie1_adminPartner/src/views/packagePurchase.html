@@ -1,0 +1,48 @@
+<div class="content">
+	<div class="package-body">
+		<div class="model-bodys">
+			<a href="javascript:void(0)" style="float: right;" class="pay_record">购买记录</a>
+			<div class="package-title">订购</div>
+			<div class="pay_type_time"></div>
+			<div class="package-content">
+				<ul class="package-data">
+				</ul>
+				<button type="button" class="layui-btn layui-btn-normal go-back layui-btn-lg layui-col-lg-offset5">返回</button>
+			</div>
+		</div>
+	</div>
+	<div id="payModel"></div>
+</div>
+
+<script type="text/javascript">
+    layui.use('packagePurchase', layui.factory('packagePurchase'));
+</script>
+<script type="text/javascript" src="./jquery.min.js"></script>
+<script type="text/javascript" src="./src/lib/common.js"></script>
+<style>
+	.content{width: 100%;height: 100%;}
+	.headImg{width: 100%;height: 4rem;border-bottom: 0.0625rem solid #F6F6F6;box-shadow: 0px 1px 5px #F6F6F6;}
+	.img-size{width: 120px;height: 44px;margin: 0.625rem 6.25rem;display: inline-block;}
+	.img-size img{width: 100%;}
+	.package-body{width: 100%;height: auto;margin-top: 3.125rem;}
+	.model-bodys{margin: 0 12.5rem;}
+	.package-title{text-align: center;font-size: 1.5625rem;line-height: 3.125rem;width: 100%;height: 3.125rem;font-family:"微软雅黑";letter-spacing: 0.1875rem;}
+	.pay_type_time{text-align: center;font-size: 1rem;line-height: 3.125rem;width: 100%;height: 3.125rem;font-family:"微软雅黑";letter-spacing: 0.1875rem;}
+	.package-content{width: 100%;}
+	.package-data{list-style: none;}
+	.package-type{margin-left: 6.25rem;margin-top: 1.875rem;}
+	.type-title{width: 100%;height: 2.125rem;line-height: 2.125rem;}
+	.package-lists{display: inline-block;}
+	.package-list-one{float: left;width: 263px;height: 105px;border: 0.0625rem solid white;border-radius: 0.9375rem;margin:20px 30px 30px 0;}
+	.package-list-one:hover{cursor: pointer;}
+	/* .package-list-one img{width: 100%;} */
+	.list-one-title{width: 100%;}
+	.list-one-img{height: 100%;width: 100%;}
+	.list-one-other-info{float: left;margin-left: 0.3125rem;}
+	.others p{margin-bottom: 5px;}
+	.list-one-info{width: 100%;}
+	.span-color{color: red;}
+	.others{margin: 0.3125rem 0 0 10px;height: 80px;float: left;width: 128px;}
+	.go-back{margin-top: 6.125rem;}
+	.pay_record {font-size: 1rem}
+</style>

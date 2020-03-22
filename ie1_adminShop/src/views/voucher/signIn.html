@@ -1,0 +1,194 @@
+<title>签到</title>
+<div class="layui-fluid">
+    <div class="layui-col-md12">
+        <form class="layui-form layui-col-md11">
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <input name="searchName" placeholder="请输入名称" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-input-inline">
+                    <a class="layui-btn" lay-submit lay-filter="find">查询</a>
+                </div>
+                <div class="layui-input-inline">
+                    <label class="layui-form-label" style="width: 4vw">签到总开关</label>
+                    <input type="checkbox" name="sign_in_status" lay-skin="switch" lay-filter="sign_in_status"
+                           lay-text="开启|关闭">
+                </div>
+            </div>
+        </form>
+        <a class="layui-btn layui-col-md1" lay-submit lay-filter="showAdd">新增</a>
+    </div>
+    <!--弹出层-->
+    <form class="layui-form" style="display: none;" id="add_edit_form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">活动名称</label>
+            <div class="layui-input-inline">
+                <input name="name" required lay-verify="required" placeholder="请输入活动名称" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">打卡签到活动日期</label>
+            <div class="times">
+                <div class="layui-input-inline">
+                    <input name="start_time" id="start_time" placeholder="开始日期" readonly class="layui-input"/>
+                </div>
+                <div class="layui-input-inline">
+                    <input name="end_time" id="end_time" placeholder="结束日期" readonly class="layui-input"/>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">每日签到积分</label>
+            <div class="layui-input-inline">
+                <input name="integral" lay-verify="number" placeholder="请输入默认签到积分" class="layui-input" value="0">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">活动背景</label>
+            <div class="layui-input-inline">
+                <a class="layui-btn layui-col-md4 add_img_put_activity">上传</a>
+                <p style="height: 40px;"></p>
+                <div id="image_activity"></div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">签到默认背景</label>
+            <div class="layui-input-inline">
+                <a class="layui-btn layui-col-md4 add_img_put_sign">上传</a>
+                <p style="height: 40px;"></p>
+                <div id="image_sign"></div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">补签</label>
+            <div class="layui-input-inline">
+                <input type="checkbox" name="supplementary" lay-skin="switch" lay-filter="supplementary"
+                       lay-text="开启|关闭">
+            </div>
+        </div>
+        <div class="layui-form-item supplementary" style="display: none;">
+            <label class="layui-form-label">单次补签费用(元)</label>
+            <div class="layui-input-inline">
+                <input name="supplementary_price" value="0" lay-verify="required|number" class="layui-input">
+            </div>
+            <label class="layui-form-label">最多补签次数</label>
+            <div class="layui-input-inline">
+                <input name="supplementary_number" value="0" lay-verify="required|number" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">连续签到</label>
+            <div class="layui-input-inline">
+                <input type="checkbox" name="continuous" lay-skin="switch" lay-filter="continuous" lay-text="开启|关闭">
+            </div>
+        </div>
+        <div class="continuous" style="display: none;">
+            <div class="layui-form-item">
+                <label class="layui-form-label">连续签到天数</label>
+                <div class="layui-input-inline" style="width: 5vw;">
+                    <input name="days" value="0" lay-verify="number" placeholder="天数" class="layui-input">
+                </div>
+                <label class="layui-form-label" style="width: 2vw;">获取</label>
+                <div class="layui-input-inline" style="width: 6vw;">
+                    <select name="give_type" lay-filter="give_type">
+                        <option value="1">积分</option>
+                        <option value="2">优惠券</option>
+                        <option value="3">实物商品</option>
+                    </select>
+                </div>
+                <div class="layui-input-inline" style="width: 10vw;">
+                    <div class="give_values">
+                        <input name="give_value" value="0" lay-verify="number" placeholder="积分" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-input-inline">
+                    <span class="layui-btn add" style="width: 4vw;">新增</span>(最多3个)
+                </div>
+            </div>
+            <div class="continuous_item"></div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">签到说明</label>
+            <div class="layui-input-inline">
+                <textarea name="remark" placeholder="请输入签到说明" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="quotations">
+            <div class="layui-form-item">
+                <label class="layui-form-label">打卡语录</label>
+                <div class="layui-input-inline">
+                    <input name="quotations" maxlength="15" required lay-verify="required" class="layui-input">
+                </div>
+                <div class="layui-input-inline" style="width: 12vw;">
+                    <span class="layui-btn add_quotations" style="width: 4vw;">新增</span> (十五个字以内，最多十条)
+                </div>
+            </div>
+            <div class="quotations_item"></div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-inline">
+                <input type="checkbox" name="status" lay-skin="switch" lay-text="开启|关闭">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" id="btn" lay-submit lay-filter="sub">提交</a>
+            </div>
+        </div>
+    </form>
+    <!--数据表格-->
+    <div class="layui-col-md12">
+        <table id="pageTable" lay-filter="pageTable" lay-data="{id: 'pageTable'}"></table>
+    </div>
+</div>
+<div class="introduce_images"></div>
+<!--添加/编辑签名-->
+<script type="text/javascript">
+    layui.use('voucher/signIn', layui.factory('voucher/signIn'));
+</script>
+<script type="text/javascript" src="./src/lib/common.js"></script>
+<script type="text/html" id="operations">
+    <a class="layui-btn layui-btn-xs" lay-event="show">签到记录</a>
+    <a class="layui-btn layui-btn-xs" lay-event="get">获奖名单</a>
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+</script>
+<!--状态码模板-->
+<script type="text/html" id="statusTpl">
+    <input type="checkbox" value="{{d.id}}" lay-skin="switch" lay-text="开启|关闭" lay-filter="status" {{
+           d.status== 1 ? 'checked' : '' }}>
+</script>
+<!--活动背景图片模板-->
+<script type="text/html" id="activityTpl">
+    <img class="layui-upload-img" style="width:40px; height:40px"
+         src={{ d.pic_url_activity }}>
+</script>
+<!--签到默认背景图片模板-->
+<script type="text/html" id="signTpl">
+    <img class="layui-upload-img" style="width:40px; height:40px"
+         src={{ d.pic_url_sign }}>
+</script>
+<style>
+    /*列表展示图片时需要添加*/
+    .layui-table-cell {
+        height: auto;
+    }
+
+    .layui-form-label {
+        width: 6vw;
+    }
+
+    #add_edit_form {
+        padding-top: 1vw;
+    }
+
+    #image_activity, #image_sign {
+        border: 1px solid #e5e5e5;
+    }
+
+    #image_activity, #image_activity img, #image_sign, #image_sign img {
+        height: 100px;
+        width: 100px;
+    }
+</style>

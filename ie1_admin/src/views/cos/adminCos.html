@@ -1,0 +1,53 @@
+<title>cos设置</title>
+<div class="layui-fluid">
+    <!--弹出层-->
+    <form class="layui-form" id="add_edit_form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">appId</label>
+            <div class="layui-input-inline">
+                <input name="appId" required lay-verify="required" placeholder="请输入appId" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">secretId</label>
+            <div class="layui-input-inline">
+                <input name="secretId" required lay-verify="required" placeholder="请输入secretId" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">secretKey</label>
+            <div class="layui-input-inline">
+                <input name="secretKey" required lay-verify="required" placeholder="请输入secretKey" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">token</label>
+            <div class="layui-input-inline">
+                <input name="token" required lay-verify="required" placeholder="请输入token" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">Bucket</label>
+            <div class="layui-input-inline">
+                <input name="Bucket" required lay-verify="required" placeholder="请输入Bucket" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" id="btn" lay-submit lay-filter="sub">提交</a>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="introduce_images"></div>
+<!--添加/编辑签名-->
+<script type="text/javascript">
+    layui.use('cos/adminCos', layui.factory('cos/adminCos'));
+</script>
+
+<style>
+    #add_edit_form {
+        margin-top: 20px;
+        margin-right: 20px;
+    }
+</style>

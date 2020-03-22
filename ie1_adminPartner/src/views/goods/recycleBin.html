@@ -1,0 +1,46 @@
+<title>商品回收站</title>
+<div class="layui-fluid">
+    <div class="layui-col-md12">
+        <form class="layui-form layui-col-md11">
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <input name="searchName" placeholder="请输入名称" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-input-inline">
+                    <a class="layui-btn" lay-submit lay-filter="find">查询</a>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!--数据表格-->
+    <div class="layui-col-md12">
+        <table id="pageTable" lay-filter="pageTable" lay-data="{id: 'pageTable'}">
+        </table>
+    </div>
+</div>
+<!--添加/编辑签名-->
+<script type="text/javascript">
+    layui.use('goods/recycleBin', layui.factory('goods/recycleBin'));
+</script>
+<script type="text/html" id="operations">
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="recovery">恢复</a>
+</script>
+<!--图片模板-->
+<script type="text/html" id="imgTpl">
+    <img class="layui-upload-img imgClickEvent" style="width:40px; height:40px; cursor: pointer;"
+         src={{ d.pic_urls=d.pic_urls.split(',')[0] }}>
+</script>
+<!--应用类型模板-->
+<script type="text/html" id="typeTpl">
+    {{#  if(d.type == '1'){ }}
+    <span class="layui-col-md8">微信</span>
+    {{#  } else if(d.type == '2'){ }}
+    <span class="layui-col-md8">小程序</span>
+    {{#  } else if(d.type == '3'){ }}
+    <span class="layui-col-md8">微信&小程序</span>
+    {{#  } else { }}
+    <span class="layui-col-md8">类型错误</span>
+    {{#  } }}
+</script>
+<link type="text/css" rel="styleSheet" href="./src/style/model.css"/>
+<script type="text/javascript" src="./src/lib/common.js"></script>

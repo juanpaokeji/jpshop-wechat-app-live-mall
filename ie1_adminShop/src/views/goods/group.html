@@ -1,0 +1,117 @@
+<title>model</title>
+<div class="layui-fluid">
+    <div class="layui-col-md12">
+        <form class="layui-form layui-col-md11">
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <input name="searchName" placeholder="请输入名称" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-input-inline">
+                    <a class="layui-btn" lay-submit lay-filter="find">查询</a>
+                </div>
+            </div>
+        </form>
+        <a class="layui-btn layui-col-md1" lay-submit lay-filter="showAdd">新增</a>
+    </div>
+    <!--弹出层-->
+    <form class="layui-form" style='display:none;' id="add_edit_form">
+        <div class="layui-form-item isShow">
+            <label class="layui-form-label">上级分类</label>
+            <div class="layui-input-inline">
+                <select name="parent_id" id="parent_id">
+                    <option id="0">未选择</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">分类名称</label>
+            <div class="layui-input-inline">
+                <input name="name" required lay-verify="required" placeholder="请输入分类名称" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">分类图标</label>
+            <div class="layui-input-block">
+                <a class="layui-btn layui-col-md4 typeIcon">上传</a>
+            </div>
+            <div class="layui-input-block">
+                <div class="typeIconImg"></div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">分类海报</label>
+            <div class="layui-input-block">
+                <a class="layui-btn layui-col-md4 typePoster">上传</a>
+            </div>
+            <div class="layui-input-block">
+                <div class="typePosterImg"></div>
+            </div>
+            <p style="float: right;color: red;">建议上传700x200大小的图片</p>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-block">
+                <input type="checkbox" name="status" checked lay-skin="switch" lay-text="开启|关闭">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">序号</label>
+            <div class="layui-input-inline">
+                <input name="sort" required lay-verify="required" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" id="btn" lay-submit lay-filter="sub">提交</a>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+    <!--数据表格-->
+    <div class="layui-col-md12">
+        <section id="uicut-app">
+            <section class="uc-section71">
+                <div class="box box2">
+                    <ul class="list">
+                        <li class="th">
+                            <div class="item">
+                                <div class="sp1">排序</div>
+                                <div class="sp2">分类名称</div>
+                                <div class="sp3">分类图标</div>
+                                <div class="sp4">分类海报</div>
+                                <div class="sp5">默认显示</div>
+                                <div class="sp6">创建时间</div>
+                                <div class="sp7">操作</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </section>
+        <div id="page"></div>
+    </div>
+</div>
+<div class="introduce_images"></div>
+<!--添加/编辑签名-->
+<script type="text/javascript">
+    layui.use('goods/group', layui.factory('goods/group'));
+</script>
+<link type="text/css" rel="styleSheet" href="./src/style/goods/group.css"/>
+<link type="text/css" rel="styleSheet" href="./group/css/main.css"/>
+<link type="text/css" rel="stylesheet" href="./start/layui/css/modules/code.css"/>
+<script type="text/javascript" src="./src/lib/common.js"></script>
+<style>
+    .typeIconImg {
+        height: 100px;
+        width: 100px;
+        /*margin-top: 40px;*/
+        border: 1px solid #e5e5e5;
+    }
+
+    .typePosterImg {
+        height: 40px;
+        width: 110px;
+        /*margin-top: 40px;*/
+        border: 1px solid #e5e5e5;
+    }
+</style>

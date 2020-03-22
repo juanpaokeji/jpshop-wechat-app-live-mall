@@ -1,0 +1,252 @@
+<title>设置我的资料</title>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">设置应用信息</div>
+                <div class="layui-card-body" pad15>
+                    <div class="layui-form-item shop_category_id" style="display: none;">
+                        <label class="layui-form-label">商城分类</label>
+                        <div class="layui-input-inline">
+                            <select name="shop_category_id" id="shop_category_id"></select>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">应用名称</label>
+                        <div class="layui-input-inline">
+                            <input name="name" required lay-verify="required" placeholder="请输入应用名称"
+                                   class="layui-input layui-unselect">
+                        </div>
+                    </div>
+                    <div class="layui-form" lay-filter="">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">Logo图片</label>
+                            <div class="layui-input-block">
+                                <a class="layui-btn layui-col-md1 addImgPut">上传</a>
+                                <p style="height: 40px;"></p>
+                                <div id="image"></div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">客服电话</label>
+                            <div class="layui-input-inline">
+                                <input name="phone" required lay-verify="required|number" placeholder="请输入客服电话"
+                                       class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">供货商联系电话</label>
+                            <div class="layui-input-inline">
+                                <input name="supplier_phone" required lay-verify="required|number" placeholder="请输入供货商联系电话"
+                                       class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">团长联系手机号</label>
+                            <div class="layui-input-inline">
+                                <input name="leader_phone" required lay-verify="required|number" placeholder="请输入团长联系手机号"
+                                       class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">登录背景图</label>
+                            <div class="layui-input-block">
+                                <a class="layui-btn layui-col-md1 addImgPutLogin">上传</a>
+                                <p style="height: 40px;"></p>
+                                <div id="imageLogin"></div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">转发默认图</label>
+                            <div class="layui-input-block">
+                                <a class="layui-btn layui-col-md1 addImgPutDefault">上传</a>
+                                <p style="height: 40px;"></p>
+                                <div id="imageDefault"></div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">商城介绍</label>
+                            <div class="layui-input-inline">
+                                <textarea name="detail_info" required lay-verify="required" placeholder="请输入商城介绍"
+                                          class="layui-textarea"></textarea>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">会员卡状态</label>
+                            <div class="layui-input-block">
+                                <input type="radio" name="user_vip" value="0" title="关闭" checked/>
+                                <input type="radio" name="user_vip" value="1" title="会员卡（付费）"/>
+                                <input type="radio" name="user_vip" value="2" title="会员卡（积分）"/>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">购买信息</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="pay_info" lay-skin="switch" lay-text="开启|关闭">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">积分商城</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="score_shop" lay-skin="switch" lay-text="开启|关闭">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">团长等级</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="leader_level" lay-skin="switch" lay-text="开启|关闭">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">添加到我的小程序</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="my_mini_info" lay-skin="switch" lay-text="开启|关闭">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">好物圈</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="good_phenosphere" lay-skin="switch" lay-text="开启|关闭">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">余额支付</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="balance_pay" lay-skin="switch" lay-text="开启|关闭">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">闪送</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="shansong" lay-skin="switch" lay-text="开启|关闭">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">UU跑腿</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="uu_is_open" lay-skin="switch" lay-text="开启|关闭">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">门店</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="store_is_open" lay-skin="switch" lay-text="开启|关闭">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">易联云</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="yly_print" lay-skin="switch" lay-text="开启|关闭">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">商品库存是否显示</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="is_stock" checked lay-skin="switch" lay-text="是|否">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">详情页商家信息是否显示</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="is_merchant_info" checked lay-skin="switch" lay-text="是|否">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">详情是否显示头部</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="is_info_header" lay-skin="switch" lay-text="是|否">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">详情是否显示底部</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="is_info_bottom" lay-skin="switch" lay-text="是|否">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">预计送达时间</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="is_estimated_service_time" lay-skin="switch" lay-filter="is_estimated_service_time" lay-text="是|否">
+                            </div>
+                        </div>
+                        <div class="estimated_service_time_info"></div>
+                        <!--<div class="layui-form-item">-->
+                            <!--<label class="layui-form-label">详情是否显示头部底部推荐商品</label>-->
+                            <!--<div class="layui-input-block">-->
+                                <!--<input type="checkbox" name="is_info_header_bottom_goods" checked lay-skin="switch" lay-text="是|否">-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">团长确认收货天数</label>
+                            <div class="layui-input-inline">
+                                <input name="leader_confirm" required lay-verify="required|number" placeholder="请输入团长确认收货天数"
+                                       class="layui-input layui-unselect">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">团长确认发货天数</label>
+                            <div class="layui-input-inline">
+                                <input name="leader_send" required lay-verify="required|number" placeholder="请输入团长确认发货天数"
+                                       class="layui-input layui-unselect">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">用户确认收货天数</label>
+                            <div class="layui-input-inline">
+                                <input name="user_confirm" required lay-verify="required|number" placeholder="请输入用户确认收货天数"
+                                       class="layui-input layui-unselect">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">经纬度</label>
+                            <div class="layui-input-inline">
+                                <input name="coordinate" required lay-verify="required" placeholder="请输入经纬度" class="layui-input">
+                            </div>
+                            <div class="layui-input-block" style="margin-left: 300px;">
+                                <a href="https://lbs.amap.com/console/show/picker" target="_blank" style="color: #0a8ffb">点击获取坐标（复制坐标获取结果）</a>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">起订价</label>
+                            <div class="layui-input-inline">
+                                <input name="starting_price" required lay-verify="required|number" value="0" class="layui-input">
+                            </div>
+                            <div class="layui-input-block" style="margin-left: 300px;">
+                                <span>限制下订单的最低价，默认0为不限制</span>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <button class="layui-btn" lay-submit lay-filter="setInfo">确认修改</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="introduce_images"></div>
+<script>
+    layui.use('appSet/info', layui.factory('appSet/info'));
+</script>
+<script type="text/javascript" src="./src/lib/common.js"></script>
+<style>
+    .layui-form-label {
+        width: 100px
+    }
+
+    .layui-input-block {
+        margin-left: 130px;
+    }
+
+    #image, #imageLogin, #imageDefault {
+        border: 1px solid #e5e5e5;
+    }
+
+    #image, #image img, #imageLogin, #imageLogin img, #imageDefault, #imageDefault img {
+        height: 120px;
+        width: 120px;
+    }
+</style>

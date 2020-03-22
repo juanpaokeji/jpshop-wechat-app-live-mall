@@ -1,0 +1,96 @@
+<title>会员卡（积分）</title>
+<div class="layui-fluid">
+    <div class="layui-col-md12">
+        <form class="layui-form layui-col-md11">
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <input name="searchName" placeholder="请输入名称" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-input-inline">
+                    <a class="layui-btn" lay-submit lay-filter="find">查询</a>
+                </div>
+                <div class="layui-input-inline">
+                    <label class="layui-form-label" style="width: 5vw">会员总开关</label>
+                    <input type="checkbox" name="vip_in_status" lay-skin="switch" lay-filter="vip_in_status" lay-text="开启|关闭">
+                </div>
+            </div>
+        </form>
+        <a class="layui-btn layui-col-md1" lay-submit lay-filter="showAdd">新增</a>
+    </div>
+    <!--弹出层-->
+    <form class="layui-form" style='display:none;' id="add_edit_form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">会员等级名称</label>
+            <div class="layui-input-inline">
+                <input name="name" required lay-verify="required" placeholder="请输入会员等级名称" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">等级积分</label>
+            <div class="layui-input-inline">
+                <input name="min_score" required lay-verify="required|number" placeholder="请输入等级积分" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">优惠比例（%）</label>
+            <div class="layui-input-inline">
+                <input name="discount_ratio" required lay-verify="required|number" placeholder="请输入优惠比例"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">每月赠送优惠券数量</label>
+            <div class="layui-input-inline">
+                <input name="voucher_count" required lay-verify="required|number" placeholder="请输入每月赠送优惠券数量"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">代金券类型</label>
+            <div class="layui-input-inline">
+                <select name="voucher_type_id" id="voucher_type_id"></select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">会员获取积分的倍数</label>
+            <div class="layui-input-inline">
+                <input name="score_times" required lay-verify="required|number" placeholder="请输入会员获取积分的倍数"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-block">
+                <input type="checkbox" name="status" checked lay-skin="switch" lay-text="开启|关闭">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" id="btn" lay-submit lay-filter="sub">提交</a>
+            </div>
+        </div>
+    </form>
+    <!--数据表格-->
+    <div class="layui-col-md12">
+        <table id="pageTable" lay-filter="pageTable" lay-data="{id: 'pageTable'}"></table>
+    </div>
+</div>
+<!--添加/编辑签名-->
+<script type="text/javascript">
+    layui.use('voucher/vipsUnpaid', layui.factory('voucher/vipsUnpaid'));
+</script>
+<script type="text/html" id="operations">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+</script>
+<!--状态码模板-->
+<script type="text/html" id="statusTpl">
+    <input type="checkbox" value="{{d.id}}" lay-skin="switch" lay-text="开启|关闭" lay-filter="status" {{
+           d.status== 1 ? 'checked' : '' }}>
+</script>
+<style>
+    #add_edit_form {
+        margin-top: 20px;
+        margin-right: 20px;
+    }
+</style>

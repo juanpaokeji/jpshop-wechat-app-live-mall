@@ -1,0 +1,80 @@
+<title>新建运费模板</title>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">新建运费模板</div>
+                <div class="layui-card-body">
+                    <form class="layui-form" id="submit_form">
+                        <div class="layui-form" lay-filter="">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">模板名称</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="name" autocomplete="off" placeholder="请输入模板名称"
+                                           class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">计费方式</label>
+                                <div class="layui-input-inline">
+                                    <input type="radio" name="type" value="1" checked><span class="piece">计件</span>
+                                    <input type="radio" name="type" value="2"><span class="piece">计重</span>
+                                </div>
+                            </div>
+                            <div class="layui-form-item layui-form-text">
+                                <label class="layui-form-label">配送区域</label>
+                                <div class="layui-input-block">
+                                    <table style="width: 100%;" >
+                                        <tr class="distribution">
+                                            <td>配送区域</td>
+                                            <td>首件（个）</td>
+                                            <td>运费（元）</td>
+                                            <td>续件（个）</td>
+                                            <td>运费（元）</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="expressTitle"><span class="national_unity">全国统一运费</span><input name="names" style="display: none" value="全国统一运费"></td>
+                                            <td><input name="first_num" class="layui-input"></td>
+                                            <td><input name="first_price" class="layui-input"></td>
+                                            <td><input name="expand_num" class="layui-input"></td>
+                                            <td><input name="expand_price" class="layui-input"></td>
+                                        </tr>
+                                        <tr id="add_new">
+                                            <td >
+                                                <span class="add_new">+添加可配送区域和运费</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block confirmChange">
+                                    <a class="layui-btn" lay-submit lay-filter="sub">确认修改</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div>
+                    <form class="layui-form" style="display: none;" id="area_form">
+                        <div class="newAddress">
+                            <div class="left"></div>
+                             <span class="gt">&gt;&gt;</span>
+                            <div class="right"></div>
+                        </div>
+                        <div class="layui-input-block confirmAll">
+                            <a class="layui-btn" lay-submit lay-filter="areaSub">确认</a>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use('logistics/add', layui.factory('logistics/add'));
+</script>
+<link rel="stylesheet" href="./src/style/logistics/add.css">

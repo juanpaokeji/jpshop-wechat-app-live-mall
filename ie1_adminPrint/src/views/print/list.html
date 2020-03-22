@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="./print/css/all.css">
+    <script type="text/javascript" src="./print/js/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="./src/lib/common.js"></script>
+    <title></title>
+</head>
+<body>
+<div class="header clearfix">
+    <h2>快递打印系统</h2>
+    <div class="header_right clearfix">
+<!--        <img src="./print/images/1.png" alt="">-->
+        <select name="" id="" style="-moz-appearance:none;">
+            <option value=""></option>
+        </select>
+        <span>-退出-</span>
+    </div>
+</div>
+<script>
+    $('.header_right').find('option').text(localStorage.getItem('name'))
+</script>
+<div class="content clearfix">
+    <div class="content_right" style="background-color: #f5f5f5">
+        <div class="search clearfix">
+            <h3>搜索时间类型：</h3>
+            <select name="time_type" id="time_type">
+                <option value="">未选定</option>
+                <option value="1">按下单时间</option>
+                <option value="2">按付款时间</option>
+                <option value="3">按发货单打印时间</option>
+                <option value="4">按快递单打印时间</option>
+                <option value="5">按发货时间</option>
+            </select>
+            <h4 style="width: 150px;padding: 0px;">
+                <input style="width: 100%;height: 30px;" name="time_type_value" id="time_type_value"/>
+            </h4>
+            <h3>订单状态：</h3>
+            <select name="status" id="status">
+                <option value="">全部</option>
+                <option value="0">待付款</option>
+                <option value="1" selected="selected">待发货</option>
+                <option value="2">已关闭</option>
+                <option value="3">已发货</option>
+                <option value="5">退款中</option>
+                <option value="6">已完成</option>
+            </select>
+            <h3>选择查询条件：</h3>
+            <!--<select class="red_select" name="type" id="type">-->
+            <select name="type" id="type">
+                <option value="">全部</option>
+                <option value="1">商品名称</option>
+                <option value="2">订单编号</option>
+                <option value="3">姓名</option>
+                <option value="4">手机号</option>
+            </select>
+            <h4 style="width: 150px;padding: 0px;">
+                <input style="width: 100%;height: 30px;" name="type_value" id="type_value"/>
+            </h4>
+            <h3>打印类型：</h3>
+            <select name="print_type" id="print_type">
+                <option value="">全部</option>
+                <option value="1">发货单</option>
+                <option value="2">快递单</option>
+            </select>
+            <h3>打印状态：</h3>
+            <select name="is_print" id="is_print">
+                <option value="">全部</option>
+                <option value="1">已打印</option>
+                <option value="0">未打印</option>
+            </select>
+            <button class="btn search_btn">搜 索</button>
+        </div>
+        <div class="info">
+            <div class="info_top clearfix">
+                <ul class="info_top_ul">
+                    <li>
+                        <i>订单情况：</i>
+                        <p><span class="user_num">0</span>买家/<span class="order_num">0</span>订单</p>
+                    </li>
+                    <li>
+                        <i>快递模板：</i>
+                        <p class="express_list">
+                            <input type="radio" id="express_0" name="express"><label>本地配送</label>
+                        </p>
+                    </li>
+                </ul>
+                <div class="configuration">
+                    <button class="layui-btn layui-btn-normal configeTemp">配置模板</button>
+                </div>
+                <div class="export">
+                    <button class="layui-btn layui-btn-normal exportcsv">订单导出</button>
+                </div>
+            </div>
+            <div class="tab_top clearfix">
+                <p><input type="checkbox" class="all_checkbox"></p>
+                <p>用户编号</p>
+                <p>姓名</p>
+                <p>手机号</p>
+                <p>收件地址</p>
+                <p>订单状态</p>
+                <p>快递单号</p>
+                <p>订单图片</p>
+                <p>订单规格</p>
+                <p>宝贝数量</p>
+                <p>留言备注</p>
+                <p>操 作</p>
+            </div>
+            <ul class="table_ul order_list"></ul>
+            <div id="page" style="margin-bottom: 60px;"></div>
+        </div>
+    </div>
+</div>
+<div class="footer">
+    <div class="footer_div clearfix">
+        <button class="print_temp" data-engshilname="leader_order">打印团长单</button>
+        <button class="print_temp" data-engshilname="Invoice">打印发货单</button>
+        <button class="print_temp" data-engshilname="purchasing_order">打印采购单</button>
+        <button class="print_temp" data-engshilname="distribution_bill">打印配货单</button>
+        <button class="print_temp" data-engshilname="route_sheet">打印路线单</button>
+        <button class="print_express_order">打印快递单</button>
+        <button class="deliver_goods">发 货</button>
+    </div>
+</div>
+<div class="tempModel" style="display: none;">
+    <div class="layui-fluid">
+        <div class="layui-tab layui-tab-brief" lay-filter="tab">
+            <ul class="layui-tab-title">
+                <li class="layui-this">我的模板</li>
+                <li>系统模板</li>
+            </ul>
+            <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show">
+                    <div class="layui-col-md12">
+                        <table id="myPageTable" lay-filter="myPageTable" lay-data="{id: 'myPageTable'}">
+                        </table>
+                    </div>
+                </div>
+                <div class="layui-tab-item">
+                    <div class="layui-col-md12">
+                        <table id="sysPageTable" lay-filter="sysPageTable" lay-data="{id: 'sysPageTable'}">
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script type="text/javascript">
+    layui.use('print/list', layui.factory('print/list'));
+</script>
+<script type="text/html" id="operations">
+    <a class="layui-btn layui-btn-xs" lay-event="select">选用</a>
+</script>
+<script type="text/html" id="Operations">
+    <a class="layui-btn layui-btn-xs" lay-event="edit" href='#/print/edit'>编辑</a>
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+</script>
+<style>
+    body {
+        height: 100vh;
+    }
+    .table_ul_top p {
+        line-height: 45px;
+    }
+
+    .configuration {
+        float: right;
+    }
+
+    .sealed-stamp-boards .btns {
+        height: 1.875rem;
+        line-height: 1.875rem;
+    }
+
+    .export {
+        margin: auto 10px;
+        float: right;
+    }
+</style>

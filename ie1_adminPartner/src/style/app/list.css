@@ -1,0 +1,76 @@
+.layui-col-md-offset1 {
+    margin-left: 8.33333333% !important;
+}
+
+.app_pic_url{
+    border: 1px dodgerblue solid;
+    /*padding: 15px;*/
+}
+
+.layui-tab-title li {
+    width: 23%;
+    font-size: 1.1vw;
+    padding: 2px 0px 0px 0px;
+
+    display: inline-block;
+    position: relative;
+    line-height: 32px;
+    min-width: 65px;
+    text-align: center;
+    cursor: pointer;
+
+    background: #ABABAB;
+    /*#1E9FFF;*/
+    color:#fff;
+    transform: scaleY(1.2) perspective(0.6em) rotateX(4deg);
+    transform-origin: bottom;
+}
+
+.layui-tab-title .layui-this, .outOfTime {
+    color: dodgerblue;
+}
+
+.layui-tab-title .layui-this:after {
+    height: 35px;
+}
+.layui-tab-title {
+    height: 35px;
+    border:none;
+}
+
+.detail {
+    text-align: center;
+    font-size: 1vw;
+    height: 18vw;
+    width: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2vw;
+}
+
+.img{
+    width: 10vw;
+    height: 10vw;
+}
+
+p{
+    height: 2vw;
+}
+
+.outOfTimePic{
+    border: 1px dimgrey solid;
+    filter: grayscale(100%);
+    /*padding: 15px;*/
+}
+
+.info{
+    width: 16vw;
+    height: 5vw;
+    /*position: absolute;*/
+    font-size: 0.8vw;
+}
+
+.pic{
+    text-align: center;
+}

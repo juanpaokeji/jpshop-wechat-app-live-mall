@@ -1,0 +1,89 @@
+<section id="uicut-app">
+    <section class="uc-section31">
+        <div class="box box1">
+            <div class="item item1"><span class="tt">审核状态</span>
+                <select name="status" id="status">
+                    <option value="">全部</option>
+                    <option value="0">审核中</option>
+                    <option value="2">审核失败</option>
+                </select>
+            </div>
+            <div class="item item2"><span class="tt">时间范围</span>
+                <input type="text" id="date-range0" placeholder="请选择时间范围">
+                <a href="javascript:void(0)" class="btn btn-red empty_time">清除</a>
+            </div>
+            <div class="item item3">
+                <span class="tt">关键词</span>
+                <input type="text" placeholder="请输入" name="searchName">
+                <input type="submit" value="搜索" class="btn examine_search">
+            </div>
+        </div>
+        <div class="box box2">
+            <div class="g-table">
+                <table class="groupExamineList"></table>
+            </div>
+        </div>
+        <div id="page" style="margin-bottom: 60px;"></div>
+    </section>
+</section>
+<script src="group/js/moment.min.js"></script>
+<script src="group/js/jquery.daterangepicker.min.js"></script>
+<link href="group/css/daterangepicker.min.css" rel="stylesheet">
+<link type="text/css" rel="styleSheet" href="./src/style/goods/group.css"/>
+<link type="text/css" rel="styleSheet" href="./group/css/main.css"/>
+<link type="text/css" rel="stylesheet" href="./start/layui/css/modules/code.css" />
+<script type="text/javascript" src="./src/lib/common.js"></script>
+<script>
+    $("body").on('click', '.checkbox', function (event) {
+        event.preventDefault();
+        $(this).toggleClass('on');
+    });
+	$(function () {
+	    if (!window['console']) {
+	        window.console = {};
+	        window.console.log = function () {
+	        };
+	    }
+		 $.dateRangePickerLanguages['custom'] =
+		    {
+		        'selected': 'Choosed:',
+		        'days': 'Days',
+		        'apply': 'Close',
+		        'week-1': 'Mon',
+		        'week-2': 'Tue',
+		        'week-3': 'Wed',
+		        'week-4': 'Thu',
+		        'week-5': 'Fri',
+		        'week-6': 'Sat',
+		        'week-7': 'Sun',
+		        'month-name': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+		        'shortcuts': 'Shortcuts',
+		        'past': 'Past',
+		        '7days': '7days',
+		        '14days': '14days',
+		        '30days': '30days',
+		        'previous': 'Previous',
+		        'prev-week': 'Week',
+		        'prev-month': 'Month',
+		        'prev-quarter': 'Quarter',
+		        'prev-year': 'Year',
+		        'less-than': 'Date range should longer than %d days',
+		        'more-than': 'Date range should less than %d days',
+		        'default-more': 'Please select a date range longer than %d days',
+		        'default-less': 'Please select a date range less than %d days',
+		        'default-range': 'Please select a date range between %d and %d days',
+		        'default-default': 'This is costom language'
+		    };
+		
+		$('#date-range0').dateRangePicker({})
+	});
+</script>
+<script type="text/javascript">
+    layui.use('customers/groupExamineList', layui.factory('customers/groupExamineList'));
+</script>
+
+<style>
+    #uicut-app input[type="text"] {
+        width: 40px;
+    }
+</style>

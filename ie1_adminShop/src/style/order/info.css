@@ -1,0 +1,109 @@
+.layui-col-md12{
+    margin-top: 3vw;
+    text-align: center;
+}
+.header-top{
+        width: 100%;
+        height:50px;
+        line-height: 50px;
+
+}
+.header-top .pic_url{
+    width: 6vw;
+    height: 2vw;
+    padding-bottom: 0.5vw;
+
+}
+/* b{
+    display: inline-block;
+    font-size: 1vw;
+    padding-right: 4.5vw;
+    width: 6vw;
+    height: 2vw;
+} */
+.header-top .name{
+    color:#000;  
+    display: inline-block;
+    font-size: 1vw;
+    padding-right: 4.5vw;
+    width: 6vw;
+    height: 2vw;
+}
+#mainNum, #mainPrice{
+     width: 50vw;
+     height: 25vw;
+ }
+
+.first{
+    width: 9vw;
+    height: 6vw;
+    background: #7BBAE3;
+    text-align: center;
+    padding-top: 2.5vw;
+    margin-left: 9vw;
+}
+.two{
+    background: #ED8178;
+    width: 9vw;
+    height: 6vw;
+    text-align: center;
+    padding-top: 2.5vw;
+    margin: 0 15px;
+}
+
+.three{
+    background: #57C78A;
+    width: 9vw;
+    height: 6vw;
+    text-align: center;
+    padding-top: 2.5vw;
+
+}
+.four{
+    background-color: #F9B382;
+    width: 9vw;
+    height: 6vw;
+    text-align: center;
+    padding-top: 2.5vw;
+    margin: 0 15px;
+
+}
+.five{
+    background: #A1C4A6;
+    width: 9vw;
+    height: 6vw;
+    text-align: center;
+    padding-top: 2.5vw;
+
+}
+.six{
+    background: #ED8178;
+    width: 9vw;
+    height: 6vw;
+    text-align: center;
+    padding-top: 2.5vw;
+    margin: 0 15px;
+
+}
+.seven{
+    background: #7BBAE3;
+    width: 9vw;
+    height: 6vw;
+    text-align: center;
+    padding-top: 2.5vw;
+
+}
+p{
+    color:#fff;  
+}
+span{
+    color:#fff;
+}
+/*.layui-layout-admin .layui-body .layadmin-tabsbody-item{*/
+    /*margin-left: -5vw;*/
+/*}*/
+.chart{
+    display:flex;
+    flex-direction:row;
+    justify-content:flex-start;
+}

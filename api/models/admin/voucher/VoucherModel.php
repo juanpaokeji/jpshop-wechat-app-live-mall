@@ -1,0 +1,251 @@
+<?php
+
+/**
+ * This file is part of Swoft.
+ *
+ * @link https://swoft.org
+ * @document https://doc.swoft.org
+ * @contact group@swoft.org
+ * @license https://github.com/swoft-cloud/swoft/blob/master/LICENSE
+ */
+
+namespace app\models\admin\voucher;
+
+//引入各表实体
+use app\models\core\TableModel;
+use yii\db\Exception;
+
+/**
+ *
+ * @version   2018年04月16日 抵用卷
+ * @author    YangJing <120912212@qq.com>
+ * @copyright Copyright 2018 Swoft software
+ * @license   PHP Version 7.x {@link http://www.php.net/license/3_0.txt}
+ *
+ * @Bean()
+ */
+class VoucherModel extends TableModel {
+
+    /**
+     * 查询列表接口
+     * 地址:/admin/group/list
+     * @throws Exception if the model cannot be found
+     * @return array
+     */
+    public function findall($params) {
+        //数据库操作
+
+        try {
+            $table = new TableModel();
+            $params['delete_time is null'] = null;
+            $params['table'] = "system_voucher";
+            if (isset($params['searchName'])) {
+                $params['searchName'] = trim($params['searchName']);
+                $params["cdkey like '%{$params['searchName']}%'"] = null;
+                unset($params['searchName']);
+            }
+            $res = $table->tableList($params);
+            $app = $res['app'];
+        } catch (Exception $ex) {
+            return result(500, '数据库操作失败');
+        }
+        //返回数据 时间格式重置
+        for ($i = 0; $i < count($app); $i++) {
+            $app[$i]['create_time'] = date('Y-m-d H:i:s', $app[$i]['create_time']);
+            if ($app[$i]['update_time'] != "") {
+                $app[$i]['update_time'] = date('Y-m-d H:i:s', $app[$i]['update_time']);
+            }
+            if ($app[$i]['start_time'] != ""&&$app[$i]['start_time'] != 0) {
+                $app[$i]['start_time'] = date('Y-m-d', $app[$i]['start_time']);
+            }else{
+                  $app[$i]['start_time'] ="";
+            }
+            if ($app[$i]['end_time'] != ""&&$app[$i]['end_time'] != 0) {
+                $app[$i]['end_time'] = date('Y-m-d', $app[$i]['end_time']);
+            }else{
+                  $app[$i]['end_time'] ="";
+            }
+            $rs1 = $table->tableSingle('merchant_user', ['id' => $app[$i]['merchant_id'], 'delete_time is null' => null]);
+            if ($rs1) {
+                $app[$i]['merchant_id'] = $rs1['name'];
+            } else {
+                $app[$i]['merchant_id'] = "无";
+            }
+            $rs2 = $table->tableSingle('system_voucher_type', ['id' => $app[$i]['type_id'], 'delete_time is null' => null]);
+            $app[$i]['type_id'] = $rs2['name'];
+            if ($rs1) {
+                $app[$i]['merchant_id'] = $rs1['name'];
+            } else {
+                $app[$i]['merchant_id'] = "未选择";
+            }
+        }
+        if (empty($app)) {
+            return result(204, '查询失败');
+        } else {
+            return ['status' => 200, 'message' => '请求成功', 'data' => $app, 'count' => $res['count']];
+        }
+    }
+
+    /**
+     * 查询列表接口
+     * 地址:/admin/group/list
+     * @throws Exception if the model cannot be found
+     * @return array
+     */
+    public function findjoin() {
+        $table = new TableModel();
+        try {
+            $app = $table->querySql('SELECT v.*,m.name as mname FROM `system_voucher` as v inner join merchant_user as  m  on  m.`name` = v.merchant_id where v.delete_time is null');
+        } catch (Exception $ex) {
+            return result(500, '数据库操作失败');
+        }
+        //返回数据 时间格式重置
+        for ($i = 0; $i < count($app); $i++) {
+            $app[$i]['create_time'] = date('Y-m-d H:i:s', $app[$i]['create_time']);
+            if ($app[$i]['update_time'] != "") {
+                $app[$i]['update_time'] = date('Y-m-d H:i:s', $app[$i]['update_time']);
+            }
+            if ($app[$i]['start_time'] != "") {
+                $app[$i]['start_time'] = date('Y-m-d', $app[$i]['start_time']);
+            }
+            if ($app[$i]['end_time'] != "") {
+                $app[$i]['end_time'] = date('Y-m-d', $app[$i]['end_time']);
+            }
+        }
+        if (empty($app)) {
+            return result(204, '查询失败');
+        } else {
+            return result(200, '请求成功', $app);
+        }
+    }
+
+    /**
+     * 查询单条接口
+     * 地址:/admin/group/single
+     * @throws Exception if the model cannot be found
+     * @return array
+     */
+    public function find($params) {
+
+        $table = new TableModel();
+        //数据库操作
+        try {
+            $app = $table->tableSingle('system_voucher', ['cdkey' => $params['cdkey'], 'delete_time is null' => null]);
+        } catch (Exception $ex) {
+            return result(500, '数据库操作失败');
+        }
+        if (empty($app)) {
+            return result(204, '未找到对应数据');
+        } else {
+            $app['create_time'] = date('Y-m-d H:i:s', $app['create_time']);
+            if ($app['update_time'] != "") {
+                $app['update_time'] = date('Y-m-d H:i:s', $app['update_time']);
+            }
+            if ($app['start_time'] != "") {
+                $app['start_time'] = date('Y-m-d H:i:s', $app['start_time']);
+            }
+            if ($app['end_time'] != "") {
+                $app['end_time'] = date('Y-m-d H:i:s', $app['end_time']);
+            }
+            return result(200, '请求成功', $app);
+        }
+    }
+
+    /**
+     * 查询单条接口
+     * 地址:/admin/group/single
+     * @throws Exception if the model cannot be found
+     * @return array
+     */
+    public function findByParams($params) {
+
+        $table = new TableModel();
+        //数据库操作
+        try {
+            $params['delete_time is null'] = null;
+            $app = $table->tableSingle('system_voucher', $params);
+        } catch (Exception $ex) {
+            return result(500, '数据库操作失败');
+        }
+        if (gettype($app) != 'array') {
+            return result(204, '未找到对应数据');
+        } else {
+            $app['create_time'] = date('Y-m-d H:i:s', $app['create_time']);
+            if ($app['update_time'] != "") {
+                $app['update_time'] = date('Y-m-d H:i:s', $app['update_time']);
+            }
+            return result(200, '请求成功', $app);
+        }
+    }
+
+    /**
+     * 新增接口
+     * 地址:/admin/group/add
+     * @throws Exception if the model cannot be found
+     * @return array
+     */
+    public function add($params) {
+        //数据库操作
+        $table = new TableModel();
+        try {
+            $params['create_time'] = time();
+            $res = $table->tableAdd('system_voucher', $params);
+        } catch (Exception $ex) {
+            return result(500, '数据库操作失败');
+        }
+        if (!$res) {
+            return result(500, '新增失败');
+        } else {
+            return result(200, '请求成功');
+        }
+    }
+
+    /**
+     * 删除接口
+     * 地 址:/admin/group/delete
+     * @throws Exception if the model cannot be found
+     * @return array
+     */
+    public function delete($params) {
+        //where条件设置
+        $where = ['cdkey' => $params['cdkey']];
+        $params['delete_time'] = time();
+        //数据库操作
+        $table = new TableModel();
+        try {
+            $res = $table->tableUpdate('system_voucher', $params, $where);
+        } catch (Exception $ex) {
+            return result(500, '数据库操作失败');
+        }
+        if (!$res) {
+            return result(204, '删除失败');
+        } else {
+            return result(200, '请求成功');
+        }
+    }
+
+    /**
+     * 更新接口
+     * 地址:/admin/group/update
+     * @throws Exception if the model cannot be found
+     * @return array
+     */
+    public function update($params) {
+        //where 条件设置
+        $where = ['cdkey' => $params['cdkey']];
+        unset($params['id']);
+        //数据库操作
+        $table = new TableModel();
+        try {
+            $res = $table->tableUpdate('system_voucher', $params, $where);
+        } catch (Exception $ex) {
+            return result(500, '数据库操作失败');
+        }
+        if (!$res) {
+            return result(500, '更新失败');
+        } else {
+            return result(200, '请求成功');
+        }
+    }
+
+}

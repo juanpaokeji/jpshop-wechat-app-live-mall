@@ -1,0 +1,133 @@
+<title>model</title>
+<div class="layui-fluid">
+    <div class="layui-col-md12">
+        <form class="layui-form layui-col-md11">
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <input name="searchName" placeholder="请输入名称" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-input-inline">
+                    <a class="layui-btn" lay-submit lay-filter="find">查询</a>
+                </div>
+            </div>
+        </form>
+        <a class="layui-btn layui-col-md1" lay-submit lay-filter="showAdd">新增</a>
+    </div>
+    <!--弹出层-->
+    <form class="layui-form" style='display:none;' id="add_edit_form" enctype="multipart/form-data">
+        <div class="layui-form-item">
+            <label class="layui-form-label">素材名称</label>
+            <div class="layui-input-inline">
+                <input name="name" required lay-verify="required" placeholder="请输入素材名称" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">类型</label>
+            <div class="layui-input-inline">
+                <select name="type" id="type">
+                    <option value="1">模板</option>
+                    <option value="2">卡通</option>
+                    <option value="3">图标</option>
+                    <option value="4">字体</option>
+                    <option value="5">边框</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">模板字符串</label>
+            <div class="layui-input-block">
+                <textarea name="pic_str" placeholder="请输入模板字符串，仅类型为模板必须"
+                          class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">图片</label>
+            <div class="layui-input-block">
+					<span class="layui-col-md12" style="position:relative; display:block;">
+						<a class="layui-btn layui-col-md4">上传</a>
+						<input id="addImgPut" name="file" type="file">
+					</span>
+                <img id="image">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-block">
+                <input type="checkbox" name="add_edit_status" checked lay-skin="switch" lay-text="开启|关闭">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" id="btn" lay-submit lay-filter="sub">提交</a>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+        <input name="key" style='display:none;' />
+    </form>
+    <!--数据表格-->
+    <div class="layui-col-md12">
+        <table id="pageTable" lay-filter="pageTable" lay-data="{id: 'pageTable'}">
+        </table>
+    </div>
+</div>
+<!--添加/编辑签名-->
+<script type="text/javascript">
+    layui.use('design', layui.factory('design'));
+</script>
+<script type="text/html" id="operations">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+</script>
+<!--图片模板-->
+<script type="text/html" id="imgTpl">
+    <img class="layui-upload-img" style="width:40px; height:40px"
+         src={{ d.pic_url }}>
+</script>
+<!--状态码模板-->
+<script type="text/html" id="statusTpl">
+    <input type="checkbox" value="{{d.id}}" lay-skin="switch" lay-text="开启|关闭" lay-filter="statusTpl" {{
+           d.status== 1 ? 'checked' : '' }}>
+</script>
+<!--应用类型模板-->
+<script type="text/html" id="typeTpl">
+    {{#  if(d.type == '1'){ }}
+    <span class="layui-col-md8">模板</span>
+    {{#  } else if(d.type == '2'){ }}
+    <span class="layui-col-md8">卡通</span>
+    {{#  } else if(d.type == '3'){ }}
+    <span class="layui-col-md8">图标</span>
+    {{#  } else if(d.type == '4'){ }}
+    <span class="layui-col-md8">字体</span>
+    {{#  } else if(d.type == '5'){ }}
+    <span class="layui-col-md8">边框</span>
+    {{#  } else { }}
+    <span class="layui-col-md8">类型错误</span>
+    {{#  } }}
+</script>
+<style>
+    #add_edit_form {
+        margin-top: 20px;
+        margin-right: 20px;
+    }
+
+    #image {
+        height: 200px;
+        width: 200px;
+        margin-top: 10px;
+        border: 1px solid #e5e5e5;
+    }
+
+    input[id=addImgPut] {
+        border: 0px solid red;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        opacity: 0;
+        height: 36px;
+        width: 200px;
+    }
+
+    input[id=addImgPut] :hover {
+        cursor: pointer;
+    }
+</style>

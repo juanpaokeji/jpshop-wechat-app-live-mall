@@ -1,0 +1,68 @@
+<title>店铺装修模板列表</title>
+<div class="layui-fluid">
+	
+	<div class="template-content">
+		<div class="search-template">
+			<form class="layui-form">
+				<div class="layui-form-item">
+					<div class="search-content">
+						<label class="layui-form-label">模板标签:</label>
+						<div class="layui-input-inline">
+							<input type="text" name="name" lay-verify="name" autocomplete="off" placeholder="请输入模板标签" class="layui-input">
+						</div>
+						<label class="search-templates">
+							<i class="layui-icon layui-icon-search"></i>
+						</label>
+					</div>
+					
+				</div>
+			</form>
+		</div>
+		<div class="template-liist">
+			<ul class="layui-row">
+				<li class="decoration">
+					<div class="borders">
+						<div class="add"></div>
+					</div>
+				</li>
+				
+			</ul>
+		</div>
+	</div>
+</div>
+<!--添加/编辑签名-->
+<script type="text/javascript">
+    layui.use('set/decoration/list', layui.factory('set/decoration/list'));
+</script>
+<style>
+	.template-content{width: 100%;height: 100%;}
+	/* 模板查询 */
+	.search-template{width: 100%;height: 4.375rem;}
+	.search-content{height: 2.375rem;width: 31.25rem;margin-left: 37.5rem;}
+	.search-content .layui-form-label{line-height: 1.25rem;}
+	.search-templates{width: 2.125rem;height: 2.125rem;float: left;border: 0.0625rem solid #DEDFE3;background-color: #EBEBEB;border-radius: 0.1875rem;cursor: pointer;}
+	.search-templates i{font-size: 1.25rem;line-height: 2.125rem;margin-left: 0.4375rem;}
+	.template-liist{width: 100%;height: auto;}
+	.template-liist ul{padding-left: 0.625rem;}
+	.template-liist ul li{list-style: none;margin: 1.25rem 2.8125rem;width: 14.625rem;height: 30.625rem;float: left;}
+	.template-liist ul li img{width:100%;height: 100%;overflow: hidden;}
+	.mask{width: 14.75rem;height: 28.125rem;position: relative;z-index: 10000;top: -29.4rem;display: inline-block;border-radius: 1.4375rem;}
+	.layui-row li a:hover{background:rgba(0,0,0,0.5)}
+	.btnGroup{width: 100%;height: 100%;display: none;}
+	/* .img-border{margin: 0.0625rem;height: 28.125rem;} */
+	.img-border{margin: 0.0625rem;height: 28.125rem;width: 100%;background: no-repeat;background-size: 104% 104%;background-position: -7px -6px;}
+	.enable-text{display: inline-block;position: relative;top: -3.125rem;left: 10.625rem;border: 0 solid !important;z-index: 10000;visibility:hidden;font-size: 1.125rem;color: #5CC435;transform: rotate(-45deg);}
+	.able-border{border: 0.0625rem solid #5CC435;border-radius: 1.4375rem 1.4375rem 1.5625rem 1.5625rem;}
+	.Active{display: none;}
+	/* 编辑、删除模板 */
+	.btnGroup .a{margin-top: 8.75rem !important;}
+	.btnGroup .edit,.btnGroup .del,.btnGroup .enable{margin-left: 4.5rem;margin-top: 1.25rem;}
+	.borders{border: 1px solid #C0C0C0;height: 100%;}
+	
+	.add {width: 100px; height: 100px;color: #ccc;transition: color .25s; position: relative;top: 10.9375rem;left: 4.1875rem;}
+	.add::before{content: '';position: absolute;left: 50%;top: 50%;width: 80px; margin-left: -40px; margin-top: -5px;border-top: 10px solid;}
+	.add::after {content: ''; position: absolute;left: 50%;top: 50%; height: 80px;margin-left: -5px;margin-top: -40px;border-left: 10px solid;}
+	.borders:hover{cursor: pointer;background-color: #000000;opacity: .3;}
+	
+	.title{text-align: center;height: 1.25rem;font-size: 1rem;line-height: 1.25rem;margin-bottom: 1.25rem;}
+</style>

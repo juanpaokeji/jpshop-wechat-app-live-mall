@@ -1,0 +1,62 @@
+.layui-fluid {
+    padding: 15px;
+    background-color: #eee;
+    min-height: 920px;
+}
+.title {
+    padding-top: 6vw;
+    text-align: center;
+    font-size: 1vw;
+}
+
+.layui-col-md-offset1 {
+    margin-left: 8.33333333% !important;
+    display: flex;
+    justify-content: space-around;
+    min-height: 22vw;
+    align-items: center;
+}
+
+.outOfTime {
+    color: dodgerblue;
+}
+
+.title {
+    text-align: center;
+    font-size: 1vw;
+}
+
+.comboList {
+    text-align: center;
+    /*font-size: 1.2vw;*/
+    width: 12vw;
+    height: 18vw;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background: #fff;
+    box-shadow: 0 0 18px 0 #999;
+}
+.layui-row{
+    display: flex;
+    flex-direction:column;
+    justify-content: space-between;
+    min-height: 18vw;
+}
+img {
+    width: 6vw;
+    height: 6vw;
+}
+
+p {
+    font-size: 10px;
+}
+
+.a {
+    text-align: center;
+}
+.name {
+    font-size: 16px;
+    letter-spacing: 3px;
+}
+

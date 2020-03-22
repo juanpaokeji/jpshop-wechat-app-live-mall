@@ -1,0 +1,187 @@
+<title>拼团商品</title>
+<div class="layui-fluid">
+    <div class="layui-tab" lay-filter="assemble_list">
+        <ul class="layui-tab-title">
+            <li class="layui-this" lay-id="1">拼团商品</li>
+            <li lay-id="2">订单管理</li>
+            <li lay-id="3">拼团管理</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <div class="layui-fluid">
+                    <div class="layui-col-md12">
+                        <form class="layui-form layui-col-md11">
+                            <div class="layui-form-item">
+                                <div class="layui-input-inline">
+                                    <input type="text" name="searchName" placeholder="请输入商品名称" autocomplete="off" class="layui-input">
+                                </div>
+                                <div class="layui-input-inline">
+                                    <a class="layui-btn" lay-submit lay-filter="find">查询</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <!--数据表格-->
+                    <div class="layui-col-md12">
+                        <table id="pageTable1" lay-filter="pageTable" lay-data="{id: 'pageTable'}">
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-tab-item">
+                <div class="layui-tab-item layui-show">
+                    <div class="layui-fluid">
+                        <div class="layui-col-md12">
+                            <form class="layui-form layui-col-md11">
+                                <div class="layui-form-item">
+                                    <div class="layui-input-inline">
+                                        <input type="text" name="searchName" placeholder="请输入商品名称或买家昵称" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-input-inline">
+                                        <a class="layui-btn" lay-submit lay-filter="find">查询</a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <!--数据表格-->
+                        <div class="layui-col-md12">
+                            <table id="pageTable2" lay-filter="pageTable" lay-data="{id: 'pageTable'}">
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-tab-item">
+                <div class="layui-tab-item layui-show">
+                    <div class="layui-fluid">
+                        <div class="layui-col-md12">
+                            <form class="layui-form layui-col-md11">
+                                <div class="layui-form-item">
+                                    <div class="layui-input-inline">
+                                        <input type="text" name="searchName" placeholder="请输入商品名称或团长昵称" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-input-inline">
+                                        <a class="layui-btn" lay-submit lay-filter="find">查询</a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <!--数据表格-->
+                        <div class="layui-col-md12">
+                            <table id="pageTable3" lay-filter="pageTable" lay-data="{id: 'pageTable'}">
+                            </table>
+                        </div>
+                        <!--弹出层-->
+                        <form class="layui-form" style='display:none;' id="count_form">
+                            <!--        <div class="layui-form-item" style="margin-left: 20px;margin-top: 20px">-->
+                            <!--            <div class="layui-input-inline">-->
+                            <!--                <input name="searchNameC" placeholder="请输入团员姓名" autocomplete="off" class="layui-input">-->
+                            <!--            </div>-->
+                            <!--            <div class="layui-input-inline">-->
+                            <!--                <a class="layui-btn" lay-submit lay-filter="findC">查询</a>-->
+                            <!--            </div>-->
+                            <!--        </div>-->
+                            <!--数据表格-->
+                            <div class="layui-col-md12">
+                                <table id="pageTableCount" lay-filter="pageTableCount" lay-data="{id: 'pageTableCount'}"></table>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<script type="text/javascript" src="./src/lib/common.js"></script>
+
+<script type="text/javascript">
+    layui.use('voucher/assemble', layui.factory('voucher/assemble'));
+</script>
+<!--状态码模板-->
+<script type="text/html" id="statusTpl">
+    {{#  if(d.status == '1'){ }}
+    <span class="layui-col-md8">开启</span>
+    {{#  } else if(d.status == '0'){ }}
+    <span class="layui-col-md8">关闭</span>
+    {{#  } else { }}
+    <span class="layui-col-md8">类型错误</span>
+    {{#  } }}
+</script>
+<script type="text/html" id="statusTp2">
+    {{#  if(d.type == '1'){ }}
+    <span class="layui-col-md8">多人团</span>
+    {{#  } else if(d.type == '2'){ }}
+    <span class="layui-col-md8">阶梯团</span>
+    {{#  } else { }}
+    <span class="layui-col-md8">类型错误</span>
+    {{#  } }}
+</script>
+<script type="text/html" id="statusTp3">
+    {{#  if(d.assemble_status == '4' || d.assemble_status == '2' || d.assemble_status == '5' || d.assemble_status == '9'){ }}
+    <span class="layui-col-md8">拼团失败</span>
+    {{#  } else if(d.assemble_status == '11' || d.assemble_status == '0'){ }}
+    <span class="layui-col-md8">等待成团</span>
+    {{#  } else if(d.assemble_status == '1' || d.assemble_status == '3' || d.assemble_status == '6' || d.assemble_status == '7'){ }}
+    <span class="layui-col-md8">已成团</span>
+    {{#  } else { }}
+    <span class="layui-col-md8">类型错误</span>
+    {{#  } }}
+</script>
+<script type="text/html" id="statusTp4">
+    {{#  if(d.assemble_status == '4' || d.assemble_status == '2' || d.assemble_status == '5' || d.assemble_status == '9'){ }}
+    <span class="layui-col-md8">拼团失败</span>
+    {{#  } else if(d.assemble_status == '11' || d.assemble_status == '0'){ }}
+    <span class="layui-col-md8">等待成团</span>
+    {{#  } else if(d.assemble_status == '1' || d.assemble_status == '3' || d.assemble_status == '6' || d.assemble_status == '7'){ }}
+    <span class="layui-col-md8">已成团</span>
+    {{#  } else { }}
+    <span class="layui-col-md8">类型错误</span>
+    {{#  } }}
+</script>
+<script type="text/html" id="statusTp5">
+    {{#  if(d.assemble_status == '0'){ }}
+    <span class="layui-col-md8">待付款</span>
+    {{#  } else if(d.assemble_status == '1'){ }}
+    <span class="layui-col-md8">待发货</span>
+    {{#  } else if(d.assemble_status == '2'){ }}
+    <span class="layui-col-md8">已取消</span>
+    {{#  } else if(d.assemble_status == '3'){ }}
+    <span class="layui-col-md8">已发货</span>
+    {{#  } else if(d.assemble_status == '4'){ }}
+    <span class="layui-col-md8">已退款</span>
+    {{#  } else if(d.assemble_status == '5'){ }}
+    <span class="layui-col-md8">退款中</span>
+    {{#  } else if(d.assemble_status == '6'){ }}
+    <span class="layui-col-md8">待评价</span>
+    {{#  } else if(d.assemble_status == '7'){ }}
+    <span class="layui-col-md8">已完成</span>
+    {{#  } else if(d.assemble_status == '8'){ }}
+    <span class="layui-col-md8">已删除</span>
+    {{#  } else if(d.assemble_status == '9'){ }}
+    <span class="layui-col-md8">一键退款</span>
+    {{#  } else if(d.assemble_status == '11'){ }}
+    <span class="layui-col-md8">拼团中</span>
+    {{#  } else { }}
+    <span class="layui-col-md8">类型错误</span>
+    {{#  } }}
+</script>
+<style>
+    #count_form .laytable-cell-3-nickname {
+        width: 148px;
+    }
+    #count_form .laytable-cell-3-name {
+        width: 148px;
+    }
+    #count_form .laytable-cell-3-phone {
+        width: 148px;
+    }
+    #count_form .laytable-cell-3-assemble_status {
+        width: 148px;
+    }
+    #count_form .laytable-cell-3-format_create_time {
+        width: 198px;
+    }
+</style>

@@ -1,0 +1,48 @@
+<title>订单概述</title>
+<div class="layui-fluid">
+    <div class="layui-col-md12">
+        <div class="layui-row layui-col-space10">
+            <div class="layui-col-md2 first">
+                <span class="order">0</span>
+                <p>订单数量</p>
+            </div>
+            <div class="layui-col-md2 two">
+                <span class="payment">0</span>
+                <p>待付款</p>
+            </div>
+            <div class="layui-col-md2 three">
+                <span class="delivery">0</span>
+                <p>待发货</p>
+            </div>
+            <div class="layui-col-md2 four">
+                <span class="evaluate">0</span>
+                <p>待评价</p>
+            </div>
+            <div class="layui-col-md2 five">
+                <span class="safeguardingRights">0</span>
+                <p>维权中</p>
+            </div>
+            <div class="layui-col-md2 six">
+                <span class="todayOrder">0</span>
+                <p>今日下单数量</p>
+            </div>
+            <div class="layui-col-md2 seven">
+                <span class="todayPrice">0</span>
+                <p>今日订单金额</p>
+            </div>
+        </div>
+        <!--<div class="layui-row layui-col-space10">-->
+            <!---->
+        <!--</div>-->
+    </div>
+    <div class="layui-col-md12 chart">
+        <div id="mainNum"></div>
+        <div id="mainPrice"></div>
+    </div>
+</div>
+<!--添加/编辑签名-->
+<script type="text/javascript">
+    layui.use('order/summary', layui.factory('order/summary'));
+</script>
+<script src="./src/lib/echarts.js"></script>
+<link rel="stylesheet" href="./src/style/order/info.css">

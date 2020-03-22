@@ -1,0 +1,117 @@
+<title>抵用券列表</title>
+
+<div class="layui-fluid">
+	<!--弹出框-->
+	<div class="layui-col-md12" style="display:none;" id="post_add">
+		<form class="layui-form">
+			<div class="layui-form-item">
+				<label class="layui-form-label">代金券类型</label>
+				<div class="layui-input-inline">
+					<select name="post_category_name" lay-filter="applicationgroup">
+						<option value="">请选择</option>
+					</select>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">绑定商户</label>
+				<div class="layui-input-block">
+					<select name="post_merchant_id" lay-filter="applicationgroup">
+						<option value="">请选择</option>
+					</select>
+				</div>
+			</div>
+		</form>
+	</div>
+	
+	<div class="layui-col-md12" style="display:none;" id="put_change">
+		<form class="layui-form">
+			<div class="layui-form-item">
+				<label class="layui-form-label">代金券类型</label>
+				<div class="layui-input-inline">
+					<select name="put_category_name" lay-filter="applicationgroup">
+						<option value="">请选择</option>
+					</select>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">绑定商户</label>
+				<div class="layui-input-block">
+					<select name="put_merchant_id" lay-filter="applicationgroup">
+						<option value="">请选择</option>
+					</select>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">cdkey状态</label>
+				<div class="layui-input-block">
+					<input type="radio" name="put_applicationStatus" value="1" title="启用">
+					<input type="radio" name="put_applicationStatus" value="0" title="不启用">
+				</div>
+			</div>
+		</form>
+	</div>
+	
+	<!--body-->
+	<div class="layui-row">
+		<!--查询-->
+		<div class="layui-col-md12">
+			<form class="layui-form">
+				<div class="layui-form-item">
+					<div class="layui-input-inline">
+						<input type="text" name="title" required  lay-verify="required" placeholder="请输入id" autocomplete="off" class="layui-input">
+					</div>
+					<div class="layui-input-inline">
+						<a class="layui-btn" lay-submit lay-filter="find">查询</a>
+						<a class="layui-btn" id="add">添加</a>
+					</div>
+				</div>
+			</form>
+		</div>
+		<hr>
+		<!--数据表格-->
+		<div class="layui-col-md12">
+			<table id="views_vouchers_vouchersList" lay-filter="views_vouchers_vouchersList" lay-data="{id: 'views_vouchers_vouchersList'}"></table>
+		</div>
+	</div>
+</div>
+<!--表格工具条-->
+<script type="text/html" id="opreationes">
+  <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+
+<!--状态码模板-->
+<script type="text/html" id="statusTpl">
+   <input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="开启|关闭" lay-filter="sexDemo" {{ d.status == 1 ? 'checked' : '' }}>
+</script>
+<!--是否兑换模板-->
+<script type="text/html" id="is_exchangeTpl">
+   <a>{{ d.is_exchange == 1 ? '已兑换' : '未兑换' }}</a>
+</script>
+<!--是否使用模板-->
+<script type="text/html" id="is_usedTpl">
+   <a>{{ d.is_used == 1 ? '已使用' : '未使用' }}</a>
+</script>
+<script>
+layui.use('views_vouchers_vouchersList', layui.factory('views_vouchers_vouchersList'));
+</script>
+<style>
+	tbody>tr{
+		height:100px;
+	}
+	tbody > tr > td > .laytable-cell-1-pic_url{
+		height:40px;
+	}
+	form{
+		margin-top:10px;
+		margin-right:20px;
+	}
+	#DocumentScreenimgput{
+		height:200px;
+		width:200px;
+		margin-top:10px;
+		border:1px solid #e5e5e5;
+	}
+
+</style>

@@ -1,0 +1,2 @@
+/** layuiAdmin.pro-v1.0.0-beta7 LPPL License By http://www.layui.com/admin/ */
+ #addImgPut,#image,#putAddBtn{width:200px}.price,.sub,.title{text-align:center}#image{height:200px;margin-top:10px;border:1px solid #e5e5e5;margin-left:150px}input[id=addImgPut]{border:0 solid red;position:absolute;left:0;top:0;opacity:0;height:36px;width:200px}input[id=addImgPut] :hover{cursor:pointer}.title{font-size:1.5vw}.pic,.upThree{font-size:1vw}.upThree{margin-top:2vw}.layui-form-label{width:120px}.input{width:90%}.price b{display:inline-block;width:1.5vw}

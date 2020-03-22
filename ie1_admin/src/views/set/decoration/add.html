@@ -1,0 +1,1696 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="./decoration/css/layout.css">
+    <link rel="stylesheet" href="./decoration/css/jquery.minicolors.css">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="stylesheet" href="./decoration/css/main.css">
+	<script type="text/javascript" src="./src/lib/ueditor/ueditor.config.js"></script>
+	<!--&lt;!&ndash; 编辑器源码文件 &ndash;&gt;-->
+	<script type="text/javascript" src="./src/lib/ueditor/ueditor.all.js"></script>
+    <!--[if lt IE 9]>
+    <script src="./decoration/js/html5shiv.min.js"></script>
+    <script src="./decoration/js/respond.min.js"></script>
+    <![endif]-->
+    <meta name="renderer" content="webkit">
+    <link rel="shortcut icon" href="">
+</head>
+<body>
+
+<section id="uicut-app">
+    <section class="g-mainBox">
+        <section class="g-sideMenu scroll">
+            <div class="title">图文组件</div>
+            <ul class="list">
+                <li><span v-on:click.stop="btnAddNewModel(1)"><img src="./decoration/images/uc-icon-sidemenu1-1.png"
+                                                                   alt="">轮播图</span></li>
+                <li><span v-on:click.stop="btnAddNewModel(2)"><img src="./decoration/images/uc-icon-sidemenu1-2.png"
+                                                                   alt="">广告位</span></li>
+                <li><span v-on:click.stop="btnAddNewModel(3)"><img src="./decoration/images/uc-icon-sidemenu1-3.png"
+                                                                   alt="">导航</span></li>
+                <li><span v-on:click.stop="btnAddNewModel(4)"><img src="./decoration/images/uc-icon-sidemenu1-4.png"
+                                                                   alt="">标题</span></li>
+                <li><span v-on:click.stop="btnAddNewModel(5)"><img src="./decoration/images/uc-icon-sidemenu1-5.png"
+                                                                   alt="">图文集</span></li>
+                <li><span v-on:click.stop="btnAddNewModel(6)"><img src="./decoration/images/uc-icon-sidemenu1-6.png"
+                                                                   alt="">图片列表</span></li>
+                <li><span v-on:click.stop="btnAddNewModel(7)"><img src="./decoration/images/uc-icon-sidemenu1-7.png"
+                                                                   alt="">三方图</span></li>
+                <li><span v-on:click.stop="btnAddNewModel(8)"><img src="./decoration/images/uc-icon-sidemenu1-8.png"
+                                                                   alt="">四方图</span></li>
+                <li></li>
+            </ul>
+			<div class="title">商品组件</div>
+			<ul class="list">
+			    <li><span v-on:click.stop="btnAddNewModel(20)"><img src="./decoration/images/uc-icon-sidemenu3-1.png"
+			                                                        alt="">商品集</span></li>
+			    <li><span v-on:click.stop="btnAddNewModel(21)"><img src="./decoration/images/uc-icon-sidemenu3-2.png"
+			                                                        alt="">产品集</span></li>
+			    <li><span v-on:click.stop="btnAddNewModel(27)"><img src="./decoration/images/coupon.png"
+			                                                        alt="">优惠券</span></li>
+				<li><span v-on:click.stop="btnAddNewModel(28)"><img src="./decoration/images/uc-icon-sidemenu3-1.png"
+																	alt="">商品分类</span></li>
+				<li></li>
+				<li></li>
+			</ul>
+			
+            <div class="title">其他</div>
+            <ul class="list">
+                <li><span v-on:click.stop="btnAddNewModel(9)"><img src="./decoration/images/uc-icon-sidemenu2-1.png"
+                                                                   alt="">视频</span></li>
+                <li><span v-on:click.stop="btnAddNewModel(10)"><img src="./decoration/images/uc-icon-sidemenu2-2.png"
+                                                                    alt="">音频</span></li>
+                <li><span v-on:click.stop="btnAddNewModel(11)"><img src="./decoration/images/uc-icon-sidemenu2-3.png"
+                                                                    alt="">富文本</span></li>
+                <!-- <li><span v-on:click.stop="btnAddNewModel(12)"><img src="./decoration/images/uc-icon-sidemenu2-4.png"
+                                                                    alt="">辅助空白</span></li> -->
+                <li><span v-on:click.stop="btnAddNewModel(13)"><img src="./decoration/images/uc-icon-sidemenu2-5.png"
+                                                                    alt="">分割线</span></li>
+                <li><span v-on:click.stop="btnAddNewModel(14)"><img src="./decoration/images/uc-icon-sidemenu2-6.png"
+                                                                    alt="">悬浮图标</span></li>
+                <li><span v-on:click.stop="btnAddNewModel(15)"><img src="./decoration/images/uc-icon-sidemenu2-7.png"
+                                                                    alt="">按钮</span></li>
+                <!-- <li><span v-on:click.stop="btnAddNewModel(16)"><img src="./decoration/images/uc-icon-sidemenu2-8.png"
+                                                                    alt="">表单</span></li> -->
+                <li><span v-on:click.stop="btnAddNewModel(17)"><img src="./decoration/images/uc-icon-sidemenu2-9.png"
+                                                                    alt="">客服</span></li>
+                <li><span v-on:click.stop="btnAddNewModel(18)"><img src="./decoration/images/uc-icon-sidemenu2-10.png"
+                                                                    alt="">公告</span></li>
+                <!-- <li><span v-on:click.stop="btnAddNewModel(19)"><img src="./decoration/images/uc-icon-sidemenu2-11.png"
+                                                                    alt="">流量主</span></li> -->
+                <li><span v-on:click.stop="btnAddNewModel(26)"><img src="./decoration/images/uc-icon-sidemenu3-3.png"
+                                                                    alt="">位置</span></li>
+				<li><span v-on:click.stop="btnAddNewModel(22)"><img src="./decoration/images/uc-icon-sidemenu3-3.png"
+				                                                    alt="">搜索框</span></li>
+				<li></li>
+				<li></li>
+            </ul>
+			
+            <!-- <div class="title">官网组件</div>
+            <ul class="list">
+                <li><span v-on:click.stop="btnAddNewModel(23)"><img src="./decoration/images/uc-icon-sidemenu3-1.png"
+                                                                    alt="">招聘</span></li>
+                <li></li>
+                <li></li>
+            </ul> -->
+           <!-- <div class="title">全局组件</div>
+            <ul class="list"> -->
+                <!-- <li><span v-on:click.stop="btnAddNewModel(24)"><img src="./decoration/images/uc-icon-sidemenu3-1.png"
+                                                                    alt="">留言板</span></li> -->
+                <!-- <li><span v-on:click.stop="btnAddNewModel(25)"><img src="./decoration/images/uc-icon-sidemenu3-2.png"
+                                                                    alt="">门店</span></li> -->
+                <!-- <li><span v-on:click.stop="btnAddNewModel(26)"><img src="./decoration/images/uc-icon-sidemenu3-3.png"
+                                                                    alt="">位置</span></li>
+				<li></li> -->
+            </ul>
+        </section>
+        <section class="g-centerBox">
+            <div class="operate">
+                <a href="javascript:void(0)" class="btn btn_add saving" data-value ="0">添加到模板库</a>
+                <a href="javascript:void(0)" class="btn btns-submit saving" data-value ="1">保存修改页面</a>
+				<div style="display: inline-block;margin-left: 4.375rem;">
+					模板名称：<input name="name" placeholder="请输入名称" required="required" style="border: #fff 1px solid !important;padding: 0.3125rem;" />
+				</div>
+				<span style="display: inline-block;margin-left: 1.25rem;">appid：</span>
+				<select style="width: 7.5rem;" class="temSelect" required="required">
+					<option class="disabledOption" style="display: none;" value="">请选择应用</option>
+				</select>
+            </div>
+            <!-- 20190418 -->
+            <div class="right-operate">
+                <button class="btn" v-on:click="btnDeleteModel" v-show="JSON.stringify(temp) != '{}'" :data-id="temp.id">删除</button>
+                <button class="btn" v-on:click="btnMove" data-type="Prev" v-show="temp.id>0" :data-id="temp.id">上移</button>
+                <button class="btn" v-on:click="btnMove" data-type="Next" v-show="pageParam.length>1 && temp.id< pageParam.length-1" :data-id="temp.id">下移</button>
+            </div>
+
+            <div class="view-box" id="the_img_div">
+                <div class="content-box scroll">
+
+                    <template v-for="(item,index) in pageParam">
+                        <!-- <strong>轮播图</strong> -->
+                        <template v-if="item.type==1">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-banner"
+                                 :class="item.edit==true ?'uc-edit':''" :style="'height:'+item.details.boxHeight+'px'">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" v-show="item.edit == true" :data-id="item.id">x</span>
+                                <img :src="item.details.imgs[0].src" alt="">
+                                <div v-if="item.details.dotShow" class="dot-box">
+                                    <template v-for="(itemImg,itemImgIndex) in item.details.imgs">
+                                        <template v-if="itemImgIndex==0">
+											<i class="dot dot-on" :style="'background-color:'+item.details.color1"></i>
+                                        </template>
+                                        <template v-else>
+											<i class="dot" :style="'background-color:'+item.details.color2"></i>
+                                        </template>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                        <!-- 广告位 -->
+                        <template v-if="item.type==2">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-ad" :class="item.edit?'uc-edit':''"
+                                 :style="'height:'+item.details.boxHeight+'px'">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <div class="list">
+                                    <template v-for="itemImg in item.details.imgs">
+                                        <img :src="itemImg.src" alt="" :style="'width:'+itemImg.w">
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                        <!-- 宫格导航 -->
+                        <template v-if="item.type==3">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-grid" :class="item.edit?'uc-edit':''">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <div class="list"
+                                     :style="'background-color:'+item.details.color2+';color:'+item.details.color1">
+                                    <template v-for="itemImg in item.details.imgs">
+                                        <div class="item"
+                                             :style="'width:'+item.details.col+';font-size:'+item.details.fontSize"><img
+                                                :src="itemImg.src" alt="" :style="'border-radius:'+item.details.radius+'px'">{{itemImg.text}}
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                        <!-- 标题 -->
+                        <template v-if="item.type==4">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-title"
+                                 :class="item.edit?'uc-edit':''">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <div :class="'title style'+item.details.style"
+                                     :style="'background-color:'+item.details.color2+';color:'+item.details.color1">
+                                    <i class="line"></i>
+                                    <template v-if="item.details.style==5"><span class="txt"
+                                                                                 :style="'background-color:'+item.details.color2+';font-size:'+item.details.fontSize">{{item.details.text}}</span>
+                                    </template>
+                                    <template v-else><span class="txt" :style="'font-size:'+item.details.fontSize">{{item.details.text}}</span>
+                                    </template>
+                                    <i class="line"></i>
+                                </div>
+                            </div>
+                        </template>
+                        <!-- 图文集 -->
+                        <template v-if="item.type==5">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-product"
+                                 :class="item.edit?'uc-edit':''">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <div :class="'list style'+item.details.style"
+                                     :style="'background-color:'+item.details.color2">
+                                    <template v-for="itemImg in item.details.imgs">
+                                        <div class="item">
+                                            <div class="img"><img :src="itemImg.src" alt="" class="cover"></div>
+                                            <div class="con">
+                                                <div class="txt1"
+                                                     :style="';color:'+item.details.color1+';font-size:'+item.details.fontSize">
+                                                    {{itemImg.title}}
+                                                </div>
+                                                <div class="txt2">{{itemImg.text}}</div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                        <!-- 图片列表 -->
+                        <template v-if="item.type==6">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-bannerList"
+                                 :class="item.edit?'uc-edit':''">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <div :class="'list style'+item.details.style" :style="'background-color:'+item.details.color2">
+                                    <template v-for="itemImg in item.details.imgs">
+                                        <div class="item">
+                                            <div class="img">
+												<img :src="itemImg.src" alt="" class="cover" :style="'border-radius:'+item.details.radius+'px'">
+											</div>
+                                            <div class="txt1" :style="';color:'+item.details.color1">{{itemImg.text}}
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                        <!-- 三方图 -->
+                        <template v-if="item.type==7">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-bannerThree"
+                                 :class="item.edit?'uc-edit':''">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <div class="list">
+                                    <template v-for="(itemImg,indexImg) in item.details.imgs">
+                                        <div class="item">
+                                            <div class="img" v-if="indexImg"><img :src="itemImg.src" alt=""
+                                                                                  class="cover" style="padding: 1px 1px 0 1px;"></div>
+                                            <div class="img" v-else><img :src="itemImg.src" alt=""></div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                        <!-- 四方图 -->
+                        <template v-if="item.type==8">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-bannerThree"
+                                 :class="item.edit?'uc-edit':''">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <div class="list style2">
+                                    <template v-for="(itemImg,indexImg) in item.details.imgs">
+                                        <div class="item">
+                                            <div class="img" v-if="indexImg"><img :src="itemImg.src" alt=""
+                                                                                  class="cover" style="padding: 1px 1px 0 1px;"></div>
+                                            <div class="img" v-else><img :src="itemImg.src" alt=""></div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+
+
+                        <!-- 视频 -->
+                        <template v-if="item.type==9">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-video"
+                                 :class="item.edit?'uc-edit':''">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <div class="video-box" :style="'height:'+item.details.boxHeight+'px'">
+                                    <video class="video" src="media/1.mp4" preload="none"
+                                           :poster="item.details.imgs[0].src" controls="controls" width=""
+                                           :height="item.details.boxHeight+'px'">您的浏览器不支持vedio，请更换浏览器再观看！
+                                    </video>
+                                </div>
+                            </div>
+                        </template>
+                        <!-- 音频 -->
+                        <template v-if="item.type==10">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-voice"
+                                 :class="item.edit?'uc-edit':''">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <div class="voice-box">
+                                    <div class="item">
+                                        <div class="left">
+                                            <img :src="item.details.imgs[0].src" alt="">
+                                            <button class="btn-play">
+                                                <img src="./decoration/images/play.png" alt="">
+                                            </button>
+                                        </div>
+                                        <div class="right">
+                                            <div class="txt1">{{item.details.imgs[0].name}} <span class="time">{{item.details.imgs[0].time}}</span>
+                                            </div>
+                                            <div class="txt2">{{item.details.imgs[0].author}}</div>
+                                        </div>
+                                    </div>
+                                    <audio src="media/1.mp3" controls="controls"></audio>
+                                </div>
+                            </div>
+                        </template>
+                        <!-- 富文本 -->
+                        <template v-if="item.type==11">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-article"
+                                 :class="item.edit?'uc-edit':''" :style="'background-color:'+item.details.color2">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <div class="article-box" v-html="item.details.text">
+                                </div>
+                            </div>
+                        </template>
+                        <!-- 辅助空白 -->
+                        <template v-if="item.type==12">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-empty"
+                                 :class="item.edit?'uc-edit':''">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <div class="empty-box"
+                                     :style="'background-color:'+item.details.color2+';height:'+item.details.boxHeight+'px;'">
+                                </div>
+                            </div>
+                        </template>
+                        <!-- 分割线 -->
+                        <template v-if="item.type==13">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-splitLine"
+                                 :class="item.edit?'uc-edit':''">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <div class="splitLine-box"
+                                     :style="'background-color:'+ item.details.color2 +';padding: '+ item.details.paddingTopBottom +'px 0;'">
+                                    <template v-if="item.details.style=='1'">
+                                        <div class="line"
+                                             :style="'border-bottom: '+ item.details.boxHeight +'px solid '+ item.details.color1"></div>
+                                    </template>
+                                    <template v-if="item.details.style=='2'">
+                                        <div class="line"
+                                             :style="'border-bottom: '+ item.details.boxHeight +'px dashed '+ item.details.color1"></div>
+                                    </template>
+                                    <template v-if="item.details.style=='3'">
+                                        <div class="line"
+                                             :style="'border-bottom: '+ item.details.boxHeight +'px dotted '+ item.details.color1"></div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                        <!-- 悬浮图标 -->
+                        <template v-if="item.type==14">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-service"
+                                 :class="item.edit?'uc-edit':''"
+                                 :style="'right:'+item.details.positionRight + '%;bottom:'+item.details.positionBottom + '% ;opacity:' + item.details.opacity">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <div class="item">
+                                    <img :src="item.details.imgs[0].src" alt="">
+                                </div>
+                            </div>
+                        </template>
+                        <!-- 按钮 -->
+                        <template v-if="item.type==15">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-botton"
+                                 :class="item.edit?'uc-edit':''">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <template v-if="item.details.borderShow">
+                                    <button class="btn"
+                                            :style="'background-color:'+ item.details.color2+ ';color:' + item.details.color1 + ';border:' + item.details.color3 + ' 1px solid;border-radius:' + item.details.radius+'px;'">
+                                        <img v-if="item.details.iconShow" :src="item.details.imgs[0].src" alt=""
+                                             class="icon">{{item.details.text}}
+                                    </button>
+                                </template>
+                                <template v-else>
+                                    <button class="btn"
+                                            :style="'background-color:'+ item.details.color2+ ';color:' + item.details.color1 + ';border-radius:' + item.details.radius+'px;'">
+                                        <img v-if="item.details.iconShow" :src="item.details.imgs[0].src" alt=""
+                                             class="icon">{{item.details.text}}
+                                    </button>
+                                </template>
+                            </div>
+                        </template>
+                        <!-- 表单 -->
+                        <template v-if="item.type==16">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-chooseForm"
+                                 :class="item.edit?'uc-edit':''">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <button class="btn">
+                                    {{item.details.text}}
+                                </button>
+                            </div>
+                        </template>
+                        <!-- 客服 -->
+                        <template v-if="item.type==17">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-fixedIcon"
+                                 :class="item.edit?'uc-edit':''"
+                                 :style="'right:'+item.details.positionRight + '%;bottom:'+item.details.positionBottom + '%;opacity:' + item.details.opacity">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <div class="item">
+                                    <img :src="item.details.imgs[0].src" alt="">
+                                </div>
+                            </div>
+                        </template>
+                        <!-- 公告 -->
+                        <template v-if="item.type==18">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-notice"
+                                 :class="item.edit?'uc-edit':''"
+                                 :style="'background-color:'+item.details.color2+';color:'+item.details.color1">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <div class="item">
+									<el-carousel height="24px" direction="vertical" :autoplay="true">
+										<el-carousel-item v-for="item in item.details.imgs" class="item">
+											<img :src="item.src" alt="" class="icon">
+											{{item.text}}
+										</el-carousel-item>
+									</el-carousel>
+                                    <!-- <img :src="item.details.imgs[0].src" alt="" class="icon">
+                                    {{item.details.text}} -->
+                                </div>
+                            </div>
+                        </template>
+                        <!-- 流量主 -->
+                        <template v-if="item.type==19">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-flowMaster"
+                                 :class="item.edit?'uc-edit':''" :style="'height:'+item.details.boxHeight+'px'">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <img src="./decoration/images/uc-banner2.png" alt="">
+                            </div>
+                        </template>
+                        <!-- 商品集 -->
+                        <template v-if="item.type==20">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-product view-product2"
+                                 :class="item.edit?'uc-edit':''">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <div :class="'list style'+item.details.style"
+                                     :style="'background-color:'+item.details.color2">
+                                    <template v-for="itemImg in item.details.imgs">
+                                        <div class="item">
+                                            <div class="img"><img :src="itemImg.src" alt="" class="cover"></div>
+                                            <div class="con">
+                                                <div class="txt1"
+                                                     :style="';color:'+item.details.color1+';font-size:'+item.details.fontSize">
+                                                    {{itemImg.title}}
+                                                </div>
+                                                <div class="txt2">{{itemImg.text}}</div>
+                                                <div class="price">￥{{itemImg.price}}</div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                        <!-- 产品集 -->
+                        <template v-if="item.type==21">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-bannerList view-bannerList2"
+                                 :class="item.edit?'uc-edit':''">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <div :class="'list style'+item.details.style"
+                                     :style="'background-color:'+item.details.color2">
+                                    <template v-for="itemImg in item.details.imgs">
+                                        <div class="item">
+                                            <div class="img"><img :src="itemImg.src" alt="" class="cover"></div>
+                                            <div class="txt1"
+                                                 :style="';color:'+item.details.color1+';font-size:'+item.details.fontSize">
+                                                {{itemImg.text}}
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                        <!-- 搜索框 -->
+                        <template v-if="item.type==22">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-search"
+                                 :class="item.edit?'uc-edit':''" :style="'background-color:'+item.details.color2">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <div class="search-box">
+                                    <input type="text" class="input" placeholder="请输入" :value="item.details.text"
+                                           readonly
+                                           :style="'background-color:'+item.details.color1+';color:'+item.details.color3">
+                                    <button class="btns"><img src="./decoration/images/search.png" alt=""></button>
+                                </div>
+                            </div>
+                        </template>
+                        <!-- 招聘 -->
+                        <template v-if="item.type==23">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-jobs" :class="item.edit?'uc-edit':''">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <div class="list">
+                                    <template v-for="itemImg in item.details.imgs">
+                                        <div class="item">
+                                            <p>{{itemImg.text}}</p>
+                                            <p>职位：职位名(固定内容)</p>
+                                            <p>职位：职位名(固定内容)</p>
+                                            <p>职位：职位名(固定内容)</p>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                        <!-- 留言板 -->
+                        <template v-if="item.type==24">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-message"
+                                 :class="item.edit?'uc-edit':''" :style="'background-color:'+item.details.color2">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <div class="list">
+                                    <div class="con1">
+                                        <textarea class="textarea" name="" readonly placeholder="感谢提出建议" id="" cols="30"
+                                                  rows="10"></textarea>
+                                    </div>
+                                    <div class="con2">
+                                        <div class="item"><span class="tt">姓名</span><input type="text" class="input"
+                                                                                           readonly
+                                                                                           placeholder="请输入姓名（可选）">
+                                        </div>
+                                        <div class="item"><span class="tt">手机</span><input type="text" class="input"
+                                                                                           readonly
+                                                                                           placeholder="请输入手机（可选）">
+                                        </div>
+                                    </div>
+                                    <div class="operate">
+                                        <button class="btn btn-white">提交</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        <!-- 门店 -->
+                        <template v-if="item.type==25">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-shopBanner"
+                                 :class="item.edit?'uc-edit':''" :style="'background-color:'+item.details.color2">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <div class="list">
+                                    <div class="item">
+                                        <img :src="item.details.imgs[0].src" alt="" class="icon">
+                                        <div class="center" :style="'color:'+item.details.color1">
+                                            <div class="txt">{{item.details.name}}</div>
+                                            <div class="txt">工作时间：{{item.details.time}}</div>
+                                        </div>
+                                        <img src="./decoration/images/telephone.png" alt="" class="icon-tel">
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        <!-- 位置 -->
+                        <template v-if="item.type==26">
+                            <div v-on:click="btnChooseModel(item.id)" class="view-location"
+                                 :class="item.edit?'uc-edit':''"
+                                 :style="'background-color:'+item.details.color2+';color:'+item.details.color1">
+                                <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+                                <div class="list" style="">
+                                    <div class="item1" v-if="item.details.style=='1'">
+                                        {{item.details.addr}}
+                                    </div>
+                                    <div class="item2" v-if="item.details.style=='2'">
+                                        <img src="./decoration/images/map.jpg" alt="">
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+						
+						<!-- 优惠券 -->
+						<template v-if="item.type==27">
+						    <div v-on:click="btnChooseModel(item.id)" class="view-location"
+						         :class="item.edit?'uc-edit':''"
+						         :style="'background-color:'+item.details.color2+';color:'+item.details.color1">
+						        <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+						        <div class="list thisScroll" style="height: 61px;overflow:hidden;white-space:nowrap;margin-left: 1px;">
+						            <div v-for="itemImg in item.details.imgs" style="width: 124px;display: inline-block;margin: 5px 0px;height: 51px;margin-right: 1px;">
+						            	<img :src="itemImg.src" style="height: 100%;width: 100%;"/>
+						            </div>
+						        </div>
+						    </div>
+						</template>
+						
+						<!-- 商品分类 -->
+						<template v-if="item.type==28">
+						    <div v-on:click="btnChooseModel(item.id)" class="view-location"
+						         :class="item.edit?'uc-edit':''">
+						        <span class="g-viewBoxClose" v-on:click="btnDeleteModel" :data-id="item.id">x</span>
+						        <div class="list thisScroll" style="height: 61px;text-align: center;line-height: 3.8125rem;color: red;">
+						            自动获取数据，请线上预览！
+						        </div>
+						    </div>
+						</template>
+                    </template>
+
+                </div>
+            </div>
+        </section>
+        <!-- scroll -->
+        <section class="g-rightParam ">
+
+
+            <!-- 轮播图 -->
+            <template v-if="temp.type==1 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">轮播图</div>
+                    <div class="title2">选择颜色</div>
+                    <div class="color-choose-box">
+                        <div class="item"><em class="tt">焦点</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color1" data-control="hue"
+                                   :value="temp.details.color1">
+                        </div>
+                        <!-- <div class="item"><em class="tt">背景</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color2" data-control="hue"
+                                   :value="temp.details.color2">
+                        </div> -->
+                    </div>
+                    <div class="title2">显示焦点</div>
+					<div class="radio-box">
+						<template>
+							<el-radio-group v-model="temp.details.dotShow">
+								<el-radio :label="true">显示</el-radio>
+								<el-radio :label="false">不显示</el-radio>
+							</el-radio-group>
+						</template>
+                    </div>
+                    <div class="title2">轮播图高度</div>
+                    <div class="g-range">
+						<el-slider v-model="temp.details.boxHeight" max="200"></el-slider>
+                        <!-- <input type="range" min="0" max="200" value="30" :value="temp.details.boxHeight" step="1" data-name="boxHeight"
+                               class="js_ration"> -->
+                    </div>
+                    <div class="upload-img-box">
+                        <template v-for="(itemImg,itemImgIndex) in temp.details.imgs">
+                            <div class="item">
+                                <h4><i class="red">*</i>建议尺寸750x360 
+								<button class="btn btns-submit" @click="upRecord(itemImgIndex,temp.details.imgs)" v-show="itemImgIndex > 0">上移</button>
+								<button class="btn btns-submit" @click="downRecord(itemImgIndex,temp.details.imgs)" v-show="itemImgIndex < temp.details.imgs.length-1">下移</button>
+                                    <span href="" class="btn-close" :data-id="itemImgIndex"
+                                          v-on:click="deleteBannerImg(itemImgIndex)"></span>
+                                </h4>
+                                <div class="btn-upload">
+                                    <template v-if="itemImg.src!=''">
+                                        <img :src="itemImg.src" alt="">
+                                    </template>
+                                    <input type="file" name="" class="btnInputUploadImg" :data-id="itemImgIndex">
+                                </div>
+                                <div class="btm">
+                                    <span class="tt">链接: </span><input type="text" class="input" v-model="itemImg.link">
+                                </div>
+                            </div>
+                        </template>
+                        <span href="" class="btn-add" v-on:click="addBannerImg">+添加</span>
+                    </div>
+                </div>
+            </template>
+
+            <!-- 广告位 -->
+            <template v-if="temp.type==2 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">广告位</div>
+                    <div class="title2">广告位高度</div>
+                    <div class="g-range">
+                       <el-slider v-model="temp.details.boxHeight" max="200"></el-slider>
+                    </div>
+                    <div class="upload-img-box">
+                        <template v-for="(itemImg,itemImgIndex) in temp.details.imgs">
+                            <div class="item">
+                                <h4><i class="red">*</i>建议尺寸750x360
+                                    <span href="" class="btn-close" :data-id="itemImgIndex"
+                                          v-on:click="deleteBannerImg"></span>
+                                </h4>
+                                <div class="btn-upload">
+                                    <template v-if="itemImg.src!=''">
+                                        <img :src="itemImg.src" alt="">
+                                    </template>
+                                    <input type="file" name="" class="btnInputUploadImg" :data-id="itemImgIndex">
+                                </div>
+                                <div class="btm">
+                                    <span class="tt">宽度%: </span><input type="text" class="input" v-model="itemImg.w" :value="temp.details.boxHeight">
+                                </div>
+                                <div class="btm">
+                                    <span class="tt">链接: </span><input type="text" class="input" v-model="itemImg.link" >
+                                </div>
+                            </div>
+                        </template>
+                        <!-- <span href="" class="btn-add" v-on:click="addBannerImg">+添加</span> -->
+                    </div>
+                </div>
+            </template>
+
+            <!-- 导航 -->
+            <template v-if="temp.type==3 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">导航</div>
+                    <div class="title2">分列排版</div>
+                    <div class="radio-box">
+						<el-radio v-model="temp.details.col" label="50%">两列</el-radio>
+						<el-radio v-model="temp.details.col" label="33.33%">三列</el-radio>
+						<el-radio v-model="temp.details.col" label="25%">四列</el-radio>
+						<el-radio v-model="temp.details.col" label="20%">五列</el-radio>
+                        <!-- <label for="" data-name="col" data-value="50%" class="uc-radio">两列</label>
+                        <label for="" data-name="col" data-value="33.33%" class="uc-radio">三列</label>
+                        <label for="" data-name="col" data-value="25%" class="uc-radio on">四列</label>
+                        <label for="" data-name="col" data-value="20%" class="uc-radio">五列</label> -->
+                    </div>
+                    <div class="title2">字体大小</div>
+                    <div class="radio-box">
+						<el-radio v-model="temp.details.fontSize" label="12px">小号</el-radio>
+						<el-radio v-model="temp.details.fontSize" label="14px">中号</el-radio>
+						<el-radio v-model="temp.details.fontSize" label="16px">大号</el-radio>
+                        <!-- <label for="" data-name="fontSize" data-value="12px" class="uc-radio on">小号</label>
+                        <label for="" data-name="fontSize" data-value="14px" class="uc-radio">中号</label>
+                        <label for="" data-name="fontSize" data-value="16px" class="uc-radio">大号</label> -->
+                    </div>
+                    <div class="title2">选择颜色</div>
+                    <div class="color-choose-box">
+                        <div class="item"><em class="tt">字体</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color1" data-control="hue"
+                                   :value="temp.details.color1">
+                        </div>
+                        <div class="item"><em class="tt">背景</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color2" data-control="hue"
+                                   :value="temp.details.color2">
+                        </div>
+                    </div>
+                    <div class="title2">圆角弧度</div>
+                    <div class="g-range">
+						<el-slider v-model="temp.details.radius"></el-slider>
+                        <!-- <input type="range" min="0" max="30" value="20" step="1" data-name="radius" class="js_ration" :value="temp.details.radius"> -->
+                    </div>
+                    <div class="upload-img-box">
+                        <template v-for="(itemImg,itemImgIndex) in temp.details.imgs">
+                            <div class="item">
+                                <h4><i class="red">*</i>建议尺寸100x100
+									<button class="btn btns-submit" @click="upRecord(itemImgIndex,temp.details.imgs)" v-show="itemImgIndex > 0">上移</button>
+									<button class="btn btns-submit" @click="downRecord(itemImgIndex,temp.details.imgs)" v-show="itemImgIndex < temp.details.imgs.length-1">下移</button>	
+                                    <span href="" class="btn-close" :data-id="itemImgIndex"
+                                          v-on:click="deleteBannerImg(itemImgIndex)"></span>
+                                </h4>
+                                <div class="btm">
+                                    <span class="tt">名称: </span><input type="text" class="input" v-model="itemImg.text">
+                                </div>
+                                <div class="btm">
+                                    <span class="tt">图片: </span>
+                                    <div class="btn-upload small">
+                                        <template v-if="itemImg.src!=''">
+                                            <img :src="itemImg.src" alt="">
+                                        </template>
+                                        <input type="file" name="" class="btnInputUploadImg" :data-id="itemImgIndex">
+                                    </div>
+                                </div>
+                                <div class="btm">
+                                    <span class="tt">链接: </span><input type="text" class="input" v-model="itemImg.link"   >
+                                </div>
+                            </div>
+                        </template>
+                        <span href="" class="btn-add" v-on:click="addBannerImg">+添加</span>
+                    </div>
+                </div>
+            </template>
+
+            <!-- 标题 -->
+            <template v-if="temp.type==4 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">标题文字</div>
+                    <div class="title2">标题设置</div>
+                    <div class="input-box">
+                        <div class="btm">
+                            <span class="tt">标题文字: </span><input type="text" class="input" v-model="temp.details.text">
+                        </div>
+                    </div>
+                    <div class="title2">样式设置</div>
+                    <div class="radio-box">
+						<el-radio v-model="temp.details.style" label="1">样式1</el-radio>
+						<el-radio v-model="temp.details.style" label="2">样式2</el-radio>
+						<el-radio v-model="temp.details.style" label="3">样式3</el-radio>
+						<el-radio v-model="temp.details.style" label="4">样式4</el-radio>
+						<el-radio v-model="temp.details.style" label="5">样式5</el-radio>
+						<el-radio v-model="temp.details.style" label="6">样式6</el-radio>
+						<el-radio v-model="temp.details.style" label="7">样式7</el-radio>
+						<el-radio v-model="temp.details.style" class="ma" label="8">样式8</el-radio>
+                        <!-- <label for="" data-name="style" data-value="1" class="uc-radio on">样式一</label>
+                        <label for="" data-name="style" data-value="2" class="uc-radio">样式二</label>
+                        <label for="" data-name="style" data-value="3" class="uc-radio">样式三</label>
+                        <label for="" data-name="style" data-value="4" class="uc-radio">样式四</label>
+                        <label for="" data-name="style" data-value="5" class="uc-radio">样式五</label>
+                        <label for="" data-name="style" data-value="6" class="uc-radio">样式六</label>
+                        <label for="" data-name="style" data-value="7" class="uc-radio">样式七</label>
+                        <label for="" data-name="style" data-value="8" class="uc-radio">样式八</label> -->
+                    </div>
+                    <div class="title2">选择颜色</div>
+                    <div class="color-choose-box">
+                        <div class="item"><em class="tt">字体</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color1" data-control="hue"
+                                   :value="temp.details.color1">
+                        </div>
+                        <div class="item"><em class="tt">背景</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color2" data-control="hue"
+                                   :value="temp.details.color2">
+                        </div>
+                    </div>
+                    <div class="title2">字体大小</div>
+                    <div class="radio-box">
+						<el-radio v-model="temp.details.fontSize" label="12px">小号</el-radio>
+						<el-radio v-model="temp.details.fontSize" label="14px">中号</el-radio>
+						<el-radio v-model="temp.details.fontSize" label="16px">大号</el-radio>
+                        <!-- <label for="" data-name="fontSize" data-value="12px" class="uc-radio on">小号</label>
+                        <label for="" data-name="fontSize" data-value="14px" class="uc-radio">中号</label>
+                        <label for="" data-name="fontSize" data-value="16px" class="uc-radio">大号</label> -->
+                    </div>
+                </div>
+            </template>
+
+            <!-- 图文集 -->
+            <template v-if="temp.type==5 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">图文集</div>
+                    <div class="title2">排版样式</div>
+                    <div class="radio-box">
+						<el-radio v-model="temp.details.style" label="1">样式一</el-radio>
+						<el-radio v-model="temp.details.style" label="2">样式二</el-radio>
+						<el-radio v-model="temp.details.style" label="3">样式三</el-radio>
+                        <!-- <label for="" data-name="style" data-value="1" class="uc-radio on">样式一</label>
+                        <label for="" data-name="style" data-value="2" class="uc-radio">样式二</label>
+                        <label for="" data-name="style" data-value="3" class="uc-radio">样式三</label> -->
+                    </div>
+                    <div class="title2">标题大小</div>
+                    <div class="radio-box">
+						<el-radio v-model="temp.details.fontSize" label="12px">小号</el-radio>
+						<el-radio v-model="temp.details.fontSize" label="14px">中号</el-radio>
+						<el-radio v-model="temp.details.fontSize" label="16px">大号</el-radio>
+                       <!-- <label for="" data-name="fontSize" data-value="12px" class="uc-radio on">小号</label>
+                        <label for="" data-name="fontSize" data-value="14px" class="uc-radio">中号</label>
+                        <label for="" data-name="fontSize" data-value="16px" class="uc-radio">大号</label> -->
+                    </div>
+                    <div class="title2">选择颜色</div>
+                    <div class="color-choose-box">
+                        <div class="item"><em class="tt">字体</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color1" data-control="hue"
+                                   :value="temp.details.color1">
+                        </div>
+                        <div class="item"><em class="tt">背景</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color2" data-control="hue"
+                                   :value="temp.details.color2">
+                        </div>
+                    </div>
+                    <div class="upload-img-box">
+                        <template v-for="(itemImg,itemImgIndex) in temp.details.imgs">
+                            <div class="item">
+                                <h4><i class="red">*</i>建议尺寸200x160
+                                    <span href="" class="btn-close" :data-id="itemImgIndex"
+                                          v-on:click="deleteBannerImg(itemImgIndex)"></span>
+                                </h4>
+                                <div class="btm">
+                                    <span class="tt">标题: </span><input type="text" class="input"
+                                                                       v-model="itemImg.title">
+                                </div>
+                                <div class="btm">
+                                    <span class="tt">描述: </span><input type="text" class="input" v-model="itemImg.text">
+                                </div>
+                                <div class="btm">
+                                    <span class="tt">图片: </span>
+                                    <div class="btn-upload small">
+                                        <template v-if="itemImg.src!=''">
+                                            <img :src="itemImg.src" alt="">
+                                        </template>
+                                        <input type="file" name="" class="btnInputUploadImg" :data-id="itemImgIndex">
+                                    </div>
+                                </div>
+                                <div class="btm">
+                                    <span class="tt">链接: </span><input type="text" class="input" v-model="itemImg.link"   >
+                                </div>
+                            </div>
+                        </template>
+                        <span href="" class="btn-add" v-on:click="addBannerImg">+添加</span>
+                    </div>
+                </div>
+            </template>
+
+            <!-- 图片列表 -->
+            <template v-if="temp.type==6 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">图片列表</div>
+                    <div class="title2">选择颜色</div>
+                    <div class="color-choose-box">
+                        <div class="item"><em class="tt">背景</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color2" data-control="hue"
+                                   :value="temp.details.color2">
+                        </div>
+                    </div>
+                    <div class="title2">排版样式</div>
+                    <div class="radio-box">
+						<el-radio v-model="temp.details.style" label="1">样式1</el-radio>
+						<el-radio v-model="temp.details.style" label="2">样式2</el-radio>
+						<el-radio v-model="temp.details.style" label="3">样式3</el-radio>
+						<el-radio v-model="temp.details.style" label="4">样式4</el-radio>
+                       <!-- <label for="" data-name="style" data-value="1" class="uc-radio on">样式一</label>
+                        <label for="" data-name="style" data-value="2" class="uc-radio">样式二</label>
+                        <label for="" data-name="style" data-value="3" class="uc-radio">样式三</label>
+                        <label for="" data-name="style" data-value="4" class="uc-radio">样式四</label> -->
+                    </div>
+                    <div class="title2">圆角弧度</div>
+                    <div class="g-range">
+                        <!-- <input type="range" min="0" max="30" value="0" step="1" data-name="radius" class="js_ration" :value="temp.details.radius"> -->
+						<el-slider v-model="temp.details.radius"></el-slider>
+                    </div>
+                    <div class="upload-img-box">
+                        <template v-for="(itemImg,itemImgIndex) in temp.details.imgs">
+                            <div class="item">
+                                <h4><i class="red">*</i>建议尺寸300x300
+                                    <span href="" class="btn-close" :data-id="itemImgIndex"
+                                          v-on:click="deleteBannerImg(itemImgIndex)"></span>
+                                </h4>
+                                <div class="btm">
+                                    <span class="tt">标题: </span><input type="text" class="input" v-model="itemImg.text">
+                                </div>
+                                <div class="btm">
+                                    <span class="tt">图片: </span>
+                                    <div class="btn-upload small">
+                                        <template v-if="itemImg.src!=''">
+                                            <img :src="itemImg.src" alt="">
+                                        </template>
+                                        <input type="file" name="" class="btnInputUploadImg" :data-id="itemImgIndex">
+                                    </div>
+                                </div>
+                                <div class="btm">
+                                    <span class="tt">链接: </span><input type="text" class="input" v-model="itemImg.link"   >
+                                </div>
+                            </div>
+                        </template>
+                        <span href="" class="btn-add" v-on:click="addBannerImg">+添加</span>
+                    </div>
+                </div>
+            </template>
+
+            <!-- 三方图 -->
+            <template v-if="temp.type==7 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">三方图</div>
+                    <div class="upload-img-box">
+                        <template v-for="(itemImg,itemImgIndex) in temp.details.imgs">
+                            <div class="item">
+                                <div class="btn-upload">
+                                    <template v-if="itemImg.src!=''">
+                                        <img :src="itemImg.src" alt="">
+                                    </template>
+                                    <input type="file" name="" class="btnInputUploadImg" :data-id="itemImgIndex">
+                                </div>
+                                <div class="btm">
+                                    <span class="tt">链接: </span><input type="text" class="input" v-model="itemImg.link"   >
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+
+            <!-- 四方图 -->
+            <template v-if="temp.type==8 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">四方图</div>
+                    <div class="upload-img-box">
+                        <template v-for="(itemImg,itemImgIndex) in temp.details.imgs">
+                            <div class="item">
+                                <div class="btn-upload">
+                                    <template v-if="itemImg.src!=''">
+                                        <img :src="itemImg.src" alt="">
+                                    </template>
+                                    <input type="file" name="" class="btnInputUploadImg" :data-id="itemImgIndex">
+                                </div>
+                                <div class="btm">
+                                    <span class="tt">链接: </span><input type="text" class="input" v-model="itemImg.link"   >
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+
+            <!-- 视频 -->
+            <template v-if="temp.type==9 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">视频设置</div>
+                    <div class="title2">视频高度</div>
+                    <div class="g-range">
+                        <el-slider v-model="temp.details.boxHeight" max="200"></el-slider>
+                    </div>
+                    <div class="title2">视频封面</div>
+                    <div class="upload-img-box">
+                        <template v-for="(itemImg,itemImgIndex) in temp.details.imgs">
+                            <div class="item">
+                                <div class="btn-upload">
+                                    <template v-if="itemImg.src!=''">
+                                        <img :src="itemImg.src" alt="">
+                                    </template>
+                                    <input type="file" name="" class="btnInputUploadImg" :data-id="itemImgIndex">
+                                </div>
+                                <div class="btm">
+                                    <span class="tt">链接: </span><input type="text" class="input" v-model="itemImg.link">
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+
+            <!-- 音频 -->
+            <template v-if="temp.type==10 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">音频设置</div>
+                    <div class="title2">音频封面</div>
+                    <div class="upload-img-box">
+                        <template v-for="(itemImg,itemImgIndex) in temp.details.imgs">
+                            <div class="item">
+                                <div class="btn-upload">
+                                    <template v-if="itemImg.src!=''">
+                                        <img :src="itemImg.src" alt="">
+                                    </template>
+                                    <input type="file" name="" class="btnInputUploadImg" :data-id="itemImgIndex">
+                                </div>
+                                <div class="btm">
+                                    <span class="tt">链接: </span><input type="text" class="input" v-model="itemImg.link">
+                                </div>
+                                <div class="btm">
+                                    <span class="tt">名称: </span><input type="text" class="input" v-model="itemImg.name">
+                                </div>
+                                <div class="btm">
+                                    <span class="tt">作者: </span><input type="text" class="input"
+                                                                       v-model="itemImg.author">
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+
+            <!-- 富文本 -->
+            <!-- <template > -->
+                <div class="setting-banner" v-if="temp.type==11 && temp.edit==true">
+					
+                    <div class="title">富文本</div>
+                    <div class="title2">选择颜色</div>
+                    <div class="color-choose-box">
+                        <div class="item"><em class="tt">背景</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color2" data-control="hue"
+                                   :value="temp.details.color2">
+                        </div>
+                    </div>
+                    <div class="title2">内容</div>
+                    <div class="textarea-box">
+                        <div class="btm">
+							<!-- <script id="content" type="text/plain" style="min-height: 200px;"></script> -->
+							<!-- <script id="content" type="text/plain"></script> -->
+                            <!-- <textarea name="" id="" cols="30" rows="10" class="textarea"
+                                      v-model="temp.details.text"></textarea> -->
+                        </div>
+                    </div>
+                </div>
+				<div class="div">
+					<div id="content" style="min-height: 200px;display: none;"></div>
+				</div>
+            <!-- </template> -->
+
+            <!-- 辅助空白 -->
+            <template v-if="temp.type==12 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">辅助空白</div>
+                    <div class="title2">选择颜色</div>
+                    <div class="color-choose-box">
+                        <div class="item"><em class="tt">背景</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color2" data-control="hue"
+                                   :value="temp.details.color2">
+                        </div>
+                    </div>
+                    <div class="title2">控件高度</div>
+                    <div class="g-range">
+                        <input type="range" min="0" max="200" value="30" step="1" data-name="boxHeight"
+                               class="js_ration">
+                    </div>
+                </div>
+            </template>
+
+            <!-- 分割线 -->
+            <template v-if="temp.type==13 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">分割线</div>
+                    <div class="title2">排版选择</div>
+                    <div class="radio-box">
+						<el-radio v-model="temp.details.style" label="1">实线</el-radio>
+						<el-radio v-model="temp.details.style" label="2">虚线</el-radio>
+						<el-radio v-model="temp.details.style" label="3">点线</el-radio>
+                        <!-- <label for="" data-name="style" data-value="1" class="uc-radio on">实线</label>
+                        <label for="" data-name="style" data-value="2" class="uc-radio">虚线</label>
+                        <label for="" data-name="style" data-value="3" class="uc-radio">点线</label> -->
+                    </div>
+                    <div class="title2">选择颜色</div>
+                    <div class="color-choose-box">
+                        <div class="item"><em class="tt">线条</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color1" data-control="hue"
+                                   :value="temp.details.color1">
+                        </div>
+                        <div class="item"><em class="tt">背景</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color2" data-control="hue"
+                                   :value="temp.details.color2">
+                        </div>
+                    </div>
+                    <div class="title2">控件高度</div>
+                    <div class="g-range">
+						<el-slider v-model="temp.details.boxHeight"></el-slider>
+                        <!-- <input type="range" min="0" max="200" value="10" step="1" data-name="boxHeight" title=""
+                               class="js_ration" :value="temp.details.boxHeight"> -->
+                    </div>
+                    <div class="title2">控件上下边距</div>
+                    <div class="g-range">
+						<el-slider v-model="temp.details.paddingTopBottom"></el-slider>
+                        <!-- <input type="range" min="0" max="100" value="5" step="1" data-name="paddingTopBottom"
+                               class="js_ration" :value="temp.details.paddingTopBottom"> -->
+                    </div>
+                </div>
+            </template>
+
+            <!-- 悬浮图标 -->
+            <template v-if="temp.type==14 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">悬浮图标</div>
+                    <div class="title2">距底部</div>
+                    <div class="g-range">
+						<el-slider v-model="temp.details.positionBottom"></el-slider>
+                        <!-- <input type="range" min="0" max="100" value="1" step="1" data-name="positionBottom"
+                               class="js_ration" :value="temp.details.positionBottom"> -->
+                    </div>
+                    <div class="title2">距右侧</div>
+                    <div class="g-range">
+						<el-slider v-model="temp.details.positionRight"></el-slider>
+                        <!-- <input type="range" min="0" max="100" value="1" step="1" data-name="positionRight" :value="temp.details.positionRight"
+                               class="js_ration"> -->
+                    </div>
+                    <div class="title2">透明度</div>
+                    <div class="g-range">
+						<el-slider v-model="temp.details.opacity" max="1" step="0.01"></el-slider>
+                        <!-- <input type="range" min="0" max="100" value="90" step="1" data-name="opacity" class="js_ration" :value="temp.details.opacity"> -->
+                    </div>
+					<div class="title2">回到顶部</div>
+					<div class="radio-box">
+						<template>
+							<el-radio-group v-model="temp.details.goTop">
+								<el-radio :label="true">是</el-radio>
+								<el-radio :label="false">否</el-radio>
+							</el-radio-group>
+						</template>
+					</div>
+					<div class="title2">分享</div>
+					<div class="radio-box">
+					    <template>
+					    	<el-radio-group v-model="temp.details.shire">
+					    		<el-radio :label="true">是</el-radio>
+					    		<el-radio :label="false">否</el-radio>
+					    	</el-radio-group>
+					    </template>
+					</div>
+                    <div class="title2">图标</div>
+                    <div class="upload-img-box">
+                        <template v-for="(itemImg,itemImgIndex) in temp.details.imgs">
+                            <div class="item">
+                                <div class="btn-upload">
+                                    <template v-if="itemImg.src!=''">
+                                        <img :src="itemImg.src" alt="">
+                                    </template>
+                                    <input type="file" name="" class="btnInputUploadImg" :data-id="itemImgIndex">
+                                </div>
+                                <div class="btm">
+                                    <span class="tt">链接: </span><input type="text" class="input" v-model="itemImg.link"   >
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+
+            <!-- 																	 -->
+            <template v-if="temp.type==15 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">按钮</div>
+                    <div class="input-box">
+                        <div class="btm">
+                            <span class="tt">名称</span><input type="text" class="input" v-model="temp.details.text">
+                        </div>
+                    </div>
+                    <div class="title2">边框</div>
+                    <div class="radio-box">
+						<template>
+							<el-radio-group v-model="temp.details.borderShow">
+								<el-radio :label="true">显示</el-radio>
+								<el-radio :label="false">不显示</el-radio>
+							</el-radio-group>
+						</template>
+                    </div>
+                    <div class="title2">图标</div>
+                    <div class="radio-box">
+						<template>
+							<el-radio-group v-model="temp.details.iconShow">
+								<el-radio :label="true">显示</el-radio>
+								<el-radio :label="false">不显示</el-radio>
+							</el-radio-group>
+						</template>
+                    </div>
+                    <div class="title2">圆角弧度</div>
+                    <div class="g-range">
+						<el-slider v-model="temp.details.radius" max="28"></el-slider>
+                        <!-- <input type="range" min="0" max="50" value="0" step="1" data-name="radius" class="js_ration" :value="temp.details.radius"> -->
+                    </div>
+                    <div class="title2">选择颜色</div>
+                    <div class="color-choose-box">
+                        <div class="item"><em class="tt">标题</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color1" data-control="hue"
+                                   :value="temp.details.color1">
+                        </div>
+                        <div class="item"><em class="tt">背景</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color2" data-control="hue"
+                                   :value="temp.details.color2">
+                        </div>
+                        <div class="item"><em class="tt">边框</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color3" data-control="hue"
+                                   :value="temp.details.color3">
+                        </div>
+                    </div>
+                    <div class="upload-img-box">
+                        <template v-for="(itemImg,itemImgIndex) in temp.details.imgs">
+                            <div class="item">
+                                <div class="btn-upload">
+                                    <template v-if="itemImg.src!=''">
+                                        <img :src="itemImg.src" alt="">
+                                    </template>
+                                    <input type="file" name="" class="btnInputUploadImg" :data-id="itemImgIndex">
+                                </div>
+                                <div class="btm">
+                                    <span class="tt">链接: </span><input type="text" class="input" v-model="itemImg.link">
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+
+            <!-- 表单 -->
+            <template v-if="temp.type==16 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">表单</div>
+                    <div class="input-box">
+                        <div class="btm">
+                            <span class="tt">表单</span><input type="text" class="input" v-model="temp.details.text">
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <!-- 客服 -->
+            <template v-if="temp.type==17 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">客服设置</div>
+                    <div class="title2">距底部</div>
+                    <div class="g-range">
+						<el-slider v-model="temp.details.positionBottom"></el-slider>
+                       <!-- <input type="range" min="0" max="100" value="1" step="1" data-name="positionBottom" :value="temp.details.positionBottom"
+                               class="js_ration"> -->
+                    </div>
+                    <div class="title2">距右侧</div>
+                    <div class="g-range">
+						<el-slider v-model="temp.details.positionRight"></el-slider>
+                        <!-- <input type="range" min="0" max="100" value="1" step="1" data-name="positionRight" :value="temp.details.positionRight"
+                               class="js_ration"> -->
+                    </div>
+                    <div class="title2">透明度</div>
+                    <div class="g-range">
+						<el-slider v-model="temp.details.opacity" max="1" step="0.01"></el-slider>
+                        <!-- <input type="range" min="0" max="100" value="90" step="1" data-name="opacity" class="js_ration" :value="temp.details.opacity"> -->
+                    </div>
+                    <div class="title2">图标</div>
+                    <div class="upload-img-box">
+                        <template v-for="(itemImg,itemImgIndex) in temp.details.imgs">
+                            <div class="item">
+                                <div class="btn-upload">
+                                    <template v-if="itemImg.src!=''">
+                                        <img :src="itemImg.src" alt="">
+                                    </template>
+                                    <input type="file" name="" class="btnInputUploadImg" :data-id="itemImgIndex">
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+
+            <!-- 公告 -->
+            <template v-if="temp.type==18 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">公告设置</div>
+                    <div class="title2">选择颜色</div>
+                    <div class="color-choose-box">
+                        <div class="item"><em class="tt">文字</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color1" data-control="hue"
+                                   :value="temp.details.color1">
+                        </div>
+                        <div class="item"><em class="tt">背景</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color2" data-control="hue"
+                                   :value="temp.details.color2">
+                        </div>
+                    </div>
+                   <template>
+						<div class="upload-img-box">
+							<div class="item" v-for="(itemImg,itemImgIndex) in temp.details.imgs">
+								<div class="title2" style="display: inline-block;">内容</div>
+								<span href="" class="btn-close" :data-id="itemImgIndex" v-on:click="deleteBannerImg(itemImgIndex)"></span>
+								<div class="textarea-box">
+									<div class="btm">
+										<textarea name="" id="" cols="30" rows="10" class="textarea" v-model="itemImg.text"></textarea>
+									</div>
+								</div>
+								<div class="title2">图标</div>
+								<div class="btn-upload">
+									<template v-if="itemImg.src!=''">
+										<img :src="itemImg.src" alt="">
+									</template>
+									<input type="file" name="" class="btnInputUploadImg" :data-id="itemImgIndex">
+								</div>
+							</div>
+							<span href="" class="btn-add" v-on:click="addBannerImg" v-show="temp.details.imgs.length<3">+添加</span>
+						</div>
+					</template>
+                </div>
+            </template>
+
+            <!-- 流量主 -->
+            <template v-if="temp.type==19 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">浏量主设置</div>
+                    <div class="title2">高度</div>
+                    <div class="g-range">
+                        <input type="range" min="0" max="200" value="30" step="1" data-name="boxHeight"
+                               class="js_ration">
+                    </div>
+                    <div class="title2">浏量主</div>
+                    <div class="input-box">
+                        <div class="btm">
+                            <span class="tt">浏量主ID: </span><input type="text" class="input" v-model="temp.details.id">
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <!-- 商品集 -->
+            <template v-if="temp.type==20 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">商品集</div>
+                    <div class="title2">排版样式</div>
+                    <div class="radio-box">
+						<el-radio v-model="temp.details.style" label="1">样式一</el-radio>
+						<el-radio v-model="temp.details.style" label="2">样式二</el-radio>
+						<el-radio v-model="temp.details.style" label="3">样式三</el-radio>
+                       <!-- <label for="" data-name="style" data-value="1" class="uc-radio on">样式一</label>
+                        <label for="" data-name="style" data-value="2" class="uc-radio">样式二</label>
+                        <label for="" data-name="style" data-value="3" class="uc-radio">样式三</label> -->
+                    </div>
+                    <div class="title2">标题大小</div>
+                    <div class="radio-box">
+						<el-radio v-model="temp.details.fontSize" label="12px">小号</el-radio>
+						<el-radio v-model="temp.details.fontSize" label="14px">中号</el-radio>
+						<el-radio v-model="temp.details.fontSize" label="16px">大号</el-radio>
+                        <!-- <label for="" data-name="fontSize" data-value="12px" class="uc-radio on">小号</label>
+                        <label for="" data-name="fontSize" data-value="14px" class="uc-radio">中号</label>
+                        <label for="" data-name="fontSize" data-value="16px" class="uc-radio">大号</label> -->
+                    </div>
+                    <div class="title2">选择颜色</div>
+                    <div class="color-choose-box">
+                        <div class="item"><em class="tt">字体</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color1" data-control="hue"
+                                   :value="temp.details.color1">
+                        </div>
+                        <div class="item"><em class="tt">背景</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color2" data-control="hue"
+                                   :value="temp.details.color2">
+                        </div>
+                    </div>
+                    <div class="upload-img-box">
+                        <template v-for="(itemImg,itemImgIndex) in temp.details.imgs">
+                            <div class="item">
+                                <h4><i class="red">*</i>建议尺寸800x800
+                                    <span href="" class="btn-close" :data-id="itemImgIndex"
+                                          v-on:click="deleteBannerImg(itemImgIndex)"></span>
+                                </h4>
+                                <div class="btm">
+                                    <span class="tt">名称: </span><input type="text" class="input" :class="'title'+itemImgIndex"
+                                                                       v-model="itemImg.title" disabled>
+                                </div>
+                                <div class="btm">
+                                    <span class="tt">简介: </span><input type="text" class="input" v-model="itemImg.text" disabled>
+                                </div>
+                                <div class="btm">
+                                    <span class="tt">金额: </span><input type="text" class="input"
+                                                                       v-model="itemImg.price" disabled>
+                                </div>
+                                <div class="btm">
+                                    <span class="tt">图片: </span>
+                                    <div class="btn-upload small">
+                                        <template v-if="itemImg.src!=''">
+                                            <img :src="itemImg.src" alt="">
+                                        </template>
+                                        <input type="file" name="" class="btnInputUploadImg" :data-id="itemImgIndex" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        <span href="" class="btn-add" v-on:click="addBannerImg">+添加</span>
+                    </div>
+                </div>
+            </template>
+
+            <!-- 产品集 -->
+            <template v-if="temp.type==21 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">产品集</div>
+                    <div class="title2">排版样式</div>
+                    <div class="radio-box">
+						<el-radio v-model="temp.details.style" label="1">单列</el-radio>
+						<el-radio v-model="temp.details.style" label="2">两列</el-radio>
+						<el-radio v-model="temp.details.style" label="3">三列</el-radio>
+						<el-radio v-model="temp.details.style" label="4">横排滑动</el-radio>
+                        <!-- <label for="" data-name="style" data-value="1" class="uc-radio on">单列</label>
+                        <label for="" data-name="style" data-value="2" class="uc-radio">两列</label>
+                        <label for="" data-name="style" data-value="3" class="uc-radio">三列</label>
+                        <label for="" data-name="style" data-value="4" class="uc-radio">横排滑动</label> -->
+                    </div>
+                    <div class="title2">标题大小</div>
+                    <div class="radio-box">
+						<el-radio v-model="temp.details.fontSize" label="12px">小号</el-radio>
+						<el-radio v-model="temp.details.fontSize" label="14px">中号</el-radio>
+						<el-radio v-model="temp.details.fontSize" label="16px">大号</el-radio>
+                        <!-- <label for="" data-name="fontSize" data-value="12px" class="uc-radio on">小号</label>
+                        <label for="" data-name="fontSize" data-value="14px" class="uc-radio">中号</label>
+                        <label for="" data-name="fontSize" data-value="16px" class="uc-radio">大号</label> -->
+                    </div>
+                    <div class="title2">选择颜色</div>
+                    <div class="color-choose-box">
+                        <div class="item"><em class="tt">字体</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color1" data-control="hue"
+                                   :value="temp.details.color1">
+                        </div>
+                        <div class="item"><em class="tt">背景</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color2" data-control="hue"
+                                   :value="temp.details.color2">
+                        </div>
+                    </div>
+                    <div class="upload-img-box">
+                        <template v-for="(itemImg,itemImgIndex) in temp.details.imgs">
+                            <div class="item">
+                                <h4><i class="red">*</i>建议尺寸200x160
+                                    <span href="" class="btn-close" :data-id="itemImgIndex"
+                                          v-on:click="deleteBannerImg(itemImgIndex)"></span>
+                                </h4>
+                                <div class="btm">
+                                    <span class="tt">标题: </span><input type="text" class="input" v-model="itemImg.text">
+                                </div>
+                                <div class="btm">
+                                    <span class="tt">图片: </span>
+                                    <div class="btn-upload small">
+                                        <template v-if="itemImg.src!=''">
+                                            <img :src="itemImg.src" alt="">
+                                        </template>
+                                        <input type="file" name="" class="btnInputUploadImg" :data-id="itemImgIndex">
+                                    </div>
+                                </div>
+                                <div class="btm">
+                                    <span class="tt">链接: </span><input type="text" class="input" v-model="itemImg.link"   >
+                                </div>
+                            </div>
+                        </template>
+                        <span href="" class="btn-add" v-on:click="addBannerImg">+添加</span>
+                    </div>
+                </div>
+            </template>
+
+            <!-- 搜索框 -->
+            <template v-if="temp.type==22 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">搜索框</div>
+                    <div class="title2">选择颜色</div>
+                    <div class="color-choose-box">
+                        <div class="item"><em class="tt">搜索框</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color1" data-control="hue"
+                                   :value="temp.details.color1">
+                        </div>
+                        <div class="item"><em class="tt">背景</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color2" data-control="hue"
+                                   :value="temp.details.color2">
+                        </div>
+                        <div class="item"><em class="tt">字体</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color3" data-control="hue"
+                                   :value="temp.details.color3">
+                        </div>
+                    </div>
+                    <div class="title2">热搜内容</div>
+                    <div class="textarea-box">
+                        <div class="btm">
+                            <textarea name="" id="" cols="30" rows="10" class="textarea"
+                                      v-model="temp.details.text"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <!-- 招聘 -->
+            <template v-if="temp.type==23 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">招聘</div>
+                    <div class="title2">分列排版</div>
+                    <div class="radio-box">
+                        <label for="" data-name="style" data-value="50%" class="uc-radio on">样式一</label>
+                    </div>
+                    <div class="upload-img-box">
+                        <template v-for="(itemImg,itemImgIndex) in temp.details.imgs">
+                            <div class="item">
+                                <h4>
+                                    <span href="" class="btn-close" :data-id="itemImgIndex"
+                                          v-on:click="deleteBannerImg"></span>
+                                </h4>
+                                <div class="btm">
+                                    <span class="tt">名称: </span><input type="text" class="input" v-model="itemImg.text">
+                                </div>
+                            </div>
+                        </template>
+                        <span href="" class="btn-add" v-on:click="addBannerImg">+添加</span>
+                    </div>
+                </div>
+            </template>
+
+            <!-- 留言板 -->
+            <template v-if="temp.type==24 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">留言板</div>
+                    <div class="title2">选择颜色</div>
+                    <div class="color-choose-box">
+                        <div class="item"><em class="tt">背景</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color2" data-control="hue"
+                                   :value="temp.details.color2">
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <!-- 门店 -->
+            <template v-if="temp.type==25 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">门店</div>
+                    <div class="title2">选择颜色</div>
+                    <div class="color-choose-box">
+                        <div class="item"><em class="tt">文字</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color1" data-control="hue"
+                                   :value="temp.details.color1">
+                        </div>
+                        <div class="item"><em class="tt">背景</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color2" data-control="hue"
+                                   :value="temp.details.color2">
+                        </div>
+                    </div>
+                    <div class="input-box">
+                        <div class="btm">
+                            <span class="tt">门店名称: </span><input type="text" class="input" v-model="temp.details.name">
+                        </div>
+                    </div>
+                    <div class="input-box">
+                        <div class="btm">
+                            <span class="tt">营业时间: </span><input type="text" class="input" v-model="temp.details.time">
+                        </div>
+                    </div>
+                    <div class="input-box">
+                        <div class="btm">
+                            <span class="tt">客服电话: </span><input type="text" class="input" v-model="temp.details.tel">
+                        </div>
+                    </div>
+                    <div class="title2">门店Logo</div>
+                    <div class="upload-img-box">
+                        <template v-for="(itemImg,itemImgIndex) in temp.details.imgs">
+                            <div class="item">
+                                <div class="btn-upload">
+                                    <template v-if="itemImg.src!=''">
+                                        <img :src="itemImg.src" alt="">
+                                    </template>
+                                    <input type="file" name="" class="btnInputUploadImg" :data-id="itemImgIndex">
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+
+            <!-- 位置 -->
+            <template v-if="temp.type==26 && temp.edit==true">
+                <div class="setting-banner">
+                    <div class="title">地理位置</div>
+                    <div class="title2">选择颜色</div>
+                    <div class="color-choose-box">
+                        <div class="item"><em class="tt">文字</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color1" data-control="hue"
+                                   :value="temp.details.color1">
+                        </div>
+                        <div class="item"><em class="tt">背景</em>
+                            <input type="text" id="hue-demo" class="chooseColor" data-name="color2" data-control="hue"
+                                   :value="temp.details.color2">
+                        </div>
+                    </div>
+                    <div class="input-box">
+                        <div class="btm">
+                            <span class="tt">地址: </span><input type="text" class="input" placeholder="请输入地址描述（限20字内）"
+                                                               v-model="temp.details.addr">
+                        </div>
+                    </div>
+                    <div class="title2">显示方式</div>
+                    <div class="radio-box">
+                        <label for="" data-name="style" data-value="1" class="uc-radio on">文字</label>
+                        <label for="" data-name="style" data-value="2" class="uc-radio">图片</label>
+                    </div>
+                    <div class="title2">位置坐标</div>
+                    <div class="input-box">
+                        <div class="btm">
+                            <span class="tt">经度 </span><input type="text" class="input" v-model="temp.details.lon">
+                        </div>
+                        <div class="btm">
+                            <span class="tt">纬度 </span><input type="text" class="input" v-model="temp.details.lat">
+                        </div>
+                        <div class="operate">
+                            <button class="btn">拾取坐标</button>
+                        </div>
+                    </div>
+                </div>
+            </template>
+			
+			<!-- 优惠券 -->
+			<template v-if="temp.type==27 && temp.edit==true">
+			    <div class="setting-banner">
+			        <div class="title">优惠券</div>
+			        <div class="upload-img-box">
+			            <template v-for="(itemImg,itemImgIndex) in temp.details.imgs">
+			                <div class="item">
+			                    <div class="btn-upload">
+			                        <template v-if="itemImg.src!=''">
+			                            <img :src="itemImg.src" alt="">
+			                        </template>
+			                        <input type="file" name="" class="btnInputUploadImg" :data-id="itemImgIndex">
+			                    </div>
+			                    <div class="btm">
+			                        <span class="tt">链接: </span><input type="text" class="input" v-model="itemImg.link">
+			                    </div>
+			                </div>
+			            </template>
+						<span href="" class="btn-add" v-on:click="addBannerImgs">+添加</span>
+			        </div>
+			    </div>
+			</template>
+			
+			<!-- 商品分类 -->
+			<template v-if="temp.type==28 && temp.edit==true">
+			    <div class="setting-banner">
+			        <div class="title">商品分类</div>
+			        <div class="upload-img-box">
+						<div class="title2">排版样式</div>
+						<div class="radio-box">
+							<el-radio v-model="temp.details.style" label="1">样式一</el-radio>
+						</div>
+			        </div>
+			    </div>
+			</template>
+        </section>
+    </section>
+</section>
+
+<script src="./decoration/js/jquery.min.js"></script>
+<script src="./decoration/js/jquery.nicescroll3.7.6.min.js"></script>
+<script src="./decoration/js/jquery.minicolors.min.js"></script>
+<script src="./decoration/js/vue.min.js"></script>
+<script src="./decoration/js/vue-common.js"></script>
+<script src="./decoration/js/vue-resource.js"></script>
+<!-- <script src="./decoration/js/main.js"></script> -->
+<script src="./decoration/js/html2canvas.js"></script>
+<!-- 引入组件库 -->
+<script src="./src/controller/elementUi.js.js"></script>
+</body>
+</html>
+<style>
+	.search{height: 6.25rem;padding: 1.25rem 200px !important;}
+	.search label,.search input,.search button{float: left;margin-top: 1.25rem;}
+	.search input{width: 50% !important;margin-right: 1.875rem;}
+	.search label{line-height: 1.875rem;margin-left: 1.875rem;}
+	.left,.right,.textShip,.imgShip,.otherShip{float: left;}
+	.right{margin-left: 3.125rem;margin-top: 0.1875rem;width: 50%;height: 30.625rem;}
+	.ship{list-style: none !important;overflow:hidden;}
+	.shipStyle{border: 1px solid white;height: 4.5rem;padding: 0.625rem;}
+	.shipStyle:hover{border: 0.0625rem solid #19C85B;cursor: pointer;}
+	.imgShip{width: 3.125rem;height: 3.125rem;}
+	.textShip,.otherShip{margin-left: 1.875rem;}
+	.textShip p{margin-top: 0.3125rem;}
+	.otherShip{margin-top: 0.3125rem;}
+	.radio-box label{margin-bottom: 10px;}
+	.ma{margin-left: 2px;}
+</style>
+<script type="text/javascript">
+    layui.use('set/decoration/add', layui.factory('set/decoration/add'));
+</script>

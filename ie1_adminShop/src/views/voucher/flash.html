@@ -1,0 +1,183 @@
+<title>秒杀</title>
+<div class="layui-fluid">
+    <div class="layui-col-md12">
+        <form class="layui-form layui-col-md11">
+            <div class="layui-form-item">
+                <label class="layui-form-label">关键词：</label>
+                <div class="layui-input-inline">
+                    <input name="searchName" placeholder="请输入活动名称" autocomplete="off" class="layui-input">
+                </div>
+                <label class="layui-form-label">活动状态：</label>
+                <div class="layui-input-inline">
+                    <!--1.未开始  2.进行中 3.已结束  4.未启动-->
+                    <select name="status">
+                        <option value="">全部</option>
+                        <option value="1">未开始</option>
+                        <option value="2">进行中</option>
+                        <option value="3">已结束</option>
+                        <option value="4">未启动</option>
+                    </select>
+                </div>
+                <div class="layui-input-inline">
+                    <a class="layui-btn" lay-submit lay-filter="find">查询</a>
+                </div>
+                <div class="layui-input-inline">
+                    <label class="layui-form-label" style="width: 4vw">秒杀总开关</label>
+                    <input type="checkbox" name="sign_in_status" lay-skin="switch" lay-filter="sign_in_status" lay-text="开启|关闭">
+                </div>
+            </div>
+        </form>
+        <a class="layui-btn layui-col-md1" lay-submit lay-filter="showAdd">新增</a>
+    </div>
+    <!--新增弹出层-->
+    <form class="layui-form" style='display:none;' id="add_edit_form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">活动名称</label>
+            <div class="layui-input-inline">
+                <input name="name" required lay-verify="required" placeholder="请输入活动名称" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">活动描述</label>
+            <div class="layui-input-inline">
+                <input name="detail_info" required lay-verify="required" placeholder="请输入活动描述" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">活动时间</label>
+            <div class="layui-input-inline">
+                <input name="start_time" id="start_time" required lay-verify="required" placeholder="请选择开始时间"
+                       class="layui-input">
+            </div>
+            <div class="layui-input-inline">
+                <input name="end_time" id="end_time" required lay-verify="required" placeholder="请选择结束时间"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">预计发货时间</label>
+            <div class="layui-input-inline">
+                <input name="send_time" id="send_time" required lay-verify="required" placeholder="请选择预计发货时间"
+                       class="layui-input">
+            </div>
+        </div>
+        <div style="margin-left: 20px">
+            <div class="layui-form-item">
+                <a class="layui-btn layui-col-md2 add_goods">添加商品</a>
+                <!--已选择商品 数据表格-->
+                <div class="layui-col-md12">
+                    <table id="orderTable" lay-filter="orderTable" lay-data="{id: 'orderTable'}"></table>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" lay-submit lay-filter="sub">提交</a>
+            </div>
+        </div>
+    </form>
+    <!--选择商品弹出层-->
+    <form class="layui-form" style='display:none;' id="goods_list_form">
+        <div style="margin-left: 20px; margin-top: 20px;">
+            <div class="layui-form-item">
+                <label class="layui-form-label">关键词：</label>
+                <div class="layui-input-inline">
+                    <input name="searchNameGoods" placeholder="请输入商品ID或者商品名称" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-input-inline">
+                    <a class="layui-btn" lay-submit lay-filter="findGoods">查询</a>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <!--商品列表 数据表格-->
+                <div class="layui-col-md12">
+                    <table id="goodsListTable" lay-filter="goodsListTable" lay-data="{id: 'goodsListTable'}"></table>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" lay-submit lay-filter="save">保存</a>
+            </div>
+        </div>
+    </form>
+    <!--设置秒杀属性弹出层-->
+    <form class="layui-form" style='display:none;' id="set_form">
+        <div class="already_choice_list"></div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" lay-submit lay-filter="set_save">保存</a>
+            </div>
+        </div>
+    </form>
+    <!--秒杀列表数据 数据表格-->
+    <form class="layui-form" style='display:none;' id="data_list_form">
+        <div style="margin-left: 20px">
+            <div class="layui-form-item">
+                <!--商品列表 数据表格-->
+                <div class="layui-col-md12">
+                    <table id="dataTable" lay-filter="dataTable" lay-data="{id: 'dataTable'}"></table>
+                </div>
+            </div>
+        </div>
+    </form>
+    <!--秒杀活动 数据表格-->
+    <div class="layui-col-md12">
+        <table id="pageTable" lay-filter="pageTable" lay-data="{id: 'pageTable'}"></table>
+    </div>
+</div>
+<!--添加/编辑签名-->
+<script type="text/javascript">
+    layui.use('voucher/flash', layui.factory('voucher/flash'));
+</script>
+<script type="text/html" id="operations">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    {{#  if(d.status == '1'){ }}
+    <a class="layui-btn layui-btn-xs" lay-event="suspend">暂停</a>
+    {{#  } else if(d.status == '0'){ }}
+    <a class="layui-btn layui-btn-xs" lay-event="start">开始</a>
+    {{#  } else { }}
+    <a class="layui-btn layui-btn-xs" lay-event="error">类型错误</a>
+    {{#  } }}
+    <!--<a class="layui-btn layui-btn-xs" lay-event="suspend">暂停</a>-->
+    <a class="layui-btn layui-btn-xs" lay-event="data">数据</a>
+</script>
+<script type="text/html" id="operations_order">
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+</script>
+<style>
+    .layui-table-cell {
+        height: auto;
+    }
+
+    #add_edit_form {
+        margin-top: 20px;
+        margin-right: 20px;
+    }
+
+    .layui-form-item .layui-form-checkbox[lay-skin="primary"] {
+        margin-top: 0px;
+    }
+
+    #goods_list_form .layui-table-cell {
+        width: 170px;
+    }
+
+    #goods_list_form .laytable-cell-checkbox {
+        width: 60px;
+    }
+
+    #add_edit_form .layui-table-cell {
+        width: 150px;
+    }
+
+    #add_edit_form .laytable-cell-checkbox {
+        width: 60px;
+    }
+
+    .flash_input {
+        width: 60px;
+        height: 20px;
+        text-align: center;
+    }
+</style>

@@ -1,0 +1,69 @@
+<title>设置我的资料</title>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">设置应用信息</div>
+                <div class="layui-card-body" pad15>
+                    <div class="layui-form-item shop_category_id" style="display: none;">
+                        <label class="layui-form-label">商城分类</label>
+                        <div class="layui-input-inline">
+                            <select name="shop_category_id" id="shop_category_id"></select>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">应用名称</label>
+                        <div class="layui-input-inline">
+                            <input name="name" required lay-verify="required" placeholder="请输入应用名称" class="layui-input layui-unselect">
+                        </div>
+                    </div>
+                    <div class="layui-form" lay-filter="">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">图片</label>
+                            <div class="layui-input-block">
+                                <span class="layui-col-md12" style="position:relative; display:block;">
+                                    <a class="layui-btn layui-col-md2">上传</a>
+                                    <input id="addImgPut" type="file">
+                                </span>
+                                <img id="image">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <button class="layui-btn" lay-submit lay-filter="setInfo">确认修改</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use('set/info', layui.factory('set/info'));
+</script>
+
+<style>
+    #image {
+        height: 200px;
+        width: 200px;
+        margin-top: 10px;
+        border: 1px solid #e5e5e5;
+    }
+
+    input[id=addImgPut] {
+        border: 0px solid red;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        opacity: 0;
+        height: 36px;
+        width: 200px;
+    }
+
+    input[id=addImgPut] :hover {
+        cursor: pointer;
+    }
+</style>

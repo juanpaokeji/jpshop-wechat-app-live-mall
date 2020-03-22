@@ -1,0 +1,23 @@
+<title>用户</title>
+<div class="layui-fluid">
+    <div class="layui-fluid">
+        <div class="layui-col-md12 header-top">
+            <b>返回请看控制台或网络</b>
+        </div>
+        <div class="layui-row">
+            <div class="layui-col-md12">
+                <button class="layui-btn temporary">获取临时二维码</button>
+            </div>
+            <div class="layui-col-md12">
+                <button class="layui-btn forever">获取永久二维码</button>
+            </div>
+        </div>
+        <image class="show"/>
+    </div>
+</div>
+<!--添加/编辑签名-->
+<script type="text/javascript">
+    layui.use('wx/officialAccount/qrCode', layui.factory('wx/officialAccount/qrCode'));
+</script>
+<link type="text/css" rel="styleSheet" href="./src/style/model.css"/>
+

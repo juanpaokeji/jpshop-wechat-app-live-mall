@@ -1,0 +1,36 @@
+<title>商城设置</title>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">商城设置</div>
+                <div class="layui-card-body" pad15>
+                    <div class="layui-form" lay-filter="">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">允许大比例优惠（超过50%）</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="is_large_scale" lay-skin="switch" lay-text="开启|关闭">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">优惠券最高发放数量（不超过10万）</label>
+                            <div class="layui-input-inline">
+                                <input name="number" required lay-verify="required|number" value="100000" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <button class="layui-btn" lay-submit lay-filter="sub">确认</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use('shopConfig', layui.factory('shopConfig'));
+</script>

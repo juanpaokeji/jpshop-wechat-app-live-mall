@@ -1,0 +1,112 @@
+<section class="section-setting" style="background-color: #F4FAFF;">
+	<div class="content">
+		<div class="top-operate">
+			<div class="con" style="float: right;">
+				<a style="cursor: pointer;" class="btn btn-green btn-save saved">保存模版</a>
+			</div>
+		</div>
+		<section class="main-box">
+			<div class="main-left">
+				<ul class="operate">
+					<li class="setFont"><span class="tt">字体</span>
+						<select name="" class="font w2" data-type="fontFamily">
+							<option value="微软雅黑">微软雅黑</option>
+							<option value="Hiragino Sans GB">Hiragino Sans GB</option>
+							<option value="宋体">宋体</option>
+							<option value="Helvetica">Helvetica</option>
+							<option value="Arial">Arial</option>
+							<option value="6">6</option>
+							<option value="7">7</option>
+							<option value="8">8</option>
+							<option value="9">9</option>
+							<option value="10">10</option>
+						</select>
+					</li>
+					<li class="setFont"><span class="tt">大小</span>
+						<select name="" class="font" data-type="fontSize">
+							<option value="12">12</option>
+							<option value="13">13</option>
+							<option value="14">14</option>
+							<option value="15">15</option>
+							<option value="16">16</option>
+							<option value="17">17</option>
+							<option value="18">18</option>
+							<option value="19">19</option>
+							<option value="20">20</option>
+						</select>
+					</li>
+					<li class="setFont"><span class="tt">字距</span>
+						<select name="" class="font" data-type="letterSpacing">
+							<option value="0">0</option>
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option>
+							<option value="6">6</option>
+							<option value="7">7</option>
+							<option value="8">8</option>
+							<option value="9">9</option>
+							<option value="10">10</option>
+						</select>
+					</li>
+					<li class="setLine">
+						<span class="tt">线型</span>
+						<select name="" class="line" data-type="line-type" >
+							<option value="solid">实线</option>
+							<option value="dashed">虚线</option>
+						</select>
+					</li>
+					<li class="setLine">
+						<span class="tt">宽度</span>
+						<input type="text" class="input line" data-type="line-width">
+					</li>
+					<li class="setLine">
+						<span class="tt">高度</span>
+						<input type="text" class="input line" data-type="line-height">
+					</li>
+					<li class="other">
+						<a href="" class="btn btn-red btn-delete">删除</a>
+					</li>
+				</ul>
+				<div class="edit-wrap">
+					<div class="edit-over"></div>
+					<div class="edit-box">
+					</div>
+				</div>
+			</div>
+			<div class="main-right">
+				<div class="title">打印设置</div>
+				<div class="panel">
+					<div class="group afterInsert">
+						<div class="subTitle"></div>
+							<form class="listPaper">
+								<div class="list-paper">
+									纸张：宽<input type="number" class="input editBoxWidth" name="width">px <span>高<input type="number" class="input editBoxHeight" name="height">px</span>
+								</div>
+							</form>
+						<div class="tips">提示：37.8px约等于10毫米</div>
+					</div>
+					<div class="group">
+						<div class="subTitle"></div>
+						<ul class="list">
+							<li class="add" data-name="name6-1" data-type="solid" data-direction="w">横实线</li>
+							<li class="add" data-name="name6-1" data-type="dashed" data-direction="w">横虚线</li>
+							<li class="add" data-name="name6-2" data-type="solid" data-direction="h">竖实线</li>
+							<li class="add" data-name="name6-2" data-type="dashed" data-direction="h">竖虚线</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+</section>
+<link rel="stylesheet" type="text/css" href="./printTemplate/css/main.css"/>
+<script type="text/javascript">
+    layui.use('print/edit', layui.factory('print/edit'));
+</script>
+<!-- <script src="./start/layui/lay/modules/jquery.js"></script> -->
+<script src="./printTemplate/js/slide.min.js"></script>
+<script src="./printTemplate/js/polyfill.min.js"></script>
+<script src="./printTemplate/js/l_zoom.min.js"></script>
+<script src="./printTemplate/js/l_drag.min.js"></script>

@@ -1,0 +1,62 @@
+<title>抵用券活动</title>
+
+<div class="layui-fluid">
+	<!--弹出框-->
+	<div class="layui-col-md12" style="display:none;" id="formm">
+		<form class="layui-form">
+			<div class="layui-form-item">
+				<label class="layui-form-label">活动名称</label>
+				<div class="layui-input-block">
+					<input type="text" name="name" required  lay-verify="required" placeholder="活动名称" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+		</form>
+	</div>
+	<!--body-->
+	<div class="layui-row">
+		<!--查询-->
+		<div class="layui-col-md12">
+			<form class="layui-form">
+				<div class="layui-form-item">
+					<div class="layui-input-inline">
+						<input type="text" name="title" required  lay-verify="required" placeholder="请输入id" autocomplete="off" class="layui-input">
+					</div>
+					<div class="layui-input-inline">
+						<a class="layui-btn" lay-submit lay-filter="find">查询</a>
+						<a class="layui-btn" id="add">添加</a>
+					</div>
+				</div>
+			</form>
+		</div>
+		<hr>
+		<!--数据表格-->
+		<div class="layui-col-md12">
+			<table id="views_vouchers_vouchersActivity" lay-filter="views_vouchers_vouchersActivity" lay-data="{id: 'views_vouchers_vouchersActivity'}"></table>
+		</div>
+	</div>
+</div>
+<!--表格工具条-->
+<script type="text/html" id="opreationes">
+  <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+
+<!--状态码模板-->
+<script type="text/html" id="statusTpl">
+  {{#  if(d.status === '1'){ }}
+    <input type="checkbox" name="zzz" lay-skin="switch" lay-text="开启|关闭" checked>
+  {{#  } else { }}
+    <input type="checkbox" name="zzz" lay-skin="switch" lay-text="开启|关闭">
+  {{#  } }}
+</script>
+<script>
+layui.use('views_vouchers_vouchersActivity', layui.factory('views_vouchers_vouchersActivity'));
+</script>
+<style>
+	
+	form{
+		margin-top:10px;
+		margin-right:20px;
+	}
+</style>

@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" readonly="true" id="5763833c-7abb-43fa-8b48-42817301f1c9" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Module\Laravel5.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Module\Laravel5.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\adminShop\src\views\user\login.html" afterPath="C:\xampp\htdocs\adminShop\src\views\user\login.html" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\autoload.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\autoload.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\12-ParallelExecution.md" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\12-ParallelExecution.md" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\modules\WebDriver.md" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\modules\WebDriver.md" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Command\Run.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Command\Run.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\tests\_files\Report\HTML\CoverageForClassWithAnonymousFunction\dashboard.html" afterPath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\tests\_files\Report\HTML\CoverageForClassWithAnonymousFunction\dashboard.html" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Module\WebDriver.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Module\WebDriver.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\adminShop\src\views\set\user\info.html" afterPath="C:\xampp\htdocs\adminShop\src\views\set\user\info.html" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\tests\_files\Report\HTML\CoverageForBankAccount\index.html" afterPath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\tests\_files\Report\HTML\CoverageForBankAccount\index.html" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\tests\_files\Report\HTML\CoverageForFileWithIgnoredLines\dashboard.html" afterPath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\tests\_files\Report\HTML\CoverageForFileWithIgnoredLines\dashboard.html" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\07-AdvancedUsage.md" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\07-AdvancedUsage.md" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\CHANGELOG-2.4.md" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\CHANGELOG-2.4.md" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Subscriber\Console.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Subscriber\Console.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\adminShop\src\views\set\user\password.html" afterPath="C:\xampp\htdocs\adminShop\src\views\set\user\password.html" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\composer.json" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\composer.json" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Util\JsonArray.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Util\JsonArray.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\composer\installed.json" afterPath="C:\xampp\htdocs\juanpao\vendor\composer\installed.json" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Module\REST.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Module\REST.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\tests\unit\Codeception\Util\JsonArrayTest.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\tests\unit\Codeception\Util\JsonArrayTest.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\.travis.yml" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\.travis.yml" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\controllers\admin\user\UserController.php" afterPath="C:\xampp\htdocs\juanpao\controllers\admin\user\UserController.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\12-ContinuousIntegration.md" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\12-ContinuousIntegration.md" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao1\runtime\logs\app.log" afterPath="C:\xampp\htdocs\juanpao1\runtime\logs\app.log" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\tests\_files\Report\HTML\CoverageForFileWithIgnoredLines\source_with_ignore.php.html" afterPath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\tests\_files\Report\HTML\CoverageForFileWithIgnoredLines\source_with_ignore.php.html" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Module\Symfony.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Module\Symfony.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao1\controllers\TestController.php" afterPath="C:\xampp\htdocs\juanpao1\controllers\TestController.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\tests\_files\Report\HTML\CoverageForClassWithAnonymousFunction\source_with_class_and_anonymous_function.php.html" afterPath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\tests\_files\Report\HTML\CoverageForClassWithAnonymousFunction\source_with_class_and_anonymous_function.php.html" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\stub\src\shim.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\stub\src\shim.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\08-Customization.md" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\08-Customization.md" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\adminShop\src\controller\admin\setInfo.js" afterPath="C:\xampp\htdocs\adminShop\src\controller\admin\setInfo.js" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Module\Memcache.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Module\Memcache.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\config\web.php" afterPath="C:\xampp\htdocs\juanpao\config\web.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\controllers\admin\user\LoginController.php" afterPath="C:\xampp\htdocs\juanpao\controllers\admin\user\LoginController.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\tests\tests\CodeCoverageTest.php" afterPath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\tests\tests\CodeCoverageTest.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\src\Report\Crap4j.php" afterPath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\src\Report\Crap4j.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Codecept.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Codecept.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\modules\Db.md" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\modules\Db.md" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\tests\TestCase.php" afterPath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\tests\TestCase.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\tests\web\WebDriverTest.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\tests\web\WebDriverTest.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\models\UserModel.php" afterPath="C:\xampp\htdocs\juanpao\models\UserModel.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\src\Report\Html\Facade.php" afterPath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\src\Report\Html\Facade.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\tests\unit\Codeception\Module\AssertsTest.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\tests\unit\Codeception\Module\AssertsTest.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\03-AcceptanceTests.md" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\03-AcceptanceTests.md" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\tests\data\claypit\c3.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\tests\data\claypit\c3.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\ChangeLog-6.0.md" afterPath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\ChangeLog-6.0.md" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Module\Db.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Module\Db.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\src\Report\Clover.php" afterPath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\src\Report\Clover.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\tests\_files\Report\HTML\CoverageForBankAccount\dashboard.html" afterPath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\tests\_files\Report\HTML\CoverageForBankAccount\dashboard.html" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Configuration.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Configuration.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\10-WebServices.md" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\10-WebServices.md" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Subscriber\GracefulTermination.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Subscriber\GracefulTermination.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\tests\data\claypit\composer.lock" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\tests\data\claypit\composer.lock" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\tests\_files\Report\HTML\CoverageForBankAccount\BankAccount.php.html" afterPath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\tests\_files\Report\HTML\CoverageForBankAccount\BankAccount.php.html" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\02-GettingStarted.md" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\02-GettingStarted.md" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\src\Report\Html\Renderer\Template\dashboard.html.dist" afterPath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\src\Report\Html\Renderer\Template\dashboard.html.dist" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\composer.lock" afterPath="C:\xampp\htdocs\juanpao\composer.lock" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Module\Asserts.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Module\Asserts.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\runtime\debug\index.data" afterPath="C:\xampp\htdocs\juanpao\runtime\debug\index.data" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\src\Report\Html\Renderer\Template\file.html.dist" afterPath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\src\Report\Html\Renderer\Template\file.html.dist" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Module\Yii2.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Module\Yii2.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\composer.json" afterPath="C:\xampp\htdocs\juanpao\composer.json" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Lib\Connector\ZF2\PersistentServiceManager.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Lib\Connector\ZF2\PersistentServiceManager.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\tests\_files\Report\HTML\CoverageForClassWithAnonymousFunction\index.html" afterPath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\tests\_files\Report\HTML\CoverageForClassWithAnonymousFunction\index.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/config.js" afterPath="$PROJECT_DIR$/src/config.js" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\tests\_files\Report\HTML\CoverageForFileWithIgnoredLines\index.html" afterPath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\tests\_files\Report\HTML\CoverageForFileWithIgnoredLines\index.html" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\06-ReusingTestCode.md" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\06-ReusingTestCode.md" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\runtime\logs\app.log" afterPath="C:\xampp\htdocs\juanpao\runtime\logs\app.log" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\modules\Yii2.md" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\modules\Yii2.md" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Event\FailEvent.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Event\FailEvent.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\src\Report\Xml\Facade.php" afterPath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\src\Report\Xml\Facade.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\07-BDD.md" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\07-BDD.md" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\modules\Symfony.md" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\modules\Symfony.md" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\tests\unit\Codeception\Module\TestsForWeb.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\tests\unit\Codeception\Module\TestsForWeb.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\modules\AngularJS.md" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\modules\AngularJS.md" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\src\Version.php" afterPath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\src\Version.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\reference\Configuration.md" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\reference\Configuration.md" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Lib\Driver\SqlSrv.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Lib\Driver\SqlSrv.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao1\.idea\workspace.xml" afterPath="C:\xampp\htdocs\juanpao1\.idea\workspace.xml" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao1\views\test\indexTemp.php" afterPath="C:\xampp\htdocs\juanpao1\views\test\indexTemp.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\05-UnitTests.md" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\05-UnitTests.md" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Lib\Interfaces\SessionSnapshot.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Lib\Interfaces\SessionSnapshot.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Lib\ParamsLoader.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Lib\ParamsLoader.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\src\Report\Html\Renderer\Template\directory.html.dist" afterPath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\src\Report\Html\Renderer\Template\directory.html.dist" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\src\CodeCoverage.php" afterPath="C:\xampp\htdocs\juanpao\vendor\phpunit\php-code-coverage\src\CodeCoverage.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Lib\Connector\Yii2.php" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\src\Codeception\Lib\Connector\Yii2.php" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao1\runtime\debug\index.data" afterPath="C:\xampp\htdocs\juanpao1\runtime\debug\index.data" />
+      <change type="MODIFICATION" beforePath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\01-Introduction.md" afterPath="C:\xampp\htdocs\juanpao\vendor\codeception\base\docs\01-Introduction.md" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="DaemonCodeAnalyzer">
+    <disable_hints />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FavoritesManager">
+    <favorites_list name="adminShop" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="list.html" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/views/order/list.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.5319149" vertical-offset="270" max-vertical-offset="4170">
+              <caret line="24" column="18" selection-start-line="24" selection-start-column="18" selection-end-line="24" selection-end-column="18" />
+              <folding>
+                <element signature="n#style#0;n#div#0;n#div#0;n#form#0;n#div#0;n#div#0;n#!!top" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="model.css" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/style/model.css">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="5591" max-vertical-offset="11310">
+              <caret line="204" column="21" selection-start-line="204" selection-start-column="21" selection-end-line="204" selection-end-column="21" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="add.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/views/goods/add.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-7.8550725" vertical-offset="6058" max-vertical-offset="8790">
+              <caret line="220" column="44" selection-start-line="220" selection-start-column="44" selection-end-line="220" selection-end-column="44" />
+              <folding>
+                <element signature="n#style#0;n#div#9;n#form#0;n#div#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#div#0;n#div#9;n#form#0;n#div#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#div#0;n#div#10;n#form#0;n#div#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#div#2;n#div#16;n#form#0;n#div#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#div#1;n#div#21;n#form#0;n#div#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#label#0;n#div#22;n#form#0;n#div#0;n#!!top" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>setInfo</find>
+      <find>LAY-user-login-vercode</find>
+      <find>LAY-user-get-vercode</find>
+    </findStrings>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/src/config.js" />
+        <option value="$PROJECT_DIR$/src/controller/users/staff/list.js" />
+        <option value="$PROJECT_DIR$/src/views/set/user/info.html" />
+        <option value="$PROJECT_DIR$/src/controller/admin/setInfo.js" />
+        <option value="$PROJECT_DIR$/src/views/set/user/password.html" />
+        <option value="$PROJECT_DIR$/src/controller/admin/setPassword.js" />
+        <option value="$PROJECT_DIR$/../juanpao/controllers/admin/user/UserController.php" />
+        <option value="$PROJECT_DIR$/../juanpao/config/web.php" />
+        <option value="$PROJECT_DIR$/src/views/user/login.html" />
+        <option value="$PROJECT_DIR$/../juanpao/controllers/admin/user/LoginController.php" />
+        <option value="$PROJECT_DIR$/../juanpao/models/UserModel.php" />
+        <option value="$PROJECT_DIR$/../juanpao/composer.json" />
+        <option value="$PROJECT_DIR$/src/controller/model.js" />
+        <option value="$PROJECT_DIR$/src/views/order/list.html" />
+        <option value="$PROJECT_DIR$/src/style/model.css" />
+        <option value="$PROJECT_DIR$/src/views/goods/add.html" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <gulpfiles>
+      <GulpfileState>
+        <gulpfile-path>$PROJECT_DIR$/gulpfile.js</gulpfile-path>
+      </GulpfileState>
+    </gulpfiles>
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="837" />
+    <option name="y" value="7" />
+    <option name="width" value="1503" />
+    <option name="height" value="1035" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <OptionsSetting value="true" id="Add" />
+    <OptionsSetting value="true" id="Remove" />
+    <OptionsSetting value="true" id="Checkout" />
+    <OptionsSetting value="true" id="Update" />
+    <OptionsSetting value="true" id="Status" />
+    <OptionsSetting value="true" id="Edit" />
+    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="0" id="Remove" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers ProjectPane="false" />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource ProjectPane="false" />
+      <autoscrollFromSource ProjectPane="false" />
+      <sortByType ProjectPane="false" />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="adminShop" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="Scope">
+        <subPane subId="Default" />
+        <subPane subId="Problems" />
+        <subPane subId="Tests" />
+        <subPane subId="Project Files" />
+        <subPane subId="Changed Files" />
+      </pane>
+      <pane id="Scratches" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="HbShouldOpenHtmlAsHb" value="" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\xampp\htdocs\adminShop\src\views\order" />
+      <recent name="E:\phpStudy\WWW\adminJuanpao\src\controller\admin" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="DartUnitRunConfigurationType" factoryName="DartUnit">
+      <method />
+    </configuration>
+    <configuration default="true" type="DartCommandLineRunConfigurationType" factoryName="Dart Command Line Application">
+      <method />
+    </configuration>
+    <configuration default="true" type="JSTestDriver:ConfigurationType" factoryName="JsTestDriver">
+      <setting name="configLocationType" value="CONFIG_FILE" />
+      <setting name="settingsFile" value="" />
+      <setting name="serverType" value="INTERNAL" />
+      <setting name="preferredDebugBrowser" value="Chrome" />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavaScriptTestRunnerKarma" factoryName="Karma" config-file="">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug">
+      <method />
+    </configuration>
+    <configuration default="true" type="NodeJSConfigurationType" factoryName="Node.js" working-dir="">
+      <method />
+    </configuration>
+    <configuration default="true" type="cucumber.js" factoryName="Cucumber.js">
+      <option name="cucumberJsArguments" value="" />
+      <option name="executablePath" />
+      <option name="filePath" />
+      <method />
+    </configuration>
+    <configuration default="true" type="js.build_tools.gulp" factoryName="Gulp.js">
+      <method />
+    </configuration>
+    <list size="0" />
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="SvnConfiguration" cleanupOnStartRun="true">
+    <configuration>C:\Users\Administrator\AppData\Roaming\Subversion</configuration>
+    <supportedVersion>125</supportedVersion>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="5763833c-7abb-43fa-8b48-42817301f1c9" name="Default" comment="" />
+      <created>1527468528597</created>
+      <option name="number" value="Default" />
+      <updated>1527468528597</updated>
+      <workItem from="1527468529727" duration="13100000" />
+      <workItem from="1527553900517" duration="9872000" />
+      <workItem from="1527564833779" duration="2197000" />
+      <workItem from="1527574772918" duration="2138000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="27307000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="837" y="7" width="1503" height="1035" extended-state="0" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Gulp" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32383966" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.041694686" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" x="1628" y="54" width="102" height="932" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.UiProperties">
+    <option name="RECENTLY_FILTERED_USER_GROUPS">
+      <collection />
+    </option>
+    <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+      <collection />
+    </option>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="myTodoPanelSettings">
+      <TodoPanelSettings />
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager />
+    <watches-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/config.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
+          <caret line="31" column="10" selection-start-line="31" selection-start-column="10" selection-end-line="31" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/config.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
+          <caret line="23" column="65" selection-start-line="23" selection-start-column="65" selection-end-line="23" selection-end-column="65" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/controller/model.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-4.494382" vertical-offset="9940" max-vertical-offset="11190">
+          <caret line="198" column="26" selection-start-line="198" selection-start-column="26" selection-end-line="198" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/views/goods/add.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-7.8550725" vertical-offset="6058" max-vertical-offset="8790">
+          <caret line="220" column="44" selection-start-line="220" selection-start-column="44" selection-end-line="220" selection-end-column="44" />
+          <folding>
+            <element signature="n#style#0;n#div#9;n#form#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#0;n#div#9;n#form#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#0;n#div#10;n#form#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#2;n#div#16;n#form#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#1;n#div#21;n#form#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#label#0;n#div#22;n#form#0;n#div#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/style/model.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="5591" max-vertical-offset="11310">
+          <caret line="204" column="21" selection-start-line="204" selection-start-column="21" selection-end-line="204" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/views/order/list.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.5319149" vertical-offset="270" max-vertical-offset="4170">
+          <caret line="24" column="18" selection-start-line="24" selection-start-column="18" selection-end-line="24" selection-end-column="18" />
+          <folding>
+            <element signature="n#style#0;n#div#0;n#div#0;n#form#0;n#div#0;n#div#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

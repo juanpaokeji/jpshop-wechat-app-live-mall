@@ -1,0 +1,79 @@
+.basic_information{
+    margin-top:3vw;
+    background:#ddd;
+    padding:15px 0;
+    padding-left:15px;
+    font-size: 1vw;
+    font-weight: 500;
+}
+#putAddBtn, #addImgPut {
+    position: absolute;
+    left: 0%;
+    top: 0;
+    color: #318AF7;
+}
+
+input[id=addImgPut] {
+    border: 0px solid red;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    opacity: 0;
+    height: 36px;
+    width: 200px;
+}
+
+input[id=addImgPut] :hover {
+    cursor: pointer;
+}
+
+/* div图片布局 */
+.item_box{
+    display: flex;
+    flex-direction:row;
+    justify-content: space-between;
+}
+/* checkbox选择框 */
+.choose_top{
+    position: relative;
+
+}
+.The_selected{
+    position: absolute;
+    top: 1.5vw;
+    right: 4vw;
+}
+.selected_img{
+    width: 8vw;
+    height: 8vw;
+    border:1px solid #D1EFD1;
+    border-radius:3px;
+    margin:1vw 0;
+}
+
+.images{
+    width: 70vw;
+    margin: 0 auto;
+}
+.page_img{
+    width: 100%;
+    text-align: center;
+    margin-top: 34vw;
+}
+.news_img{
+    width: 118px; 
+    height: 100px
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

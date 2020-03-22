@@ -1,0 +1,519 @@
+<title>门店商品添加</title>
+<!--&lt;!&ndash; 配置文件 &ndash;&gt;-->
+<script type="text/javascript" src="./src/lib/ueditor/ueditor.config.js"></script>
+<!--&lt;!&ndash; 编辑器源码文件 &ndash;&gt;-->
+<script type="text/javascript" src="./src/lib/ueditor/ueditor.all.js"></script>
+<div class="layui-fluid">
+    <form class="layui-form" id="add_edit_form">
+        <!-- 商品类型 -->
+        <div class="layui-row">
+            <div class="layui-col-md12 commodity_type">
+                商品类型
+            </div>
+        </div>
+        <div class="layui-col-md2 undetail type" id="type1" style="margin-right: 175px;">
+            <div class="layui-row">
+                <p class="app_name type1">实物商品</p>
+                <!--<p class="combo_name">（物流发货）</p>-->
+            </div>
+        </div>
+        <div class="layui-col-md2 undetail type" id="type2">
+            <div class="layui-row">
+                <p class="appname type2">服务商品</p>
+            </div>
+        </div>
+        <div class="layui-form-item" style="padding-top: 20px; padding-left: 50px;">
+            <div style="color: #b0b0b0;"><p style="float: left; margin-right: 50px;">实物商品：指需要配送的实体商品，如：水果，数码，美食，服装等</p>
+                <p style="float: left;">服务商品：无需配送，可直接到店取货的虚拟商品，如：餐券，电影票，优惠卡券等</p></div>
+        </div>
+        <!--基本信息-->
+        <div class="layui-row">
+            <div class="layui-col-md12 basic_information">
+                基本信息
+            </div>
+        </div>
+        <div class="layui-form-item service_goods_is_ship" style="display: none;">
+            <label class="layui-form-label">商品是否自动发货</label>
+            <div class="layui-input-block">
+                <input type="checkbox" name="service_goods_is_ship" lay-skin="switch" lay-text="是|否">
+            </div>
+        </div>
+        <div class="layui-col-md4 upThree">
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="asterisk">*</span>商品名：</label>
+                <div class="layui-input-block">
+                    <input name="name" required lay-verify="required" class="layui-input input" maxlength="30"
+                           onchange="this.value=this.value.substring(0, 30)">
+                    <!--onkeydown="this.value=this.value.substring(0, 30)"-->
+                    <!--onkeyup="this.value=this.value.substring(0, 30)">-->
+                    <p>商品名称，30字以内</p>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    短标题：</label>
+                <div class="layui-input-block">
+                    <input name="short_name" class="layui-input input" maxlength="12"
+                           onchange="this.value=this.value.substring(0, 12)">
+                    <!--onkeydown="this.value=this.value.substring(0, 12)"-->
+                    <!--onkeyup="this.value=this.value.substring(0, 12)">-->
+                    <p>商品短标题，12字以内</p>
+                </div>
+            </div>
+            <div class="layui-col-md10 layui-col-md-offset2 upThree">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">简单说明：</label>
+                    <div class="layui-input-block">
+                        <textarea name="simple_info" class="layui-input simple_instructions" maxlength="200"
+                                  onchange="this.value=this.value.substring(0, 200)"
+                                  onkeydown="this.value=this.value.substring(0, 200)"
+                                  onkeyup="this.value=this.value.substring(0, 200)"></textarea>
+                        <p>在商品详情页标题下面展示卖点信息，200字以内</p>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    商品编码：</label>
+                <div class="layui-input-block">
+                    <input name="code" class="layui-input input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item layui-col-md10 layui-col-md-offset2 pic">
+            <label class="layui-form-label">
+                <span class="asterisk">*</span>商品图：</label>
+            <div class="layui-input-block">
+                <span class="layui-col-md6 Commodity_figure">
+                    <a id="putAddBtn" href="javascript: void(0)">
+                        <i class="layui-icon layui-icon-face-smile">&#xe61f;</i>
+                        添加图片
+                    </a>
+                    <img id="image">
+                    <div class="layui-upload-list" id="images"
+                         style="display: flex;flex-direction: row;justify-content: flex-start;"></div>
+                </span>
+            </div>
+
+        </div>
+        <div class="layui-form-item">
+            <span style="margin-left:5.6vw;">建议尺寸：750*750，最多上传 5 张</span>
+        </div>
+        <!-- 折叠更多设置 -->
+        <!-- <div class="layui-row">
+            <div class="layui-col-md12" style="color:#318AF7;">
+                <i class="layui-icon"> &#xe625;</i>
+                折叠更多设置
+            </div>
+        </div> -->
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">商品视频：</label>
+            <div class="layui-input-inline">
+                <input type="file" class="videos" id="file"/>
+                <video class="videoed" controls="controls" style="display: none; width: 200px;"></video>
+            </div>
+        </div>
+
+        <div class="layui-form-item" style="display: flex;flex-direction: row;justify-content: flex-start;">
+            <label class="layui-form-label"><span class="asterisk">*</span>商品分组：</label>
+            <div class="layui-input-block" style="margin-left: 0vw;">
+                <select name="m_parent_id" lay-filter="m_parent_id"> </select>
+            </div>
+            <div class="layui-input-block" style="margin-left: 0vw;">
+                <select name="m_category_id"> </select>
+            </div>
+            <div class="layui-form-mid layui-word-aux" style="margin-left: 0vw;">
+                <!-- <a href="#">刷新</a>&nbsp;|&nbsp; -->
+                <a lay-href="/goods/group">新建分组</a>&nbsp;&nbsp;
+                <!-- <a href="#">如何创建商品分组?</a> -->
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">区域分组：</label>
+            <div class="layui-input-inline">
+                <select name="city_group_id" lay-filter="city_group_id">
+                    <option value="0">全国</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">增值服务：</label>
+            <div class="layui-input-block">
+                <input name="label" class="layui-input label" value="微信支付" disabled>
+                <input name="label" class="layui-input label">
+                <input name="label" class="layui-input label">
+                <input name="label" class="layui-input label">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label"><span class="asterisk">*</span>商品单位</label>
+            <div class="layui-input-inline">
+                <input name="unit" value="件" class="layui-input" lay-verify="required">
+                <p class="line">如：件、份、箱</p>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">商品属性</label>
+            <div class="layui-input-inline">
+                <input name="attribute" class="layui-input">
+            </div>
+            <a href="javascript: void(0)" class="attribute_add_button" style="color: limegreen">添加</a>
+        </div>
+        <div class="attribute_list"></div>
+        <div class="layui-col-md10">
+            <div class="layui-form-item">
+                <label class="layui-form-label"><span class="asterisk">*</span>详细说明：</label>
+                <div class="layui-input-block">
+                    <div id="editor"></div>
+                </div>
+            </div>
+        </div>
+        <!-- 拼团信息 -->
+        <!--<div class="layui-row">-->
+            <!--<div class="layui-col-md12 price_of_inventory">-->
+                <!--拼团设置-->
+            <!--</div>-->
+            <!--<div class="layui-form-item">-->
+                <!--<label class="layui-form-label">开启拼团</label>-->
+                <!--<div class="layui-input-inline" style="width: 100px">-->
+                    <!--<input type="checkbox" name="is_open_assemble" lay-skin="switch" lay-filter="is_open_assemble"-->
+                           <!--lay-text="开启|关闭">-->
+                <!--</div>-->
+                <!--<div class="layui-input-inline" style="width: 300px">-->
+                    <!--<span>开启拼团后，该商品将进入拼团模式，无法和其他商品加入购物车</span>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="tuan_config" style="display:none;">-->
+                <!--<div class="layui-form-item">-->
+                    <!--<label class="layui-form-label">单独购买</label>-->
+                    <!--<div class="layui-input-inline" style="width: 100px">-->
+                        <!--<input type="checkbox" name="is_self" lay-skin="switch" lay-text="开启|关闭">-->
+                    <!--</div>-->
+                    <!--<div class="layui-input-inline" style="width: 300px">-->
+                        <!--<span>是否允许该商品以原价单独购买</span>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <!--<div class="layui-form-item">-->
+                    <!--<label class="layui-form-label">虚拟成团</label>-->
+                    <!--<div class="layui-input-inline" style="width: 100px">-->
+                        <!--<input type="checkbox" name="is_automatic" lay-skin="switch" lay-text="开启|关闭">-->
+                    <!--</div>-->
+                    <!--<div class="layui-input-inline" style="width: 300px">-->
+                        <!--<span>开启后，未成团的团会在最后五分钟虚拟成团，以便成交订单</span>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <!--<div class="layui-form-item">-->
+                    <!--<label class="layui-form-label">老带新</label>-->
+                    <!--<div class="layui-input-inline" style="width: 100px">-->
+                        <!--<input type="checkbox" name="older_with_newer" lay-skin="switch" lay-text="开启|关闭">-->
+                    <!--</div>-->
+                    <!--<div class="layui-input-inline" style="width: 300px">-->
+                        <!--<span>开启后，该拼团仅能老客户分享给新客户下单</span>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <!--<div class="layui-form-item">-->
+                    <!--<label class="layui-form-label">是否团长优惠</label>-->
+                    <!--<div class="layui-input-inline" style="width: 100px">-->
+                        <!--<input type="checkbox" name="is_leader_discount" lay-skin="switch" lay-text="开启|关闭"-->
+                               <!--lay-filter="is_leader_discount">-->
+                    <!--</div>-->
+                    <!--<div class="layui-input-inline" style="width: 300px">-->
+                        <!--<span>开启后，可以设置给开团的团长优惠多少比例</span>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <!--<div class="layui-form-item">-->
+                    <!--<label class="layui-form-label">是否显示团长优惠</label>-->
+                    <!--<div class="layui-input-inline" style="width: 100px">-->
+                        <!--<input type="checkbox" name="is_show" lay-skin="switch" lay-text="开启|关闭">-->
+                    <!--</div>-->
+                    <!--<div class="layui-input-inline" style="width: 300px">-->
+                        <!--<span>开启后，将把团长的优惠显示在前端</span>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <!--<div class="layui-form-item">-->
+                    <!--<label class="layui-form-label">拼团类型</label>-->
+                    <!--<div class="layui-input-block">-->
+                        <!--<input type="radio" name="tuan_type" value="1" title="多人团" checked lay-filter="tuan_type"/>-->
+                        <!--<input type="radio" name="tuan_type" value="2" title="阶梯团" lay-filter="tuan_type"/>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <!--<div class="layui-form-item">-->
+                    <!--<label class="layui-form-label"></label>-->
+                    <!--<div class="layui-input-block assemble_number_set">-->
+                        <!--<div class="layui-form-item ">-->
+                            <!--<label class="layui-form-label">成团人数</label>-->
+                            <!--<div class="layui-input-inline">-->
+                                <!--<input name="assemble_number" class="layui-input" lay-verify="number" value="0">-->
+                                <!--该拼团多少人能够成团-->
+                            <!--</div>-->
+                            <!--<div class="is_leader_discount" style="display: none;">-->
+                                <!--<label class="layui-form-label">团长优惠比例(%)</label>-->
+                                <!--<div class="layui-input-inline">-->
+                                    <!--<input name="assemble_group_discount" class="layui-input" lay-verify="number"-->
+                                           <!--value="0">-->
+                                    <!--给团长的优惠比例-->
+                                <!--</div>-->
+                            <!--</div>-->
+                            <!--<div class="group_price_discount" style="display: none;">-->
+                                <!--<label class="layui-form-label">拼团价比例(%)</label>-->
+                                <!--<div class="layui-input-inline">-->
+                                    <!--<input name="group_price_discount" class="layui-input" lay-verify="number"-->
+                                           <!--value="0">-->
+
+                                <!--</div>-->
+                            <!--</div>-->
+                            <!--<a href="javascript: void(0)" class="assemble_add_button"-->
+                               <!--style="color: limegreen; display: none;">添加</a>-->
+                        <!--</div>-->
+                        <!--<div class="assemble_ladder"></div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+        <!-- 价格库存 -->
+        <div class="layui-row">
+            <div class="layui-col-md12 price_of_inventory">
+                价格库存
+            </div>
+        </div>
+        <!--商品规格添加-->
+        <label class="layui-form-label" style="margin-top:1vw;width: 84px;">商品规格：</label>
+        <div class="layui-col-md10 layui-col-md-offset2 upFour">
+            <div class="layui-input-inline double_spec">
+                <select lay-filter="stock_type" class="layui-input" name="stock_type" id="stock_type"
+                        title="stock_type">
+                    <option value="1" selected>单规格</option>
+                    <option value="2">双规格</option>
+                </select>
+            </div>
+            <div class="layui-form-item" style="display: flex;flex-direction: row;justify-content: flex-start;">
+                <div class="layui-input-inline ">
+                    <label class="layui-form-label double_specifications">规格1名称：</label>
+                    <input class="layui-input specification_name" name="property1_key">
+                </div>
+                <div class="layui-input-inline ">
+                    <label class="layui-form-label double_specifications">值：</label>
+                    <input class="layui-input specification_name first_s_name">
+                </div>
+                <div class="layui-input-inline ">
+                    <a class="layui-btn first_s_add">添加</a>
+                </div>
+            </div>
+            <div class="generation">
+                <div class="layui-form-item add_generation first_s"></div>
+            </div>
+            <div class="layui-form-item property2"
+                 style="display: flex;flex-direction: row;justify-content: flex-start;">
+                <div class="layui-input-inline ">
+                    <label class="layui-form-label double_specifications">规格2名称：</label>
+                    <input class="layui-input specification_name" name="property2_key">
+                </div>
+                <div class="layui-input-inline ">
+                    <label class="layui-form-label double_specifications">值：</label>
+                    <input class="layui-input specification_name second_s_name">
+                </div>
+                <div class="layui-input-inline ">
+                    <a class="layui-btn second_s_add">添加</a>
+                </div>
+            </div>
+            <div class="generation">
+                <div class="layui-form-item add_generation second_s"></div>
+            </div>
+        </div>
+        <div class="layui-col-md10 layui-col-md-offset2" style="margin-left: 8vw;font-size:10px;">
+            如有颜色、尺寸等多种规格，请添加商品规格
+        </div>
+
+        <div class="layui-col-md12">
+            <label class="layui-form-label" style="margin-top:1vw;width: 84px;">规格明细：</label>
+            <div class="layui-col-md10 layui-col-md-offset2 upFour save_specifications_list"></div>
+            <div class="layui-col-md4 layui-col-md-offset4"
+                 style="margin-left: 6vw;font-size:10px;padding-bottom: 1vw;">批量设置：
+                <a href="#">价格</a>&nbsp;&nbsp;
+                <a href="#">库存</a>
+            </div>
+        </div>
+        <div class="layui-form-item assemble_price_div" style="display: none;">
+            <label class="layui-form-label">
+                <!--（判断 取最低价）-->
+                <span class="asterisk">*</span>拼团价：</label>
+            <div class="layui-input-block" style="display: flex;flex-direction: row;justify-content: flex-start;">
+                <span class="the_yuan">¥</span>
+                <input name="assemble_price" value="0" id="assemble_price" lay-verify="required|number"
+                       class="layui-input specification_price">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">
+                <!--（判断 取最低价）-->
+                <span class="asterisk">*</span>价格：</label>
+            <div class="layui-input-block" style="display: flex;flex-direction: row;justify-content: flex-start;">
+                <span class="the_yuan">¥</span>
+                <input name="price" id="price" value="0" lay-verify="required|number"
+                       class="layui-input specification_price">
+            </div>
+        </div>
+        <div class="layui-col-md10 layui-col-md-offset2 upFive">
+            <div class="layui-form-item">
+                <!--（填写）-->
+                <label class="layui-form-label">划线价：</label>
+                <div class="layui-input-block">
+                    <input name="line_price" lay-verify="number" value="0" class="layui-input line_price">
+                    <p class="line">商品没有优惠的情况下，划线价在商品详情会以划线形式显示。
+                        <a href="#">示例</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md10 layui-col-md-offset2 upFive">
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="asterisk">*</span>库存：</label>
+                </label>
+                <div class="layui-input-block">
+                    <input name="stocks" id="stocks" lay-verify="required|number" value="0" class="layui-input"
+                           style="width: 14%;">
+                    <p class="line">库存为0时，会放到「已售罄」的商品列表里，保存后，买家看到的商品可售库存同步更新
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md10 layui-col-md-offset2 upFive">
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    虚拟销量：</label>
+                </label>
+                <div class="layui-input-block">
+                    <input name="sales_number" class="layui-input" style="width: 14%;">
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md10 layui-col-md-offset2 upFive">
+            <div class="layui-form-item">
+                <label class="layui-form-label">推客佣金(%)：</label>
+                <div class="layui-input-block">
+                    <input name="commission_leader_ratio" value="0" lay-verify="required|number" class="layui-input"
+                           style="width: 14%;">
+                    <p class="line">默认0表示获取社区团购配置，若填写则使用该佣金比例</p>
+                </div>
+            </div>
+        </div>
+        <!--<div class="layui-col-md10 layui-col-md-offset2 upFive is_open" style="display: none;">-->
+            <!--<div class="layui-form-item">-->
+                <!--<label class="layui-form-label">自提点佣金(%)：</label>-->
+                <!--<div class="layui-input-block">-->
+                    <!--<input name="commission_selfleader_ratio" value="0" lay-verify="required|number" class="layui-input"-->
+                           <!--style="width: 14%;">-->
+                    <!--<p class="line">默认0表示获取社区团购配置，若填写则使用该佣金比例</p>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--<div class="layui-form-item">-->
+            <!--<label class="layui-form-label">绑定自提点：</label>-->
+            <!--<div class="layui-input-inline">-->
+                <!--<select name="band_self_leader_id" lay-filter="band_self_leader_id"></select>-->
+            <!--</div>-->
+        <!--</div>-->
+        <div class="layui-form-item">
+            <div class="layui-input-block" style="display: flex;flex-direction: row;justify-content: flex-start;">
+                <input type="checkbox" lay-filter="is_limit" name="is_limit" value="1">限量
+                <div class="layui-input-inline" id="limit_number" style="margin-left: 1vw;display: none;">
+                    <input type="text" class="layui-input" name="limit_number" placeholder="0不限量">
+                </div>
+            </div>
+        </div>
+        <!-- 其他信息 -->
+        <div class="layui-row">
+            <div class="layui-col-md12 price_of_inventory">
+                其他信息
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width:87px;">
+                上架时间：
+            </label>
+            <div class="layui-input-block">
+                <input type="radio" name="start_time" value="1" checked>立即上架售卖
+            </div>
+            <div class="layui-input-block" style="display: flex;flex-direction: row;justify-content: flex-start;">
+                <input type="radio" name="start_time" value="2">自定义上架时间
+                <div class="layui-input-inline" style="margin-left: 1vw;">
+                    <input type="text" class="layui-input" name="diyStartTime" id="diyStartTime" placeholder="请选择上架时间">
+                </div>
+            </div>
+            <div class="layui-input-block" style="margin-left: 6.1vw;">
+                <input type="radio" name="start_time" value="3">暂不售卖，放入仓库
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">下架时间</label>
+            <div class="layui-input-inline">
+                <input type="text" class="layui-input" name="end_time" id="endTime" placeholder="请选择下架时间">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">提货时间</label>
+            <div class="layui-input-inline">
+                <input type="text" class="layui-input" name="take_goods_time" id="take_goods_time"
+                       placeholder="请选择提货时间">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">团长专属</label>
+            <div class="layui-input-block">
+                <input type="checkbox" name="regimental_only" lay-skin="switch" lay-text="开启|关闭">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">序号</label>
+            <div class="layui-input-inline">
+                <input name="sort" value="0" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-row buttons">
+            <div class="layui-col-md12 save">
+                <button type="button" class="layui-btn layui-btn-primary" lay-submit lay-filter="sub_goods">保存</button>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="introduce_images"></div>
+<script type="text/javascript" src="./src/lib/common.js"></script>
+<!--添加/编辑签名-->
+<script type="text/javascript">
+    layui.use('ship/add', layui.factory('ship/add'));
+</script>
+<!--图片模板-->
+<script type="text/html" id="imgTpl">
+    <img class="layui-upload-img" style="width:40px; height:40px"
+         src={{ d.pic_url }}>
+</script>
+<!--状态码模板-->
+<script type="text/html" id="statusTpl">
+    <input type="checkbox" value="{{d.id}}" lay-skin="switch" lay-text="开启|关闭" lay-filter="statusTpl" {{
+           d.status== 1 ? 'checked' : '' }}>
+</script>
+<!--应用类型模板-->
+<script type="text/html" id="typeTpl">
+    {{#  if(d.type == '1'){ }}
+    <span class="layui-col-md8">微信</span>
+    {{#  } else if(d.type == '2'){ }}
+    <span class="layui-col-md8">小程序</span>
+    {{#  } else if(d.type == '3'){ }}
+    <span class="layui-col-md8">微信&小程序</span>
+    {{#  } else { }}
+    <span class="layui-col-md8">类型错误</span>
+    {{#  } }}
+</script>
+<link type="text/css" rel="styleSheet" href="./src/style/goods/add.css"/>
+<style>
+    .tuan_config *, .layui-form-switch em {
+        font-size: 10px
+    }
+
+    .main_figure {
+        left: 97px;
+    }
+</style>

@@ -1,0 +1,26 @@
+
+.title {
+    text-align: center;
+    font-size: 1.5vw;
+    margin-top: 5vw;
+    color: limegreen;
+}
+
+.img, .info {
+    text-align: center;
+    margin-top: 2vw;
+}
+
+img{
+    width: 10vw;
+    height: 10vw;
+}
+
+.info {
+    font-size: 1vw;
+}
+
+p{
+    line-height: 2vw;
+}
+

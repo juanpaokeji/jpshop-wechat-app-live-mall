@@ -1,0 +1,104 @@
+<title>抵用券类型</title>
+<div class="layui-fluid">
+    <div class="layui-col-md12">
+        <form class="layui-form layui-col-md11">
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <input name="searchName" placeholder="请输入类型名称" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-input-inline">
+                    <a class="layui-btn" lay-submit lay-filter="find">查询</a>
+                </div>
+            </div>
+        </form>
+        <a class="layui-btn layui-col-md1" lay-submit lay-filter="showAdd">新增</a>
+    </div>
+    <!--弹出层-->
+    <form class="layui-form" style='display:none;' id="add_edit_form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">类型名称</label>
+            <div class="layui-input-inline">
+                <input type="text" name="name" required lay-verify="required" placeholder="请输入类型名称"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">面值</label>
+            <div class="layui-input-inline">
+                <input type="text" name="price" required lay-verify="required" placeholder="请输入面值" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">满减条件</label>
+            <div class="layui-input-inline">
+                <input type="text" name="full_price" required lay-verify="required" placeholder="满减金额,0为无要求"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">发放总量</label>
+            <div class="layui-input-inline">
+                <input type="text" name="count" required lay-verify="required" placeholder="请输入发放总量"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">有效期</label>
+            <div class="layui-input-inline">
+                <input type="text" name="days" required lay-verify="required" placeholder="领取后有效期,单位/天"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">活动</label>
+            <div class="layui-input-inline">
+                <select name="act_id" id="act_id"> </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">有效期</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" id="from_to_date" name="from_to_date" placeholder="请选择有效期">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-block">
+                <input type="checkbox" name="add_edit_status" checked lay-skin="switch" lay-text="开启|关闭">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" id="btn" lay-submit lay-filter="sub">提交</a>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+        <input name="add_edit_type" style="display: none;"/>
+    </form>
+    <!--当前操作的id-->
+    <input name="operationId" style="display: none;"/>
+    <!--数据表格-->
+    <div class="layui-col-md12">
+        <table id="pageTable" lay-filter="pageTable" lay-data="{id: 'pageTable'}">
+        </table>
+    </div>
+</div>
+<!--添加/编辑签名-->
+<script type="text/javascript">
+    layui.use('voucher/type', layui.factory('voucher/type'));
+</script>
+<script type="text/html" id="operations">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+</script>
+<!--状态码模板-->
+<script type="text/html" id="statusTpl">
+    <input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="开启|关闭" lay-filter="status" {{
+           d.status== 1 ? 'checked' : '' }}>
+</script>
+<style>
+    #add_edit_form {
+        margin-top: 20px;
+        margin-right: 20px;
+    }
+</style>

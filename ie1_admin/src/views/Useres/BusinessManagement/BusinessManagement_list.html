@@ -1,0 +1,221 @@
+<title>商户列表</title>
+
+<div class="layui-fluid">
+    <div class="layui-tab-content">
+        <div class="layui-tab-item layui-show" id="tt">
+            <!--查询-->
+            <div class="layui-col-md12">
+                <form class="layui-form">
+                    <div class="layui-form-item">
+                        <div class="layui-input-inline">
+                            <input type="text" name="searchName" required lay-verify="required"
+                                   placeholder="请输入商户名称"
+                                   autocomplete="off" class="layui-input">
+                        </div>
+                        <div class="layui-input-inline">
+                            <a class="layui-btn" lay-submit lay-filter="find">查询</a>
+                            <a class="layui-btn" lay-submit lay-filter="add">新增</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <hr>
+            <!--数据表格-->
+            <div class="layui-col-md12">
+                <table id="views_BusinessManagement_table" lay-filter="views_BusinessManagement_table"
+                       lay-data="{id: 'views_BusinessManagement_table'}"></table>
+            </div>
+        </div>
+        <div class="layui-tab-item" id="Add_form">
+            <form class="layui-form" autocomplete="off">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">用户名称</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="name" required lay-verify="required" placeholder="请输入用户名称"
+                               autocomplete="off" class="layui-input">
+                    </div>
+
+                    <label class="layui-form-label">姓名</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="real_name" required placeholder="请输入用户名称" autocomplete="off"
+                               class="layui-input">
+                    </div>
+
+                    <label class="layui-form-label">密码</label>
+                    <div class="layui-input-inline">
+                        <input type="password" name="password" required lay-verify="required"
+                               placeholder="请输入密码" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">手机号</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="phone" required lay-verify="required|phone"
+                               placeholder="请输入手机号" autocomplete="off" class="layui-input">
+                    </div>
+
+                    <label class="layui-form-label">应用key</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="app_keys" required lay-verify="required" placeholder="应用key"
+                               autocomplete="off" class="layui-input">
+                    </div>
+
+                    <label class="layui-form-label">应用证书</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="app_secret" required lay-verify="required" placeholder="应用key"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">状态</label>
+                    <div class="layui-input-block">
+                        <input type="checkbox" name="status" value='1' lay-skin="switch" lay-text="开启|关闭">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <a class="layui-btn" id="btn" lay-submit lay-filter="add">立即提交</a>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div>
+    <form class="layui-form" style='display:none;' id="Wx_form">
+        <input name="mid" style="display: none;"/>
+        <div class="layui-form-item layui-row">
+            <label class="layui-form-label">应用id</label>
+            <div class="layui-input-block">
+                <input type="text" name="APPID" required lay-verify="required" placeholder="请输入APPID"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item layui-row">
+            <label class="layui-form-label">商户号</label>
+            <div class="layui-input-block">
+                <input type="text" name="MCHID" required lay-verify="required" placeholder="请输入商户号"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">支付密钥</label>
+            <div class="layui-input-block">
+                <input type="text" name="KEY" required lay-verify="required" placeholder="请输入支付密钥"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">公众帐号secert</label>
+            <div class="layui-input-block">
+                <input type="text" name="APPSECRET" required lay-verify="required" placeholder="请输入公众帐号secert"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">代理服务器</label>
+            <div class="layui-input-block">
+                <input type="text" name="CURL_PROXY_HOST" value="0,0,0,0" required lay-verify="required"
+                       placeholder="请输入代理服务器" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">代理服务器端口</label>
+            <div class="layui-input-block">
+                <input type="text" name="CURL_PROXY_PORT" value="0" required lay-verify="required"
+                       placeholder="请输入代理服务器端口" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">接口调用上报等级</label>
+            <div class="layui-input-block">
+                <input type="text" name="REPORT_LEVENL" value="1" required lay-verify="required"
+                       placeholder="请输入接口调用上报等级" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">证书CERT</label>
+            <div class="layui-input-block">
+                <input type="file" class="layui-btn" id="SSLCERT_PATH" name="SSLCERT_PATH">上传文件</input>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">证书KEY</label>
+            <div class="layui-input-block">
+                <input type="file" class="layui-btn" id="SSLKEY_PATH" name="SSLKEY_PATH">上传文件</input>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" lay-submit="" lay-filter="submitWx">立即提交</a>
+            </div>
+        </div>
+    </form>
+    <form class="layui-form" style='display:none;' id="Ali_form">
+        <input name="mid" style="display: none;"/>
+        <div class="layui-form-item layui-row">
+            <label class="layui-form-label">应用id</label>
+            <div class="layui-input-block">
+                <input type="text" name="app_id" required lay-verify="required" placeholder="请输入APPID"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item layui-row">
+            <label class="layui-form-label">商户私钥</label>
+            <div class="layui-input-block">
+                <input type="text" name="merchant_private_key" required lay-verify="required" placeholder="请输入商户私钥"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">编码格式</label>
+            <div class="layui-input-block">
+                <input type="text" name="charset" required lay-verify="required" placeholder="请输入编码格式"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">签名方式</label>
+            <div class="layui-input-block">
+                <input type="text" name="sign_type" required lay-verify="required" placeholder="请输入签名方式"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">支付宝公钥</label>
+            <div class="layui-input-block">
+                <input type="text" name="alipay_public_key" value="0" required lay-verify="required"
+                       placeholder="请输入支付宝公钥" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" lay-submit="" lay-filter="submitAli">立即提交</a>
+            </div>
+        </div>
+    </form>
+</div>
+<!--表格工具条-->
+<script type="text/html" id="opreationes">
+    <form class="layui-form">
+        <a class="layui-btn layui-btn-xs" lay-event="wxConfig" lay-submit lay-filter="wxConfig">微信配置</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="aliConfig" lay-submit
+           lay-filter="aliConfig">支付宝配置</a>
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </form>
+</script>
+
+
+<!--状态码模板-->
+<script type="text/html" id="statusTpl">
+    <input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="开启|关闭" lay-filter="sexDemo" {{
+           d.status== 1 ? 'checked' : '' }}>
+</script>
+<script>
+    layui.use('views_BusinessManagement', layui.factory('views_BusinessManagement'));
+</script>
+<style>
+
+</style>

@@ -1,0 +1,11 @@
+<script src="./jquery.min.js"></script>
+<script>
+    layui.use(['admin', 'user'], function () {
+        var $ = layui.$;
+        var arr = {
+            method: 'admin/app/app/updates',
+            type: 'get',
+        };
+        getAjaxReturn(arr);
+    });
+</script>

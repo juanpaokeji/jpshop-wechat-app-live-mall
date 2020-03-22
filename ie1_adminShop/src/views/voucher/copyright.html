@@ -1,0 +1,35 @@
+<title>自定义版权</title>
+<div class="layui-fluid customize">
+    <form class="layui-form" id="add_edit_form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">图片</label>
+            <div class="layui-input-inline">
+                <a class="layui-btn layui-col-md4 putAddBtn">上传</a>
+                <div id="image"></div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" id="btn" lay-submit lay-filter="sub">提交</a>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="introduce_images"></div>
+<!--添加/编辑签名-->
+<script type="text/javascript">
+    layui.use('voucher/copyright', layui.factory('voucher/copyright'));
+</script>
+<script type="text/javascript" src="./src/lib/common.js"></script>
+<style>
+    #image {
+        height: 100px;
+        width: 200px;
+        margin-top: 40px;
+        border: 1px solid #e5e5e5;
+    }
+
+    input[id=addImgPut] :hover {
+        cursor: pointer;
+    }
+</style>

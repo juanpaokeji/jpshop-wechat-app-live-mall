@@ -1,0 +1,63 @@
+<title>小程序基本配置</title>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <form class="layui-form">
+                <div class="first_page">
+                    <div class="layui-form-item layui-row">
+                        <label class="layui-form-label">小程序名称</label>
+                        <div class="layui-input-inline">
+                            <input name="name" required lay-verify="required" placeholder="请输入小程序名称"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">小程序ID</label>
+                        <div class="layui-input-inline">
+                            <input name="AppID" required lay-verify="required" placeholder="请输入小程序ID"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">小程序应用密钥</label>
+                        <div class="layui-input-inline">
+                            <input name="AppSecret" required lay-verify="required" placeholder="请输入微信小程序应用密钥"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">微信支付商户号</label>
+                        <div class="layui-input-inline">
+                            <input name="MCHID" required lay-verify="required" placeholder="请输入微信支付商户号"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">微信支付密钥</label>
+                        <div class="layui-input-inline">
+                            <input name="pay_key" required lay-verify="required" placeholder="请输入微信支付密钥"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">支付类型</label>
+                        <div class="layui-input-inline">
+                            <input type="radio" name="pay_type" value="1" title="普通支付" checked/>
+                            <!--<input type="radio" name="radios" title="2" value="服务商支付"/>-->
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-inline">
+                            <a class="layui-btn" lay-submit="" lay-filter="sub">保存</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use('miniprogram/base', layui.factory('miniprogram/base'));
+</script>

@@ -1,0 +1,153 @@
+<title>model</title>
+<div class="layui-fluid">
+	<div class="layui-row">
+		<div class="layui-col-md12">
+			<button type="button" class="layui-btn btn-default select-tem">+选择模板</button>
+		</div>
+		<div class="layui-col-md12">
+			<div class="mode-preview">
+				<form class="form" id="add_edit_form">
+					<div class="mode-view-left">
+						<div class="form-list">
+							<div class="mode-box after">
+								<div class="active-mod-title msgName">工作任务通知</div>
+							</div>
+						</div>
+					</div>
+				</form>
+				<div class="mode-view-right">
+					<div class="acitve-preview-title">模板预览</div>
+					<div class="active-right-table-push-con">
+						<div class="push-tem-title">
+							<span class="tem-logo">
+								<img>
+							</span>
+							<span class="title-con">水果乐</span>
+							<i class="layui-icon layui-icon-more tem-more"></i>
+						</div>
+						<div class="tem-con-list">
+							<p class="tem-con-list-title msgName">工作任务通知</p>
+						</div>
+						<div class="tem-foot">
+							<p class="view-mini">进入小程序查看<i class="layui-icon layui-icon-right"></i></p>
+							<p>拒收通知<i class="layui-icon layui-icon-right"></i></p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<form class="form" id="leftForms">
+				<div class="step-mod">
+					<div class="mode-box">
+						<label class="input-title">消息标题</label>
+						<div class="title-input">
+							<input type="text" class="input-inner" name="title" placeholder="请输入消息标题">
+						</div>
+					</div>
+					<div class="mode-box">
+						<label class="input-title">跳转页</label>
+						<div class="title-input jumpPage">
+							<input type="text" name="choice_page_name_view" class="input-inner" disabled style="background-color: white !important;" placeholder="请选择跳转页面">
+							<input class="choice_page_type" name="choice_page_type" style="display: none;" disabled/>
+							<input name="choice_page_name" style="display: none;" disabled>
+							<input name="choice_app_id" class="page_app_id" style="display: none;" disabled/>
+							<input name="choice_page_url" class="page_url" style="display: none;" disabled/>
+						</div>
+					</div>
+					<div class="mode-box">
+						<label class="input-title">推送范围</label>
+						<label class="ty-label"> 
+							<input class="ty-radio" type="radio" name="scope" checked="checked" value="1"> 
+							<span class="ty-radioInput"></span>全部用户
+						</label> 
+					</div>
+					<div class="mode-box">
+						<label class="input-title">推送方式</label>
+						<label class="ty-label">
+							<input class="ty-radio" type="radio" name="scope_type" checked="checked" value="1"> 
+							<span class="ty-radioInput"></span>及时推送
+						</label>
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="btn-group layui-col-md12">
+			<div class="layui-col-md6">
+				<button type="button" class="layui-btn layui-btn-warm saveTemplate" style="float: right;margin-right: 3.125rem;">保存不发送</button>
+			</div>
+			<div class="layui-col-md6">
+				<button type="button" class="layui-btn layui-btn-normal saveTemplate" data-type="1">保存并发送</button>
+			</div>
+		</div>
+	</div>
+	<div class="tem-lists" style="display: none;">
+		<div class="model-body">
+			<ul class="active-moudle-list">
+				<!-- <li class="models" style="border:0rem;">
+					<div class="add-new-moudle" title="添加模板">
+						<div class="add"></div>
+					</div>
+				</li> -->
+			</ul>
+			<div class="btn-group" style="overflow: hidden;">
+				<button type="button" class="layui-btn layui-btn-normal saved float-right">确定</button>
+				<button type="button" class="layui-btn layui-btn-warm cancels float-right">取消</button>
+			</div>
+		</div>
+	</div>
+	<div id="choicePageUrl" style="display: none;"></div>
+</div>
+<style>
+	.mode-preview{width: 68.75rem;min-height: 30.9375rem;border: 0.0625rem solid #E4E5E7;float: left;}
+	.mode-view-left{float: left;width: 37rem;height: 100%;padding-top: 2.5rem;}
+	.mode-view-right{float: right;width: 24.6875rem;min-height: 29.6875rem;height: 100%;background-color: #F8F8F9;padding: 1.25rem 2.5rem 0 2.5rem;}
+	.mode-box{margin-bottom: 1.75rem;}
+	.active-mod-title{font-size: 0.875rem;padding-left: 3.125rem;}
+	.mess-title{width: 6.25rem;text-align: right;display: inline-block;line-height: 3.375rem;margin-right: 0.3125rem;font-size: 0.75rem;color: #262626;}
+	.style-textarea{width: 22.9375rem;display: inline-block;vertical-align: bottom;font-size: 0.875rem;}
+	.textarea-inner{display: block;resize: vertical;padding: 0.3125rem 0.9375rem;line-height: 1.5;box-sizing: border-box;width: 100%;font-size: inherit;color: #606266;border: 0.0625rem solid #dcdfe6;border-radius: 0.25rem;transition: border-color .2s;}
+	.acitve-preview-title{height: 3.3125rem;line-height: 3.3125rem;color: #262626;font-size: 0.875rem;margin: 0 auto;}
+	.active-right-table-push-con{width: 100%;min-height: 20.4375rem;border-radius: 0.25rem;background-color: white;}
+	.push-tem-title{height: 3.125rem;line-height: 3.125rem;border-bottom: 0.0625rem solid #E4E5E7;padding-left: 0.9375rem;}
+	.tem-logo{display: inline-block;width: 1.5625rem;height: 1.5625rem;text-align: center;border: 0.0625rem solid #E4E5E7;border-radius: 50%;vertical-align: middle;line-height: 2.125rem;}
+	.tem-logo img{margin-bottom: 0.6875rem;width: 100%;height: 100%;border-radius: 50%;}
+	.title-con{font-size: 0.875rem;margin-left: 0.3125rem;}
+	.tem-more{float: right;font-size: 1.875rem;padding-right: 0.3125rem;}
+	.tem-con-list{height: 10.5rem;overflow: auto;padding: 0.5rem 0.9375rem 1.875rem;text-align: left;}
+	.tem-con-list-title{margin-bottom: 0.625rem;font-size: 1rem;line-height: 2.125rem;}
+	.tem-con-list-tem{margin-bottom: 0.625rem;height: 1.1875rem;}
+	.tem-con-list-tem span{float: left;}
+	.tem-con-list-tem span:first-child{width: 5.4375rem;color: #8b8b8b;display: inline-block;}
+	.tem-con-list-tem span:last-child{word-wrap:break-word;}
+	.tem-foot{width: 100%;height: 4.375rem;}
+	.tem-foot p{height: 2.125rem;line-height: 2.125rem;border-top: 1px solid #E4E5E7;font-size: 0.875rem;text-align: left;margin: 0 0.625rem;}
+	.layui-icon-right{float: right;}
+	.input-title{display: inline-block;width: 4.375rem;padding-left: 2.5rem;text-align: left;margin-right: 0.625rem;font-size: 0.75rem;color: #262626;}
+	.step-mod{width:31.25rem;padding: 2.375rem  0 2.5rem;margin: 0 1.25rem;float: left;border: 1px solid #E4E5E7;min-height: 26.1875rem;}
+	.title-input{width: 22.9375rem;height: 2.0625rem;line-height: 2.0625rem;font-size: 0.875rem;display: inline-block;}
+	.input-inner{height: 2.0625rem;line-height: 2.0625rem;border-radius: 0.25rem;border: 0.0625rem solid #C0C4CC;box-sizing: border-box;padding: 0 0.9375rem;width: 80%;}
+	.btn-group{margin-top: 3.125rem;}
+	.model-body{padding: 1.875rem 1.25rem;font-size: 0.875rem;}
+	.models{width: 18rem;min-height: 19.1875rem;float: left;margin: 0 1.25rem 1.25rem 0;border: 0.0625rem solid #E4E5E7;border-radius: 0.25rem;}
+	.active-table-content-box{width: 18rem;min-height: 19.0625rem;background-color: #F9F9F9;padding: 1.25rem 0;border-radius: 0.25rem;cursor: pointer;}
+	.active-table-push-con{width: 16.25rem;margin: 0 auto;border-radius: 0.25rem;background-color: white;border: 0.0625rem solid #E4E5E7;min-height: 19.3125rem;}
+	.active-push-tem-title{height: 2.5rem;line-height: 2.5rem;border-bottom: 0.0625rem solid #E4E5E7;text-align: left;padding-left: 0.9375rem;}
+	.add-new-moudle{width: 10.25rem;height: 13.0625rem;border: 0.0625rem dashed #E4E5E7;margin: 0 auto;margin-top: 3.125rem;text-align: center;}
+	.add {width: 100px; height: 100px;color: #ccc;transition: color .25s; position: relative;top: 55px;left: 2.0625rem;}
+	.add::before{content: '';position: absolute;left: 50%;top: 50%;width: 100px; margin-left: -50px; margin-top: -5px;border-top: 10px solid;}
+	.add::after {content: ''; position: absolute;left: 50%;top: 50%; height: 100px;margin-left: -5px;margin-top: -50px;border-left: 10px solid;}
+	.active-moudle-list{overflow: hidden;}
+	.float-right{float: right;margin-right: 1.25rem;}
+	.layui-input-block{width: 12.5rem;}
+	.ty-label{display:inline-block} 
+	.ty-radio{display:none} 
+	.ty-radioInput{background-color:#fff;border:1px solid #64BA7C;border-radius:100%;display:inline-block;height:16px;margin-right:10px;vertical-align:middle;width:16px;line-height:1} 
+	.ty-radio:checked + .ty-radioInput:after{background-color:#64BA7C;border-radius:100%;content:"";display:inline-block;height:10px; margin:3px; width:10px} 
+	.ty-checkbox.ty-radioInput,.ty-radio:checked + .ty-checkbox.ty-radioInput:after{border-radius:0}
+	/* 弹窗li改变border颜色 */
+	.actives{border-color: #4D75FF !important;}
+</style>
+<script type="text/javascript" src="./src/lib/common.js"></script>
+<!--添加/编辑签名-->
+<script type="text/javascript">
+    layui.use('voucher/miniTemplateAdd', layui.factory('voucher/miniTemplateAdd'));
+</script>
