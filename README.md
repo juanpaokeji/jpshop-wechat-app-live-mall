@@ -21,19 +21,14 @@
 #### 安装教程
 
 1.  下载好系统文件，解压上传到域名解析的根目录<br>
-2.  访问：http://域名/Install ，按照提示安装<br>
-修改config.js文件，里面的域名改为你的域名，安装好后，访问你的域名，按Ctrl+F5强制刷新几次。<br>
-安装完成后，进入后台：http://域名/ie1_admin<br>
-   小程序首页：http://域名<br>
+2.  访问：http://域名/install ，按照提示安装<br>
+安装完成后，进入后台：http://域名<br>
 注：域名必须开通ssl，否则小程序无法运行，建议使用宝塔面板
 
 #### 使用说明
 
 使用说明文档：http://wen.juanpao.cn/web/#/1?page_id=1<br>
-体验后台http://ceshi.juanpao.cn
-帐号：admin
-密码：123456
-
+体验后台http://an.juanpao.cn 帐号：system 密码：123456
 
 体验小程序》微信扫码体验<br>
 ![体验小程序](https://images.gitee.com/uploads/images/2020/0214/094433_e0de68fd_1843738.jpeg "322be14eb69cc07fdbe67476679f5491.jpg")
