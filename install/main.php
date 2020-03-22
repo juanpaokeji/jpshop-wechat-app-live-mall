@@ -16,12 +16,6 @@ if(INSTALLTYPE == 'HOST'){
         " 'password' => '".$dbPwd."',".
         " 'charset' => 'utf8',];");
     fclose($fp);
-
-	$url = "http://".$_SERVER['HTTP_HOST'];
-	$filename = '../config.js';
-    $fp= fopen($filename, "w");  //w是写入模式，文件不存在则创建文件写入。
-    $len = fwrite($fp, "const domain = '{$url}/api/web/index.php'");
-    fclose($fp);
 }
 
 //插入管理员
@@ -37,13 +31,11 @@ $query  ="INSERT INTO `merchant_user` VALUES (13, '{$username}', NULL, NULL, '{$
 $b= mysqli_query($conn,$query);
 
 if($a){
-
 	return array('status'=>2,'info'=>'成功添加管理员<br />成功写入配置文件<br>安装完成...');
 }else{
 	return array('status'=>0,'info'=>'安装失败...');
 }
 if($b){
-
 	return array('status'=>2,'info'=>'成功添加管理员<br />成功写入配置文件<br>安装完成...');
 }else{
 	return array('status'=>0,'info'=>'安装失败...');

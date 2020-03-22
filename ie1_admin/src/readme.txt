@@ -1,2 +1,0 @@
-controller   ∑≈÷√js
-view   ∑≈÷√ ”Õº
