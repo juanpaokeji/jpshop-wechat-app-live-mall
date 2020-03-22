@@ -15,7 +15,8 @@ use app\models\tuan\ConfigModel;
  * @throws Exception if the model cannot be found
  * @return array
  */
-class BalanceController extends ShopController {
+class BalanceController extends ShopController
+{
 
     public $enableCsrfValidation = false; //禁用CSRF令牌验证，可以在基类中设置
 
@@ -25,7 +26,8 @@ class BalanceController extends ShopController {
      * @return array
      */
 
-    public function actionList() {
+    public function actionList()
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数          
@@ -41,7 +43,8 @@ class BalanceController extends ShopController {
         }
     }
 
-    public function actionAll() {
+    public function actionAll()
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数          
@@ -50,8 +53,8 @@ class BalanceController extends ShopController {
             $params['uid'] = yii::$app->session['user_id'];
             $params['shop_user_balance.merchant_id'] = yii::$app->session['merchant_id'];
             $params['<>'] = ["shop_user_balance.order_sn", "0"];
-            $params['join'][] = ['inner join ','shop_order_group','shop_order_group.order_sn = shop_user_balance.order_sn'];
-            $params['join'][] = ['inner join ','shop_user','shop_user.id = shop_order_group.user_id'];
+            $params['join'][] = ['inner join ', 'shop_order_group', 'shop_order_group.order_sn = shop_user_balance.order_sn'];
+            $params['join'][] = ['inner join ', 'shop_user', 'shop_user.id = shop_order_group.user_id'];
             $array = $model->do_select($params);
             return $array;
         } else {
@@ -59,20 +62,24 @@ class BalanceController extends ShopController {
         }
     }
 
-    public function actionBalance() {
+    public function actionBalance()
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
             $user = new UserModel();
             $u = $user->find(['id' => yii::$app->session['user_id']]);
-            $array['data']['balance'] = $u['data']['balance']+$u['data']['withdrawable_commission'];
+            if ($params['type'] == 1) {
+                $array['data']['balance'] = $u['data']['balance'];
+            } else {
+                $array['data']['balance'] = $u['data']['withdrawable_commission'];
+            }
             $configM = new ConfigModel();
             $config = $configM->do_one(['merchant_id' => yii::$app->session['merchant_id']]);
 
             if ($config['status'] != 200) {
                 return $config;
             }
-
             $array['data']['withdraw_fee_ratio'] = $config['data']['withdraw_fee_ratio'];
             $array['data']['min_withdraw_money'] = $config['data']['min_withdraw_money'];
             $array['status'] = 200;
@@ -83,7 +90,8 @@ class BalanceController extends ShopController {
         }
     }
 
-    public function actionAdd() {
+    public function actionAdd()
+    {
         if (yii::$app->request->isPost) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
@@ -96,31 +104,46 @@ class BalanceController extends ShopController {
 
             $user = new UserModel();
             $u = $user->find(['id' => yii::$app->session['user_id']]);
-            if ((float)$u['data']['balance']+(float)$u['data']['withdrawable_commission'] == 0.00) {
-                return result(500, '余额为0');
+            if ($params['type'] == 1) {
+                $content = "团长佣金提现";
+                if ((float)$u['data']['balance'] == 0.00) {
+                    return result(500, '余额为0');
+                }
+
+                if ($u['data']['balance'] < (float)$params['money']) {
+                    return result(500, '余额为不足');
+                }
+
+            }else{
+                $content = "分销佣金提现";
+                if ((float)$u['data']['withdrawable_commission'] == 0.00) {
+                    return result(500, '余额为0');
+                }
+
+                if ($u['data']['withdrawable_commission'] < (float)$params['money']) {
+                    return result(500, '余额为不足');
+                }
             }
 
-            if ((float) $u['data']['balance']+$u['data']['withdrawable_commission'] < (float) $params['money']) {
-                return result(500, '余额为不足');
-            }
 
             $configM = new ConfigModel();
             $config = $configM->do_one(['merchant_id' => yii::$app->session['merchant_id']]);
             if ($config['status'] != 200) {
                 return $config;
             }
-            if ((float) $config['data']['withdraw_fee_ratio'] > (float) $params['money']) {
+            if ((float)$config['data']['withdraw_fee_ratio'] > (float)$params['money']) {
                 return result(500, '提现金额小于最低体现金额');
             }
+
 
             $data = array(
                 'uid' => yii::$app->session['user_id'],
                 'balance_sn' => order_sn(),
                 'order_sn' => 0,
-                'fee' => (float) $params['money'] * (float) $config['data']['withdraw_fee_ratio'],
-                'money' => (float) $params['money'],
-                'remain_money' => (float) $params['money'] - ((float) $params['money'] * (float) $config['data']['withdraw_fee_ratio']),
-                'content' => '余额提现',
+                'fee' => (float)$params['money'] * (float)$config['data']['withdraw_fee_ratio'],
+                'money' => (float)$params['money'],
+                'remain_money' => (float)$params['money'] - ((float)$params['money'] * (float)$config['data']['withdraw_fee_ratio']),
+                'content' => $content,
                 'send_type' => $params['send_type'],
                 'is_send' => 1,
                 'type' => 0,
@@ -137,7 +160,12 @@ class BalanceController extends ShopController {
             $array = $model->do_add($data);
 
             if ($array['status'] == 200) {
-                $user->update(['id' => yii::$app->session['user_id'], '`key`' => yii::$app->session['key'], 'balance' => (float) $u['data']['balance'] - (float) $params['money']]);
+                if($params['type']==1){
+                    $user->update(['id' => yii::$app->session['user_id'], '`key`' => yii::$app->session['key'], 'balance' => (float)$u['data']['balance'] - (float)$params['money']]);
+                }else{
+                    $user->update(['id' => yii::$app->session['user_id'], '`key`' => yii::$app->session['key'], 'balance' => (float)$u['data']['withdrawable_commission'] - (float)$params['money']]);
+                }
+
             }
             return $array;
         } else {

@@ -42,12 +42,18 @@ class TestController extends ShopController {
     public function actionUpdate(){
         $sqlfile = '../../update.sql';
         $dbStr = file_get_contents($sqlfile);
-        Yii::$app->db->createCommand($dbStr)->execute();
-     //   if($res!=false){
+        if($dbStr==""){
+            return result(200,'数据库无更新内容');
+        }
+        $bool = Yii::$app->db->createCommand($dbStr)->execute();
+        if($bool==true){
+            $sqlfile = '../../update.sql';
+            $fp= fopen($sqlfile, "w");  //w是写入模式，文件不存在则创建文件写入。
+            $len = fwrite($fp, "");
+            fclose($fp);
+            return result(200,'更新成功');
+        }
         return result(200,'更新成功');
-//        }else{
-//            return result(500,'更新失败');
-//        }
     }
 
 

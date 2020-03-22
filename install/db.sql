@@ -1657,7 +1657,6 @@ CREATE TABLE `shop_stock` (
   `number` int(11) unsigned DEFAULT '0' COMMENT '库存数量',
   `price` decimal(10,2) NOT NULL COMMENT '价格',
   `cost_price` double(10,2) NOT NULL COMMENT '成本价',
-  `assemble_price` decimal(10, 2) NOT NULL COMMENT '拼团价',
   `storehouse_number` int(11) NOT NULL DEFAULT '0' COMMENT '库存量出入库专用',
   `outbound_number` int(11) NOT NULL DEFAULT '0' COMMENT '出库数量',
   `incoming_number` int(11) NOT NULL DEFAULT '0' COMMENT '入库数量',

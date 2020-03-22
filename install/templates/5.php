@@ -15,6 +15,6 @@
 	</div>
 	<div class="btn-box">
 		<a href="../" class="btn">进入应用后台</a>
-		<a href="../" class="btn">进入应用后台</a>
+		<a href="../ie1_admin" class="btn">进入后台</a>
 	</div>
 <?php require './templates/footer.php';?>

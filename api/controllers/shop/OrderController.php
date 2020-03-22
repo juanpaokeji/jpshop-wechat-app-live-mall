@@ -2925,6 +2925,7 @@ class OrderController extends ShopController
                     $data['partner_id'] = $params['partner_id'] ?? 0;
                     $data['user_contact_id'] = isset($params['user_contact_id']) ? $params['user_contact_id'] : 0;
                     $data['voucher_id'] = isset($params['goods'][$i]['voucher_id']) ? $params['goods'][$i]['voucher_id'] : 0;
+                    $data['remark'] = isset($params['goods'][$i]['remark']) ? $params['goods'][$i]['remark'] : "";
                     $data['transaction_order_sn'] = $transaction_order_sn;
                     if ($params['user_contact_id'] == 0) {
                         $data['name'] = $params['name'];
@@ -3410,7 +3411,7 @@ class OrderController extends ShopController
             'express_type' => $data['type'],
             'after_sale' => -1,
             'status' => 0,
-            'remark' => isset($goods['remark']) ? $goods['remark'] : "",
+            'remark' => isset($data['remark']) ? $data['remark'] : "",
             'supplier_id' => $data['supplier_id'],
             'partner_id' => $data['partner_id'] ?? 0,
             'create_time' => time(),

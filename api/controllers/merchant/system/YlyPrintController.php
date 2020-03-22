@@ -124,8 +124,10 @@ class YlyPrintController extends MerchantController {
             $content .= "小计:￥". $order['total_price'] ."\n";
             $content .= "运费:￥". $order['express_price'] ."\n";
             $content .= "折扣:￥". $order['voucher_price']['price'] ."\n";
-            $content .= str_repeat('*', 32);
             $content .= "订单总价:￥". $order['payment_money'] ."\n";
+            $content .= str_repeat('*', 32);
+            $content .= "买家备注:". $order['remark'] ."\n";
+            $content .= "商家备注:". $order['admin_remark'] ."\n";
 
             $param = array(
                 "partner"=>$partner,
@@ -221,8 +223,10 @@ class YlyPrintController extends MerchantController {
                     $content .= "小计:￥". $order['total_price'] ."\n";
                     $content .= "运费:￥". $order['express_price'] ."\n";
                     $content .= "折扣:￥". $order['voucher_price']['price'] ."\n";
-                    $content .= str_repeat('*', 32);
                     $content .= "订单总价:￥". $order['payment_money'] ."\n";
+                    $content .= str_repeat('*', 32);
+                    $content .= "买家备注:". $order['remark'] ."\n";
+                    $content .= "商家备注:". $order['admin_remark'] ."\n";
 
                     $param = array(
                         "partner"=>$partner,

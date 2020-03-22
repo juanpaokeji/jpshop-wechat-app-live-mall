@@ -656,7 +656,7 @@ layui.define(function (exports) {
 						data.temp.details.imgs[i].src = freader.result;
 					}
 				}
-				var url = window.location.hostname + '/api/web/index.php/base64';
+				var url = 'http://' + window.location.hostname + '/api/web/index.php/base64';
 				var postData = {
 					pic_url: freader.result
 				};

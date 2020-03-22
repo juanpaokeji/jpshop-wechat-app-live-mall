@@ -651,9 +651,91 @@ class WechatController extends Controller {
                 \Yii::$app->redis->lpush('ylyprint',json_encode($ylyData));
 
                 //好物圈导入订单
-                $goodCircleData['key'] = $orderRs['data']['key'];
-                $goodCircleData['order_sn'] = $result['out_trade_no'];
-                \Yii::$app->redis->lpush('good_circle',json_encode($goodCircleData));
+                //查询好物圈插件是否开启
+                $appAccessModel = new AppAccessModel();
+                $appAccessInfo = $appAccessModel->find(['`key`' => $orderRs['data']['key']]);
+
+                if (isset($appAccessInfo['status']) && $appAccessInfo['status'] == 200 && $appAccessInfo['data']['good_phenosphere'] == 1){
+                    $categoryModel = new MerchantCategoryModel();
+                    $sql = "SELECT so.*,sg.m_category_id FROM `shop_order_group` sog LEFT JOIN `shop_order` so ON so.order_group_sn = sog.order_sn LEFT JOIN `shop_goods` sg ON sg.id = so.goods_id WHERE sog.`key` = '".$orderRs['data']['key']."' AND sog.order_sn = '".$result['out_trade_no']."'";
+                    $goodsData = $orderModel->querySql($sql);
+                    //商品分类
+                    $sql = "SELECT * FROM `shop_marchant_category` WHERE `key` = '".$orderRs['data']['key']."' AND delete_time is NULL";
+                    $categoryData = $categoryModel->querySql($sql);
+                    if (count($goodsData)>0 || count($categoryData)>0) {
+                        $config = $this->getSystemConfig($orderRs['data']['key'], "miniprogram");
+                        if ($config == false) {
+                            file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . "未配置小程序信息" . PHP_EOL, FILE_APPEND);
+                        } else {
+                            $miniProgram = Factory::miniProgram($config);
+                            $token = $miniProgram->access_token->getToken(true);// 强制重新从微信服务器获取 token
+                            if (!isset($token['access_token'])){
+                                file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . "小程序access_token不存在" . PHP_EOL, FILE_APPEND);
+                            } else {
+                                $miniProgram['access_token']->setToken($token['access_token'], 3600);
+                                $access_token = $token['access_token'];
+                                $url = "https://api.weixin.qq.com/mall/importorder?action=add-order&is_history=0&access_token={$access_token}";
+                                $circleData[0]['order_id'] = $result['out_trade_no'];  //订单id，需要保证唯一性
+                                $circleData[0]['create_time'] = $orderRs['data']['create_time'];  //订单创建时间，unix时间戳
+                                $circleData[0]['pay_finish_time'] = time();  //支付完成时间，unix时间戳
+                                $circleData[0]['trans_id'] = $result['transaction_id'];  //微信支付订单id，对于使用微信支付的订单，该字段必填
+                                $circleData[0]['fee'] = $result['cash_fee'];  //订单金额，单位：分
+                                $circleData[0]['status'] = 3;//订单状态，3：支付完成 4：已发货 5：已退款 100: 已完成
+                                $circleData[0]['ext_info'] = [
+                                    'express_info'=>[
+                                        'price'=>$orderRs['data']['express_price']*100 //运费，单位：分
+                                    ],  //快递信息
+                                    'brand_info'=>[
+                                        'contact_detail_page'=>[
+                                            'kf_type'=>1   //在线客服类型 1 没有在线客服; 2 微信客服消息; 3 小程序自有客服; 4 公众号h5自有客服
+                                        ]  //联系商家页面
+                                    ],  //商家信息
+                                    'payment_method'=>1,  //订单支付方式，0：未知方式 1：微信支付 2：其他支付方式
+                                    'user_open_id'=>$result['openid'],  //用户的openid，参见openid说明
+                                    'order_detail_page'=>[
+                                        'path'=>'pages/orderItem/orderItem/orderItem?order_sn='.$result['out_trade_no']  //小程序订单详情页跳转链接
+                                    ],  //订单详情页（小程序页面）
+                                ];  //订单扩展信息
+                                foreach ($goodsData as $gk=>$gv){
+                                    if ($gv['order_group_sn'] == $result['out_trade_no']){
+                                        $categoryList = [];
+                                        foreach ($categoryData as $ck=>$cv){
+                                            if ($gv['m_category_id'] == $cv['id']){
+                                                $categoryList[] = $cv['name'];
+                                                foreach ($categoryData as $pk => $pv){
+                                                    if ($pv['id'] == $cv['parent_id']){
+                                                        $categoryList[] = $pv['name'];
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        $categoryList = array_reverse($categoryList);
+                                        $circleData[0]['ext_info']['product_info']['item_list'][] = [
+                                            'item_code'=>$gv['goods_id'],  //物品ID（SPU ID），要求appid下全局唯一
+                                            'sku_id'=>$gv['goods_id'],  //sku_id
+                                            'amount'=>$gv['number'],  //物品数量
+                                            'total_fee'=>$gv['total_price']*100,  //物品总价，单位：分
+                                            'thumb_url'=>$gv['pic_url'],  //物品图片，图片宽度必须大于750px，宽高比建议4:3 - 1:1之间
+                                            'title'=>$gv['name'],  //物品名称
+                                            'unit_price'=>$gv['price']*100,  //物品单价（实际售价），单位：分
+                                            'original_price'=>$gv['price']*100,  //物品原价，单位：分
+                                            'category_list'=>$categoryList,  //物品类目列表
+                                            'item_detail_page'=>['path'=>'pages/goodsItem/goodsItem/goodsItem?id='.$gv['goods_id']],  //小程序物品详情页跳转链接
+                                            'can_be_search'=>true
+                                        ];  //物品相关信息
+                                    }
+                                }
+                                $orderList['order_list'] = $circleData;
+                                $array = json_encode($orderList, JSON_UNESCAPED_UNICODE);
+                                $rs = curlPost($url, $array);
+                                file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . $rs . PHP_EOL, FILE_APPEND);
+                            }
+                        }
+                    } else {
+                        file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . "未查询到订单商品信息" . PHP_EOL, FILE_APPEND);
+                    }
+                }
+
 
                 if ($orderRs['data']['order_type'] == 2) {
                     $shopUserModel = new \app\models\shop\UserModel;
@@ -905,9 +987,92 @@ class WechatController extends Controller {
                     \Yii::$app->redis->lpush('ylyprint', json_encode($ylyData));
 
                     //好物圈导入订单
-                    $goodCircleData['key'] = $orderRs['data']['key'];
-                    $goodCircleData['order_sn'] = $result['out_trade_no'];
-                    \Yii::$app->redis->lpush('good_circle',json_encode($goodCircleData));
+                    //查询好物圈插件是否开启
+                    $appAccessModel = new AppAccessModel();
+                    $appAccessInfo = $appAccessModel->find(['`key`' => $orderRs['data']['key']]);
+
+                    if (isset($appAccessInfo['status']) && $appAccessInfo['status'] == 200 && $appAccessInfo['data']['good_phenosphere'] == 1){
+                        $categoryModel = new MerchantCategoryModel();
+                        $sql = "SELECT so.*,sg.m_category_id FROM `shop_order_group` sog LEFT JOIN `shop_order` so ON so.order_group_sn = sog.order_sn LEFT JOIN `shop_goods` sg ON sg.id = so.goods_id WHERE sog.`key` = '".$orderRs['data']['key']."' AND sog.order_sn = '".$result['out_trade_no']."'";
+                        $goodsData = $orderModel->querySql($sql);
+                        //商品分类
+                        $sql = "SELECT * FROM `shop_marchant_category` WHERE `key` = '".$orderRs['data']['key']."' AND delete_time is NULL";
+                        $categoryData = $categoryModel->querySql($sql);
+                        if (count($goodsData)>0 || count($categoryData)>0) {
+                            $config = $this->getSystemConfig($orderRs['data']['key'], "miniprogram");
+                            if ($config == false) {
+                                file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . "未配置小程序信息" . PHP_EOL, FILE_APPEND);
+                            } else {
+                                $miniProgram = Factory::miniProgram($config);
+                                $token = $miniProgram->access_token->getToken(true);// 强制重新从微信服务器获取 token
+                                if (!isset($token['access_token'])){
+                                    file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . "小程序access_token不存在" . PHP_EOL, FILE_APPEND);
+                                } else {
+                                    $miniProgram['access_token']->setToken($token['access_token'], 3600);
+                                    $access_token = $token['access_token'];
+                                    $url = "https://api.weixin.qq.com/mall/importorder?action=add-order&is_history=0&access_token={$access_token}";
+                                    $circleData[0]['order_id'] = $result['out_trade_no'];  //订单id，需要保证唯一性
+                                    $circleData[0]['create_time'] = $orderRs['data']['create_time'];  //订单创建时间，unix时间戳
+                                    $circleData[0]['pay_finish_time'] = time();  //支付完成时间，unix时间戳
+                                    $circleData[0]['trans_id'] = $result['transaction_id'];  //微信支付订单id，对于使用微信支付的订单，该字段必填
+                                    $circleData[0]['fee'] = $result['cash_fee'];  //订单金额，单位：分
+                                    $circleData[0]['status'] = 3;//订单状态，3：支付完成 4：已发货 5：已退款 100: 已完成
+                                    $circleData[0]['ext_info'] = [
+                                        'express_info'=>[
+                                            'price'=>$orderRs['data']['express_price']*100 //运费，单位：分
+                                        ],  //快递信息
+                                        'brand_info'=>[
+                                            'contact_detail_page'=>[
+                                                'kf_type'=>1   //在线客服类型 1 没有在线客服; 2 微信客服消息; 3 小程序自有客服; 4 公众号h5自有客服
+                                            ]  //联系商家页面
+                                        ],  //商家信息
+                                        'payment_method'=>1,  //订单支付方式，0：未知方式 1：微信支付 2：其他支付方式
+                                        'user_open_id'=>$result['openid'],  //用户的openid，参见openid说明
+                                        'order_detail_page'=>[
+                                            'path'=>'pages/orderItem/orderItem/orderItem?order_sn='.$result['out_trade_no']  //小程序订单详情页跳转链接
+                                        ],  //订单详情页（小程序页面）
+                                    ];  //订单扩展信息
+                                    foreach ($goodsData as $gk=>$gv){
+                                        if ($gv['order_group_sn'] == $result['out_trade_no']){
+                                            $categoryList = [];
+                                            foreach ($categoryData as $ck=>$cv){
+                                                if ($gv['m_category_id'] == $cv['id']){
+                                                    $categoryList[] = $cv['name'];
+                                                    foreach ($categoryData as $pk => $pv){
+                                                        if ($pv['id'] == $cv['parent_id']){
+                                                            $categoryList[] = $pv['name'];
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            $categoryList = array_reverse($categoryList);
+                                            $circleData[0]['ext_info']['product_info']['item_list'][] = [
+                                                'item_code'=>$gv['goods_id'],  //物品ID（SPU ID），要求appid下全局唯一
+                                                'sku_id'=>$gv['goods_id'],  //sku_id
+                                                'amount'=>$gv['number'],  //物品数量
+                                                'total_fee'=>$gv['total_price']*100,  //物品总价，单位：分
+                                                'thumb_url'=>$gv['pic_url'],  //物品图片，图片宽度必须大于750px，宽高比建议4:3 - 1:1之间
+                                                'title'=>$gv['name'],  //物品名称
+                                                'unit_price'=>$gv['price']*100,  //物品单价（实际售价），单位：分
+                                                'original_price'=>$gv['price']*100,  //物品原价，单位：分
+                                                'category_list'=>$categoryList,  //物品类目列表
+                                                'item_detail_page'=>['path'=>'pages/goodsItem/goodsItem/goodsItem?id='.$gv['goods_id']],  //小程序物品详情页跳转链接
+                                                'can_be_search'=>true
+                                            ];  //物品相关信息
+                                        }
+                                    }
+                                    $orderList['order_list'] = $circleData;
+                                    $array = json_encode($orderList, JSON_UNESCAPED_UNICODE);
+                                    $rs = curlPost($url, $array);
+                                    file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . $rs . PHP_EOL, FILE_APPEND);
+                                }
+                            }
+                        } else {
+                            file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . "未查询到订单商品信息" . PHP_EOL, FILE_APPEND);
+                        }
+                    }
+
+
 
                     //微信支付   佣金 库存 计算
 
@@ -1255,12 +1420,91 @@ class WechatController extends Controller {
                 \Yii::$app->redis->lpush('ylyprint',json_encode($ylyData));
 
                 //好物圈导入订单
-                $goodCircleData['key'] = $orderRs['data']['key'];
-                $goodCircleData['order_sn'] = $data['terminal_trace'];
-                \Yii::$app->redis->lpush('good_circle',json_encode($goodCircleData));
-
+                //查询好物圈插件是否开启
                 $appAccessModel = new AppAccessModel();
                 $appAccessInfo = $appAccessModel->find(['`key`' => $orderRs['data']['key']]);
+
+                if (isset($appAccessInfo['status']) && $appAccessInfo['status'] == 200 && $appAccessInfo['data']['good_phenosphere'] == 1){
+                    $categoryModel = new MerchantCategoryModel();
+                    $sql = "SELECT so.*,sg.m_category_id FROM `shop_order_group` sog LEFT JOIN `shop_order` so ON so.order_group_sn = sog.order_sn LEFT JOIN `shop_goods` sg ON sg.id = so.goods_id WHERE sog.`key` = '".$orderRs['data']['key']."' AND sog.order_sn = '".$data['terminal_trace']."'";
+                    $goodsData = $orderModel->querySql($sql);
+                    //商品分类
+                    $sql = "SELECT * FROM `shop_marchant_category` WHERE `key` = '".$orderRs['data']['key']."' AND delete_time is NULL";
+                    $categoryData = $categoryModel->querySql($sql);
+                    if (count($goodsData)>0 || count($categoryData)>0) {
+                        $config = $this->getSystemConfig($orderRs['data']['key'], "miniprogram");
+                        if ($config == false) {
+                            file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . "未配置小程序信息" . PHP_EOL, FILE_APPEND);
+                        } else {
+                            $miniProgram = Factory::miniProgram($config);
+                            $token = $miniProgram->access_token->getToken(true);// 强制重新从微信服务器获取 token
+                            if (!isset($token['access_token'])){
+                                file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . "小程序access_token不存在" . PHP_EOL, FILE_APPEND);
+                            } else {
+                                $miniProgram['access_token']->setToken($token['access_token'], 3600);
+                                $access_token = $token['access_token'];
+                                $url = "https://api.weixin.qq.com/mall/importorder?action=add-order&is_history=0&access_token={$access_token}";
+                                $circleData[0]['order_id'] = $data['terminal_trace'];  //订单id，需要保证唯一性
+                                $circleData[0]['create_time'] = $orderRs['data']['create_time'];  //订单创建时间，unix时间戳
+                                $circleData[0]['pay_finish_time'] = time();  //支付完成时间，unix时间戳
+                                $circleData[0]['trans_id'] = $data['channel_trade_no'];  //微信支付订单id，对于使用微信支付的订单，该字段必填
+                                $circleData[0]['fee'] = $data['total_fee'];  //订单金额，单位：分
+                                $circleData[0]['status'] = 3;//订单状态，3：支付完成 4：已发货 5：已退款 100: 已完成
+                                $circleData[0]['ext_info'] = [
+                                    'express_info'=>[
+                                        'price'=>$orderRs['data']['express_price']*100 //运费，单位：分
+                                    ],  //快递信息
+                                    'brand_info'=>[
+                                        'contact_detail_page'=>[
+                                            'kf_type'=>1   //在线客服类型 1 没有在线客服; 2 微信客服消息; 3 小程序自有客服; 4 公众号h5自有客服
+                                        ]  //联系商家页面
+                                    ],  //商家信息
+                                    'payment_method'=>1,  //订单支付方式，0：未知方式 1：微信支付 2：其他支付方式
+                                    'user_open_id'=>$data['user_id'],  //用户的openid，参见openid说明
+                                    'order_detail_page'=>[
+                                        'path'=>'pages/orderItem/orderItem/orderItem?order_sn='.$data['terminal_trace']  //小程序订单详情页跳转链接
+                                    ],  //订单详情页（小程序页面）
+                                ];  //订单扩展信息
+                                foreach ($goodsData as $gk=>$gv){
+                                    if ($gv['order_group_sn'] == $data['terminal_trace']){
+                                        $categoryList = [];
+                                        foreach ($categoryData as $ck=>$cv){
+                                            if ($gv['m_category_id'] == $cv['id']){
+                                                $categoryList[] = $cv['name'];
+                                                foreach ($categoryData as $pk => $pv){
+                                                    if ($pv['id'] == $cv['parent_id']){
+                                                        $categoryList[] = $pv['name'];
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        $categoryList = array_reverse($categoryList);
+                                        $circleData[0]['ext_info']['product_info']['item_list'][] = [
+                                            'item_code'=>$gv['goods_id'],  //物品ID（SPU ID），要求appid下全局唯一
+                                            'sku_id'=>$gv['goods_id'],  //sku_id
+                                            'amount'=>$gv['number'],  //物品数量
+                                            'total_fee'=>$gv['total_price']*100,  //物品总价，单位：分
+                                            'thumb_url'=>$gv['pic_url'],  //物品图片，图片宽度必须大于750px，宽高比建议4:3 - 1:1之间
+                                            'title'=>$gv['name'],  //物品名称
+                                            'unit_price'=>$gv['price']*100,  //物品单价（实际售价），单位：分
+                                            'original_price'=>$gv['price']*100,  //物品原价，单位：分
+                                            'category_list'=>$categoryList,  //物品类目列表
+                                            'item_detail_page'=>['path'=>'pages/goodsItem/goodsItem/goodsItem?id='.$gv['goods_id']],  //小程序物品详情页跳转链接
+                                            'can_be_search'=>true
+                                        ];  //物品相关信息
+                                    }
+                                }
+                                $orderList['order_list'] = $circleData;
+                                $array = json_encode($orderList, JSON_UNESCAPED_UNICODE);
+                                $rs = curlPost($url, $array);
+                                file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . $rs . PHP_EOL, FILE_APPEND);
+                            }
+                        }
+                    } else {
+                        file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . "未查询到订单商品信息" . PHP_EOL, FILE_APPEND);
+                    }
+                }
+
 
                 try {
                     $tr = Yii::$app->db->beginTransaction();

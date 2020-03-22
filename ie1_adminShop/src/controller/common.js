@@ -32,7 +32,7 @@ layui.define(function (exports) {
                 localStorage.removeItem('name');
                 localStorage.removeItem('saa_key');
                 //获取网站域名和协议
-                var href = document.location.protocol + '//' + window.location.host + '/ie1_adminMerchant/#/';
+                var href = document.location.protocol + '//' + window.location.host + '/adminMerchant/#/';
                 if (is_admin_login == '0') {
                     localStorage.removeItem('is_admin_login');
                     location.href = href + 'user/appLogin';

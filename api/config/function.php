@@ -183,7 +183,7 @@ function creatFolder($f_path) {
 }
 
 function getConfig($key) {
-
+    $key  = $key."-".$_SERVER['HTTP_HOST'];
     $value = \Yii::$app->redis->get($key);
 
     if ($value) {

@@ -152,7 +152,7 @@ layui.extend({
 
             //独立页面
             if (isIndPage || pathURL === '/user/login') { //此处单独判断登入页，是为了兼容旧版（即未在 config.js 配置 indPage 的情况）
-                // location.href = 'https://' + window.location.host + '/ie1_adminMerchant/#/user/login'; //跳转到登入页
+                // location.href = 'https://' + window.location.host + '/adminMerchant/#/user/login'; //跳转到登入页
                 // return false;
                 container.render(router.path.join('/')).done(function () {
                     admin.pageType = 'alone';

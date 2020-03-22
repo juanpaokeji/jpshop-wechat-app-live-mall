@@ -47,12 +47,13 @@ class GoodCircleController extends ShopController{
             if ($config == false) {
                 return result(500, "未配置小程序信息");
             }
-            $openPlatform = Factory::openPlatform($this->config);
-            $miniProgram = $openPlatform->miniProgram($config['app_id'],$config['refresh_token']);
-            $AuthorizerToken = $miniProgram->access_token->getToken();
-            $access_token = $AuthorizerToken['authorizer_access_token'];
+            $miniProgram = Factory::miniProgram($config);
+            $token = $miniProgram->access_token->getToken(true);// 强制重新从微信服务器获取 token
+            if (!isset($token['access_token'])) {
+                return result(500, "小程序access_token不存在");
+            }
 
-            $url = "https://api.weixin.qq.com/mall/importproduct?access_token={$access_token}";
+            $url = "https://api.weixin.qq.com/mall/importproduct?access_token={$token['access_token']}";
 
             $model = new GoodsModel();
             $categoryModel = new MerchantCategoryModel();
@@ -61,7 +62,7 @@ class GoodCircleController extends ShopController{
             $goodsData = $model->querySql($sql);
 
             //商品分类
-            $sql = "SELECT * FROM `shop_marchant_category` WHERE `key` = '".$params['key']."'";
+            $sql = "SELECT * FROM `shop_marchant_category` WHERE `key` = '".$params['key']."' AND delete_time is NULL";
             $categoryData = $categoryModel->querySql($sql);
 
             foreach ($goodsData as $key=>$val) {
@@ -261,16 +262,16 @@ class GoodCircleController extends ShopController{
 
                 //获取小程序上传信息配置
                 $config = $this->getSystemConfig($params['key'], "miniprogram");
-
                 if ($config == false) {
                     return result(500, "未配置小程序信息");
                 }
-                $openPlatform = Factory::openPlatform($this->config);
-                $miniProgram = $openPlatform->miniProgram($config['app_id'],$config['refresh_token']);
-                $AuthorizerToken = $miniProgram->access_token->getToken();
-                $access_token = $AuthorizerToken['authorizer_access_token'];
+                $miniProgram = Factory::miniProgram($config);
+                $token = $miniProgram->access_token->getToken(true);// 强制重新从微信服务器获取 token
+                if (!isset($token['access_token'])) {
+                    return result(500, "小程序access_token不存在");
+                }
 
-                $url = "https://api.weixin.qq.com/mall/importorder?action=update-order&is_history=0&access_token={$access_token}";
+                $url = "https://api.weixin.qq.com/mall/importorder?action=update-order&is_history=0&access_token={$token['access_token']}";
 
                 foreach ($orderData as $key=>$val){
                     $data['order_list'][$key]['order_id'] = $val['order_sn'];  //订单id，需要保证唯一性
@@ -336,16 +337,16 @@ class GoodCircleController extends ShopController{
 
             //获取小程序上传信息配置
             $config = $this->getSystemConfig($params['key'], "miniprogram");
-
             if ($config == false) {
                 return result(500, "未配置小程序信息");
             }
-            $openPlatform = Factory::openPlatform($this->config);
-            $miniProgram = $openPlatform->miniProgram($config['app_id'],$config['refresh_token']);
-            $AuthorizerToken = $miniProgram->access_token->getToken();
-            $access_token = $AuthorizerToken['authorizer_access_token'];
+            $miniProgram = Factory::miniProgram($config);
+            $token = $miniProgram->access_token->getToken(true);// 强制重新从微信服务器获取 token
+            if (!isset($token['access_token'])) {
+                return result(500, "小程序access_token不存在");
+            }
 
-            $url = "https://api.weixin.qq.com/mall/importorder?action=add-order&is_history=1&access_token={$access_token}";
+            $url = "https://api.weixin.qq.com/mall/importorder?action=add-order&is_history=1&access_token={$token['access_token']}";
 
             //组装参数
             foreach ($orderData as $key=>$val){
@@ -444,12 +445,13 @@ class GoodCircleController extends ShopController{
             if ($config == false) {
                 return result(500, "未配置小程序信息");
             }
-            $openPlatform = Factory::openPlatform($this->config);
-            $miniProgram = $openPlatform->miniProgram($config['app_id'],$config['refresh_token']);
-            $AuthorizerToken = $miniProgram->access_token->getToken();
-            $access_token = $AuthorizerToken['authorizer_access_token'];
+            $miniProgram = Factory::miniProgram($config);
+            $token = $miniProgram->access_token->getToken(true);// 强制重新从微信服务器获取 token
+            if (!isset($token['access_token'])) {
+                return result(500, "小程序access_token不存在");
+            }
 
-            $url = "https://api.weixin.qq.com/mall/queryproduct?access_token={$access_token}&type=batchquery";
+            $url = "https://api.weixin.qq.com/mall/queryproduct?access_token={$token['access_token']}&type=batchquery";
 
             $data['key_list'][0] = ['item_code'=>$id];
 

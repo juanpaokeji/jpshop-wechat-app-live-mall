@@ -195,11 +195,11 @@ class UserController extends ShopController
 //                }
                 $must = array();
                 if (isset($params['is_self'])) {
-                    if ($params['is_self'] === true || $params['is_self'] == 'true') {
-                        $params['is_self'] = 1;
-                    } else {
-                        $params['is_self'] = 0;
-                    }
+//                    if ($params['is_self'] == true || $params['is_self'] == 'true') {
+//                        $params['is_self'] = 1;
+//                    } else {
+//                        $params['is_self'] = 0;
+//                    }
                     if ($params['is_self'] == 1) {
                         $must = ['area_name', 'province_code', 'city_code', 'area_code', 'addr', 'longitude', 'latitude', 'realname'];
 //                        $url = "https://restapi.amap.com/v3/geocode/regeo?output=json&location={$params['longitude']},{$params['latitude']}&key=bc55956766e813d3deb1f95e45e97d73&poitype=&radius=1000&extensions=all&batch=true&roadlevel=0";
