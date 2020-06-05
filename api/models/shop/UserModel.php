@@ -123,8 +123,8 @@ class UserModel extends TableModel {
     public function add($params) {
         //data 新增数据参数设置
         //数据库操作
-
         try {
+            $params['nickname'] = addslashes($params['nickname']);
             $table = new TableModel();
             $params['create_time'] = time();
             $res = $table->tableAdd($this->table, $params);
@@ -186,7 +186,7 @@ class UserModel extends TableModel {
         $table = new TableModel();
 
         try {
-              $res = $table->tableUpdate($this->table, $params, $where);
+            $res = $table->tableUpdate($this->table, $params, $where);
         } catch (Exception $ex) {
             return result(500, '数据库操作失败');
         }

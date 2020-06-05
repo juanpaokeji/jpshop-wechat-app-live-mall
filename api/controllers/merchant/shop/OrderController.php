@@ -4,12 +4,15 @@ namespace app\controllers\merchant\shop;
 
 use app\models\admin\app\AppAccessModel;
 use app\models\admin\user\SystemAccessModel;
+use app\models\merchant\distribution\DistributionAccessModel;
 use app\models\merchant\system\OperationRecordModel;
 use app\models\shop\BalanceModel;
 use app\models\shop\GroupOrderModel;
 use app\models\shop\SubOrdersModel;
 use app\models\shop\UserModel;
 use app\models\system\SystemMerchantMiniAccessModel;
+use app\models\system\SystemMerchantMiniSubscribeTemplateAccessModel;
+use app\models\system\SystemMerchantMiniSubscribeTemplateModel;
 use app\models\tuan\LeaderModel;
 use foo\bar;
 use tools\pay\Payx;
@@ -174,15 +177,15 @@ class OrderController extends MerchantController
             unset($params['key']);
             $params['shop_order_group.merchant_id'] = yii::$app->session['uid'];
             $params['shop_order_group.supplier_id'] = 0;
-          // $array = $model->findAll($params);
+            // $array = $model->findAll($params);
 
-            $model =  new GroupOrderModel();
+            $model = new GroupOrderModel();
             if (isset($params['goods_name'])) {
                 if ($params['goods_name'] != "") {
                     $goods_name = trim($params['goods_name']);
-                    $params['goodsname'] =['like',$goods_name] ;
+                    $params['goodsname'] = ['like', $goods_name];
                     unset($params['goods_name']);
-                }else{
+                } else {
                     unset($params['goods_name']);
                 }
             }
@@ -196,22 +199,22 @@ class OrderController extends MerchantController
             if (isset($params['order_sn'])) {
                 if ($params['order_sn'] != "") {
                     $params['order_sn'] = trim($params['order_sn']);
-                    $params["shop_order_group.order_sn"] = $params['order_sn'];
+                    $params["shop_order_group.order_sn"] =['like', trim($params['order_sn'])];
                 }
                 unset($params['order_sn']);
             }
             if (isset($params['start_time'])) {
                 if ($params['start_time'] != "") {
                     $time = strtotime(str_replace("+", " ", $params['start_time']));
-                    $params[">="] = ['shop_order_group.create_time',$time];
+                    $params[">="] = ['shop_order_group.create_time', $time];
                 }
                 unset($params['start_time']);
             }
             if (isset($params['end_time'])) {
                 if ($params['end_time'] != "") {
                     $time = strtotime(str_replace("+", " ", $params['end_time']));
-                 //   $params["shop_order_group.create_time <={$time} "] = null;
-                    $params["<="] = ['shop_order_group.create_time',$time];
+                    //   $params["shop_order_group.create_time <={$time} "] = null;
+                    $params["<="] = ['shop_order_group.create_time', $time];
                 }
                 unset($params['end_time']);
             }
@@ -219,41 +222,39 @@ class OrderController extends MerchantController
                 if ($params['searchNameType'] != "") {
                     if ($params['searchName'] != "") {
                         if ($params['searchNameType'] == 1) {
-                            $params['shop_order_group.order_sn'] = trim($params['searchName']);
+                            $params['shop_order_group.order_sn'] = ['like', trim($params['searchName'])];
                         }
                         if ($params['searchNameType'] == 2) {
                             $name = trim($params['searchName']);
-                            $params['shop_order_group.name'] =['like',$name] ;
+                            $params['shop_order_group.name'] = ['like', $name];
                         }
                         if ($params['searchNameType'] == 3) {
-                            $params['shop_order_group.phone'] = trim($params['searchName']);
+                            $params['shop_order_group.phone'] = ['like', trim($params['searchName'])];
                         }
                     }
                 }
                 unset($params['searchNameType']);
                 unset($params['searchName']);
             }
+            $params['<>'] = ['shop_order_group.status', 11];   //排除订单列表中的拼团订单
             if (isset($params['status'])) {
                 if ($params['status'] != "") {
                     if ($params['status'] == 2) {
-                      //  $params['(shop_order_group.status = 2 or shop_order_group.status = 4) '] = null;
-                        $params['or']['shop_order_group.status'] = [4,2];
-                    } else if ($params['status'] == 6) {
-                        $params['or']['shop_order_group.status'] = [6,7];
+                        //  $params['(shop_order_group.status = 2 or shop_order_group.status = 4) '] = null;
+                        $params['or']['shop_order_group.status'] = [4, 2];
+                    } else if ($params['status'] == 7) {
+                        $params['or']['shop_order_group.status'] = [6, 7];
                     } else if ($params['status'] == 5) {
-                        $params['<>'] = ['after_sale',-1];
+                        $params['<>'] = ['after_sale', -1];
+                    } else if ($params['status'] == 8) {
+                        $params['or']['shop_order_group.status'] = [8, 2];
                     } else {
                         $params['shop_order_group.status'] = $params['status'];
                     }
                 }
                 unset($params['status']);
             }
-//            if (isset($params['logistics_type'])) {
-//                if ($params['logistics_type'] != "") {
-//                    $params['sg.type'] = $params['logistics_type'];
-//                }
-//                unset($params['logistics_type']);
-//            }
+
             if (isset($params['pay_type'])) {
                 if ($params['pay_type'] != "") {
                     $params['sp.type'] = $params['pay_type'];
@@ -263,8 +264,7 @@ class OrderController extends MerchantController
             if (isset($params['after_sale'])) {
                 if ($params['after_sale'] != "") {
                     $params['shop_order_group.after_sale'] = $params['after_sale'];
-                   // $params['shop_order_group.status'] = 4;
-                    $params['or']['shop_order_group.status'] = [4,5];
+                    $params['or']['shop_order_group.status'] = [4, 5];
                 }
                 unset($params['after_sale']);
             }
@@ -275,32 +275,33 @@ class OrderController extends MerchantController
                 unset($params['leader_uid']);
             }
             $params['field'] = "shop_order_group.*,shop_order_group.id as group_id,shop_user.nickname,shop_tuan_leader.realname,shop_tuan_leader.phone as leader_phone,shop_tuan_leader.area_name,shop_tuan_leader.province_code,shop_tuan_leader.city_code,shop_tuan_leader.area_code,shop_tuan_leader.addr,shop_order_group.status as order_status";
-            $params['join'][] = ['left join','shop_tuan_leader','shop_tuan_leader.uid=shop_order_group.leader_self_uid  and shop_tuan_leader.`key`="'.$params['shop_order_group.`key`'].'"'];
-            $params['join'][] = ['left join','shop_user','shop_user.id=shop_order_group.user_id'];
+            $params['join'][] = ['left join', 'shop_tuan_leader', 'shop_tuan_leader.uid=shop_order_group.leader_self_uid and shop_tuan_leader.`delete_time` IS NULL  and shop_tuan_leader.`key`="' . $params['shop_order_group.`key`'] . '"'];
+            $params['join'][] = ['left join', 'shop_user', 'shop_user.id=shop_order_group.user_id'];
             $array = $model->do_select($params);
 
-            //return $array;
             if ($array['status'] == 200) {
                 $subModel = new SubOrdersModel();
 
                 $leaderModel = new LeaderModel();
                 for ($i = 0; $i < count($array['data']); $i++) {
-                    $data= array();
+                    $data = array();
                     $data['order_group_sn'] = $array['data'][$i]['order_sn'];
-                    $data['field'] = "shop_order.*,shop_stock.weight";
-                    $data['join'][] = ['left join','shop_order_group','shop_order_group.order_sn=shop_order.order_group_sn'];
-                    $data['join'][] = ['left join','shop_stock','shop_stock.goods_id=shop_order.goods_id'];
-                    $data['join'][] = ['left join','shop_user','shop_user.id=shop_order_group.user_id'];
-                    $data['col'] =[' stock_id','shop_stock.id'];
+                    $data['field'] = "shop_order.*,shop_stock.weight,system_express.name as express_name";
+                    $data['join'][] = ['left join', 'shop_order_group', 'shop_order_group.order_sn=shop_order.order_group_sn'];
+                    $data['join'][] = ['left join', 'shop_stock', 'shop_stock.goods_id=shop_order.goods_id'];
+                    $data['join'][] = ['left join', 'shop_user', 'shop_user.id=shop_order_group.user_id'];
+                    $data['join'][] = ['left join', 'system_express', 'system_express.id=shop_order.express_id'];
+                    $data['col'] = [' stock_id', 'shop_stock.id'];
+                    $data['limit'] = false;
                     $order = $subModel->do_select($data);
-                    if($order['status']==200){
+                    if ($order['status'] == 200) {
                         $array['data'][$i]['order'] = $order['data'];
-                    }else{
+                    } else {
                         $array['data'][$i]['order'] = array();
                     }
 
-                    if($array['data'][$i]['leader_self_uid']!=0){
-                        $leader = $leaderModel->do_one(['uid'=>$array['data'][$i]['leader_self_uid']]);
+                    if ($array['data'][$i]['leader_self_uid'] != 0) {
+                        $leader = $leaderModel->do_one(['uid' => $array['data'][$i]['leader_self_uid']]);
                         $array['data'][$i]['leader_phone'] = $leader['data']['phone'];
                         $array['data'][$i]['area_name'] = $leader['data']['area_name'];
                         $array['data'][$i]['realname'] = $leader['data']['realname'];
@@ -333,7 +334,7 @@ class OrderController extends MerchantController
 
             //查询闪送查询是否开启
             $appModel = new AppAccessModel();
-            $res = $appModel->find(['`key`'=>$params['shop_order_group.`key`']]);
+            $res = $appModel->find(['`key`' => $params['shop_order_group.`key`']]);
             if ($res['status'] == 200) {
                 $array['shansong'] = $res['data']['shansong'];
                 $array['uu_is_open'] = $res['data']['uu_is_open'];
@@ -529,8 +530,17 @@ class OrderController extends MerchantController
             if (!isset($params['id'])) {
                 return result(400, "缺少参数 id");
             } else {
+
+                //   if (isset($params['modify_price'])) {
+//                    $groupModel = new GroupOrderModel();
+//                    $group = $groupModel->one(['order_sn' => $params['order_sn']]);
+//                    $payment_money = $group['data']['payment_money']+$group['data']['modify_price'];
+//                    $modify_price = $params['modify_price'];
+//                    $params['modify_price'] = $payment_money - $params['modify_price'];
+//                    $params['payment_money'] = $modify_price;
+                //              }
                 $array = $model->update($params);
-                if ($array['status'] == 200){
+                if ($array['status'] == 200) {
                     //添加操作记录
                     $operationRecordModel = new OperationRecordModel();
                     $operationRecordData['key'] = $params['`key`'];
@@ -702,7 +712,6 @@ class OrderController extends MerchantController
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
 
-
             $must = ['key'];
             $rs = $this->checkInput($must, $params);
             if ($rs != false) {
@@ -719,26 +728,39 @@ class OrderController extends MerchantController
             }
             $data = $model->find($params);
 
-            if ($data['status'] == 200) {
-                if ($data['data']['is_tuan'] == 1 && ($data['data']['express_type'] == 1 || $data['data']['express_type'] == 2)) {
-                    $params['express_id'] = 0;
-                    $params['express_number'] = "本地配送";
-                }
-            }
+            //目前按卖家实际选择的发货方式为准，不需要判断买家选择的发货方式
+//            if ($data['status'] == 200) {
+//                if ($data['data']['is_tuan'] == 1 && ($data['data']['express_type'] == 1 || $data['data']['express_type'] == 2)) {
+//                    $params['express_id'] = 0;
+//                    $params['express_number'] = "本地配送";
+//                }
+//            }
 
-            if ($data['status'] == 200){
-                if ($params['express_type'] !== 0) {
+            if ($data['status'] == 200) {
+                if ($params['express_type'] != 0) {
                     $params['express_id'] = 0;
                     $params['express_number'] = "本地配送";
-                }else{
-                    if (!isset($params['express_id'])) {
-                        return result(400, "缺少参数 快递id");
+                    $express_name = "本地配送";
+                } else {
+                    if (!isset($params['electronics_express_id'])) {
+                        return result(400, "缺少参数 电子面单id");
                     }
+                    $electronicsModel = new ElectronicsModel();
+                    $electronicsWhere['field'] = "shop_electronics.express_id,system_express.name";
+                    $electronicsWhere['shop_electronics.id'] = $params['electronics_express_id'];
+                    $electronicsWhere['join'][] = ['LEFT JOIN ', 'system_express', 'shop_electronics.express_id = system_express.id'];
+                    $electronicsInfo = $electronicsModel->do_select($electronicsWhere);
+                    if ($electronicsInfo['status'] != 200){
+                        return result(400, "未查询到电子面单信息");
+                    }
+                    $params['express_id'] = $electronicsInfo['data'][0]['express_id'];
+                    $express_name = $electronicsInfo['data'][0]['name'];
                     if (!isset($params['express_number'])) {
                         return result(400, "缺少参数 快递单号");
                     }
-
+                    unset($params['electronics_express_id']);
                 }
+                $sendExpressType = $params['express_type'];
                 unset($params['express_type']);
             }
             $data = $model->find($params);
@@ -751,6 +773,7 @@ class OrderController extends MerchantController
             } else {
                 $type = 1;
             }
+            $params['send_express_type'] = $sendExpressType;
             $array = $model->updateSend($params, $type);
 //
             $orderModel = new OrderModel;
@@ -783,7 +806,40 @@ class OrderController extends MerchantController
             );
             $tempAccess->do_add($taData);
 
-            if ($array['status'] == 200){
+            //订阅消息
+            $subscribeTempModel = new SystemMerchantMiniSubscribeTemplateModel();
+            $subscribeTempInfo = $subscribeTempModel->do_one(['template_purpose' => 'send_goods']);
+            if ($subscribeTempInfo['status'] == 200) {
+                if ($params['express_number'] == '本地配送') {
+                    $params['express_number'] = 0;
+                }
+                if (mb_strlen($orderRs['data']['goodsname'], 'utf-8') > 20) {
+                    $goodsName = mb_substr($orderRs['data']['goodsname'], 0, 17, 'utf-8') . '...'; //商品名超过20个汉字截断
+                } else {
+                    $goodsName = $orderRs['data']['goodsname'];
+                }
+                $accessParams = array(
+                    'character_string1' => ['value' => $params['order_sn']],  //订单号
+                    'thing2' => ['value' => $goodsName],  //商品名
+                    'thing8' => ['value' => $express_name],    //快递公司
+                    'character_string9' => ['value' => $params['express_number']],   //快递单号
+                );
+                $subscribeTempAccessModel = new SystemMerchantMiniSubscribeTemplateAccessModel();
+                $subscribeTempAccessData = array(
+                    'key' => $orderRs['data']['key'],
+                    'merchant_id' => $orderRs['data']['merchant_id'],
+                    'mini_open_id' => $shopUser['data']['mini_open_id'],
+                    'template_id' => $subscribeTempInfo['data']['template_id'],
+                    'number' => '0',
+                    'template_params' => json_encode($accessParams, JSON_UNESCAPED_UNICODE),
+                    'template_purpose' => 'send_goods',
+                    'page' => "/pages/orderItem/orderItem/orderItem?order_sn={$params['order_sn']}",
+                    'status' => '-1',
+                );
+                $subscribeTempAccessModel->do_add($subscribeTempAccessData);
+            }
+
+            if ($array['status'] == 200) {
                 //添加操作记录
                 $operationRecordModel = new OperationRecordModel();
                 $operationRecordData['key'] = $params['`key`'];
@@ -838,7 +894,7 @@ class OrderController extends MerchantController
                 return result(500, "请求错误");
             }
             $array = $model->cancel($params);
-            if ($array['status'] == 200){
+            if ($array['status'] == 200) {
                 //添加操作记录
                 $operationRecordModel = new OperationRecordModel();
                 $operationRecordData['key'] = $params['`key`'];
@@ -923,6 +979,35 @@ class OrderController extends MerchantController
                         $data['after_sale'] = 1;
                         $array = $model->update($data);
 
+                        //退款成功处理分销预估佣金
+                        $userModel = new UserModel();
+                        $distributionModel = new DistributionAccessModel();
+                        $distributionWhere['order_sn'] = $order['data']['order_sn'];
+                        $distributionWhere['or'] = ['or', ['=', 'type', 1], ['=', 'type', 3]];
+                        $distributionWhere['limit'] = false;
+                        $distributionInfo = $distributionModel->do_select($distributionWhere);
+                        if ($distributionInfo['status'] == 200) {
+                            foreach ($distributionInfo['data'] as $k => $v) {
+                                $userInfo = $userModel->find(['id' => $v['uid']]);
+                                if ($userInfo['status'] == 200) {
+                                    //减去各自相应预估佣金
+                                    $userData['id'] = $v['uid'];
+                                    $userData['`key`'] = $v['key'];
+                                    $userData['commission'] = $userInfo['data']['commission'] - $v['money'];
+                                    $userModel->update($userData);
+                                    //添加佣金退款记录
+                                    $distributionAccessModel = new DistributionAccessModel();
+                                    $accessData = [];
+                                    $accessData['key'] = $v['key'];
+                                    $accessData['merchant_id'] = $v['merchant_id'];
+                                    $accessData['uid'] = $v['uid'];
+                                    $accessData['order_sn'] = $order['data']['order_sn'];
+                                    $accessData['money'] = -$v['money'];
+                                    $distributionAccessModel->do_add($accessData);
+                                }
+                            }
+                        }
+
                         $balanceModel = new \app\models\shop\BalanceAccessModel();
                         $balanceModel->do_update(['pay_sn' => $order['data']['order_sn']], ['status' => 2]);
                         return $array;
@@ -972,11 +1057,40 @@ class OrderController extends MerchantController
                     $res = $this->RefundMoney($order['data']['order_sn'], $params['key']);
                     if ($res['result_code'] == "SUCCESS") {
                         $data['after_sale'] = 1;
-                        $data['refund'] = 1;
+                        $data['status'] = 4;
                         $array = $model->update($data);
 
+                        //退款成功处理分销预估佣金
+                        $userModel = new UserModel();
+                        $distributionModel = new DistributionAccessModel();
+                        $distributionWhere['order_sn'] = $order['data']['order_sn'];
+                        $distributionWhere['or'] = ['or', ['=', 'type', 1], ['=', 'type', 3]];
+                        $distributionWhere['limit'] = false;
+                        $distributionInfo = $distributionModel->do_select($distributionWhere);
+                        if ($distributionInfo['status'] == 200) {
+                            foreach ($distributionInfo['data'] as $k => $v) {
+                                $userInfo = $userModel->find(['id' => $v['uid']]);
+                                if ($userInfo['status'] == 200) {
+                                    //减去各自相应预估佣金
+                                    $userData['id'] = $v['uid'];
+                                    $userData['`key`'] = $v['key'];
+                                    $userData['commission'] = $userInfo['data']['commission'] - $v['money'];
+                                    $userModel->update($userData);
+                                    //添加佣金退款记录
+                                    $distributionAccessModel = new DistributionAccessModel();
+                                    $accessData = [];
+                                    $accessData['key'] = $v['key'];
+                                    $accessData['merchant_id'] = $v['merchant_id'];
+                                    $accessData['uid'] = $v['uid'];
+                                    $accessData['order_sn'] = $order['data']['order_sn'];
+                                    $accessData['money'] = -$v['money'];
+                                    $distributionAccessModel->do_add($accessData);
+                                }
+                            }
+                        }
+
                         $balanceModel = new \app\models\shop\BalanceAccessModel();
-                        $balanceModel->do_update(['order_sn' => $order['data']['order_sn']], ['status' => 2]);
+                        $balanceModel->do_update(['pay_sn' => $order['data']['order_sn']], ['status' => 2]);
                         return $array;
                     } else {
                         return result(500, '请求失败');
@@ -1013,9 +1127,9 @@ class OrderController extends MerchantController
             $data['`key`'] = $params['key'];
             $model = new OrderModel();
             $order = $model->find($data);
-          //  var_dump($order);die();
+            //  var_dump($order);die();
             if ($order['status'] != 200) {
-                return result(500, "订单状态异常！");
+                return result(500, "！");
             }
             $res = $this->RefundMoney($order['data']['order_sn'], $params['key']);
             if ($res['result_code'] == "SUCCESS") {
@@ -1024,7 +1138,39 @@ class OrderController extends MerchantController
                 $array = $model->update($data);
                 $balanceModel = new BalanceModel();
                 $balanceModel->do_update(['order_sn' => $order['data']['order_sn']], ['status' => 2]);
-                if ($array['status'] == 200){
+
+                if ($order['data']['status'] != 6 || $order['data']['status'] != 7) {
+                    //退款成功处理分销预估佣金
+                    $userModel = new UserModel();
+                    $distributionModel = new DistributionAccessModel();
+                    $distributionWhere['order_sn'] = $order['data']['order_sn'];
+                    $distributionWhere['or'] = ['or', ['=', 'type', 1], ['=', 'type', 3]];
+                    $distributionWhere['limit'] = false;
+                    $distributionInfo = $distributionModel->do_select($distributionWhere);
+                    if ($distributionInfo['status'] == 200) {
+                        foreach ($distributionInfo['data'] as $k => $v) {
+                            $userInfo = $userModel->find(['id' => $v['uid']]);
+                            if ($userInfo['status'] == 200) {
+                                //减去各自相应预估佣金
+                                $userData['id'] = $v['uid'];
+                                $userData['`key`'] = $v['key'];
+                                $userData['commission'] = $userInfo['data']['commission'] - $v['money'];
+                                $userModel->update($userData);
+                                //添加佣金退款记录
+                                $distributionAccessModel = new DistributionAccessModel();
+                                $accessData = [];
+                                $accessData['key'] = $v['key'];
+                                $accessData['merchant_id'] = $v['merchant_id'];
+                                $accessData['uid'] = $v['uid'];
+                                $accessData['order_sn'] = $order['data']['order_sn'];
+                                $accessData['money'] = -$v['money'];
+                                $distributionAccessModel->do_add($accessData);
+                            }
+                        }
+                    }
+                }
+
+                if ($array['status'] == 200) {
                     //添加操作记录
                     $operationRecordModel = new OperationRecordModel();
                     $operationRecordData['key'] = $params['key'];
@@ -1062,10 +1208,10 @@ class OrderController extends MerchantController
 
         $payModel = new PayModel();
 
-        $pays = $payModel->find(['order_id' => $order_sn]);
+        $pays = $payModel->find(['order_id' => $orderData['data']['transaction_order_sn']]);
 
         //获取商户微信配置
-       if ($orderData['data']['order_type'] == 3) { //余额退款
+        if ($orderData['data']['order_type'] == 3) { //余额退款
             $userModel = new UserModel();
             $userInfo = $userModel->find(['id' => $orderData['data']['user_id']]);
             if ($userInfo['status'] == 200) {
@@ -1079,22 +1225,23 @@ class OrderController extends MerchantController
                     $res = ['result_code' => 'FAIL'];
                 }
             }
-        } else{
+        } else {
             $config = $this->getSystemConfig($key, "miniprogrampay", 1);
             if ($config == false) {
                 return result(500, "未配置小程序信息");
             }
-            
+
             if ($config['wx_pay_type'] == 1) {
-                $config['notify_url'] = "https://".$_SERVER['SERVER_NAME']."/api/web/index.php/pay/wechat/notifyreturn";
-                $config['cert_path'] = yii::getAlias('@webroot/') .$config['cert_path'];
-                $config['key_path'] = yii::getAlias('@webroot/') .$config['key_path'];
+                $config['notify_url'] = "https://" . $_SERVER['SERVER_NAME'] . "/api/web/index.php/pay/wechat/notifyreturn";
+                $config['cert_path'] = yii::getAlias('@webroot/') . $config['cert_path'];
+                $config['key_path'] = yii::getAlias('@webroot/') . $config['key_path'];
                 $app = Factory::payment($config);
                 // 参数分别为：微信订单号、商户退款单号、订单金额、退款金额、其他参数
-                if($pays['status']!=200){
-                   return result(500, "退款失败查询到微信支付订单号");
+                if ($pays['status'] != 200) {
+                    return ['result_code' => 'FAIL', 'result_msg' => '退款失败查询到微信支付订单号'];
                 }
-                $res = $app->refund->byTransactionId($pays['data']['transaction_id'], $params['order_sn'], $orderData['data']['payment_money'] * 100, $orderData['data']['payment_money'] * 100, ['refund_desc' => '商品退款']);
+                $number = intval($orderData['data']['payment_money'] * 1000)/10;
+                $res = $app->refund->byTransactionId($pays['data']['transaction_id'], $pays['data']['order_id'],$number , $number, ['refund_desc' => '商品退款']);
             } else {
                 $mini_pay = new \tools\pay\refund\Refund();
                 $mini_pay->setPay_ver(Payx::PAY_VER);
@@ -1123,63 +1270,7 @@ class OrderController extends MerchantController
         return $res;
     }
 
-    public function actionTest()
-    {
-        $model = new OrderModel();
-        $eModel = new ElectronicsModel();
-        $eData = $eModel->do_one(['id' => $params['electronics_id']]);
-        $express = new SystemExpressModel();
-        for ($i = 0; $i < count($params['order_sn']); $i++) {
-            $order = $model->find(['order_sn' => $params['order_sn'][$i]]);
-            $eorder['ShipperCode'] = $express['data']['simple_name'];
-            if ($express['data']['simple_name'] == "ZJS") {
-                $eorder["LogisticCode"] = $params['LogisticCode'];
-            }
-            //物流公司信息
-            $eorder["ThrOrderCode"] = $params['order_sn'][$i];
-            $eorder["OrderCode"] = date("Y-m-d H:i:s", time()) . rand(1000, 9999);
-            $eorder['IsReturnPrintTemplate'] = 1;
-            $eorder["PayType"] = 1;
-            $eorder["ExpType"] = 1;
-            if ($express['data']['simple_name'] != "SF") {
-                $eorder["CustomerName"] = $eData['data']['customer_name'];
-                $eorder["CustomerPwd"] = $eData['data']['customer_pwd'];
-                //$eorder["SendSite"] = "福田保税区网点";
-            }
 
-            //发件人信息
-            $sender["Name"] = $eData['data']['name'];
-            $sender["Mobile"] = $eData['data']['phone'];
-            $sender["ProvinceName"] = $eData['data']['province_name'];
-            $sender["CityName"] = $eData['data']['city_name'];
-            $sender["ExpAreaName"] = $eData['data']['area_name'];
-            $sender["Address"] = $eData['data']['addr'];
-
-            //收件人信息
-            $address = explode("-", $order['data']['address']);
-            $receiver["Name"] = $order['data']['name'];
-            $receiver["Mobile"] = $order['data']['phone'];
-            $receiver["ProvinceName"] = $address[0];
-            $receiver["CityName"] = $address[1];
-            $receiver["ExpAreaName"] = $address[2];
-            $receiver["Address"] = $address[3];
-
-            $commodityOne = [];
-            $commodityOne["GoodsName"] = $eData['data']['towing_goods'];
-            $commodity = [];
-            $commodity[] = $commodityOne;
-
-            $res[$i] = electronics($eorder, $sender, $receiver, $commodity);
-
-
-            if (!isset($params['express_id'])) {
-                return result(400, "缺少参数 快递id");
-            }
-            $params['order_sn'] = $params['order_sn'][$i];
-            $params['express_number'] = $res[$i]['order']['LogisticCode'];
-            $array = $model->updateSend($params);
-        }
-    }
 
 //    public function actionTuan($order_sn) {
 //        $configModel = new \app\models\tuan\ConfigModel();
@@ -1213,7 +1304,7 @@ class OrderController extends MerchantController
                 $params['admin_remark'] = $remark;
                 unset($params['remark']);
                 $array = $model->update($params);
-                if ($array['status'] == 200){
+                if ($array['status'] == 200) {
                     //添加操作记录
                     $operationRecordModel = new OperationRecordModel();
                     $operationRecordData['key'] = $params['`key`'];
@@ -1272,20 +1363,21 @@ class OrderController extends MerchantController
         }
     }
 
-	public function actionConfimOrder(){
-		if (yii::$app->request->isPut) {
+    public function actionConfimOrder()
+    {
+        if (yii::$app->request->isPut) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
-            $must = ['key','user_id'];
+            $must = ['key', 'user_id'];
             $rs = $this->checkInput($must, $params);
             if ($rs != false) {
                 return json_encode($rs, JSON_UNESCAPED_UNICODE);
             }
 
             $orderModel = new OrderModel();
-            $where = ['order_sn' => $params['order_sn'],'is_tuan' =>0,'after_sale'=>-1,'status'=>3, 'user_id' => $params['user_id'], '`key`' => $params['key'], 'merchant_id' => yii::$app->session['uid']];
-            $data = ['status'=>6];
-            $res = $orderModel->update($where,$data);
+            $where = ['order_sn' => $params['order_sn'], 'is_tuan' => 0, 'after_sale' => -1, 'status' => 3, 'user_id' => $params['user_id'], '`key`' => $params['key'], 'merchant_id' => yii::$app->session['uid']];
+            $data = ['status' => 6];
+            $res = $orderModel->update($where, $data);
             if ($res['status'] == 200) {
                 $balanceModel = new BalanceModel();
                 $data['type'] = 3;
@@ -1311,19 +1403,56 @@ class OrderController extends MerchantController
         } else {
             return result(500, "请求方式错误");
         }
-	}
+    }
 
     public function actionExpress($id)
     {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
+
+            $must = ['key'];
+            $rs = $this->checkInput($must, $params);
+            if ($rs != false) {
+                return json_encode($rs, JSON_UNESCAPED_UNICODE);
+            }
+
             $model = new OrderModel();
             $data['`key`'] = $params['key'];
             $data['merchant_id'] = yii::$app->session['uid'];
             $data['order_sn'] = $id;
             $array = $model->express($data);
             return $array;
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
+
+    public function actionDelOrder()
+    {
+        if (yii::$app->request->isDelete) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->bodyParams; //获取body传参
+
+            $must = ['start_time', 'end_time'];
+            $rs = $this->checkInput($must, $params);
+            if ($rs != false) {
+                return json_encode($rs, JSON_UNESCAPED_UNICODE);
+            }
+
+            if (isset($params['start_time'])) {
+                if ($params['start_time'] != "") {
+                    $start_time = strtotime($params['start_time']);
+                }
+            }
+            if (isset($params['end_time'])) {
+                if ($params['end_time'] != "") {
+                    $end_time = strtotime($params['end_time']);
+                }
+            }
+            $sql = " delete  from shop_order_group where status = 2 and create_time>={$start_time} and create_time<={$end_time}";
+            Yii::$app->db->createCommand($sql)->execute();
+            return result(200, "请求成功");
         } else {
             return result(500, "请求方式错误");
         }

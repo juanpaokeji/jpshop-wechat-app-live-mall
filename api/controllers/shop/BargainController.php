@@ -99,7 +99,6 @@ class BargainController extends ShopController
                     $goods['data'][$i]['avatar'][] =$res1[1]['avatar'];
                     $goods['data'][$i]['avatar'][] =$res1[2]['avatar'];
                 }else{
-
                     $goods['data'][$i]['avatar'][] =$res[0]['avatar'];
                     $goods['data'][$i]['avatar'][] =isset($res[1])?$res[1]['avatar']:"";
                     $goods['data'][$i]['avatar'][] =isset($res[2])?$res[1]['avatar']:"";
@@ -129,7 +128,7 @@ class BargainController extends ShopController
             $model = new ShopBargainInfoModel();
             $params['`key`'] = yii::$app->session['key'];
             $params['merchant_id'] = yii::$app->session['merchant_id'];
-            $params['promoter_user_id'] = yii::$app->session['user_id'];
+            //$params['promoter_user_id'] = yii::$app->session['user_id'];
             $params['is_promoter'] = 1;
             $params['id'] = $id;
 //            $array = $model->do_one($params);//非发起人查询不到数据
@@ -148,10 +147,10 @@ class BargainController extends ShopController
             $stock = $stockModel->find(['id' => $array['data']['stock_id']]);
 
 
-            $sql = "select count(id) as num from shop_order where merchant_id = {$params['merchant_id']} and `key`  ='{$params['`key`']}'";
+            $sql = "select count(id) as num from shop_order where goods_id ={$array['data']['goods_id']} and  merchant_id = {$params['merchant_id']} and `key` ='{$params['`key`']}'";
             $num = $stockModel->querySql($sql);
 
-            $sql = "select avatar  from shop_user where id = {$params['promoter_user_id']}";
+            $sql = "select avatar  from shop_user where id = {$array['data']['promoter_user_id']}";
             $avatar = $stockModel->querySql($sql);
 
 
@@ -163,6 +162,7 @@ class BargainController extends ShopController
             $data['goods_id'] = $array['data']['goods_id'];
             $data['shop_bargain_info.merchant_id'] = $array['data']['merchant_id'];
             $data['shop_bargain_info.key'] = $array['data']['key'];
+            $data['shop_bargain_info.promoter_user_id'] = $array['data']['promoter_user_id'];
             $list = $model->do_select($data);
 
             $res['app_name'] = $app['data']['name'];
@@ -172,7 +172,7 @@ class BargainController extends ShopController
             $res['format_bargain_start_time'] =date('Y-m-d H:i:s', $goods['data']['bargain_start_time']);
             $res['format_bargain_end_time'] =date('Y-m-d H:i:s', $goods['data']['bargain_end_time']);
             $res['pic_url'] = $stock['data']['pic_url'];
-            $res['number'] = $goods['data']['fictitious_help_bargain'] + $num[0]['num'];
+            $res['number'] =(int)$goods['data']['fictitious_initiate_bargain'] +(int)$num[0]['num'];
             $res['stock_id'] = $stock['data']['id'];
             $res['property1_name'] = $stock['data']['property1_name'];
             $res['property2_name'] = $stock['data']['property2_name'];
@@ -245,6 +245,7 @@ class BargainController extends ShopController
             $data['goods_price'] = $stock['data']['price'];
             $data['end_time'] = time() + $goods['data']['bargain_limit_time'] * 3600;
             $data['status'] = 1;
+
             $array = $model->do_add($data);
             return $array;
         } else {
@@ -319,25 +320,31 @@ class BargainController extends ShopController
                 $num = 0;
 
                 if ($goods['data']['bargain_price'] >= $one['data']['goods_price']) {
-
-                    return result(500, "已看到最低价格");
+                    return result(500, "已砍到最低价格");
                 }
 
                 for ($i = 0; $i < count($json['bargain_price']); $i++) {
-                    if ($json['bargain_price'][$i] <= $one['data']['goods_price']) {
 
+                    if ($json['bargain_price'][$i] <= $one['data']['goods_price']) {
                         $num = sprintf("%.2f", rand($json['bargain_min'][$i], $json['bargain_max'][$i]));
                         if ($num != $json['bargain_max'][$i]) {
                             $num = sprintf("%.2f", $num + lcg_value());
                         }
-                        break;
+                        if($goods['data']['bargain_price']>=$one['data']['goods_price']-$num){
+                            $num = $goods['data']['bargain_price'];
+                        }
+                        if($info['data']['bargain_price']<=$one['data']['goods_price']-$num){
+                            $num = $one['data']['goods_price']-$num;
+                        }
                     }
                 }
+
                 $data['price'] = $num;
                 $data['promoter_sn'] = $info['data']['promoter_sn'];
                 $data['promoter_user_id'] = $info['data']['promoter_user_id'];
                 $data['goods_price'] = $one['data']['goods_price'] - $num;
                 $data['status'] = 1;
+
                 $array = $model->do_add($data);
                 if ($array['status'] == 200) {
                     return result(200, "请求成功", $data['price']);

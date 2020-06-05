@@ -44,7 +44,7 @@ class UserModel extends TableModel
 
             $table = new TableModel();
             $params['system_sub_admin.delete_time is null'] = null;
-            $params['fields'] = 'system_sub_admin.id,username,real_name,intro,system_sub_admin.status,phone,system_sub_admin.status,type,system_sub_admin.leader';
+            $params['fields'] = 'system_sub_admin.id,username,real_name,system_sub_admin.sort,intro,system_sub_admin.status,phone,system_sub_admin.status,type,system_sub_admin.leader,points';
             if ($params['type'] != 1) {
                 $params['join'] = " inner join shop_auth_group_access on uid=id  inner join shop_auth_group  on group_ids = shop_auth_group.id";
                 $params['shop_auth_group.is_kefu'] = 0;
@@ -63,7 +63,7 @@ class UserModel extends TableModel
                 $params["username like '%{$params['searchName']}%'"] = null;
                 unset($params['searchName']);
             }
-            $params['orderby'] = "  system_sub_admin.id desc";
+          //  $params['orderby'] = "  system_sub_admin.id desc";
             $params['table'] = $this->tableName;
             $res = $table->tableList($params);
             $app = $res['app'];
@@ -266,9 +266,15 @@ class UserModel extends TableModel
         $where = ['id' => $params['id']];
         $table = new TableModel();
         if (!isset($params['username'])) {
-            $data = [
-                'status' => $params['status'],
-            ];
+            if(isset($params['status'])){
+                $data = [
+                    'status' => $params['status'],
+                ];
+            }else{
+                $data = [
+                    'sort' => $params['sort'],
+                ];
+            }
             try {
                 $table->tableUpdate($this->tableName, $data, $where);
             } catch (\Exception $e) {
@@ -286,17 +292,20 @@ class UserModel extends TableModel
                 'status' => $params['status'],
                 'update_time' => time()
             ];
-            if ($params['password'] != "") {
-                $data['password'] = md5($params['password'] . $params['salt']);
-                $sql = "update wolive_service set password = {$data['password']} where user_name = {$data['username']}";
+            if (isset($params['password'])) {
+                if ($params['password'] != "") {
+                    $data['password'] = md5($params['password'] . $params['salt']);
+                    $sql = "update wolive_service set password = '{$data['password']}' where user_name = '{$data['username']}'";
+                    Yii::$app->db->createCommand($sql)->execute();
+                }
             }
+
             //开始事务
             $transaction = Yii::$app->db->beginTransaction();
-            try {
+
                 $table->tableUpdate($this->tableName, $data, $where);
-                $table->tableUpdate('shop_auth_group_access', ['group_ids' => $params['group_id'], 'update_time' => time()], ['uid' => $params['id']]);
                 $transaction->commit(); //只有执行了commit(),对于上面数据库的操作才会真正执行
-            } catch (\Exception $e) {
+            try {   } catch (\Exception $e) {
                 $transaction->rollBack(); //回滚
                 return result(500, '更新失败');
             }
@@ -304,6 +313,19 @@ class UserModel extends TableModel
         return result(200, '请求成功');
         //请求成功示例 {"status":"200","message":"请求成功"}
         //请求失败示例 {"status":"500","message":"1003 更新失败"}
+    }
+
+    public function updatemd($params)
+    {
+        $where = ['id' => $params['id']];
+        $table = new TableModel();
+
+        try {
+            $table->tableUpdate($this->tableName, $params, $where);
+        } catch (\Exception $e) {
+            return result(500, '更新失败');
+        }
+        return result(200, '请求成功');
     }
 
     /**
@@ -330,14 +352,14 @@ class UserModel extends TableModel
      * @param array|null $params
      * @throws Exception if the model cannot be found
      * @return array
-     * 修改门店易联云配置信息
+     * 修改门店小票自动打印开关
      */
     public function ylyupdate($params)
     {
         $where = ['id' => $params['id']];
         $table = new TableModel();
         $data = [
-            'yly_config' => isset($params['yly_config']) ? $params['yly_config'] : '',
+            'yly_print' => $params['yly_print'],
             'update_time' => time()
         ];
         $table->tableUpdate($this->tableName, $data, $where);
@@ -362,12 +384,13 @@ class UserModel extends TableModel
         return result(200, '请求成功');
     }
 
-    public function more($params){
+    public function more($params)
+    {
         try {
             $table = new TableModel();
             $params['delete_time is null'] = null;
             $params['fields'] = '*';
-            $params['orderby'] = " id desc";
+            $params['orderby'] = " sort desc";
             $params['table'] = $this->tableName;
             $res = $table->tableList($params);
             $app = $res['app'];
@@ -381,14 +404,33 @@ class UserModel extends TableModel
             return result(500, '数据库操作失败');
         }
     }
-    
-    public function updates($params){
-    	$where = ['id' => $params['id']];
-    	unset($params['id']);
+
+    public function updates($params)
+    {
+        $where = ['id' => $params['id']];
+        unset($params['id']);
         $table = new TableModel();
         $data = $params;
         $table->tableUpdate($this->tableName, $data, $where);
         return result(200, '请求成功');
+    }
+
+    public function all(){
+        try {
+            $table = new TableModel();
+            $params['delete_time is null'] = null;
+            $params['table'] = $this->tableName;
+            $res = $table->tableList($params);
+            $app = $res['app'];
+            return [
+                'status' => 200,
+                'message' => '请求成功',
+                'data' => $app,
+                'count' => $res['count'],
+            ];
+        } catch (\Exception $e) {
+            return result(500, '数据库操作失败');
+        }
     }
 
 }

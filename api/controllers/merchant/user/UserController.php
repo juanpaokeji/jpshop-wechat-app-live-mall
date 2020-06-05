@@ -11,11 +11,13 @@ use app\models\admin\user\MerchantModel;
 use app\models\system\SystemSmsAccessModel;
 use app\models\wolive\ServiceModel;
 
-class UserController extends MerchantController {
+class UserController extends MerchantController
+{
 
     public $enableCsrfValidation = false; //禁用CSRF令牌验证，可以在基类中设置
 
-    public function behaviors() {
+    public function behaviors()
+    {
         return [
             'token' => [
                 'class' => 'yii\filters\MerchantFilter', //调用过滤器
@@ -31,7 +33,8 @@ class UserController extends MerchantController {
      * @return array
      * @throws Exception
      */
-    public function actionDelete($id) {
+    public function actionDelete($id)
+    {
         if (yii::$app->request->isDelete) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取地址栏参数
@@ -58,7 +61,8 @@ class UserController extends MerchantController {
      * @return array|string
      * @throws Exception
      */
-    public function actionUpdate($id) {
+    public function actionUpdate($id)
+    {
         if (yii::$app->request->isPut) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取地址栏参数
@@ -82,7 +86,8 @@ class UserController extends MerchantController {
      * 查询所有（可扩展条件查询）
      * @return array
      */
-    public function actionList() {
+    public function actionList()
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
@@ -98,7 +103,8 @@ class UserController extends MerchantController {
         }
     }
 
-    public function actionAll() {
+    public function actionAll()
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
@@ -116,7 +122,8 @@ class UserController extends MerchantController {
      * @param $id
      * @return array|string
      */
-    public function actionSingle($id) {
+    public function actionSingle($id)
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
@@ -133,7 +140,8 @@ class UserController extends MerchantController {
         }
     }
 
-    public function actionSms() {
+    public function actionSms()
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
@@ -160,7 +168,8 @@ class UserController extends MerchantController {
         }
     }
 
-    public function actionRegister() {
+    public function actionRegister()
+    {
         if (yii::$app->request->isPost) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取地址栏参数
@@ -190,7 +199,8 @@ class UserController extends MerchantController {
         }
     }
 
-    public function actionPassword() {
+    public function actionPassword()
+    {
         if (yii::$app->request->isPost) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取地址栏参数
@@ -233,7 +243,8 @@ class UserController extends MerchantController {
      * @return array
      * @throws Exception
      */
-    public function actionBindPhone() {
+    public function actionBindPhone()
+    {
         if (yii::$app->request->isPut) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取地址栏参数
@@ -249,7 +260,7 @@ class UserController extends MerchantController {
             }
             $data = [
                 'phone' => $params['phone'],
-                'id'=>yii::$app->session['uid'],
+                'id' => yii::$app->session['uid'],
             ];
             $merchantModel = new MerchantModel();
             $array = $merchantModel->updatePhone($data);
@@ -263,11 +274,12 @@ class UserController extends MerchantController {
      * 校验登录账号是否是手机号
      * @return array
      */
-    public function actionCheckPhone(){
+    public function actionCheckPhone()
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
-            if(!isset($params['phone']) || empty($params['phone'])){
+            if (!isset($params['phone']) || empty($params['phone'])) {
                 return result(500, "缺少参数");
             }
             $check = '/^(1(([23456789][0-9])|(47)))\d{8}$/';
@@ -275,6 +287,32 @@ class UserController extends MerchantController {
                 return result(500, "不是手机号");
             }
             return result(200, "请求成功");
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
+
+    public function actionDistributionUser()
+    {
+        if (yii::$app->request->isGet) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->get(); //获取地址栏参数
+            $userModel = new \app\models\shop\UserModel();
+            if (!isset($params['level'])) {
+                $params['level'] = 1;
+            }
+            if (isset($params['key'])) {
+                $params['`key`'] = $params['key'];
+                unset($params['key']);
+            }
+            $array = $userModel->findall($params);
+            if ($array['status'] == 200) {
+                for ($i = 0; $i < count($array['data']); $i++) {
+                    $array['data'][$i]['reg_time'] = $array['data'][$i]['reg_time'] == 0 ? "" : date('Y-m-d H:i:s', $array['data'][$i]['reg_time']);
+                    $array['data'][$i]['check_time'] = $array['data'][$i]['check_time'] == 0 ? "" : date('Y-m-d H:i:s', $array['data'][$i]['check_time']);
+                }
+            }
+            return $array;
         } else {
             return result(500, "请求方式错误");
         }

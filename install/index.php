@@ -29,8 +29,8 @@ set_time_limit(1000);
 //php版本
 $phpversion = phpversion();
 //php版本过低提示
-if ($phpversion < '7.2.0') {
-    exit(get_tip_html('您的php版本过低，不能安装本软件，请升级到7.2.0或更高版本再安装，谢谢！'));
+if ($phpversion < '7.1.0') {
+    exit(get_tip_html('您的php版本过低，不能安装本软件，请升级到5.2.0或更高版本再安装，谢谢！'));
 }
 //数据库文件
 if (!file_exists('./' . $config['sqlFileName'])) {
@@ -162,7 +162,7 @@ switch ($step) {
         if (intval($_GET['install'])) {
             dataVerify();
             //关闭特殊字符提交处理到数据库
-            if ($phpversion < '7.2.0') {
+            if ($phpversion <= '5.3.0') {
                 set_magic_quotes_runtime(0);
             }
             //设置时区

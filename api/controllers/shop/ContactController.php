@@ -3,6 +3,7 @@
 namespace app\controllers\shop;
 
 use app\models\merchant\app\AppAccessModel;
+use app\models\tuan\LeaderModel;
 use yii;
 use yii\db\Exception;
 use yii\web\ShopController;
@@ -258,7 +259,8 @@ class ContactController extends ShopController
             $model = new ShopExpressTemplateModel();
             $number = $params['number'];
             $weight = $params['weight'];
-            $temp = $model->find(['status' => 1, 'merchant_id' => yii::$app->session['merchant_id'], '`key`' => yii::$app->session['key']]);
+
+            $temp = $model->find(['status' => 1, 'supplier_id' => 0, 'merchant_id' => yii::$app->session['merchant_id'], '`key`' => yii::$app->session['key']]);
             if ($temp['status'] != 200) {
                 return $temp;
             }
@@ -273,6 +275,7 @@ class ContactController extends ShopController
                 $params['user_id'] = yii::$app->session['user_id'];
                 $tempModel = new ShopExpressTemplateModel();
                 $data['merchant_id'] = yii::$app->session['merchant_id'];
+                $data['supplier_id'] = 0;
                 $data['`key`'] = yii::$app->session['key'];
                 $data['status'] = 1;
                 $temp = $tempModel->find($data);
@@ -289,6 +292,7 @@ class ContactController extends ShopController
                 unset($params['id']);
                 $data['searchName'] = $address['data']['province'];
                 $data['merchant_id'] = yii::$app->session['merchant_id'];
+                $data['supplier_id'] = 0;
                 $data['`key`'] = yii::$app->session['key'];
                 $data['shop_express_template_id'] = $temp['data']['id'];
                 $data['status'] = 1;
@@ -306,7 +310,7 @@ class ContactController extends ShopController
                 }
                 $price = $kdf['data']['first_price'] + (($number - 1) * $kdf['data']['expand_price']);
                 $price = $price == 0 ? "0" : $price;
-                return result(200, "请求成功", $price);
+                return result(200, "请求成功", round($price));
             } else if ($type == 2) {
                 $model = new ContactModel();
                 $params['id'] = $id;
@@ -314,6 +318,7 @@ class ContactController extends ShopController
                 $params['user_id'] = yii::$app->session['user_id'];
                 $tempModel = new ShopExpressTemplateModel();
                 $data['merchant_id'] = yii::$app->session['merchant_id'];
+                $data['supplier_id'] = 0;
                 $data['`key`'] = yii::$app->session['key'];
                 $data['status'] = 1;
                 $temp = $tempModel->find($data);
@@ -327,6 +332,7 @@ class ContactController extends ShopController
                 unset($params['id']);
                 $data['searchName'] = $address['data']['province'];
                 $data['merchant_id'] = yii::$app->session['merchant_id'];
+                $data['supplier_id'] = 0;
                 $data['`key`'] = yii::$app->session['key'];
                 $data['shop_express_template_id'] = $temp['data']['id'];
                 $data['status'] = 1;
@@ -351,7 +357,7 @@ class ContactController extends ShopController
                     }
                     $price = $kdf['data']['first_price'] + ($num1 * $kdf['data']['expand_price']);
                 }
-                return result(200, "请求成功", $price);
+                return result(200, "请求成功", round($price));
             } else if ($type == 3) {
                 //寄距离
                 $contactModel = new ContactModel();
@@ -365,8 +371,8 @@ class ContactController extends ShopController
                 if ($merchan_info['status'] != 200) {
                     return $merchan_info;
                 }
-                $origin = $address['data']['longitude'] . "," . $address['data']['latitude'];//出发地
-                $destination = $merchan_info['data']['coordinate'];//目的地
+                $origin = bd_amap($address['data']['longitude'] . "," . $address['data']['latitude']);//出发地
+                $destination = bd_amap($merchan_info['data']['coordinate']);//目的地
                 $juli = 0;
                 $yunfei = 0;
                 $url = "https://restapi.amap.com/v3/distance?key=bc55956766e813d3deb1f95e45e97d73&origins={$origin}&destination={$destination}&type=0";
@@ -389,7 +395,159 @@ class ContactController extends ShopController
                         $yunfei = $fw['freight'][$i];
                     }
                 }
-                return result(200, "请求成功", $yunfei);
+                return result(200, "请求成功", round($yunfei));
+            }
+        }
+    }
+
+    public function actionSkdf($id)
+    {
+        if (yii::$app->request->isGet) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->get(); //获取body传参
+            $model = new ShopExpressTemplateModel();
+            $number = $params['number'];
+            $weight = $params['weight'];
+            $supplierId = $params['supplier_id'];
+            unset($params['supplier_id']);
+
+            $temp = $model->find(['status' => 1, 'supplier_id' => $supplierId, 'merchant_id' => yii::$app->session['merchant_id'], '`key`' => yii::$app->session['key']]);
+            if ($temp['status'] != 200) {
+                return $temp;
+            }
+
+            $type = $temp['data']['type'];
+            $templateModel = new ShopExpressTemplateDetailsModel();
+            //寄件 寄重
+            if ($type == 1) {
+                $model = new ContactModel();
+                $params['id'] = $id;
+                $params['`key`'] = yii::$app->session['key'];
+                $params['user_id'] = yii::$app->session['user_id'];
+                $tempModel = new ShopExpressTemplateModel();
+                $data['merchant_id'] = yii::$app->session['merchant_id'];
+                $data['supplier_id'] = $supplierId;
+                $data['`key`'] = yii::$app->session['key'];
+                $data['status'] = 1;
+                $temp = $tempModel->find($data);
+                if ($temp['status'] != 200) {
+                    return result(500, "快递费获取失败");
+                }
+                $address = $model->find($params);
+                if ($address['status'] != 200) {
+                    return result(500, "快递费获取失败");
+                }
+                $price = 0;
+                $kdmb = new ShopExpressTemplateDetailsModel();
+
+                unset($params['id']);
+                $data['searchName'] = $address['data']['province'];
+                $data['merchant_id'] = yii::$app->session['merchant_id'];
+                $data['supplier_id'] = $supplierId;
+                $data['`key`'] = yii::$app->session['key'];
+                $data['shop_express_template_id'] = $temp['data']['id'];
+                $data['status'] = 1;
+                if ($address['status'] == 200) {
+                    $data['searchName'] = $address['data']['province'];
+                    $kdf = $kdmb->find($data);
+                } else {
+                    $params['searchName'] = "全国统一运费";
+                    $kdf = $kdmb->find($data);
+                }
+                if ($kdf['status'] != 200) {
+                    $data['searchName'] = "全国统一运费";
+                    $kdf = $kdmb->find($data);
+                    $price = $kdf['data']['expand_price'];
+                }
+                $price = $kdf['data']['first_price'] + (($number - 1) * $kdf['data']['expand_price']);
+                $price = $price == 0 ? "0" : $price;
+                return result(200, "请求成功", round($price));
+            } else if ($type == 2) {
+                $model = new ContactModel();
+                $params['id'] = $id;
+                $params['`key`'] = yii::$app->session['key'];
+                $params['user_id'] = yii::$app->session['user_id'];
+                $tempModel = new ShopExpressTemplateModel();
+                $data['merchant_id'] = yii::$app->session['merchant_id'];
+                $data['supplier_id'] = $supplierId;
+                $data['`key`'] = yii::$app->session['key'];
+                $data['status'] = 1;
+                $temp = $tempModel->find($data);
+                if ($temp['status'] != 200) {
+                    return result(500, "快递费获取失败");
+                }
+                $address = $model->find($params);
+                $price = 0;
+                $kdmb = new ShopExpressTemplateDetailsModel();
+
+                unset($params['id']);
+                $data['searchName'] = $address['data']['province'];
+                $data['merchant_id'] = yii::$app->session['merchant_id'];
+                $data['supplier_id'] = $supplierId;
+                $data['`key`'] = yii::$app->session['key'];
+                $data['shop_express_template_id'] = $temp['data']['id'];
+                $data['status'] = 1;
+                if ($address['status'] == 200) {
+                    $data['searchName'] = $address['data']['province'];
+                    $kdf = $kdmb->find($data);
+                } else {
+                    $params['searchName'] = "全国统一运费";
+                    $kdf = $kdmb->find($data);
+                }
+                if ($kdf['status'] != 200) {
+                    $data['searchName'] = "全国统一运费";
+                    $kdf = $kdmb->find($data);
+                }
+                if ($weight <= $kdf['data']['first_num']) {
+                    $price = $kdf['data']['first_price'];
+                } else {
+                    $num1 = ($weight - $kdf['data']['first_num']) / $kdf['data']['expand_num'];
+                    $num2 = ($weight - $kdf['data']['first_num']) % $kdf['data']['expand_num'];
+                    if ($num2 != 0) {
+                        $num1 = $num1 + 1;
+                    }
+                    $price = $kdf['data']['first_price'] + ($num1 * $kdf['data']['expand_price']);
+                }
+                return result(200, "请求成功", round($price));
+            } else if ($type == 3) {
+                //寄距离
+                $contactModel = new ContactModel();
+                $params['id'] = $id;
+                $address = $contactModel->find($params);
+                if ($address['status'] != 200) {
+                    return $address;
+                }
+                $leaderModel = new LeaderModel();
+                $leaderWhere['supplier_id'] = $supplierId;
+                $leaderInfo = $leaderModel->do_one($leaderWhere);
+                if ($leaderInfo['status'] != 200) {
+                    return result(500, "未查询到门店信息");
+                }
+                $origin = bd_amap($address['data']['longitude'] . "," . $address['data']['latitude']);//出发地
+                $destination = bd_amap($leaderInfo['data']['longitude'] . "," . $leaderInfo['data']['latitude']);//目的地
+                $juli = 0;
+                $yunfei = 0;
+                $url = "https://restapi.amap.com/v3/distance?key=bc55956766e813d3deb1f95e45e97d73&origins={$origin}&destination={$destination}&type=0";
+                $result = json_decode(curlGet($url), true);
+
+                if ($result['status'] == 1) {
+                    $juli = $result['results'][0]['distance'] / 1000;
+                } else {
+                    return result(500, '请求失败，距离计算错误');
+                }
+                $express = $templateModel->find(['shop_express_template_id' => $temp['data']['id']]);
+
+                if ($express['status'] != 200) {
+                    return $express;
+                }
+                $fw = json_decode($express['data']['distance'], true);
+                //{"start_number":["0","4"],"end_number":["3","6"],"freight":["6","11"]}
+                for ($i = 0; $i < count($fw['start_number']); $i++) {
+                    if ($fw['start_number'][$i] < $juli && $fw['end_number'][$i] > $juli) {
+                        $yunfei = $fw['freight'][$i];
+                    }
+                }
+                return result(200, "请求成功", round($yunfei));
             }
         }
     }

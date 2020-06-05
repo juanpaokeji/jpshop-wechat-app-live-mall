@@ -73,72 +73,25 @@ class ConfigController extends MerchantController {
             $data['key'] = $params['key'];
             $array = $model->do_one($data);
 
-            $must = ['is_open', 'open_time', 'close_time', 'banner_pic_url', 'is_express', 'is_site', 'is_tuan_express', 'min_withdraw_money', 'withdraw_fee_ratio', 'commission_leader_ratio', 'leader_range'];
+            $must = ['is_open', 'open_time', 'close_time', 'banner_pic_url', 'is_express', 'is_site', 'is_tuan_express', 'min_withdraw_money', 'withdraw_fee_ratio', 'leader_range'];
             $rs = $this->checkInput($must, $params);
             if ($rs != false) {
                 return $rs;
             }
+            $params['commission_leader_ratio'] = isset($params['commission_leader_ratio'])?$params['commission_leader_ratio']:0;
             $open_time = explode(":", $params['open_time']);
             $close_time = explode(":", $params['close_time']);
             $params['open_time'] = ((int) $open_time[0] * 3600) + ((int) $open_time[1] * 60) + ((int) $open_time[2]);
             $params['close_time'] = ((int) $close_time[0] * 3600) + ((int) $close_time[1] * 60) + ((int) $close_time[2]);
             $params['status'] = 1;
             if ($array['status'] == 204) {
-//                if ($params['close_pic_url']) {
-//                    $base64 = new Base64Model();
-//                    $path = creat_mulu('./uploads/shop/tuan/' . $data['merchant_id']);
-//                    $localRes = $base64->base64_image_content($params['close_pic_url'], $path);
-//                    $cos = new CosModel();
-//                    $cosRes = $cos->putObject($localRes);
-//                    if ($cosRes['status'] == '200') {
-//                        $url = $cosRes['data'];
-//                        unlink(Yii::getAlias('@webroot/') . $localRes);
-//                    } else {
-//                        unlink(Yii::getAlias('@webroot/') . $localRes);
-//                        return json_encode($cosRes, JSON_UNESCAPED_UNICODE);
-//                    }
-//                    $params['close_pic_url'] = $url;
-//                }
-//                if ($params['banner_pic_url']) {
-//                    $base64 = new Base64Model();
-//                    $path = creat_mulu('./uploads/shop/tuan/' . $data['merchant_id']);
-//                    $localRes = $base64->base64_image_content($params['banner_pic_url'], $path);
-//                    $cos = new CosModel();
-//                    $cosRes = $cos->putObject($localRes);
-//                    if ($cosRes['status'] == '200') {
-//                        $url = $cosRes['data'];
-//                        unlink(Yii::getAlias('@webroot/') . $localRes);
-//                    } else {
-//                        unlink(Yii::getAlias('@webroot/') . $localRes);
-//                        return json_encode($cosRes, JSON_UNESCAPED_UNICODE);
-//                    }
-//                    $params['banner_pic_url'] = $url;
-//                }
-//                if ($params['pic_url']) {
-//                    $base64 = new Base64Model();
-//                    $path = creat_mulu('./uploads/shop/tuan/' . $data['merchant_id']);
-//                    $localRes = $base64->base64_image_content($params['pic_url'], $path);
-//                    $cos = new CosModel();
-//                    $cosRes = $cos->putObject($localRes);
-//                    if ($cosRes['status'] == '200') {
-//                        $url = $cosRes['data'];
-//                        unlink(Yii::getAlias('@webroot/') . $localRes);
-//                    } else {
-//                        unlink(Yii::getAlias('@webroot/') . $localRes);
-//                        return json_encode($cosRes, JSON_UNESCAPED_UNICODE);
-//                    }
-//                    $params['pic_url'] = $url;
-//                }
-
                 $params['merchant_id'] = yii::$app->session['uid'];
                 $params['withdraw_fee_ratio'] = $params['withdraw_fee_ratio'];
-
                 //团购开关
                 $appAccessModel = new AppAccessModel();
                 $appAccessWhere['`key`'] = $params['key'];
                 $appAccessWhere['merchant_id'] = $data['merchant_id'];
                 $appAccessWhere['group_buying'] = $params['is_open'];
-
                 $transaction = Yii::$app->db->beginTransaction();
                 try {
                     $array = $model->do_add($params);
@@ -152,60 +105,7 @@ class ConfigController extends MerchantController {
                 $where['id'] = $array['data']['id'];
                 $where['merchant_id'] = yii::$app->session['uid'];
                 $where['key'] = $params['key'];
-//                if (isset($params['banner_pic_url'])) {
-//                    if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $params['close_pic_url'], $result)) {
-//                        $base64 = new Base64Model();
-//                        $path = creat_mulu('./uploads/shop/tuan/' . $data['merchant_id']);
-//                        $localRes = $base64->base64_image_content($params['close_pic_url'], $path);
-//                        $cos = new CosModel();
-//                        $cosRes = $cos->putObject($localRes);
-//                        if ($cosRes['status'] == '200') {
-//                            $url = $cosRes['data'];
-//                            unlink(Yii::getAlias('@webroot/') . $localRes);
-//                        } else {
-//                            unlink(Yii::getAlias('@webroot/') . $localRes);
-//                            return json_encode($cosRes, JSON_UNESCAPED_UNICODE);
-//                        }
-//                        $params['close_pic_url'] = $url;
-//                    }
-//                }
-//                if (isset($params['banner_pic_url'])) {
-//                    if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $params['banner_pic_url'], $result)) {
-//                        $base64 = new Base64Model();
-//                        $path = creat_mulu('./uploads/shop/tuan/' . $data['merchant_id']);
-//                        $localRes = $base64->base64_image_content($params['banner_pic_url'], $path);
-//                        $cos = new CosModel();
-//                        $cosRes = $cos->putObject($localRes);
-//                        if ($cosRes['status'] == '200') {
-//                            $url = $cosRes['data'];
-//                            unlink(Yii::getAlias('@webroot/') . $localRes);
-//                        } else {
-//                            unlink(Yii::getAlias('@webroot/') . $localRes);
-//                            return json_encode($cosRes, JSON_UNESCAPED_UNICODE);
-//                        }
-//                        $params['banner_pic_url'] = $url;
-//                    }
-//                }
-//                if (isset($params['pic_url'])) {
-//                    if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $params['pic_url'], $result)) {
-//                        $base64 = new Base64Model();
-//                        $path = creat_mulu('./uploads/shop/tuan/' . $data['merchant_id']);
-//                        $localRes = $base64->base64_image_content($params['pic_url'], $path);
-//                        $cos = new CosModel();
-//                        $cosRes = $cos->putObject($localRes);
-//                        if ($cosRes['status'] == '200') {
-//                            $url = $cosRes['data'];
-//                            unlink(Yii::getAlias('@webroot/') . $localRes);
-//                        } else {
-//                            unlink(Yii::getAlias('@webroot/') . $localRes);
-//                            return json_encode($cosRes, JSON_UNESCAPED_UNICODE);
-//                        }
-//                        $params['pic_url'] = $url;
-//                    }
-//                }
-
                 $params['withdraw_fee_ratio'] = $params['withdraw_fee_ratio'];
-
                 //团购开关
                 $appAccessModel = new AppAccessModel();
                 $appAccessWhere['`key`'] = $params['key'];

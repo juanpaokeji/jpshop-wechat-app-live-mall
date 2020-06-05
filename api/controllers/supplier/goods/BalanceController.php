@@ -3,6 +3,7 @@
 namespace app\controllers\supplier\goods;
 
 use app\models\shop\BalanceModel;
+use app\models\tuan\LeaderModel;
 use yii;
 use yii\web\SupplierController;
 use app\models\system\SystemSubAdminBalanceModel;
@@ -13,7 +14,8 @@ use app\models\system\SystemSubAdminBalanceModel;
  * @throws Exception if the model cannot be found
  * @return array
  */
-class BalanceController extends SupplierController {
+class BalanceController extends SupplierController
+{
 
     public $enableCsrfValidation = false; //禁用CSRF令牌验证，可以在基类中设置
 
@@ -27,7 +29,8 @@ class BalanceController extends SupplierController {
 //        ];
 //    }
 
-    public function actionList() {
+    public function actionList()
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数      
@@ -41,7 +44,7 @@ class BalanceController extends SupplierController {
             // $params['status'] = 1;
             $params['key'] = yii::$app->session['key'];
             $params['sub_admin_id'] = yii::$app->session['sid'];
-            $params['merchant_id'] = yii::$app->session['uid'];
+            //$params['merchant_id'] = yii::$app->session['uid'];
 
             $userModel = new \app\models\merchant\system\UserModel();
             $userData = $userModel->find(['id' => yii::$app->session['sid']]);
@@ -57,7 +60,8 @@ class BalanceController extends SupplierController {
         }
     }
 
-    public function actionSingle($id) {
+    public function actionSingle($id)
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
@@ -74,12 +78,13 @@ class BalanceController extends SupplierController {
         }
     }
 
-    public function actionAdd() {
+    public function actionAdd()
+    {
         if (yii::$app->request->isPost) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
             $model = new SystemSubAdminBalanceModel();
-            $must = ['realname','money','pay_number'];
+            $must = ['realname', 'money', 'pay_number'];
             //设置类目 参数
             $rs = $this->checkInput($must, $params);
             if ($rs != false) {
@@ -90,20 +95,31 @@ class BalanceController extends SupplierController {
             if ($userData['data']['balance'] < $params['money']) {
                 return result(500, "提现金额大于余额");
             }
-            $params['balance_sn'] = "balance_".order_sn();
+
+            $leader = json_decode($userData['data']['leader']);
+            if (isset($leader['points'])) {
+                $params['remain_money'] = $params['money'] - ($params['money'] * $leader['points'] / 100);
+            } else {
+                $params['remain_money'] = $params['money'] - ($params['money'] * 1 / 100);
+            }
+            $params['balance_sn'] = "balance_" . order_sn();
+            $params['type'] = 6;
             $params['is_send'] = 1;
             $params['content'] = "余额提现";
             $params['key'] = yii::$app->session['key'];
-            $params['sub_admin_id'] = yii::$app->session['sid'];
             $params['merchant_id'] = yii::$app->session['uid'];
+            $params['sub_admin_id'] = yii::$app->session['sid'];
             $array = $model->do_add($params);
+            $sql = "update  system_sub_admin set balance  = balance-" . (float)$params['money'] . " where id = " . yii::$app->session['sid'];
+            $res = Yii::$app->db->createCommand($sql)->execute();
             return $array;
         } else {
             return result(500, "请求方式错误");
         }
     }
 
-    public function actionUpdate($id) {
+    public function actionUpdate($id)
+    {
         if (yii::$app->request->isPut) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
@@ -119,7 +135,8 @@ class BalanceController extends SupplierController {
         }
     }
 
-    public function actionDelete($id) {
+    public function actionDelete($id)
+    {
         if (yii::$app->request->isDelete) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
@@ -136,7 +153,8 @@ class BalanceController extends SupplierController {
     }
 
     //佣金明细列表
-    public function actionCommission() {
+    public function actionCommission()
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数

@@ -7,6 +7,7 @@ use app\models\merchant\system\OperationRecordModel;
 use app\models\merchant\vip\UnpaidVipModel;
 use app\models\merchant\vip\VipConfigModel;
 use app\models\merchant\vip\VipModel;
+use app\models\shop\VipAccessModel;
 use yii;
 use yii\base\Exception;
 use yii\web\MerchantController;
@@ -59,7 +60,27 @@ class VipController extends MerchantController {
                         $val['validity_time_text'] = '一年';
                     }
                 }
+                $accessModel = new VipAccessModel();
+                $accessWhere['shop_vip_access.key'] = $params['key'];
+                $accessWhere['shop_vip_access.merchant_id'] = yii::$app->session['uid'];
+                $accessWhere['shop_vip_access.status'] = 1; //已付款
+                $accessWhere['field'] = "shop_vip_access.vip_id,shop_vip_access.create_time,shop_user.nickname,shop_user.avatar,shop_user.phone,shop_user.vip_validity_time";
+                $accessWhere['join'][] = ['left join', 'shop_user', 'shop_user.id = shop_vip_access.user_id'];
+                $accessWhere['groupBy'] = "shop_vip_access.user_id";
+                $accessWhere['limit'] = false;
+                $userInfo = $accessModel->do_select($accessWhere);
+                if ($userInfo['status'] == 200){
+                    foreach ($array['data'] as $key=>&$val){
+                        foreach ($userInfo['data'] as $k=>$v){
+                            $v['vip_validity_time'] = date('Y-m-d H:i:s',$v['vip_validity_time']);
+                            if ($v['vip_id'] == $val['id']){
+                                $val['user_list'][] = $v;
+                            }
+                        }
+                    }
+                }
             }
+
             return $array;
         } else {
             return result(500, "请求方式错误");

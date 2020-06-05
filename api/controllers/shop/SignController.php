@@ -27,11 +27,13 @@ require_once yii::getAlias('@vendor/wxpay/Wechat.php');
  * @throws Exception if the model cannot be found
  * @return array
  */
-class SignController extends ShopController {
+class SignController extends ShopController
+{
 
     public $enableCsrfValidation = false; //禁用CSRF令牌验证，可以在基类中设置
 
-    public function behaviors() {
+    public function behaviors()
+    {
         return [
             'token' => [
                 'class' => 'yii\filters\ShopFilter', //调用过滤器
@@ -48,7 +50,8 @@ class SignController extends ShopController {
         'aes_key' => '9ILejPm7rpu5kJykkY13oHMO80bYJkNbQfCvL3otaWA',
     ];
 
-    public function actionList($id) {
+    public function actionList($id)
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
@@ -65,7 +68,8 @@ class SignController extends ShopController {
         }
     }
 
-    public function actionSingle($id) {
+    public function actionSingle($id)
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
@@ -81,7 +85,8 @@ class SignController extends ShopController {
         }
     }
 
-    public function actionOne($id) {
+    public function actionOne($id)
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
@@ -95,7 +100,8 @@ class SignController extends ShopController {
         }
     }
 
-    public function actionAdd() {
+    public function actionAdd()
+    {
         if (yii::$app->request->isPost) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
@@ -128,45 +134,30 @@ class SignController extends ShopController {
                 return result(500, '找不到该活动');
             }
 
-            $upload = new UploadsModel('pic_url', "./uploads/shop/sign");
-            $str = $upload->upload();
-            if (!$str) {
-                return "上传文件错误";
-            }
-            //将图片上传到cos
-            $cos = new CosModel();
-            $cosRes = $cos->putObject($str);
-            if ($cosRes['status'] == '200') {
-                $url = $cosRes['data'];
-                unlink(Yii::getAlias('@webroot/') . $str);
-            } else {
-                unlink(Yii::getAlias('@webroot/') . $str);
-                return json_encode($cosRes, JSON_UNESCAPED_UNICODE);
-            }
-            $params['pic_url'] = $url;
-
             $params['create_time'] = time();
             $array = $model->add($params);
+
+            $sql = "update shop_user set score = score+" . $res['data']['integral'] . " where id = " . yii::$app->session['user_id'];
+            Yii::$app->db->createCommand($sql)->execute();
 
             $number = $this->prize(yii::$app->session['merchant_id'], $params['sign_id'], yii::$app->session['user_id']);
 
 
             $continuous_arr = $res['data']['continuous_arr'];
-            $days = explode(",", rtrim($continuous_arr['days'], ","));
-            $give_type = explode(",", rtrim($continuous_arr['give_type'], ","));
-            $give_value = explode(",", rtrim($continuous_arr['give_value'], ","));
+
             $arr = array();
-            for ($i = 0; $i < count($days); $i++) {
-                if ($number == $days[$i]) {
+
+            for ($i = 0; $i < count($continuous_arr); $i++) {
+                if ($number == $continuous_arr[$i]['days']) {
                     $arr['`key`'] = yii::$app->session['key'];
                     $arr['merchant_id'] = yii::$app->session['merchant_id'];
                     $arr['user_id'] = yii::$app->session['user_id'];
                     $arr['sign_id'] = $params['sign_id'];
                     $arr['days'] = $number;
-                    $arr['give_type'] = $give_type[$i];
-                    $arr['give_value'] = $give_value[$i];
+                    $arr['give_type'] = $continuous_arr[$i]['give_type'];
+                    $arr['give_value'] = $continuous_arr[$i]['give_value'];
                     $arr['days'] = $number;
-                    if ($give_type[$i] == 3) {
+                    if ($continuous_arr[$i]['give_type']== 3) {
                         $arr['status'] = 0;
                     } else {
                         $arr['status'] = 1;
@@ -175,8 +166,8 @@ class SignController extends ShopController {
                     $signPrizeData = $signPrize->findall($arr);
                     if ($signPrizeData['stauts'] == 204) {
                         $signPrize->add($arr);
-                        $give_value = explode("_", $give_value[$i]);
-                        $this->addPrize($give_type[$i], $give_value[0], yii::$app->session['user_id'], yii::$app->session['key'], yii::$app->session['merchant_id']);
+                        $give_value = explode("_", $continuous_arr[$i]['give_value']);
+                        $this->addPrize($continuous_arr[$i]['give_type'], $give_value[0], yii::$app->session['user_id'], yii::$app->session['key'], yii::$app->session['merchant_id']);
                     }
                 }
             }
@@ -186,13 +177,13 @@ class SignController extends ShopController {
         }
     }
 
-    public function actionSignin() {
+    public function actionSignin()
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
             $params['`key`'] = $params['key'];
-
-            $merchant_id = yii::$app->session['merchant_id'];
+            $merchant_id = 13;
             unset($params['key']);
             $model = new SignInModel();
             $time = time();
@@ -201,11 +192,11 @@ class SignController extends ShopController {
             $params['status'] = 1;
             $array = $model->findall($params);
             $table = new TableModel();
-            $sql = "SELECT COUNT(DISTINCT user_id) as num  FROM shop_sign where `key` = {$params['`key`']},merchant_id  ={$merchant_id}";
+            $sql = "SELECT COUNT(DISTINCT user_id) as num  FROM shop_sign where `key` = '{$params['`key`']}' and merchant_id  ={$merchant_id}";
             $res = $table->querySql($sql);
 
             $array['number'] = $res[0]['num'];
-            $sql = "SELECT DISTINCT (user_id),avatar  FROM shop_sign INNER JOIN  shop_user on shop_user.id = shop_sign.user_id  shop_sign.`key` = {$params['`key`']},shop_sign.merchant_id  ={$merchant_id}";
+            $sql = "SELECT DISTINCT (user_id),avatar  FROM shop_sign INNER JOIN  shop_user on shop_user.id = shop_sign.user_id  where shop_sign.`key` = '{$params['`key`']}' and shop_sign.merchant_id  ={$merchant_id}";
             $res = $table->querySql($sql);
             $array['avatar'] = $res;
             return $array;
@@ -214,7 +205,8 @@ class SignController extends ShopController {
         }
     }
 
-    public function actionSign($id) {
+    public function actionSign($id)
+    {
         $key = yii::$app->session['key'];
         $merchant_id = yii::$app->session['merchant_id'];
         $user_id = yii::$app->session['user_id'];
@@ -224,7 +216,7 @@ class SignController extends ShopController {
         $sql = "select count(*)as num  from shop_sign where `key` ='{$key}' and merchant_id={$merchant_id} and user_id = {$user_id} and sign_id = {$id} and  create_time >= {$res['data']['start']} and create_time <= {$res['data']['end']}";
         $leiji = $table->querySql($sql);
         $signModel = new SignModel();
-        $res = $signModel->findall(['merchant_id' => $merchant_id,'`key`'=>"{$key}", 'user_id' => yii::$app->session['user_id'], 'sign_id' => $id, 'orderby' => ' create_time asc']);
+        $res = $signModel->findall(['merchant_id' => $merchant_id, '`key`' => "{$key}", 'user_id' => yii::$app->session['user_id'], 'sign_id' => $id, 'orderby' => ' create_time asc']);
         if ($res['status'] != 200) {
             $arr['qcode'] = $this->qcode($key);
             $arr['leiji'] = 1;
@@ -258,19 +250,21 @@ class SignController extends ShopController {
      * 小程序二维码
      */
 
-    public function qcode($key) {
+    public function qcode($key)
+    {
 
         $config = $this->getSystemConfig($key, "miniprogram");
         if ($config == false) {
             return "";
         }
-        $openPlatform = Factory::openPlatform($this->config);
-        // 代小程序实现业务
-        $miniProgram = $openPlatform->miniProgram($config['app_id'], $config['refresh_token']);
+        $miniProgram = Factory::miniProgram($config);
         $response = $miniProgram->app_code->getUnlimit($key, ['width' => 280, "path" => '/pages/index/index/index']);
+
+        // $url = getConfig('qrcode'.$key);
+        //if($url==false){
         $url = "";
         if ($response instanceof \EasyWeChat\Kernel\Http\StreamResponse) {
-
+            $url = "";
             $filename = $response->saveAs(yii::getAlias('@webroot/') . "/uploads/qcode/" . date('Y') . "/" . date('m') . "/" . date('d') . "/", time() . $config['app_id'] . rand(1000, 9999) . ".png");
             $localRes = "./uploads/qcode/" . date('Y') . "/" . date('m') . "/" . date('d') . "/" . $filename;
             $cos = new CosModel();
@@ -280,14 +274,16 @@ class SignController extends ShopController {
                 $url = $cosRes['data'];
                 unlink(Yii::getAlias('@webroot/') . $localRes);
             } else {
-                unlink(Yii::getAlias('@webroot/') . $localRes);
-                return json_encode($cosRes, JSON_UNESCAPED_UNICODE);
+                $url = "http://" . $_SERVER['HTTP_HOST'] . "/api/web/" . $localRes;
             }
+            //  setConfig('qrcode'.$key ,$url);
         }
+        //  }
         return $url;
     }
 
-    public function actionTotal($id) {
+    public function actionTotal($id)
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
@@ -299,7 +295,6 @@ class SignController extends ShopController {
 
             $model = new SignInModel();
             $res = $model->find(['id' => $data['id'], 'merchant_id' => $data['merchant_id'], '`key`' => $data['`key`']]);
-
 
 
             $table = new TableModel();
@@ -383,7 +378,8 @@ class SignController extends ShopController {
         }
     }
 
-    public function prize($merchant_id, $id, $user_id) {
+    public function prize($merchant_id, $id, $user_id)
+    {
         $signModel = new SignModel();
         $res = $signModel->findall(['merchant_id' => $merchant_id, 'user_id' => $user_id, 'sign_id' => $id, 'orderby' => ' create_time asc']);
         $number = 1;
@@ -410,7 +406,8 @@ class SignController extends ShopController {
         return $number;
     }
 
-    public function actionIndex($id) {
+    public function actionIndex($id)
+    {
         if (yii::$app->request->isPost) {
             $request = yii::$app->request; //获取 request 对象 $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
@@ -484,7 +481,7 @@ class SignController extends ShopController {
                 'attach' => json_encode($signData, JSON_UNESCAPED_UNICODE),
                 'out_trade_no' => time() . rand(1000, 9999),
                 //   'total_fee' => (int)$res['data']['supplementary_price'] * 100,
-                'total_fee' => (int) $res['data']['supplementary_price'],
+                'total_fee' => (int)$res['data']['supplementary_price'],
                 'notify_url' => "https://api2.juanpao.com/shop/sign/notify",
                 'trade_type' => 'JSAPI',
                 'openid' => $userData['data']['open_id'],
@@ -504,7 +501,8 @@ class SignController extends ShopController {
         }
     }
 
-    public function actionNotify() {
+    public function actionNotify()
+    {
         //获取商户微信配置
         $xml = file_get_contents("php://input");
         $wxPatNotify = new \WxPayNotify();
@@ -526,35 +524,30 @@ class SignController extends ShopController {
             $number = $this->prize($params['merchant_id'], $params['sign_id'], $params['user_id']);
 
             $continuous_arr = $res['data']['continuous_arr'];
-            $days = explode(",", rtrim($continuous_arr['days'], ","));
-            $give_type = explode(",", rtrim($continuous_arr['give_type'], ","));
-            $give_value = explode(",", rtrim($continuous_arr['give_value'], ","));
+
             $arr = array();
 
-            for ($i = 0; $i < count($days); $i++) {
-
-                if ($number == (int) $days[$i]) {
-
-                    $arr['`key`'] = $params['`key`'];
-                    $arr['merchant_id'] = $params['merchant_id'];
-                    $arr['user_id'] = $params['user_id'];
+            for ($i = 0; $i < count($continuous_arr); $i++) {
+                if ($number == $continuous_arr[$i]['days']) {
+                    $arr['`key`'] = yii::$app->session['key'];
+                    $arr['merchant_id'] = yii::$app->session['merchant_id'];
+                    $arr['user_id'] = yii::$app->session['user_id'];
                     $arr['sign_id'] = $params['sign_id'];
                     $arr['days'] = $number;
-                    $arr['give_type'] = $give_type[$i];
-                    $arr['give_value'] = $give_value[$i];
+                    $arr['give_type'] = $continuous_arr[$i]['give_type'];
+                    $arr['give_value'] = $continuous_arr[$i]['give_value'];
                     $arr['days'] = $number;
-                    if ($give_type[$i] == 3) {
+                    if ($continuous_arr[$i]['give_type']== 3) {
                         $arr['status'] = 0;
                     } else {
                         $arr['status'] = 1;
                     }
-
                     $signPrize = new SignPrizeModel();
                     $signPrizeData = $signPrize->findall($arr);
-                    if ($signPrizeData['stauts'] == 204) {
+                    if ($signPrizeData['status'] == 204) {
                         $signPrize->add($arr);
-                        $give_value = explode("_", $give_value[$i]);
-                        $this->addPrize($give_type[$i], $give_value[0], $params['user_id'], $params['`key`'], $params['merchant_id']);
+                        $give_value = explode("_", $continuous_arr[$i]['give_value']);
+                        $this->addPrize($continuous_arr[$i]['give_type'], $give_value[0], yii::$app->session['user_id'], yii::$app->session['key'], yii::$app->session['merchant_id']);
                     }
                 }
             }
@@ -574,7 +567,8 @@ class SignController extends ShopController {
     /**
      * @param $log_content
      */
-    private function logger($log_content) {
+    private function logger($log_content)
+    {
         if (isset($_SERVER['HTTP_APPNAME'])) {   //SAE
             sae_set_display_errors(false);
             sae_debug($log_content);
@@ -582,14 +576,15 @@ class SignController extends ShopController {
         } else if ($_SERVER['REMOTE_ADDR'] != "127.0.0.1") { //LOCAL
             $max_size = 1000000;
             $log_filename = "log.xml";
-            if (file_exists($log_filename) and ( abs(filesize($log_filename)) > $max_size)) {
+            if (file_exists($log_filename) and (abs(filesize($log_filename)) > $max_size)) {
                 unlink($log_filename);
             }
             file_put_contents($log_filename, date('Y-m-d H:i:s') . " " . $log_content . "\r\n", FILE_APPEND);
         }
     }
 
-    public function addPrize($give_type, $give_value, $user_id, $key, $merchant_id) {
+    public function addPrize($give_type, $give_value, $user_id, $key, $merchant_id)
+    {
 
         if ($give_type == 1) {
             $sql = "update shop_user set score = score+{$give_value} where id = {$user_id}";
@@ -626,7 +621,7 @@ class SignController extends ShopController {
             $vdata['type_name'] = $voutype['data']['name'];
             $vdata['status'] = 1;
             $vdata['start_time'] = time();
-            $vdata['end_time'] = $voutype['data']['to_date'];
+            $vdata['end_time'] = $voutype['data']['to_date1'];
             $vdata['is_exchange'] = 0;
             $vdata['merchant_id'] = $params['merchant_id'];
 

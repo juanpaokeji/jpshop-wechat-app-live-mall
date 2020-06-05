@@ -2,6 +2,14 @@
 
 namespace app\controllers\shop;
 
+use app\models\core\TableModel;
+use app\models\merchant\app\AppAccessModel;
+use app\models\merchant\distribution\AgentModel;
+use app\models\merchant\distribution\DistributionAccessModel;
+use app\models\merchant\distribution\OperatorModel;
+use app\models\merchant\distribution\SuperModel;
+use app\models\merchant\vip\UnpaidVipModel;
+use app\models\shop\GroupOrderModel;
 use app\models\shop\OrderModel;
 use app\models\shop\SignModel;
 use app\models\shop\TuanLeaderModel;
@@ -136,21 +144,19 @@ class TuanController extends ShopController
             $data['order_sn'] = $params['order_sn'];
             $data['`key`'] = yii::$app->session['key'];
             $data['merchant_id'] = yii::$app->session['merchant_id'];
-            $data['leader_self_uid'] = yii::$app->session['user_id'];
-//            yii::$app->session['user_id'] = 1551;
-//            yii::$app->session['merchant_id'] = 253;
-//            yii::$app->session['key'] = '000572';
-//            $params['order_sn'] = "201908251021259753";
-//            $data['order_sn'] = "201908251021259753";
-//            $data['`key`'] = "000572";
-//            $data['merchant_id'] = 253;
-//            $data['leader_self_uid'] = "1551";
-
+            $data['leader_uid'] = yii::$app->session['user_id'];
+//            yii::$app->session['user_id'] = 444;
+//            yii::$app->session['merchant_id'] = 13;
+//            yii::$app->session['key'] = 'ccvWPn';
+//            $params['order_sn'] = "202003311854181672";
+//            $data['order_sn'] = "202003311854181672";
+//            $data['`key`'] = "ccvWPn";
+//            $data['merchant_id'] = 13;
+//            $data['leader_uid'] = "444";
             $data['status'] = 3;
-            $data['tuan_status'] = 2;
+           // $data['tuan_status'] = 2;
 
             $array = $orderModel->queryOrder($data);
-
             if ($array['status'] != 200) {
                 return $array;
             }
@@ -161,7 +167,7 @@ class TuanController extends ShopController
             $data1['order_group_sn'] = $params['order_sn'];
             $data1['`key`'] = yii::$app->session['key'];
             $data1['merchant_id'] = yii::$app->session['merchant_id'];
-            //$data['leader_self_uid'] = yii::$app->session['user_id'];
+            $data['leader_uid'] = yii::$app->session['user_id'];
             $orderModel = new \app\models\shop\SubOrderModel();
             $array = $orderModel->update($data1);
 
@@ -169,11 +175,42 @@ class TuanController extends ShopController
             $sql = "select is_vip,vip_validity_time from shop_user where id = " . yii::$app->session['user_id'];
             $vipUser = $orderModel->querySql($sql);
             $vip = 1;
-            if ($vipUser[0]['is_vip'] == 1 && $vipUser[0]['vip_validity_time'] > time()) {
-                $sql = "select score_times from shop_vip_config where merchant_id = " . yii::$app->session['merchant_id'] . " `key` = '" . yii::$app->session['key'] . "'";
-                $vipConfig = $orderModel->querySql($sql);
-                if (count($vipConfig) != 0) {
-                    $vip = $vipConfig[0]['score_times'];
+            $appAccessModel = new AppAccessModel();
+            $appInfo = $appAccessModel->find(['key' => yii::$app->session['key']]);
+            if ($appInfo['status'] == 200 && $appInfo['data']['user_vip'] != 0){
+                if ($appInfo['data']['user_vip'] == 2){
+                    //积分会员等级
+                    $userModel = new UserModel;
+                    $userInfo = $userModel->find(['id' => yii::$app->session['user_id']]);
+                    $unpaidVipModel = new UnpaidVipModel();
+                    $unpaidVipWhere['key'] = yii::$app->session['key'];
+                    $unpaidVipWhere['merchant_id'] = yii::$app->session['merchant_id'];
+                    $unpaidVipWhere['limit'] = false;
+                    $unpaidVipInfo = $unpaidVipModel->do_select($unpaidVipWhere);
+                    if ($unpaidVipInfo['status'] == 200 && $userInfo['status'] == 200){
+                        $minLev = reset($unpaidVipInfo['data']);//最低等级
+                        $maxLev = end($unpaidVipInfo['data']);//最高等级
+                        //总积分大于等于最高等级
+                        if ($userInfo['data']['total_score'] >= $maxLev['min_score']){
+                            $vip = $maxLev['score_times'];
+                        }
+                        //总积分在最低和最高之间的
+                        if ($userInfo['data']['total_score'] >= $minLev['min_score'] && $userInfo['data']['total_score'] < $maxLev['min_score']){
+                            foreach ($unpaidVipInfo['data'] as $k=>$v){
+                                if ($userInfo['data']['total_score'] >= $v['min_score']){
+                                    $vip = $v['score_times'];
+                                }
+                            }
+                        }
+                    }
+                }else{
+                    if ($vipUser[0]['is_vip'] == 1 && $vipUser[0]['vip_validity_time'] > time()) {
+                        $sql = "select score_times from shop_vip_config where merchant_id = " . yii::$app->session['merchant_id'] . " and `key` = '" . yii::$app->session['key'] . "'";
+                        $vipConfig = $orderModel->querySql($sql);
+                        if (count($vipConfig) != 0) {
+                            $vip = $vipConfig[0]['score_times'];
+                        }
+                    }
                 }
             }
             $rs = $orderModel->tableSingle("shop_order_group", ['order_sn' => $params['order_sn'], 'delete_time is null' => null]);
@@ -193,13 +230,11 @@ class TuanController extends ShopController
             $user_id = yii::$app->session['user_id'];
             $userModel = new UserModel();
             $user = $userModel->find(['id' => $user_id]);
-            $userModel->update(['id' => $user_id, '`key`' => yii::$app->session['key'], 'score' => $user['data']['score'] + $score]);
+            $userModel->update(['id' => $user_id, '`key`' => yii::$app->session['key'], 'total_score' => $user['data']['total_score'] + $score,'score' => $user['data']['score'] + $score]);
 
 
             if ($array['status'] == 200) {
-
                 $configModel = new \app\models\tuan\ConfigModel();
-                $bool = array();
                 $config = $configModel->do_one(['merchant_id' => yii::$app->session['merchant_id'], 'key' => yii::$app->session['key']]);
                 if ($config['status'] == 200 && $config['data']['status'] == 1) {
                     //团长佣金
@@ -208,75 +243,158 @@ class TuanController extends ShopController
                     if ($balance['status'] == 200) {
                         $userModel = new UserModel();
                         $user = $userModel->find(['id' => $balance['data']['uid']]);
-                        $bool[0] = $userModel->update(['id' => $balance['data']['uid'], '`key`' => yii::$app->session['key'], 'balance' => (float)$user['data']['balance'] + (float)$balance['data']['money']]);
+                        $userModel->update(['id' => $balance['data']['uid'], '`key`' => yii::$app->session['key'], 'balance' => (float)$user['data']['balance'] + (float)$balance['data']['money']]);
                     }
-                    //自提佣金
+                    //团长配送
                     $balanceModel = new \app\models\shop\BalanceModel();
-                    $balance = $balanceModel->do_one(['order_sn' => $params['order_sn'], 'uid' => yii::$app->session['user_id'], 'type' => 3, 'key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['merchant_id']]);
+                    $balance = $balanceModel->do_one(['order_sn' => $params['order_sn'], 'uid' => yii::$app->session['user_id'], 'type' => 6, 'key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['merchant_id']]);
                     if ($balance['status'] == 200) {
                         $userModel = new UserModel();
                         $user = $userModel->find(['id' => $balance['data']['uid']]);
                         $userModel->update(['id' => $balance['data']['uid'], '`key`' => yii::$app->session['key'], 'balance' => (float)$user['data']['balance'] + (float)$balance['data']['money'], 'leader_exp' => $user['data']['leader_exp'] + (int)$balance['data']['money']]);
-                        $bool[1] = $balanceModel->do_update(['order_sn' => $params['order_sn'], 'key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['merchant_id']], ['status' => 1]);
+                        $balanceModel->do_update(['order_sn' => $params['order_sn'], 'key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['merchant_id']], ['status' => 1]);
+                    }
+
+                    //门店佣金
+                    if($rs['data']['supplier_id']!=0){
+                        $sql = "select sum(money) as num from shop_user_balance where order_sn = '{$rs['order_sn']}' and type = 1";
+                        $tuanbalance =  Yii::$app->db->createCommand($sql)->queryOne();
+                        $balance = $rs['data']['payment_money'] - $tuanbalance['num']-$rs['data']['commission']+$rs['data']['commissions_pool'];
+                        $sql = "update system_sub_admin set balance = balance+{$balance} where id = " . $rs['data']['supplier_id'] . " ;";
+                        Yii::$app->db->createCommand($sql)->execute();
+                    }
+
+                }
+                $balanceModel = new \app\models\shop\BalanceModel();
+                $balanceModel->do_update(['order_sn' => $data['order_sn']], ['status' => 1]);
+
+                $orderRs = $orderModel->find(['order_sn' => $params['order_sn']]);
+
+                //确认收货后更新团长等级、经验
+                if ($orderRs['data']['leader_uid'] != 0){
+                    $this->level($orderRs['data']['leader_uid'],floor($orderRs['data']['payment_money']));
+                }
+
+                //用户确认收货后，查询普通会员是否可以升级为超级会员
+                $appInfo = $appAccessModel->find(['key' => $orderRs['data']['key']]);
+                $userModel = new UserModel;
+                $userInfo = $userModel->find(['id' => $orderRs['data']['user_id']]);
+                //会员等级为普通会员的再做后续判断
+                if ($userInfo['status'] == 200 && $userInfo['data']['level'] == 0) {
+                    $superModel = new SuperModel();
+                    $superInfo = $superModel->one(['key' => $orderRs['data']['key']]);
+                    //未查询到超级会员设置信息的，不做处理
+                    if ($superInfo['status'] == 200) {
+                        //用户消费金额达到设定则升级，否则不做处理
+                        $groupOrderModel = new GroupOrderModel();
+                        $groupOrderWhere['field'] = "sum(payment_money) as money";
+                        $groupOrderWhere['user_id'] = $orderRs['data']['user_id'];
+                        $groupOrderWhere['or'] = ['or', ['=', 'status', 6], ['=', 'status', 7]];
+                        $moneyInfo = $groupOrderModel->one($groupOrderWhere);
+                        if ($moneyInfo['status'] == 200 && $moneyInfo['data']['money'] >= $superInfo['data']['condition']) {
+                            //是否开启手动审核
+                            if ($appInfo['status'] == 200 && $appInfo['data']['distribution_is_open'] == 0) {
+                                $levelData['id'] = $orderRs['data']['user_id'];
+                                $levelData['`key`'] = $orderRs['data']['key'];
+                                $levelData['level'] = 1;
+                                $levelData['up_level'] = 1;
+                                $levelData['reg_time'] = time();
+                                $userModel->update($levelData);
+                            } else {
+                                $levelData['id'] = $orderRs['data']['user_id'];
+                                $levelData['`key`'] = $orderRs['data']['key'];
+                                $levelData['up_level'] = 1;
+                                $levelData['is_check'] = 0;
+                                $levelData['reg_time'] = time();
+                                $userModel->update($levelData);
+                            }
+                        }
                     }
                 }
-                if ($bool[0]['status'] == 200 && $bool[1]['status'] == 200) {
-                    //供应商金额
-                    $subBalanceModel = new \app\models\system\SystemSubAdminBalanceModel();
-                    $subBalance = $subBalanceModel->do_select(['order_sn' => $params['order_sn']]);
-                    if ($subBalance['status'] == 200) {
-                        $subBalanceModel->do_update(['order_sn' => $params['order_sn']], ['status' => 1]);
-                        for ($i = 0; $i < count($subBalance['data']); $i++) {
-                            $subUserModel = new \app\models\merchant\system\UserModel();
-                            $sql = "update system_sub_admin set balance = balance+{$subBalance['data'][$i]['money']} where id = {$subBalance['data'][$i]['sub_admin_id']}";
-                            $subUserModel->querySql($sql);
+                //判断父级是否可以升级
+                if ($userInfo['status'] == 200 && !empty($userInfo['data']['parent_id'])) {
+                    $parentInfo = $userModel->find(['id' => $userInfo['data']['parent_id']]);
+                    $sql = "SELECT sum(sog.payment_money) as total FROM `shop_user` su RIGHT JOIN `shop_order_group` sog ON sog.user_id = su.id WHERE su.parent_id = {$userInfo['data']['parent_id']} AND (sog.status = 6 OR sog.status = 7)";
+                    $total = $userModel->querySql($sql); //$total[0]['total']
+                    if (isset($parentInfo['data'])) {
+                        $fanNum = $parentInfo['data']['fan_number'];
+                        $secondhandFanNum = $parentInfo['data']['secondhand_fan_number'];
+                        $level = $parentInfo['data']['level'];
+                        $agentModel = new AgentModel();
+                        $agentWhere['key'] = $orderRs['data']['key'];
+                        $agentWhere['merchant_id'] = $orderRs['data']['merchant_id'];
+                        $agentWhere['status'] = 1;
+                        $agentWhere['limit'] = false;
+                        $agentInfo = $agentModel->do_select($agentWhere);
+                        if (isset($agentInfo['data'])) {
+                            foreach ($agentInfo['data'] as $k => $v) {
+                                if ($v['fan_number_buy'] <= $total[0]['total'] && $v['fan_number'] <= $fanNum && $v['secondhand_fan_number'] <= $secondhandFanNum) {
+                                    $level = 2;
+                                    $levelId = $v['id'];
+                                }
+                            }
+                        }
+                        $operatorModel = new OperatorModel();
+                        $operatorWhere['key'] = $orderRs['data']['key'];
+                        $operatorWhere['merchant_id'] = $orderRs['data']['merchant_id'];
+                        $operatorWhere['status'] = 1;
+                        $operatorWhere['limit'] = false;
+                        $operatorInfo = $operatorModel->do_select($operatorWhere);
+                        if (isset($operatorInfo['data'])) {
+                            foreach ($operatorInfo['data'] as $k => $v) {
+                                if ($v['fan_number_buy'] <= $total[0]['total'] && $v['fan_number'] <= $fanNum && $v['secondhand_fan_number'] <= $secondhandFanNum) {
+                                    $level = 3;
+                                    $levelId = $v['id'];
+                                }
+                            }
+                        }
+                        //是否开启手动审核
+                        if ($level > $parentInfo['data']['level'] || ($level == $parentInfo['data']['level'] && $levelId != $parentInfo['data']['level_id'])) {
+                            $levelData['id'] = $userInfo['data']['parent_id'];
+                            $levelData['`key`'] = $orderRs['data']['key'];
+                            $levelData['up_level'] = $level;
+                            $levelData['reg_time'] = time();
+                            if (isset($levelId)) {
+                                $levelData['up_level_id'] = $levelId;
+                            }
+                            if ($appInfo['status'] == 200 && $appInfo['data']['distribution_is_open'] == 0) {
+                                $levelData['level'] = $level;
+                                if (isset($levelId)) {
+                                    $levelData['level_id'] = $levelId;
+                                }
+                            } else {
+                                $levelData['is_check'] = 0;
+                            }
+                            $userModel->update($levelData);
                         }
                     }
                 }
 
-
-                $balanceModel = new \app\models\shop\BalanceModel();
-                $balanceModel->do_update(['order_sn' => $data['order_sn']], ['status' => 1]);
-
-
-                $orderModel = new OrderModel();
-                $orderRs = $orderModel->find(['order_sn' => $params['order_sn']]);
-
-                $shopUserModel = new \app\models\shop\UserModel();
-                $shopUser = $shopUserModel->find(['id' => $orderRs['data']['user_id']]);
-                $leaderUser = $shopUserModel->find(['id' => $orderRs['data']['leader_self_uid']]);
-
-                $leaderModel = new LeaderModel();
-                $leader = $leaderModel->do_one(['uid'=>$orderRs['data']['leader_self_uid']]);
-
-                $areaModel = new SystemAreaModel();
-                $area = $areaModel->do_one(['code'=>$leader['data']['area_code']]);
-
-                $tempModel = new \app\models\system\SystemMiniTemplateModel();
-                $minitemp = $tempModel->do_one(['id' => 32]);
-                //订单编号,订单金额,到货时间,领取位置,手机号,团长
-                $tempParams = array(
-                    'keyword1' => $params['order_sn'],
-                    'keyword2' => $orderRs['data']['pay_money'],
-                    'keyword3' => date("Y-m-d h:i:sa", time()),
-                    'keyword4' => $area['data']['name'].$leader['data']['area_name'].$leader['data']['addr'],
-                    'keyword5' => $leaderUser['data']['phone'],
-                    'keyword5' => $leader['data']['realname'],
-                );
-
-                $tempAccess = new SystemMerchantMiniAccessModel();
-                $taData = array(
-                    'key' => $orderRs['data']['key'],
-                    'merchant_id' => $orderRs['data']['merchant_id'],
-                    'mini_open_id' => $shopUser['data']['mini_open_id'],
-                    'template_id' => 32,
-                    'number' => '0',
-                    'template_params' => json_encode($tempParams),
-                    'template_purpose' => 'order',
-                    'page' => "/pages/orderItem/orderItem/orderItem?order_sn={$params['order_sn']}",
-                    'status' => '-1',
-                );
-                $tempAccess->do_add($taData);
+                //确认收货后,将每个人的预估分销佣金计入可提现分销佣金中,将订单表中未分配完的佣金计入应用表未分配佣金池
+                $userModel = new UserModel();
+                $distributionAccessModel = new DistributionAccessModel();
+                $accessWhere['key'] = yii::$app->session['key'];
+                $accessWhere['merchant_id'] = yii::$app->session['merchant_id'];
+                $accessWhere['order_sn'] = $params['order_sn'];
+                $accessWhere['type'] = 1; //订单提佣
+                $accessWhere['limit'] = false;
+                $distributionAccess = $distributionAccessModel->do_select($accessWhere);
+                if ($distributionAccess['status'] == 200) {
+                    foreach ($distributionAccess['data'] as $k => $v) {
+                        $userInfo = $userModel->find(['id' => $v['uid']]);
+                        if ($userInfo['status'] == 200) {
+                            $userData['id'] = $v['uid'];
+                            $userData['`key`'] = $v['key'];
+                            $userData['withdrawable_commission'] = $v['money'] + $userInfo['data']['withdrawable_commission'];
+                            $userModel->update($userData);
+                        }
+                    }
+                }
+                $appData = [];
+                $appData['`key`'] = $userInfo['data']['key'];
+                $appData['merchant_id'] = $userInfo['data']['merchant_id'];
+                $appData['commissions_pool'] = $orderRs['data']['commissions_pool'] + $appInfo['data']['commissions_pool'];
+                $appAccessModel->update($appData);
 
                 return result(200, "订单{$data['order_sn']}核销成功！");
             } else {
@@ -284,6 +402,26 @@ class TuanController extends ShopController
             }
         } else {
             return result(500, "请求方式错误");
+        }
+    }
+
+    public function level($leader_uid, $exp)
+    {
+        $table = new TableModel();
+        $sql = "select * from shop_user where id = " . $leader_uid;
+        $user = $table->querySql($sql);
+        if (count($user) > 0) {
+            $user[0]['leader_exp'] = $exp + $user[0]['leader_exp'];
+
+            $sql = "select * from shop_leader_level  where min_exp < {$user[0]['leader_exp']} and `key`='ccvWPn'  order by min_exp desc limit 1";
+            $res = $table->querySql($sql);
+            if (count($res) > 0) {
+                $sql = "update shop_user set leader_level = {$res[0]['id']},leader_exp = {$user[0]['leader_exp']}";
+                Yii::$app->db->createCommand($sql)->execute();
+            }else{
+                $sql = "update shop_user set leader_exp = {$user[0]['leader_exp']}";
+                Yii::$app->db->createCommand($sql)->execute();
+            }
         }
     }
 
@@ -390,7 +528,8 @@ class TuanController extends ShopController
         }
     }
 
-    public function actionMerbers(){
+    public function actionMerbers()
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
@@ -399,7 +538,7 @@ class TuanController extends ShopController
             $tuanUserModel = new \app\models\tuan\UserModel();
             $where['shop_tuan_user.leader_uid'] = yii::$app->session['user_id'];
             $where['field'] = "avatar,nickname,money";
-            $where['join'][] = ['inner join','shop_user','shop_user.id=shop_tuan_user.uid'];
+            $where['join'][] = ['inner join', 'shop_user', 'shop_user.id=shop_tuan_user.uid'];
             $data = $tuanUserModel->do_select($where);
             return $data;
         } else {

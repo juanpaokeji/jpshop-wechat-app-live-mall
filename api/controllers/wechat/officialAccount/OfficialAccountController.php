@@ -233,11 +233,10 @@ class OfficialAccountController extends Controller {
 
     //新订单模板消息
     public function actionTemplateMessage() {
-        $redis =  \Yii::$app->redis;
-        $paramsLen = $redis->llen('wechat_template_message');
+        $paramsLen = llenRedis('wechat_template_message');
         if ($paramsLen > 0){
             for ($i = 0; $i < $paramsLen;$i++){
-                $paramsList[] = json_decode($redis->rpop('wechat_template_message'),true);
+                $paramsList[] = rpopRedis('wechat_template_message');
             }
             foreach ($paramsList as $k=>$v){
                 $params = $v;

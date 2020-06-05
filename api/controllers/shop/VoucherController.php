@@ -61,6 +61,17 @@ class VoucherController extends ShopController
             $params['merchant_id'] = yii::$app->session['merchant_id'];
             $params['user_id'] = yii::$app->session['user_id'];
             $params['supplier_id'] = $params['supplier_id'];
+            if (isset($params['goods_id'])){
+                $goodsKey = explode(",",$params['goods_id']);
+                foreach ($goodsKey as $k=>$v){
+                    $goodsKey[$k] = "goods_id = {$v} ";
+                }
+                $goodsKey[] = "goods_id = 0 ";
+                $keyStr = implode(" or ", $goodsKey);
+                $keyStr = '('.$keyStr.')';
+                $params[$keyStr] = null;
+                unset($params['goods_id']);
+            }
             $params['status'] = 1;
             $array = $model->findall($params);
             if($array['status']==200){
@@ -144,6 +155,15 @@ class VoucherController extends ShopController
             if ($voutype['data']['count'] <= $voutype['data']['send_count']) {
                 return result(500, "该优惠券已到达上限！");
             }
+            //新人红包只能新人领取
+            if ($voutype['data']['type'] == 2){
+                $orderModel = new OrderModel();
+                $sql = "select count(id)as num from shop_order_group where (status >2 or status =1) and  user_id = {$params['user_id']}";
+                $is_recruits = $orderModel->querySql($sql);
+                if ($is_recruits[0]['num'] != 0) {
+                    return result(500, "您不是新用户，无法领取新用户专用优惠券！");
+                }
+            }
 
 //            if ((int)$voutype['data']['from_date1'] > time()) {
 //                return result(500, "该优惠券活动未开始");
@@ -171,6 +191,8 @@ class VoucherController extends ShopController
             $vdata['cdkey'] = $params['cdkey'];
             $vdata['type_id'] = $params['type_id'];
             $vdata['type_name'] = $voutype['data']['name'];
+            $vdata['goods_id'] = $voutype['data']['goods_id'];
+            $vdata['category_id'] = $voutype['data']['category_id'];
             $vdata['status'] = 1;
             $vdata['start_time'] = time();
             $vdata['end_time'] = ($voutype['data']['days'] * 24 * 60 * 60) + ($vdata['start_time']);
@@ -210,6 +232,7 @@ class VoucherController extends ShopController
             unset($params['key']);
             $params['status'] = 1;
             $params['collection_type'] = 1;
+            $params['(type!=3 and type!=9)'] = null;
             $time = time();
             $params["from_date<={$time}"] = null;
             $params["to_date>={$time}"] = null;
@@ -291,10 +314,10 @@ class VoucherController extends ShopController
             }
             $params['`key`'] = yii::$app->session['key'];
             $params['merchant_id'] = yii::$app->session['merchant_id'];
-            $sql = "select * from shop_order_group  where  delete_time is null and `status` in (1,3,5,6,7) and merchant_id = {$params['merchant_id']} and `key` = '{$params['`key`']}' and order_sn = '{$params['order_sn']}'";
+            $sql = "select * from shop_order_group  where  delete_time is null and `status` = 1 and merchant_id = {$params['merchant_id']} and `key` = '{$params['`key`']}' and transaction_order_sn = '{$params['order_sn']}'";
             $info = $orderModel->querySql($sql);
             if (empty($info)) {
-                return result(500, "当前订单已不能发送运气红包");
+                return result(204, "当前订单已不能发送运气红包");
             }
             //检测运气红包类型券是否有效
             $voucherTypeModel = new VoucherTypeModel();
@@ -307,7 +330,7 @@ class VoucherController extends ShopController
             $typeWhere["to_date>={$time}"] = null;
             $typeInfo = $voucherTypeModel->finds($typeWhere);
             if ($typeInfo['status'] != 200) {
-                return result(500, "运气红包数据错误");
+                return result(204, "运气红包数据错误");
             }
             //查询已领取量
             $voucherModel = new VoucherModel();
@@ -335,10 +358,10 @@ class VoucherController extends ShopController
                 $luckWhere['lucky_number'] = rand(3, 10);
                 $res = $luckyModel->add($luckWhere);
                 if ($res['status'] == 200) {
-                    return result(200, "分享成功");
+                    return result(200, "分享成功","http://" . $_SERVER['HTTP_HOST'] . "/api/web/uploads/yqhb.png" );
                 }
             }else{
-                return result(200, "分享成功");
+                return result(200, "分享成功","http://" . $_SERVER['HTTP_HOST'] . "/api/web/uploads/yqhb.png");
             }
             return result(200, "分享失败");
         } else {
@@ -379,7 +402,7 @@ class VoucherController extends ShopController
                 foreach ($list as $key => &$val) {
                     $user_info = $userModel->find(['id' => $val['user_id']]);
                     $val['nickname'] = '';
-                    $vdata['avatar'] = '';
+                    $val['avatar'] = '';
                     if ($user_info['status'] == 200) {
                         $val['nickname'] = $user_info['data']['nickname'];
                         $val['avatar'] = $user_info['data']['avatar'];
@@ -443,7 +466,7 @@ class VoucherController extends ShopController
             $vdata['type_id'] = $typeInfo['data'][0]['id'];
             $vdata['type_name'] = $typeInfo['data'][0]['name'];
             $vdata['status'] = 1;
-            $vdata['start_time'] = time();
+            $vdata['start_time'] = $typeInfo['data'][0]['from_date'];
             $vdata['end_time'] = ($typeInfo['data'][0]['days'] * 24 * 60 * 60) + ($vdata['start_time']);
             $vdata['is_exchange'] = 0;
             $vdata['merchant_id'] = $typeWhere['merchant_id'];

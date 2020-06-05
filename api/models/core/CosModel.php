@@ -9,6 +9,7 @@
 namespace app\models\core;
 
 use app\models\admin\system\SystemCosModel;
+use app\models\system\SystemPicServerModel;
 use Qcloud\Cos\Client;
 use Yii;
 
@@ -51,18 +52,22 @@ class CosModel {
                 return result(500,'未配置cos信息');
             }
             $cosClient = new Client(array(
-                    'region' => 'cn-south',
-                    'credentials' => array('appId' => $cos['data'][0]['appId'], 'secretId' =>$cos['data'][0]['secretId'], 'secretKey' => $cos['data'][0]['secretKey'], 'token' => $cos['data'][0]['token']))
+                    'region' => $cos['data']['config']['region'],
+                    'credentials' => array(
+                        'appId' => $cos['data']['config']['appId'],
+                        'secretId' =>$cos['data']['config']['secretId'],
+                        'secretKey' => $cos['data']['config']['secretKey']
+                    ))
             );
             $url = substr($res, 10);
             try {
                 $args = array(
-                    'Bucket' => $cos['data'][0]['Bucket'],
+                    'Bucket' => $cos['data']['config']['Bucket'],
                     'Key' => $url,
                     'Body' => fopen(Yii::getAlias('@webroot/') . $res, 'rb'),
                 );
                 $result = $this->object2array($cosClient->putObject($args));
-                $url = str_replace('http://juanpao999-1255754174.cos.cn-south.myqcloud.com', 'https://imgs.juanpao.com', $result['ObjectURL']);
+                $url =  $result['ObjectURL'];
                 return [
                     'status' => '200',
                     'data' => $url,
@@ -88,12 +93,16 @@ class CosModel {
                  return result(500,'未配置cos信息');
              }
             $cosClient = new Client(array(
-                'region' => 'cn-south',
+                'region' => $cos['data']['config']['region'],
                 'timeout' => '',
-                'credentials' => array('appId' => $cos['data'][0]['appId'], 'secretId' =>$cos['data'][0]['secretId'], 'secretKey' => $cos['data'][0]['secretKey'], 'token' => $cos['data'][0]['token']))
+                'credentials' => array(
+                    'appId' => $cos['data']['config']['appId'],
+                    'secretId' =>$cos['data']['config']['secretId'],
+                    'secretKey' => $cos['data']['config']['secretKey']
+                ))
             );
             //  bucket的命名规则为{name}-{appid} ，此处填写的存储桶名称必须为此格式
-            $result = $cosClient->deleteObject(array('Bucket' => 'juanpao999-1255754174', 'Key' => $key));
+            $result = $cosClient->deleteObject(array('Bucket' => $cos['data']['config']['Bucket'], 'Key' => $key));
             $this->object2array($result);
             return json_encode([
                 'status' => '200',
@@ -104,10 +113,15 @@ class CosModel {
         }
     }
 
-     function cos(){
-        $cosModel = new SystemCosModel();
-        $cos  = $cosModel->do_select([]);
-         return $cos;
+    function cos(){
+        $model = new SystemPicServerModel();
+        $where['type'] = 1; //1为腾讯云
+        $where['status'] = 1;
+        $cos  = $model->do_one($where);
+        if ($cos['status'] == 200){
+            $cos['data']['config'] = json_decode($cos['data']['config'],true);
+        }
+        return $cos;
     }
 
 }

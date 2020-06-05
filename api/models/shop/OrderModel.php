@@ -296,7 +296,7 @@ class OrderModel extends TableModel
             if ($params['leader_uid'] != "") {
                 $params['shop_order_group.leader_uid'] = $params['leader_uid'];
             }
-            unset($params['after_sale']);
+            unset($params['leader_uid']);
         }
         $data = $table->tableList($params);
         $orders = $data['app'];
@@ -452,14 +452,14 @@ class OrderModel extends TableModel
     public function findSuborder($params)
     {
         //数据库操作
-        try {
+
             $table = new TableModel();
             $params['shop_order.delete_time is null'] = null;
             $params['fields'] = " shop_order.* ";
             $params['table'] = 'shop_order';
             $res = $table->tableList($params);
             $app = $res['app'];
-        } catch (Exception $ex) {
+        try {} catch (Exception $ex) {
             return result(500, '数据库操作失败');
         }
         //返回数据 时间格式重置
@@ -994,6 +994,7 @@ class OrderModel extends TableModel
             $params['after_sale'] = -1; //主订单需要修改的退款状态，改完后删除
             $table = new TableModel();
             $table->tableUpdate($this->table, $params, $where);
+            unset($params['send_express_type']);
             unset($params['supplier_id']);
             unset($params['status']);
             unset($params['after_sale']);
@@ -1166,6 +1167,8 @@ class OrderModel extends TableModel
                 $params["shop_order_group.name like '%{$name}%'"] = null;
             } else if ($params['type'] == 4) {
                 $params['shop_order_group.phone'] = trim($params['type_value']);
+            } else if ($params['type'] == 5) {
+                $params['shop_order_group.leader_uid'] = trim($params['type_value']);
             }
             unset($params['type_value']);
             unset($params['type']);
@@ -1251,6 +1254,7 @@ class OrderModel extends TableModel
                         $res[$j]['address'] = $app[$i]['address'];
                         $res[$j]['phone'] = $app[$i]['phone'];
                         $res[$j]['name'] = $app[$i]['name'];
+                        $res[$j]['leader_uid'] = $app[$i]['leader_uid'];
                         $res[$j]['after_sale'] = $app[$i]['after_sale'];
                         $res[$j]['after_type'] = $app[$i]['after_type'];
                         $res[$j]['after_phone'] = $app[$i]['after_phone'];
@@ -1373,15 +1377,8 @@ class OrderModel extends TableModel
             $sql = "select id,avatar from shop_user where id = {$app[$i]['user_id']}";
             $avatar = $table->querySql($sql);
             $app[$i]['avatar'] = $avatar[0]['avatar'];
-//            var_dump($type);
-//            $sql = "select sum(money)as number from shop_user_balance where order_sn = '{$app[$i]['order_sn']}' and  uid= {$app[$i]['leader_self_uid']}";
-            $sql = "";
-            if ($type == 1) {
-                $sql = "select sum(money)as number from shop_user_balance where order_sn = '{$app[$i]['order_sn']}' and  uid= {$app[$i]['leader_self_uid']} and type = 3";
+            $sql = "select sum(money)as number from shop_user_balance where order_sn = '{$app[$i]['order_sn']}' and  uid= {$app[$i]['leader_self_uid']} and  type = 1";
 
-            } else {
-                $sql = "select sum(money)as number from shop_user_balance where order_sn = '{$app[$i]['order_sn']}' and uid={$app[$i]['leader_uid']} and type= 1";
-            }
             $balace = $table->querySql($sql);
             $app[$i]['balace'] = $balace[0]['number'] == null ? 0 : $balace[0]['number'];
 

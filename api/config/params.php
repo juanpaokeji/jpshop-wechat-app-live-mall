@@ -178,7 +178,7 @@ return [
                 "proposal" => ''
             ],
             [
-                "name" => "申请供应商",
+                "name" => "申请门店",
                 "url" => "/pages/supplier/supplierbrochure/supplierbrochure",
                 "introduce" => "",
                 "proposal" => ''
@@ -207,7 +207,30 @@ return [
                 "introduce" => "",
                 "proposal" => ''
             ],
-
+            [
+                "name" => "门店列表",
+                "url" => "/supplier/list/list",
+                "introduce" => "",
+                "proposal" => ''
+            ],
+            [
+                "name" => "资质",
+                "url" => "/pages/home/qualificationDetail/qualificationDetail?key='qualifications'",
+                "introduce" => "",
+                "proposal" => ''
+            ],
+            [
+                "name" => "隐私政策",
+                "url" => "/pages/home/qualificationDetail/qualificationDetail?key='privacy_policy'",
+                "introduce" => "",
+                "proposal" => ''
+            ],
+            [
+                "name" => "用户协议",
+                "url" => "/pages/home/qualificationDetail/qualificationDetail?key='user_protocol'",
+                "introduce" => "",
+                "proposal" => ''
+            ],
 
         ],
         'type_link' => "/pages/goodsClassify/goodsClassify/goodsClassify",

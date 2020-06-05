@@ -7,8 +7,10 @@ use yii;
 use yii\web\MerchantController;
 use yii\db\Exception;
 use app\models\shop\BalanceModel;
+use EasyWeChat\Factory;
 
-class BalanceController extends MerchantController {
+class BalanceController extends MerchantController
+{
 
     public $enableCsrfValidation = false; //禁用CSRF令牌验证，可以在基类中设置
 
@@ -22,7 +24,8 @@ class BalanceController extends MerchantController {
 //        ];
 //    }
 
-    public function actionList() {
+    public function actionList()
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
@@ -43,10 +46,8 @@ class BalanceController extends MerchantController {
                 $data['limit'] = $params['limit'];
             }
             if ($params['type'] == 1) {
-
-
                 $data['field'] = "shop_user_balance.*,shop_tuan_leader.realname,shop_user.phone,shop_user.avatar,shop_order_group.status as order_status ,shop_order_group.tuan_status as tuan_status ";
-                $data['<>'] = ['shop_user_balance.type', 0];
+                $data['in'] = ['shop_user_balance.type', [1, 6]];
                 $data['join'][] = ['inner join', 'shop_order_group', 'shop_order_group.order_sn = shop_user_balance.order_sn'];
                 $data['join'][] = ['inner join', 'shop_tuan_leader', 'shop_tuan_leader.uid = shop_user_balance.uid'];
                 $data['join'][] = ['inner join', 'shop_user', 'shop_user.id = shop_user_balance.uid'];
@@ -114,7 +115,7 @@ class BalanceController extends MerchantController {
             $array = $model->do_select($data);
             if ($array['status'] == 200) {
                 for ($i = 0; $i < count($array['data']); $i++) {
-                    $array['data'][$i]['confirm_time'] = date('Y-m-d H:i:s', $array['data'][$i]['confirm_time']);
+                    $array['data'][$i]['confirm_time'] = $array['data'][$i]['confirm_time'] == "" ? "" : date('Y-m-d H:i:s', $array['data'][$i]['confirm_time']);
                     $array['data'][$i]['format_create_time'] = date('Y-m-d H:i:s', $array['data'][$i]['create_time']);
                 }
             }
@@ -124,25 +125,40 @@ class BalanceController extends MerchantController {
         }
     }
 
-    public function actionAudit($id) {
+    public function actionAudit($id)
+    {
         if (yii::$app->request->isPut) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
 
             $model = new BalanceModel();
+
             if ($params['status'] == 1) {
                 $where['id'] = $id;
                 $where['merchant_id'] = yii::$app->session['uid'];
                 $where['key'] = $params['key'];
                 $data['status'] = 1;
-                $array = $model->do_update($where, $data);
-
+                $data['confirm_time'] = time();
                 $res = $model->do_one(['id' => $id]);
                 if ($res['data']['send_type'] == 1) {
-                    $this->weixin($res['uid'], $params['key'], $res['remain_money'], $res['balance_sn']);
+                    if ($params['type'] == 1) {
+                        $res = $this->weixin($res['data']['uid'], $params['key'], $res['data']['remain_money'], $res['data']['balance_sn']);
+                        if ($res['return_code'] == "SUCCESS") {
+                            unset($params['type']);
+                            $array = $model->do_update($where, $data);
+                        } else {
+                            return result(500, '提现失败');
+                        }
+                    } else {
+
+                        unset($params['type']);
+                        $array = $model->do_update($where, $data);
+                    }
+                } else {
+
+                    $array = $model->do_update($where, $data);
                 }
 
-                //withdraw_fee_ratio
             } else {
                 $balance = $model->do_one(['id' => $id, 'merchant_id' => yii::$app->session['uid'], 'key' => $params['key']]);
                 $userModel = new \app\models\shop\UserModel();
@@ -152,16 +168,17 @@ class BalanceController extends MerchantController {
                 $where['merchant_id'] = yii::$app->session['uid'];
                 $where['key'] = $params['key'];
                 $data['status'] = 2;
+                $data['confirm_time'] = time();
                 $array = $model->do_update($where, $data);
             }
-            if ($array['status'] == 200){
+            if ($array['status'] == 200) {
                 //添加操作记录
                 $operationRecordModel = new OperationRecordModel();
                 $operationRecordData['key'] = $params['key'];
                 $operationRecordData['merchant_id'] = yii::$app->session['uid'];
                 $operationRecordData['operation_type'] = '更新';
                 $operationRecordData['operation_id'] = $id;
-                $operationRecordData['module_name'] = '佣金体现申请';
+                $operationRecordData['module_name'] = '佣金提现申请';
                 $operationRecordModel->do_add($operationRecordData);
             }
             return $array;
@@ -170,19 +187,21 @@ class BalanceController extends MerchantController {
         }
     }
 
-    public function weixin($uid, $key, $money, $balance_sn) {
+    public function weixin($uid, $key, $money, $balance_sn)
+    {
         $config = $this->getSystemConfig($key, "miniprogrampay", 1);
         $userModel = new \app\models\shop\UserModel();
         $user = $userModel->find(['id' => $uid]);
         $app = Factory::payment($config);
-        $app->transfer->toBalance([
+        $res = $app->transfer->toBalance([
             'partner_trade_no' => $balance_sn, // 商户订单号，需保持唯一性(只能是字母或者数字，不能包含有符号)
-            'openid' => $user['data']['nimi_open_id'],
+            'openid' => $user['data']['mini_open_id'],
             'check_name' => 'NO_CHECK', // NO_CHECK：不校验真实姓名, FORCE_CHECK：强校验真实姓名
             're_user_name' => '', // 如果 check_name 设置为FORCE_CHECK，则必填用户真实姓名
             'amount' => $money * 100, // 企业付款金额，单位为分
             'desc' => '余额提现', // 企业付款操作说明信息。必填
         ]);
+        return $res;
     }
 
 //    public function actionPay($id) {

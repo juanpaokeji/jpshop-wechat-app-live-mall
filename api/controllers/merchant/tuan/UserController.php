@@ -6,6 +6,8 @@ use app\models\merchant\app\AppAccessModel;
 use app\models\merchant\partnerUser\PartnerUserModel;
 use app\models\merchant\system\OperationRecordModel;
 use app\models\system\SystemMerchantMiniAccessModel;
+use app\models\system\SystemMerchantMiniSubscribeTemplateAccessModel;
+use app\models\system\SystemMerchantMiniSubscribeTemplateModel;
 use app\models\tuan\UserModel;
 use yii;
 use yii\web\MerchantController;
@@ -62,12 +64,12 @@ class UserController extends MerchantController
             } else {
                 $offset = 0;
             }
-            $sql = "(select count(id) from shop_order_group where shop_order_group.leader_self_uid = shop_tuan_leader.id) as self_number,"
-                . "(select count(id) from shop_order_group where shop_order_group.leader_uid = shop_tuan_leader.id) as number, "
-                . "(select sum(money) from shop_user_balance where shop_user_balance.uid = shop_tuan_leader.uid and status =1 and shop_user_balance.type != 8 and shop_user_balance.type != 7) as sum_money, "
+            $sql = "(select count(id) from shop_order_group where shop_order_group.leader_self_uid = shop_tuan_leader.uid and (shop_order_group.status=6 or shop_order_group.status =7) ) as self_number,"
+                . "(select count(id) from shop_order_group where shop_order_group.leader_uid = shop_tuan_leader.uid and (shop_order_group.status=6 or shop_order_group.status =7)) as number, "
+                . "(select sum(money) from shop_user_balance where shop_user_balance.uid = shop_tuan_leader.uid and (shop_user_balance.type = 6 and shop_user_balance.type =1) ) as sum_money, "
                 . "(select sum(money) from shop_user_balance where shop_user_balance.uid = shop_tuan_leader.uid and status =0) as on_money,";
 
-            $query = $query->select("shop_tuan_leader.*,shop_user.phone,shop_user.nickname,shop_user.balance as user_balance," . $sql)->leftJoin('shop_user', 'shop_tuan_leader.uid = shop_user.id')->orderBy('shop_tuan_leader.id desc')->limit($limit)->offset($offset);
+            $query = $query->select("shop_tuan_leader.*,shop_user.nickname,shop_user.balance as user_balance,shop_leader_level.name as level_name," . $sql)->leftJoin('shop_user', 'shop_tuan_leader.uid = shop_user.id')->leftJoin('shop_leader_level', 'shop_user.leader_level = shop_leader_level.id')->orderBy('shop_tuan_leader.id desc');
 
 
             if (isset($params['searchName'])) {
@@ -102,6 +104,7 @@ class UserController extends MerchantController
                     $query->andWhere(['shop_tuan_leader.status' => 0]);
                 }
             }
+            $query->andWhere(['shop_tuan_leader.supplier_id' => 0]);
             if (isset($params['audit_time'])) {
                 $time = explode("to", $params['audit_time']);
                 $start_time = strtotime(trim($time[0] . " 00:00:00"));
@@ -134,16 +137,10 @@ class UserController extends MerchantController
                 $query->andWhere(['or',['warehouse_id' => $params['warehouse_id']],['warehouse_id' =>$params['warehouse_id1']]]);
             }
 
-
+            $count = $query->limit("")->all();
             //$query->andWhere(['or', ['like', 'realname', $params['searchName']], ['=', 'phone', $params['searchName']], ['like', 'nickname', $params['searchName']]]);
             $query->limit($limit)->offset($offset);
             $res = $query->all();
-           //  print_r($query->createCommand()->getRawSql());die();
-////
-            //   die();
-
-            $count = $query->limit("")->all();
-
             if (!empty($res)) {
                 $array['status'] = 200;
                 $array['message'] = "请求成功";
@@ -206,7 +203,7 @@ class UserController extends MerchantController
                     }
                     for ($j = 0; $j < count($user['data']); $j++) {
                         if ($array['data'][$i]['uid'] == $user['data'][$j]['id']) {
-                            $array['data'][$i]['phone'] = $user['data'][$j]['phone'];
+                          //  $array['data'][$i]['phone'] = $user['data'][$j]['phone'];
                             $array['data'][$i]['nickname'] = $user['data'][$j]['nickname'];
                             $array['data'][$i]['avatar'] = $user['data'][$j]['avatar'];
 
@@ -278,7 +275,7 @@ class UserController extends MerchantController
 
                 for ($j = 0; $j < count($user['data']); $j++) {
                     if ($array['data']['uid'] == $user['data'][$j]['id']) {
-                        $array['data']['phone'] = $user['data'][$j]['phone'];
+                      //  $array['data']['phone'] = $user['data'][$j]['phone'];
                         $array['data']['nickname'] = $user['data'][$j]['nickname'];
                         $array['data']['avatar'] = $user['data'][$j]['avatar'];
 
@@ -440,6 +437,37 @@ class UserController extends MerchantController
                         'status' => '-1',
                     );
                     $tempAccess->do_add($taData);
+
+                    $appModle = new AppAccessModel();
+                    $array = $appModle->find(['`key`'=>$params['key']]);
+                    if ($array['status'] != 200){
+                        return result(500, "未查到应用信息");
+                    }
+                    //订阅消息
+                    $subscribeTempModel = new SystemMerchantMiniSubscribeTemplateModel();
+                    $subscribeTempInfo = $subscribeTempModel->do_one(['template_purpose'=>'check']);
+                    if ($subscribeTempInfo['status'] == 200){
+                        $accessParams = array(
+                            'thing1' => ['value'=>$array['data']['name']],  //商户名称
+                            'thing2' => ['value'=>'申请成为团长'],  //申请事项
+                            'phrase3' => ['value'=>'审核通过'],  //审核状态
+                            'date8' => ['value'=>date('Y-m-d h:i:s',time())],    //操作时间
+                            'thing5' => ['value'=>'通过'],   //备注(目前审核团长没有备注给个默认值)
+                        );
+                        $subscribeTempAccessModel = new SystemMerchantMiniSubscribeTemplateAccessModel();
+                        $subscribeTempAccessData = array(
+                            'key' => $leader_info['data']['key'],
+                            'merchant_id' => $leader_info['data']['merchant_id'],
+                            'mini_open_id' => $shopUser['data']['mini_open_id'],
+                            'template_id' => $subscribeTempInfo['data']['template_id'],
+                            'number' => '0',
+                            'template_params' => json_encode($accessParams, JSON_UNESCAPED_UNICODE),
+                            'template_purpose' => 'check',
+                            'page' => "/pages/home/my/my",
+                            'status' => '-1',
+                        );
+                        $subscribeTempAccessModel->do_add($subscribeTempAccessData);
+                    }
 
                     //添加操作记录
                     $operationRecordModel = new OperationRecordModel();

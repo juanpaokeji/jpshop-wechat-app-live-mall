@@ -39,6 +39,7 @@ class TemplateController extends MerchantController
 //            $params['shop_express.`key`'] = $params['key'];
 //            unset($params['key']);
             $params['merchant_id'] = yii::$app->session['uid'];
+            $params['supplier_id'] = 0;
             // $params['fields'] ="";
             $array = $model->findall($params);
             return $array;

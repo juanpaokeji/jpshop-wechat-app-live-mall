@@ -40,6 +40,7 @@ class CategoryController extends MerchantController {
             }
             $params['merchant_id'] = yii::$app->session['uid'];
             $params['parent_id'] = 0;
+            $params['supplier_id'] = 0;
             $res = $model->findall($params);
             unset($params['parent_id']);
             $params['parent_id !=0'] = null;
@@ -70,7 +71,7 @@ class CategoryController extends MerchantController {
             }
 
 
-            return ['status' => 200, 'message' => '请求成功', 'data' => $data, 'count' => count($data)];
+            return ['status' => 200, 'message' => '请求成功', 'data' => $data, 'count' => (int)$res['count']];
         } else {
             return result(500, "请求方式错误");
         }
@@ -102,6 +103,10 @@ class CategoryController extends MerchantController {
             $data['`key`'] = $params['key'];
             $data['fields'] = " id,name ";
             $data['parent_id'] = 0;
+            //由于此接口需要过滤门店分组，所以添加判断是否传参中包含门店id，为了向前兼容，所以判断如果包含再添加查询条件
+            if (isset($params['supplier_id'])) {
+                $data['supplier_id'] = $params['supplier_id'];
+            }
             $array = $category->finds($data);
             return $array;
         } else {
@@ -211,39 +216,10 @@ class CategoryController extends MerchantController {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
             $model = new MerchantCategoryModel();
-            $base = new Base64Model();
             $params['id'] = $id;
             $params['`key`'] = $params['key'];
             unset($params['key']);
             $params['merchant_id'] = yii::$app->session['uid'];
-//            if ($params['pic_url'] != "") {
-//                $params['pic_url'] = $base->base64_image_content($params['pic_url'], "./uploads/admin/shop/category");
-//                $cos = new CosModel();
-//                $cosRes = $cos->putObject($params['pic_url']);
-//                if ($cosRes['status'] == '200') {
-//                    $url = $cosRes['data'];
-//                } else {
-//                    unlink(Yii::getAlias('@webroot/') . $params['pic_url']);
-//                    return json_encode($cosRes, JSON_UNESCAPED_UNICODE);
-//                }
-//                $params['pic_url'] = $url;
-//            } else {
-//                unset($params['pic_url']);
-//            }
-//            if ($params['img_url'] != "") {
-//                $params['img_url'] = $base->base64_image_content($params['img_url'], "./uploads/admin/shop/category");
-//                $cos = new CosModel();
-//                $cosRes = $cos->putObject($params['img_url']);
-//                if ($cosRes['status'] == '200') {
-//                    $url = $cosRes['data'];
-//                } else {
-//                    unlink(Yii::getAlias('@webroot/') . $params['img_url']);
-//                    return json_encode($cosRes, JSON_UNESCAPED_UNICODE);
-//                }
-//                $params['img_url'] = $url;
-//            } else {
-//                unset($params['img_url']);
-//            }
             if (!isset($params['id'])) {
                 return result(400, "缺少参数 id");
             } else {
@@ -406,7 +382,11 @@ class CategoryController extends MerchantController {
             $data['parent_id'] = 0;
             $data['`key`'] = $params['key'];
             unset($params['key']);
-            $params['merchant_id'] = yii::$app->session['uid'];
+            if (isset($params['supplier_id'])) {
+                $data['supplier_id'] = $params['supplier_id'];
+            }else{
+                $data['merchant_id'] = yii::$app->session['uid'];
+            }
             $array = $model->finds($data);
             if ($array['status'] != 200) {
                 return result(204, "查询失败");

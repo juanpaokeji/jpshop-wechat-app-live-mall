@@ -18,11 +18,13 @@ use app\models\shop\CartModel;
  * @throws Exception if the model cannot be found
  * @return array
  */
-class CartController extends ShopController {
+class CartController extends ShopController
+{
 
     public $enableCsrfValidation = false; //禁用CSRF令牌验证，可以在基类中设置
 
-    public function actionList() {
+    public function actionList()
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
@@ -68,13 +70,14 @@ class CartController extends ShopController {
 //                $data = array_values($data);
             }
             return $array;
-         //   return result(200,'请求成功',$array);
+            //   return result(200,'请求成功',$array);
         } else {
             return result(500, "请求方式错误");
         }
     }
 
-    public function actionCart() {
+    public function actionCart()
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
@@ -99,41 +102,26 @@ class CartController extends ShopController {
                     }
                 }
 
-                $subAdminModel = new UserModel();
-                $subadmin = $subAdminModel->more(['`key`'=>yii::$app->session['key'],'merchant_id'=>yii::$app->session['merchant_id'],'type'=>1]);
-
                 $leaderModel = new LeaderModel();
-                $leader = $leaderModel->do_select(['key'=>yii::$app->session['key'],'merchant_id'=>yii::$app->session['merchant_id'],'<>'=>['supplier_id',0]]);
+                $leader = $leaderModel->do_select(['key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['merchant_id'], '<>' => ['supplier_id', 0]]);
 
 
                 $app = new AppAccessModel();
-                $apps = $app->find(['`key`'=>yii::$app->session['key']]);
+                $apps = $app->find(['`key`' => yii::$app->session['key']]);
 
                 $data = array();
                 $len = count($array['data']);
-                for ($i = 0; $i<$len;$i++) {
-                    if($array['data'][$i]['supplier_id']==0){
+                for ($i = 0; $i < $len; $i++) {
+                    if ($array['data'][$i]['supplier_id'] == 0) {
                         $array['data'][$i]['supplier_name'] = $apps['data']['name'];
                         $data['0'][] = $array['data'][$i];
                         unset($array['data'][$i]);
-                    }else{
+                    } else {
                         $str = $array['data'][$i]['supplier_id'];
-//                        if($subadmin['status']==200){
-//                            for($j=0;$j<count($subadmin['data']);$j++){
-//                               // $data[$str]['supplier'] = $subadmin['data'][$i];
-//                                if($leader['status']==200){
-//
-//                                } for($k=0;$k<count($leader['data']);$k++){
-//                                    if($leader['data'][$k]['supplier_id']==$str){
-//                                        $data[$str]['supplier_name'] = $leader['data'][$k]['realname'];
-//                                    }
-//                                }
-//                            }
-//                        }
-                        for($k=0;$k<count($leader['data']);$k++){
-                                    if($leader['data'][$k]['supplier_id']==$str){
-                                        $array['data'][$i]['supplier_name'] = $leader['data'][$k]['realname'];
-                                    }
+                        for ($k = 0; $k < count($leader['data']); $k++) {
+                            if ($leader['data'][$k]['supplier_id'] == $str) {
+                                $array['data'][$i]['supplier_name'] = $leader['data'][$k]['realname'];
+                            }
                         }
 
                         $data[$str][] = $array['data'][$i];
@@ -141,11 +129,11 @@ class CartController extends ShopController {
                 }
 
                 $data = array_values($data);
-                return result(200,'请求成功',$data);
-            }else if($array['status'] == 204){
-            	return $array;
-            }else{
-                return result(500,'请求失败');
+                return result(200, '请求成功', $data);
+            } else if ($array['status'] == 204) {
+                return $array;
+            } else {
+                return result(500, '请求失败');
             }
 
         } else {
@@ -155,9 +143,10 @@ class CartController extends ShopController {
 
 
     //秒杀商品属性
-    public function flash($goods_id) {
+    public function flash($goods_id)
+    {
         $time = time();
-        $sql = "SELECT * FROM `shop_flash_sale_group` where FIND_IN_SET({$goods_id},goods_ids) and start_time <={$time} and end_time >={$time};";
+        $sql = "SELECT * FROM `shop_flash_sale_group` where FIND_IN_SET({$goods_id},goods_ids) and start_time <={$time} and end_time >={$time} and delete_time is null;";
         $res = yii::$app->db->createCommand($sql)->queryAll();
 
         if (count($res) == 0) {
@@ -173,7 +162,8 @@ class CartController extends ShopController {
         }
     }
 
-    public function actionAdd() {
+    public function actionAdd()
+    {
         if (yii::$app->request->isPost) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
@@ -195,22 +185,30 @@ class CartController extends ShopController {
                 return $stock;
             }
             $goodsModel = new GoodsModel();
-            $goodsinfo = $goodsModel->find(['id'=>$params['goods_id']]);
+            $goodsinfo = $goodsModel->find(['id' => $params['goods_id']]);
+
+            if ($goodsinfo['status'] == 200 && $goodsinfo['data']['is_cart'] == 0){
+                return result(500, "此商品不能添加购物车！");
+            }
+
             //检测当前商品是否是拼团商品
-            if($goodsinfo['status'] == 200 && $goodsinfo['data']['is_open_assemble'] == 1){
+            if ($goodsinfo['status'] == 200 && $goodsinfo['data']['is_open_assemble'] == 1) {
                 $groupModel = new ShopAssembleModel();
                 $where['key'] = yii::$app->session['key'];
                 $where['merchant_id'] = yii::$app->session['merchant_id'];
                 $where['goods_id'] = $params['goods_id'];
                 $where['status'] = 1;
                 $groupInfo = $groupModel->one($where);
-                if($groupInfo['status'] == 200){
+                if ($groupInfo['status'] == 200) {
                     return result(500, "此商品是拼团商品不能添加购物车呦！");
                 }
             }
-            //检测商品是否是服务商品
-            if($goodsinfo['status'] == 200 && $goodsinfo['data']['type'] == 3){
+            //检测商品是否是服务商品、下架商品不能加入购物车
+            if ($goodsinfo['status'] == 200 && ($goodsinfo['data']['type'] == 3 || $goodsinfo['data']['status'] == 0)) {
                 return result(500, "此商品是服务商品不能添加购物车呦！");
+            }
+            if($goodsinfo['status']==200&&$goodsinfo['data']['is_cart'] == 0){
+                return result(500, "此商品不能添加购物车呦！");
             }
             $params['total_price'] = $stock['data']['price'] * $params['number'];
             $params['pic_url'] = $stock['data']['pic_url'];
@@ -240,7 +238,8 @@ class CartController extends ShopController {
         }
     }
 
-    public function actionUpdate($id) {
+    public function actionUpdate($id)
+    {
         if (yii::$app->request->isPut) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
@@ -260,7 +259,8 @@ class CartController extends ShopController {
         }
     }
 
-    public function actionDelete() {
+    public function actionDelete()
+    {
         if (yii::$app->request->isDelete) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参、

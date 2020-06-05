@@ -218,7 +218,10 @@ $config = [
                 'GET merchantTheme' => 'merchant/system/theme/single', //主题单条
                 'GET merchantThemeLink' => 'merchant/system/theme/link', //主题链接
                 'PUT merchantTheme' => 'merchant/system/theme/update', //主题更新
-                'GET merchantCopyright' => 'merchant/system/theme/copyright', //查询自定义版权状态
+                //自定义版权
+                'GET merchantCopyright' => 'merchant/plugin/copyright/single', //查询自定义版权状态
+                'POST merchantCopyright' => 'merchant/plugin/copyright/add',
+
                 //商户注册
                 'GET merchantsSmsCode' => 'merchant/user/user/sms', //获取验证码
                 'POST merchantRegister' => 'merchant/user/user/register', //注册
@@ -234,7 +237,8 @@ $config = [
                 'PUT merchantAppInfo/<id>' => 'merchant/app/access/update', //APP应用类目更新
                 'PUT merchantAppInfos/<id>' => 'merchant/app/access/updates', //满减活动更新
 
-                'GET merchantPlugin'=>'merchant/app/access/plugin', //APP应用类目单条
+                'GET merchantPlugin' => 'merchant/app/access/plugin', //APP应用类目单条
+                'GET merchantCopyrightInfo' => 'merchant/app/access/copyright',
 
                 //商户帮助中心
                 'GET merchantAppHelp' => 'merchant/system/app-help/list', //模板订单列表
@@ -359,11 +363,8 @@ $config = [
                 'PUT adminCos/<id>' => 'admin/system/cos/update',
                 'DELETE adminCos/<id>' => 'admin/system/cos/delete',
 
-                'GET adminSms' => 'admin/system/sms/list',
-                'GET adminSms/<id>' => 'admin/system/sms/single',
-                'POST adminSms' => 'admin/system/sms/add',
-                'PUT adminSms/<id>' => 'admin/system/sms/update',
-                'DELETE adminSms/<id>' => 'admin/system/sms/delete',
+                'GET adminSms' => 'merchant/system/sms/list',//短信配置查询
+                'POST adminSms' => 'merchant/system/sms/add', //短信配置添加、更新
 
                 'GET adminVideo' => 'admin/system/video/list',
                 'GET adminVideo/<id>' => 'admin/system/video/single',
@@ -396,7 +397,6 @@ $config = [
                 'POST merchantSubUser' => 'merchant/system/user/add', //员工更新
                 'PUT merchantSubUser/<id>' => 'merchant/system/user/update', //员工更新
                 'DELETE merchantSubUser/<id>' => 'merchant/system/user/delete', //员工删除
-                'PUT merchantYly/<id>' => 'merchant/system/user/ylyupdate', //门店易联云配置更新
                 //应用菜单列表
                 'GET merchantMenu' => 'merchant/system/menu/list', //菜单列表
                 'GET merchantSubMenu' => 'merchant/system/menu/menu', //菜单列表
@@ -432,17 +432,27 @@ $config = [
                 'GET merchantGoods' => 'merchant/shop/goods/list', //商品列表
                 'GET merchantGoodsQCode/<id>' => 'merchant/shop/goods/qcode', //商品列表
                 'GET merchantGoods/<id>' => 'merchant/shop/goods/single', //商品单条
+                'GET merchantIsUpdate/<id>' => 'merchant/shop/goods/goods-bool', //商品单条
                 'POST merchantGoods' => 'merchant/shop/goods/add', //商品新增
                 'POST merchantGoodsImg' => 'merchant/shop/goods/uploads', //商品图片上传
                 'POST merchantGoodsImgInfo' => 'merchant/shop/goods/uploadsinfo', //商品图片上传
                 'POST merchantGoodsVideo' => 'merchant/shop/goods/upload-vod', //商品视频图片上传
                 'PUT merchantGoods/<id>' => 'merchant/shop/goods/update', //商品更新
-                'PUT merchantGood/<id>' => 'merchant/shop/goods/updates', //商品更新
+                'PUT merchantGood/<id>' => 'merchant/shop/goods/updates', //商品修改上下架、排序
                 'DELETE merchantGoods/<id>' => 'merchant/shop/goods/delete', //商品删除
                 'GET merchantGoodsRecycle' => 'merchant/shop/goods/recycle', //回收商品
                 'PUT merchantGoodReduction/<id>' => 'merchant/shop/goods/reduction', //恢复商品
                 'PUT merchantGoodAudit/<id>' => 'merchant/shop/goods/audit', //供应商商品审核，填写售价
                 'GET merchantStock' => 'merchant/shop/goods/stock', //供应商商品审核，填写售价
+                'GET merchantGoodsName' => 'merchant/shop/goods/goods-name', //商品列表
+
+                //商品标签
+                'GET merchantGoodsLabel' => 'merchant/shop/goods-label/list', //商品标签列表
+                'GET merchantGoodsLabel/<id>' => 'merchant/shop/goods-label/single', //商品标签单条
+                'POST merchantGoodsLabel' => 'merchant/shop/goods-label/add', //商品标签新增
+                'PUT merchantGoodsLabel/<id>' => 'merchant/shop/goods-label/update', //商品标签更新
+                'DELETE merchantGoodsLabel/<id>' => 'merchant/shop/goods-label/delete', //商品标签删除
+
 //
 //商城后台订单
                 'GET merchantOrderSummary' => 'merchant/shop/order/summary', //订单概述
@@ -462,7 +472,7 @@ $config = [
                 'PUT merchantLeaderGoods/<id>' => 'merchant/tuan/user/goods', //更新团长商品
 
                 'PUT merchantOrderConfim' => 'merchant/tuan/user/goods', //更新团长商品
-
+                'DELETE merchantDelOrder' => 'merchant/shop/order/del-order', //删除已取消订单
 
 //订单状态个性化更新
 //                'PUT merchantOrderRefuse/<id>' => 'merchant/shop/order/refuse', //确认拒绝操作
@@ -556,6 +566,7 @@ $config = [
                 'GET shopUserCode' => 'shop/user/usercode', //用户二维码
                 'POST shopUserPayment' => 'shop/user/payment',
                 'GET shopUserPayment' => 'shop/user/payment-list', //用户付款记录
+                'GET shopUserOrder' => 'shop/user/user-order', //用户订单
 
                 //
 //商城签到
@@ -576,6 +587,7 @@ $config = [
                 'DELETE shopContact/<id>' => 'shop/contact/delete',
                 //根据收货地址获取快递费
                 'GET shopKdf/<id>' => 'shop/contact/kdf',
+                'GET shopSkdf/<id>' => 'shop/contact/skdf', //门店获取快递费
                 //商品分类
                 'GET shopCategory' => 'shop/category/list',
                 'GET shopCategory/<id>' => 'shop/category/all',
@@ -597,6 +609,7 @@ $config = [
                 'GET shopGoodsInfos' => 'shop/goods/cartinfo', //根据购物车选的商品返回详情
                 'GET shopGoodsStock/<id>' => 'shop/goods/stock', //商品库存
                 'GET shopGoodsStockProperty/<id>' => 'shop/goods/property', //商品库存属性
+
 
                 'GET merchantGoodsStock/<id>' => 'shop/goods/stock', //商品库存
                 'GET merchantGoodsStockProperty/<id>' => 'shop/goods/property', //商品库存属性
@@ -713,6 +726,7 @@ $config = [
                 'POST shopTuanUserLeader' => 'tuan/user/leader', //绑定团长
                 'GET shopTuanUserLast' => 'tuan/user/last', //最后一次团长
                 'PUT shopTuanUserLast/<id>' => 'tuan/user/update', //最后一次团长更新
+                'PUT shopTuanUserLeader/<id>' => 'tuan/user/update-tuan', //最后一次团长更新
                 'GET shopTuanSupplier' => 'tuan/user/supplier', //门店团长信息
                 'GET shopTuanMiniprogramr' => 'shop/user/miniprogram', //门店团长信息
                 //系统前台
@@ -830,25 +844,63 @@ $config = [
                 //
                 //----
                 //供应商商品
+                'GET supplierTotal' => 'supplier/shop/total/total', //商品列表
                 'GET supplierGoods' => 'supplier/goods/goods/list', //商品列表
                 'GET supplierGoods/<id>' => 'supplier/goods/goods/single', //商品单条
+                'GET supplierIsUpdate/<id>' => 'supplier/goods/goods/goods-bool', //商品单条
                 'POST supplierGoods' => 'supplier/goods/goods/add', //商品新增
                 'POST supplierGoodsImg' => 'supplier/goods/goods/uploads', //商品图片上传
                 'POST supplierGoodsImgInfo' => 'supplier/goods/goods/uploadsinfo', //商品图片上传
                 'PUT supplierGoods/<id>' => 'supplier/goods/goods/update', //商品更新
-                //'PUT supplierGoods/<id>' => 'supplier/goods/updates', //商品更新
+                'PUT supplierGood/<id>' => 'supplier/goods/goods/updates', //商品更新
                 'DELETE supplierGoods/<id>' => 'supplier/goods/goods/delete', //商品删除
-                //'GET supplierGoods' => 'supplier/goods/recycle', //回收商品
+                'GET supplierGoodsRecycle' => 'supplier/goods/goods/recycle', //回收商品
                 'PUT supplierGoodsReduction/<id>' => 'supplier/goods/goods/reduction', //恢复商品
+                'GET supplierGoodsQCode/<id>' => 'supplier/goods/goods/qcode', //商品二维码
+                'GET supplierCategoryParent' => 'supplier/goods/category/parent', //商品类目父类
+                'GET supplierShopCategory' => 'supplier/goods/category/category', //加载商品类目管理
+                'GET supplierCategory' => 'supplier/goods/category/list', //商品类目管理
+                'GET supplierCategorys' => 'supplier/goods/category/all', //商品类目管理
+                'GET supplierCategory/<id>' => 'supplier/goods/category/single', //商品类目单条
+                'POST supplierCategory' => 'supplier/goods/category/add', //商品类目增
+                'PUT supplierCategory/<id>' => 'supplier/goods/category/update', //模商品类目更新
+                'PUT supplierCategoryStatus/<id>' => 'supplier/goods/category/status', //模商品类目状态
+                'DELETE supplierCategory/<id>' => 'supplier/goods/category/delete', //商品类目删除
+                'GET supplierCategoryType' => 'supplier/goods/category/type', //商品类目整理后
                 'GET supplierCategoryTypeMini' => 'supplier/goods/category/merchanttype', //商品类目父类
+                'GET supplierCategoryTypeSub' => 'supplier/goods/category/sub', //商品类目子类
                 'GET supplierShopExpressTemplate' => 'supplier/goods/template/list', //运费模板列表
+                'GET supplierShopExpressTemplate/<id>' => 'supplier/goods/template/single', //运费模板单条
+                'POST supplierShopExpressTemplate' => 'supplier/goods/template/add', //运费模板新增
+                'PUT supplierShopExpressTemplate/<id>' => 'supplier/goods/template/update', //运费模板更新
+                'DELETE supplierShopExpressTemplate/<id>' => 'supplier/goods/template/delete', //运费模板更新
+                'PUT supplierShopExpressTemplates/<id>' => 'supplier/goods/template/updates', //运费模板启用
                 'GET supplierGoodsCityGroup' => 'supplier/goods/city/list', //城市组表列表
                 'GET supplierUserInfo' => 'supplier/goods/goods/info', //供应商信息
                 'GET supplierOrder' => 'supplier/goods/order/list', //供应商订单
                 'PUT supplierSend' => 'supplier/goods/order/send', //供应商订单
                 'GET supplierElectronics' => 'supplier/goods/electronics/list', //快递信息配置列表
-                'GET supplierYlyPrint' => 'supplier/goods/yly-print/single', //易联云小票机配置查询
-                'PUT supplierYlyPrint/<id>' => 'supplier/goods/yly-print/update', //易联云小票机配置更新
+                'POST supplierGoodsVideo' => 'supplier/goods/goods/upload-vod', //商品视频图片上传
+                'GET supplierTuanUser' => 'supplier/goods/order/tuan-user', //团长列表
+                'PUT supplierOrderLeader' => 'supplier/goods/order/leader', //订单自提点修改
+                'PUT supplierOrderRemark' => 'supplier/goods/order/remark', //更新备注
+                'PUT supplierOrderRefund/<id>' => 'supplier/goods/order/refunds', //订单售后  一键退款
+                'GET supplierSuborder' => 'supplier/goods/order/suborder', //子订单列表
+                'PUT supplierOrderAfter/<id>' => 'supplier/goods/order/refund', //订单售后状态跟新
+                'GET supplierAfterInfo' => 'supplier/goods/order/after', //售后列表
+                'PUT supplierAfterInfo' => 'supplier/goods/order/after-update', //售后列表
+                'PUT supplierUpdateInfo' => 'supplier/goods/afterinfo/update-info', //信息修改
+                'GET supplierInfo' => 'supplier/goods/afterinfo/info', //供货商信息
+                'PUT supplierInfo' => 'supplier/goods/afterinfo/update-password', //供货商信息
+
+                //商品标签
+                'GET supplierGoodsLabel' => 'supplier/shop/goods-label/list', //商品标签列表
+                'GET supplierGoodsLabel/<id>' => 'supplier/shop/goods-label/single', //商品标签单条
+                'POST supplierGoodsLabel' => 'supplier/shop/goods-label/add', //商品标签新增
+                'PUT supplierGoodsLabel/<id>' => 'supplier/shop/goods-label/update', //商品标签更新
+                'DELETE supplierGoodsLabel/<id>' => 'supplier/shop/goods-label/delete', //商品标签删除
+
+
                 //指定购物返现
                 'GET merchantCashback' => 'merchant/shop/cashback/list',
                 'GET merchantCashback/<id>' => 'merchant/shop/cashback/single',
@@ -880,6 +932,14 @@ $config = [
                 //前台秒杀
                 'GET shopFlashSale' => 'shop/flash/group',
                 'GET shopFlashSale/<id>' => 'shop/flash/single',
+
+                //预售
+                'GET merchantAdvanceSale' => 'merchant/shop/advance-sale/list',
+                'GET merchantAdvanceSaleGoods' => 'merchant/shop/advance-sale/goods',
+                'GET merchantAdvanceSale/<id>' => 'merchant/shop/advance-sale/single',
+                'POST merchantAdvanceSale' => 'merchant/shop/advance-sale/add',
+                'PUT merchantAdvanceSale/<id>' => 'merchant/shop/advance-sale/update',
+                'DELETE merchantAdvanceSale/<id>' => 'merchant/shop/advance-sale/delete',
 
                 //砍价
                 'GET shopBargainGoods' => 'shop/bargain/goods',//砍价商品
@@ -1060,13 +1120,14 @@ $config = [
                 //后台获取直播列表
                 'GET merchantLive' => 'merchant/live/live/list', //直播列表
                 'PUT merchantLive/<id>' => 'merchant/live/live/update', //直播列表
-                //商户后台仓库
-                'GET merchantWarehouse' => 'merchant/tuan/warehouse/list', //仓库列表
-                'GET merchantWarehouse/<id>' => 'merchant/tuan/warehouse/one', //仓库单条
-                'POST merchantWarehouse' => 'merchant/tuan/warehouse/add', //新增仓库
-                'PUT merchantWarehouse/<id>' => 'merchant/tuan/warehouse/update', //仓库更新
-                'DELETE merchantWarehouse/<id>' => 'merchant/tuan/warehouse/delete', //仓库删除
-                'GET merchantWarehouseleader/<id>' => 'merchant/tuan/warehouse/leader', //仓库下团长
+                //商户后台路线
+                'GET merchantWarehouse' => 'merchant/tuan/warehouse/list', //路线列表
+                'GET merchantWarehouse/<id>' => 'merchant/tuan/warehouse/one', //路线单条
+                'POST merchantWarehouse' => 'merchant/tuan/warehouse/add', //新增路线
+                'PUT merchantWarehouse/<id>' => 'merchant/tuan/warehouse/update', //路线更新
+                'DELETE merchantWarehouse/<id>' => 'merchant/tuan/warehouse/delete', //路线删除
+                'GET merchantWarehouseLeader/<id>' => 'merchant/tuan/warehouse/leader', //路线团长
+                'GET merchantWarehouseHouse/<id>' => 'merchant/tuan/warehouse/house', //路线仓库
                 //新人代金卷
                 'GET shopNewUserVoucher' => 'shop/voucher/new', //新人代金卷
                 //供应商资金明细
@@ -1116,6 +1177,12 @@ $config = [
                 'GET shopSuppliersImg' => 'shop/suppliers/img',//供应商申请海报
                 'PUT merchantSuppliers/<id>' => 'merchant/shop/suppliers/update',
                 'DELETE merchantSuppliers/<id>' => 'merchant/shop/suppliers/delete',
+
+                //供应商列表
+                'GET shopSuppliers' => 'shop/suppliers/list',
+                'GET shopSuppliers/<id>' => 'shop/suppliers/info',
+                'GET shopSuppliersGoods/<id>' => 'shop/suppliers/goods',
+                'GET shopSuppliersCategory/<id>' => 'shop/suppliers/category',
                 //供应商banner
                 'GET merchantSuppliersBanner' => 'merchant/shop/suppliers/all',
                 'GET merchantSuppliersBanner/<id>' => 'merchant/shop/suppliers/one',
@@ -1139,12 +1206,13 @@ $config = [
                 'GET merchantAssembleAssemble/<id>' => 'merchant/shop/assemble/assembleone',//拼团管理已参团信息
                 'GET merchantAssemble' => 'merchant/shop/assemble/list',//拼团商品列表
                 'PUT merchantAssemble/<id>' => 'merchant/shop/assemble/update',//商品拼团信息添加、更新
+                'DELETE merchantAssemble/<id>' => 'merchant/shop/assemble/delete',//商品拼团删除
                 //介入腾讯云商品
                 'POST instance' => 'tencents/instance/instance', //校验token
                 'PUT updatePhone' => 'merchant/user/user/bind-phone', //修改merchant_user 商户手机号
                 'GET checkPhone' => 'merchant/user/user/check-phone', //校验登录账号是否是手机号
                 'GET getInstanceLog/<id>' => 'admin/user/merchant/buy-t-c-instance', //获取商户在腾讯购买记录
-                //易联云
+                //小票打印
                 'GET merchantPrint' => 'merchant/system/yly-print/print',//打印
                 'GET merchantPrints' => 'merchant/system/yly-print/list',//查询打印机列表
                 'GET merchantPrints/<id>' => 'merchant/system/yly-print/one',//查询单条打印机
@@ -1152,6 +1220,18 @@ $config = [
                 'PUT merchantPrints/<id>' => 'merchant/system/yly-print/update',//更新打印机
                 'DELETE merchantPrints/<id>' => 'merchant/system/yly-print/delete',//删除打印机
                 'GET merchantAutoprint' => 'merchant/system/yly-print/auto-print',//自动推送打印
+                'GET merchantAutoprint/<id>' => 'merchant/system/yly-print/auto-switch',//自动推送打印开关查询
+                'PUT merchantAutoprint/<id>' => 'merchant/system/yly-print/auto-update',//自动推送打印开关修改
+                //门店小票打印
+                'GET supplierPrint' => 'supplier/goods/yly-print/print',//打印
+                'GET supplierPrints' => 'supplier/goods/yly-print/list',//查询打印机列表
+                'GET supplierPrints/<id>' => 'supplier/goods/yly-print/one',//查询单条打印机
+                'POST supplierPrints' => 'supplier/goods/yly-print/add',//添加打印机
+                'PUT supplierPrints/<id>' => 'supplier/goods/yly-print/update',//更新打印机
+                'DELETE supplierPrints/<id>' => 'supplier/goods/yly-print/delete',//删除打印机
+                'GET supplierAutoprint' => 'supplier/goods/yly-print/auto-print',//自动推送打印
+                'GET supplierAutoPrints' => 'supplier/goods/yly-print/auto-switch',//自动推送打印开关查询
+                'POST supplierAutoPrint' => 'supplier/goods/yly-print/auto-update',//自动推送打印开关修改
                 //砍价活动
                 'GET merchantBargainOrder' => 'merchant/shop/bargains/order',//活动列表
                 'GET merchantBargainGoods' => 'merchant/shop/bargains/goods',//查询可以砍价的商品
@@ -1276,6 +1356,7 @@ $config = [
                 'GET userSalesExport' => 'merchant/statistics/statistics/user-sales-export',//用户销售统计导出
 
                 //多级分销
+                'GET merchantDistributionUser' => 'merchant/user/user/distribution-user',//分销用户
                 'GET merchantDistribution' => 'merchant/app/access/distributions',//分销佣金比例设置
                 'PUT merchantDistribution/<id>' => 'merchant/app/access/distribution',//分销佣金比例设置
                 'POST uploadsImages' => 'merchant/distribution/super/uploads',//上传图片
@@ -1305,6 +1386,46 @@ $config = [
                 'POST dianwodaCreate' => 'merchant/system/dian-wo-da/create',//下单
                 'GET dianwoda' => 'merchant/system/dian-wo-da/one',//配置查询
                 'POST dianwoda' => 'merchant/system/dian-wo-da/add',//配置添加、修改
+                //订阅消息
+                'GET SubscribeTemplate' => 'merchant/system/subscribe-template/list',//查询
+                'POST SubscribeTemplate' => 'merchant/system/subscribe-template/add',//同步订阅模板
+                'GET SubscribeMessage' => 'message/subscribe-message/index',//推送订阅消息
+                'GET SubscribeTemplateId' => 'shop/subscribe-template/list',//前台获取订阅模板ID
+                //门店海报
+                'POST merchantSupplierConfig' => 'merchant/app/access/supplier-config', //更新海报
+                //图片库
+                'GET merchantPicServer' => 'merchant/system/pic-server/list',//查询服务器配置
+                'POST merchantPicServer' => 'merchant/system/pic-server/add',//保存服务器配置
+                'POST merchantThum' => 'merchant/system/thumbnail/add',//保存缩略图配置
+                'GET merchantThum' => 'merchant/system/thumbnail/list',//查询服务器配置
+                //物流查询API配置
+                'GET merchantLogisticsConfig' => 'merchant/system/logistics-config/list',//查询配置
+                'POST merchantLogisticsConfig' => 'merchant/system/logistics-config/add',//保存配置
+                //短信模板ID编辑
+                'GET merchantSmsTemplateId' => 'merchant/system/sms-template-id/list',//查询配置
+                'POST merchantSmsTemplateId' => 'merchant/system/sms-template-id/add',//保存配置
+                //小票打印模板
+                'GET merchantYlyTemplate' => 'merchant/system/yly-print-template/list',//查询模板
+                'POST merchantYlyTemplate' => 'merchant/system/yly-print-template/add',//增加模板
+                'PUT merchantYlyTemplate/<id>' => 'merchant/system/yly-print-template/update',//更新模板
+                //开屏广告
+                'GET merchantOpenAdvertisement/<id>' => 'merchant/system/open-advertisement/one',//查询
+                'PUT merchantOpenAdvertisement/<id>' => 'merchant/system/open-advertisement/update',//增加、修改
+                'GET shopOpenAdvertisement' => 'shop/user/open-advertisement',//前台查询
+                //商品推荐
+                'GET merchantRecommendGoods' => 'merchant/shop/recommend-goods/goods',//查询商品列表
+                'GET merchantRecommendConfig' => 'merchant/shop/recommend-goods/list',//查询
+                'POST merchantRecommendConfig' => 'merchant/shop/recommend-goods/add',//增加、修改
+                'GET shopRecommendGoods' => 'shop/goods/recommend',//前台查询推荐商品
+                //集团分组
+                'GET merchantGrouping' => 'merchant/system/shop-grouping/list',//查询
+                'GET merchantGrouping/<id>' => 'merchant/system/shop-grouping/one',//单条查询
+                'POST merchantGrouping' => 'merchant/system/shop-grouping/add',//增加
+                'PUT merchantGrouping/<id>' => 'merchant/system/shop-grouping/update',//修改
+                'DELETE merchantGrouping/<id>' => 'merchant/system/shop-grouping/delete',//删除
+                'GET supplierGrouping' => 'supplier/goods/goods/grouping',//查询
+                'GET shopGrouping' => 'shop/grouping/list',//前台查询集团分组列表
+                'GET shopGroupingGoods' => 'shop/grouping/goods',//前台查询集团分组商品
 
 
                 'GET miniConfig' => 'merchant/config/config/minione', //查单条
@@ -1321,10 +1442,6 @@ $config = [
         'imagine' => [
             'class' => 'yii\imagine\Image',
         ],
-//        'cache' => [
-////            'class' => 'yii\caching\FileCache',
-//            'class' => 'yii\redis\Cache',
-//        ],
         'user' => [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
@@ -1334,9 +1451,6 @@ $config = [
         ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
-            // send all mails to a file by default. You have to set
-// 'useFileTransport' to false and configure a transport
-// for the mailer to send real emails.
             'useFileTransport' => true,
         ],
         'log' => [
@@ -1349,14 +1463,6 @@ $config = [
             ],
         ],
         'db' => $db,
-        /*
-          'urlManager' => [
-          'enablePrettyUrl' => true,
-          'showScriptName' => false,
-          'rules' => [
-          ],
-          ],
-         */
     ],
     'params' => $params,
 ];

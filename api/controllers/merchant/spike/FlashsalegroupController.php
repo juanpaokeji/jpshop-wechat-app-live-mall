@@ -10,7 +10,8 @@ use app\models\spike\FlashSaleGroupModel;
 use app\models\core\Base64Model;
 use app\models\core\CosModel;
 
-class FlashsalegroupController extends MerchantController {
+class FlashsalegroupController extends MerchantController
+{
 
     public $enableCsrfValidation = false; //禁用CSRF令牌验证，可以在基类中设置
 
@@ -24,7 +25,8 @@ class FlashsalegroupController extends MerchantController {
 //        ];
 //    }
 
-    public function actionList() {
+    public function actionList()
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数          
@@ -40,6 +42,7 @@ class FlashsalegroupController extends MerchantController {
                     unset($params['type']);
                 }
             }
+            $params['orderby'] = ' start_time desc';
             $array = $model->do_select($params);
 
             return $array;
@@ -48,7 +51,8 @@ class FlashsalegroupController extends MerchantController {
         }
     }
 
-    public function actionSingle($id) {
+    public function actionSingle($id)
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
@@ -62,7 +66,8 @@ class FlashsalegroupController extends MerchantController {
         }
     }
 
-    public function actionAdd() {
+    public function actionAdd()
+    {
         if (yii::$app->request->isPost) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
@@ -97,7 +102,8 @@ class FlashsalegroupController extends MerchantController {
         }
     }
 
-    public function actionUpdate($id) {
+    public function actionUpdate($id)
+    {
         if (yii::$app->request->isPut) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
@@ -128,12 +134,20 @@ class FlashsalegroupController extends MerchantController {
         }
     }
 
-    public function actionDelete($id) {
+    public function actionDelete($id)
+    {
         if (yii::$app->request->isDelete) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
             $model = new FlashSaleGroupModel();
             $params['id'] = $id;
+            $group = $model->do_one($params);
+            if ($group['status'] == 200) {
+                if ($group['data']['goods_ids'] != "") {
+                    $sql = "update shop_goods set is_flash_sale = 0 where id in ({$group['data']['goods_ids'] })";
+                    Yii::$app->db->createCommand($sql)->execute();
+                }
+            }
             $array = $model->do_delete($params);
             return $array;
         } else {
@@ -216,7 +230,7 @@ class FlashsalegroupController extends MerchantController {
         if (yii::$app->request->isPut) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
-            if(!$id || !isset($params['status'])){
+            if (!$id || !isset($params['status'])) {
                 return result(404, "参数错误");
             }
             $model = new FlashSaleGroupModel();
@@ -235,7 +249,7 @@ class FlashsalegroupController extends MerchantController {
                         $tr->rollBack();
                         return result(500, "修改失败");
                     }
-                    if ($array['status'] == 200){
+                    if ($array['status'] == 200) {
                         //添加操作记录
                         $operationRecordModel = new OperationRecordModel();
                         $operationRecordData['key'] = $params['key'];

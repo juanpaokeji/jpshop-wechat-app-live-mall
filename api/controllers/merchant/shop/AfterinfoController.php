@@ -90,7 +90,7 @@ class AfterinfoController extends MerchantController {
         if (yii::$app->request->isPut) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
-            $must = ['key'];
+            $must = ['key','user_name','after_phone'];
             $rs = $this->checkInput($must, $params);
             if ($rs != false) {
                 return $rs;

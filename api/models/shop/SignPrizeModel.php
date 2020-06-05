@@ -37,7 +37,7 @@ class SignPrizeModel extends TableModel {
     public function findall($params) {
         //数据库操作
         $table = new TableModel();
-        try {
+
             $params['shop_sign_prize.delete_time is null'] = null;
             $params['table'] = $this->table;
             if (isset($params['searchName'])) {
@@ -47,7 +47,7 @@ class SignPrizeModel extends TableModel {
             }
             $res = $table->tableList($params);
             $app = $res['app'];
-        } catch (Exception $ex) {
+        try {} catch (Exception $ex) {
             return result(500, '数据库操作失败');
         }
         //返回数据 时间格式重置

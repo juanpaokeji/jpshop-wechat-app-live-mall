@@ -25,7 +25,8 @@ use yii\db\Exception;
  *
  * @Bean()
  */
-class GoodsModel extends TableModel {
+class GoodsModel extends TableModel
+{
 
     public $table = "shop_goods";
 
@@ -35,12 +36,13 @@ class GoodsModel extends TableModel {
      * @throws Exception if the model cannot be found
      * @return array
      */
-    public function findall($params) {
+    public function findall($params)
+    {
         //数据库操作
         $table = new TableModel();
         try {
             if (!isset($params['fields'])) {
-                $params['fields'] = " *,(select sum(number) from shop_order where send_out_time != 0 and shop_order.goods_id = shop_goods.id) as number ";
+                $params['fields'] = " *,(select IFNULL(sum(number),0) from shop_order where  shop_order.goods_id = shop_goods.id) as sold ";
             }
 
             if ($params['delete_time'] == 1) {
@@ -68,6 +70,14 @@ class GoodsModel extends TableModel {
             if ($app[$i]['update_time'] != "") {
                 $app[$i]['update_time'] = date('Y-m-d H:i:s', $app[$i]['update_time']);
             }
+
+            $stock = new StockModel();
+            $s = $stock->findall(['goods_id' => $app[$i]['id']]);
+            if ($s['status'] != 200) {
+                $app[$i]['stock'] = array();
+            } else {
+                $app[$i]['stock'] = $s['data'];
+            }
             $cModel = new MerchantCategoryModel();
             $data['id'] = $app[$i]['m_category_id'];
             $c = $cModel->find($data);
@@ -84,25 +94,27 @@ class GoodsModel extends TableModel {
         }
     }
 
-    public function finds($params) {
+    public function finds($params)
+    {
         //数据库操作
         try {
             $table = new TableModel();
             $params['delete_time is null'] = null;
             $params['table'] = $this->table;
-
-            $params['status'] = 1;
+            if (!isset($params['status'])) {
+                $params['status'] = 1;
+            }
             $params['orderby'] = " sort desc";
             $bool = true;
             if (!isset($params['fields'])) {
-                $params['fields'] = " *,(select sum(number) from shop_order where  shop_order.goods_id = shop_goods.id) as sold ";
+                $params['fields'] = " *,(select IFNULL(sum(number),0) from shop_order where  shop_order.goods_id = shop_goods.id) as sold ";
             }
             if (isset($params['stock'])) {
                 $bool = $params['stock'];
                 unset($params['stock']);
                 $params['limit'] = 999;
             } else {
-                if(!isset($params['limit']) || empty($params['limit'])){
+                if (!isset($params['limit']) || empty($params['limit'])) {
                     $params['limit'] = 10;
                 }
             }
@@ -121,6 +133,7 @@ class GoodsModel extends TableModel {
                     $params["name like '%{$params['searchName'][$i]}%' or code like '%{$params['searchName'][$i]}%'"] = null;
                 }
                 unset($params['searchName']);
+                unset($params['supplier_id']);
             }
             $res = $table->tableList($params);
             $app = $res['app'];
@@ -141,9 +154,9 @@ class GoodsModel extends TableModel {
                 $app[$i]['format_start_time'] = date('m-d H:i:s', $app[$i]['start_time']);
                 $app[$i]['format_start_time1'] = date('m:d', $app[$i]['start_time']);
             }
-            if (isset($app[$i]['take_goods_time']) && $app[$i]['take_goods_time'] != ""&&$app[$i]['take_goods_time'] != 0) {
+            if (isset($app[$i]['take_goods_time']) && $app[$i]['take_goods_time'] != "" && $app[$i]['take_goods_time'] != 0) {
                 $app[$i]['format_take_goods_time'] = date('m-d', $app[$i]['take_goods_time']);
-            }else{
+            } else {
                 $app[$i]['format_take_goods_time'] = "";
             }
             $app[$i]['pic_urls'] = array_filter(explode(",", $app[$i]['pic_urls']));
@@ -157,8 +170,10 @@ class GoodsModel extends TableModel {
 
 //            $sql = "select sum(shop_order.number) as  num from shop_order  where goods_id = {$app[$i]['id']} and confirm_time != 0 ";
 //            $sold = $table->querySql($sql);
-            if (isset($app[$i]['sales_number'])) {
-                $app[$i]['sold'] =$app[$i]['sold'] + intval($app[$i]['sales_number']);
+            if ($app[$i]['sales_number']!=0) {
+                $app[$i]['sold'] = $app[$i]['sold'] + intval($app[$i]['sales_number']);
+            }else{
+                $app[$i]['sold'] = $app[$i]['sold'];
             }
         }
 
@@ -175,7 +190,8 @@ class GoodsModel extends TableModel {
      * @throws Exception if the model cannot be found
      * @return array
      */
-    public function findOne($params) {
+    public function findOne($params)
+    {
 
         $table = new TableModel();
         //数据库操作
@@ -226,7 +242,8 @@ class GoodsModel extends TableModel {
         }
     }
 
-    public function find($params) {
+    public function find($params)
+    {
 
         $table = new TableModel();
         //数据库操作
@@ -238,6 +255,9 @@ class GoodsModel extends TableModel {
         }
         if (isset($params['merchant_id'])) {
             $where['merchant_id'] = $params['merchant_id'];
+        }
+        if (isset($params['status'])) {
+            $where['status'] = $params['status'];
         }
         $where['delete_time is null'] = null;
         try {
@@ -265,7 +285,8 @@ class GoodsModel extends TableModel {
         }
     }
 
-    public function one($params) {
+    public function one($params)
+    {
 
         $table = new TableModel();
         //数据库操作
@@ -310,7 +331,8 @@ class GoodsModel extends TableModel {
         }
     }
 
-    public function findInfo($params) {
+    public function findInfo($params)
+    {
 
         $table = new TableModel();
         //数据库操作
@@ -347,7 +369,8 @@ class GoodsModel extends TableModel {
      * @throws Exception if the model cannot be found
      * @return array
      */
-    public function add($params) {
+    public function add($params)
+    {
         //data 新增数据参数设置
         //数据库操作
         try {
@@ -370,7 +393,8 @@ class GoodsModel extends TableModel {
      * @throws Exception if the model cannot be found
      * @return array
      */
-    public function delete($params) {
+    public function delete($params)
+    {
         //where条件设置
         $where = ['id' => $params['id']];
         //params 参数设置
@@ -396,7 +420,8 @@ class GoodsModel extends TableModel {
      * @throws Exception if the model cannot be found
      * @return array
      */
-    public function update($params) {
+    public function update($params)
+    {
 
         try {
             //where 条件设置
@@ -428,7 +453,8 @@ class GoodsModel extends TableModel {
         }
     }
 
-    public function updates($params) {
+    public function updates($params)
+    {
         try {
             //where 条件设置
             if (isset($params['`key`'])) {
@@ -460,12 +486,13 @@ class GoodsModel extends TableModel {
     }
 
     //月销
-    public function MonthSale($id) {
+    public function MonthSale($id)
+    {
 
         try {
             $year = date("Y");
             $month = date("m");
-            $sql = "select count(shop_order.id)as num from shop_order inner join shop_order_group on shop_order_group.order_sn = shop_order.order_group_sn  where {$month} = month(curdate()) and {$year} = year(curdate()) and goods_id ={$id}  and ( shop_order_group.status= 7 or shop_order_group.status=6)";
+            $sql = "select sum(shop_order.number)as num from shop_order  where {$month} = month(curdate()) and {$year} = year(curdate()) and goods_id ={$id}  ";
             $table = new TableModel();
             $res = $table->querySql($sql);
         } catch (Exception $ex) {
@@ -479,9 +506,10 @@ class GoodsModel extends TableModel {
     }
 
     //商品总销量
-    public function TotalSale($id) {
+    public function TotalSale($id)
+    {
         try {
-            $sql = "select sum(shop_order.number) as total, count(shop_order.id) as num from shop_order left join shop_order_group on shop_order_group.order_sn = shop_order.order_group_sn  where goods_id ={$id}  and shop_order_group.status not in(0,2,8) ";
+            $sql = "select sum(shop_order.number) as total, count(shop_order.id) as num from shop_order   where goods_id ={$id}  ";
             $table = new TableModel();
             $res = $table->querySql($sql);
         } catch (Exception $ex) {
@@ -494,7 +522,8 @@ class GoodsModel extends TableModel {
         }
     }
 
-    public function goodsOut() {
+    public function goodsOut()
+    {
         $table = new TableModel();
         $sql = "UPDATE shop_goods set status = 0  where id in (select sg.id from (select id from shop_goods  where stocks = 0)sg );";
         $res = yii::$app->db->createCommand($sql)->execute();
@@ -507,7 +536,8 @@ class GoodsModel extends TableModel {
      * @return array
      * @throws Exception
      */
-    public function findByVideoId($params) {
+    public function findByVideoId($params)
+    {
         $table = new TableModel();
         if (isset($params['video_id'])) {
             $where['video_id'] = $params['video_id'];

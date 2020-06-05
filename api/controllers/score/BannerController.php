@@ -27,7 +27,7 @@ class BannerController extends ShopController {
             $params = $request->get(); //获取地址栏参数          
             $model = new ScoreBannerModel();
             $data['merchant_id'] = yii::$app->session['merchant_id'];
-            $data['user_id'] = yii::$app->session['user_id'];
+         //   $data['user_id'] = yii::$app->session['user_id'];
             $data['key'] = yii::$app->session['key'];
             if (isset($params['searchName'])) {
                 if ($params['searchName'] != "") {

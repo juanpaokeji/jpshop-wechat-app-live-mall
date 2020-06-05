@@ -2,6 +2,7 @@
 
 namespace app\controllers\shop;
 
+use app\models\system\SystemPicServerModel;
 use yii;
 use yii\db\Exception;
 use yii\web\ShopController;
@@ -206,16 +207,25 @@ class CommentController extends ShopController {
             if (!$str) {
                 return "上传文件错误";
             }
-            //将图片上传到cos
-            $cos = new CosModel();
-            $cosRes = $cos->putObject($str);
-            if ($cosRes['status'] == '200') {
-                $url = $cosRes['data'];
-                unlink(Yii::getAlias('@webroot/') . $str);
-            } else {
-                unlink(Yii::getAlias('@webroot/') . $str);
-                return json_encode($cosRes, JSON_UNESCAPED_UNICODE);
+
+            $cosModel = new SystemPicServerModel();
+            $where['status'] = 1; //服务器只会有一个开启，没有开启则使用本地
+            $a  = $cosModel->do_one($where);
+            if($a['status']==200){
+                //将图片上传到cos
+                $cos = new CosModel();
+                $cosRes = $cos->putObject($str);
+                if ($cosRes['status'] == '200') {
+                    $url = $cosRes['data'];
+                    unlink(Yii::getAlias('@webroot/') . $str);
+                } else {
+                    unlink(Yii::getAlias('@webroot/') . $str);
+                    return json_encode($cosRes, JSON_UNESCAPED_UNICODE);
+                }
+            }else{
+                $url = "http://".$_SERVER['HTTP_HOST']."/api/web/".$str;
             }
+
             return result(200, "请求成功!", $url);
         } else {
             return result(500, "请求方式错误");

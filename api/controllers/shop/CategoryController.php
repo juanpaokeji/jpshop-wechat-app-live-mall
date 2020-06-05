@@ -89,6 +89,7 @@ class CategoryController extends ShopController {
             unset($params['key']);
             $params['parent_id!=0'] = null;
 //            $params['merchant_id'] = yii::$app->session['merchant_id'];
+
             $params['status'] = 1;
             $array = $model->findall($params);
             if ($array['status'] == 200) {
@@ -201,6 +202,7 @@ class CategoryController extends ShopController {
             $params['`key`'] = $params['key'];
             $params['parent_id!=0'] = null;
             $params['status'] = 1;
+            $params['supplier_id'] = 0;
             unset($params['key']);
             unset($params['id']);
             $array = $merchantCategorymodel->finds($params);

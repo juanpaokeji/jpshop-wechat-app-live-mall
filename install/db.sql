@@ -1,88 +1,4 @@
-SET FOREIGN_KEY_CHECKS=0;
 
--- ----------------------------
--- Table structure for `admin_user`
--- ----------------------------
-DROP TABLE IF EXISTS `admin_user`;
-CREATE TABLE `admin_user` (
-  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
-  `username` varchar(50) NOT NULL COMMENT '管理用户名',
-  `is_vip` tinyint(1) DEFAULT '0' COMMENT '是否vip  0=非vip 1=vip',
-  `vip_id` tinyint(3) DEFAULT '0' COMMENT 'vip等级id',
-  `balance` decimal(8,2) DEFAULT '0.00' COMMENT '余额',
-  `real_name` char(12) DEFAULT NULL COMMENT '管理姓名',
-  `password` char(32) NOT NULL COMMENT '密码',
-  `salt` char(32) NOT NULL COMMENT '盐',
-  `phone` char(11) DEFAULT NULL COMMENT '手机号',
-  `intro` varchar(200) DEFAULT NULL COMMENT '简单说明',
-  `status` tinyint(1) NOT NULL COMMENT '状态 1正常 0禁用',
-  `create_time` int(11) NOT NULL COMMENT '创建时间',
-  `update_time` int(11) DEFAULT NULL COMMENT '修改时间',
-  `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8 COMMENT='管理用户表';
-
-
--- ----------------------------
--- Table structure for `ims_merchant_user`
--- ----------------------------
-DROP TABLE IF EXISTS `ims_merchant_user`;
-CREATE TABLE `ims_merchant_user` (
-  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
-  `name` varchar(20) DEFAULT NULL COMMENT '用户名称',
-  `real_name` char(12) DEFAULT NULL COMMENT '姓名',
-  `avatar` varchar(256) DEFAULT NULL COMMENT '头像',
-  `password` char(32) DEFAULT NULL COMMENT '密码',
-  `salt` char(32) DEFAULT NULL COMMENT '盐',
-  `phone` char(11) DEFAULT NULL COMMENT '手机号',
-  `wx_open_id` char(32) DEFAULT NULL COMMENT '微信公众号openid',
-  `config` text COMMENT '配置信息',
-  `app_key` char(32) DEFAULT NULL COMMENT '全局key',
-  `app_secret` char(32) DEFAULT NULL COMMENT '全局secret',
-  `balance` decimal(8,2) DEFAULT '0.00' COMMENT '余额',
-  `pay_switch` tinyint(1) DEFAULT '1' COMMENT '支付开关 1可用 0禁用（适用于小程序支付配置页面）',
-  `number` int(1) DEFAULT '1' COMMENT '可创建应用数量',
-  `source` tinyint(1) NOT NULL DEFAULT '0' COMMENT '账号来源 0网站注册 1 腾讯云',
-  `status` tinyint(1) DEFAULT '1' COMMENT '状态 1可用 0禁用',
-  `last_login_time` int(11) DEFAULT NULL COMMENT '最后一次登录时间',
-  `create_time` int(11) NOT NULL COMMENT '创建时间',
-  `update_time` int(11) DEFAULT NULL COMMENT '更新时间',
-  `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 COMMENT='商户表';
-
--- ----------------------------
--- Records of ims_merchant_user
--- ----------------------------
-
--- ----------------------------
--- Table structure for `merchant_partner_user`
--- ----------------------------
-DROP TABLE IF EXISTS `merchant_partner_user`;
-CREATE TABLE `merchant_partner_user` (
-  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
-  `name` varchar(20) DEFAULT NULL COMMENT '姓名',
-  `rale_name` varchar(20) DEFAULT NULL COMMENT '姓名',
-  `password` char(32) DEFAULT NULL COMMENT '密码',
-  `salt` char(32) DEFAULT NULL COMMENT '盐',
-  `account` char(11) DEFAULT NULL COMMENT '登录账号',
-  `kefu_phone` char(13) DEFAULT NULL COMMENT '客服电话',
-  `key` char(32) DEFAULT NULL COMMENT 'key',
-  `merchant_id` int(11) NOT NULL COMMENT '商户id',
-  `time_type` int(1) NOT NULL DEFAULT '0' COMMENT '1 不限时  2 限时',
-  `location` varchar(255) NOT NULL DEFAULT '' COMMENT '地址',
-  `expired_time` int(11) NOT NULL DEFAULT '0' COMMENT '过期时间',
-  `user_id` int(11) NOT NULL DEFAULT '0' COMMENT '会员id',
-  `adcode` varchar(30) NOT NULL COMMENT '高德行政编码',
-  `balance` decimal(8,0) DEFAULT '0' COMMENT '余额',
-  `status` tinyint(1) DEFAULT '1' COMMENT '状态 1可用 0禁用',
-  `create_time` int(11) NOT NULL COMMENT '创建时间',
-  `update_time` int(11) DEFAULT NULL COMMENT '更新时间',
-  `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='合伙人信息表';
-
--- ----------------------------
 
 -- ----------------------------
 -- Table structure for `merchant_user`
@@ -111,8 +27,30 @@ CREATE TABLE `merchant_user` (
   `update_time` int(11) DEFAULT NULL COMMENT '更新时间',
   `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=526 DEFAULT CHARSET=utf8 COMMENT='商户表';
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 COMMENT='商户表';
 
+CREATE TABLE `merchant_partner_user` (
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `name` varchar(20) DEFAULT NULL COMMENT '姓名',
+  `rale_name` varchar(20) DEFAULT NULL COMMENT '姓名',
+  `password` char(32) DEFAULT NULL COMMENT '密码',
+  `salt` char(32) DEFAULT NULL COMMENT '盐',
+  `account` char(11) DEFAULT NULL COMMENT '登录账号',
+  `kefu_phone` char(13) DEFAULT NULL COMMENT '客服电话',
+  `key` char(32) DEFAULT NULL COMMENT 'key',
+  `merchant_id` int(11) NOT NULL COMMENT '商户id',
+  `time_type` int(1) NOT NULL DEFAULT '0' COMMENT '1 不限时  2 限时',
+  `location` varchar(255) NOT NULL DEFAULT '' COMMENT '地址',
+  `expired_time` int(11) NOT NULL DEFAULT '0' COMMENT '过期时间',
+  `user_id` int(11) NOT NULL DEFAULT '0' COMMENT '会员id',
+  `adcode` varchar(30) NOT NULL COMMENT '高德行政编码',
+  `balance` decimal(8,0) DEFAULT '0' COMMENT '余额',
+  `status` tinyint(1) DEFAULT '1' COMMENT '状态 1可用 0禁用',
+  `create_time` int(11) NOT NULL COMMENT '创建时间',
+  `update_time` int(11) DEFAULT NULL COMMENT '更新时间',
+  `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='合伙人信息表';
 
 -- ----------------------------
 -- Table structure for `partner_withdraw`
@@ -139,6 +77,39 @@ CREATE TABLE `partner_withdraw` (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for `shop_advance_sale`
+-- ----------------------------
+DROP TABLE IF EXISTS `shop_advance_sale`;
+CREATE TABLE `shop_advance_sale` (
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `key` char(6) NOT NULL COMMENT '唯一标识符',
+  `merchant_id` int(11) NOT NULL COMMENT '商户id',
+  `supplier_id` int(11) NOT NULL,
+  `name` varchar(128) NOT NULL COMMENT '预售名称',
+  `detail_info` varchar(512) NOT NULL DEFAULT '' COMMENT '预售描述',
+  `days` int(4) NOT NULL DEFAULT '0' COMMENT '发货天数',
+  `preheat_time` int(11) NOT NULL COMMENT '预热开始时间',
+  `start_time` int(11) NOT NULL COMMENT '开始售卖时间',
+  `end_time` int(11) NOT NULL COMMENT '结束售卖时间',
+  `pay_start_time` int(11) NOT NULL COMMENT '付款开始时间',
+  `pay_end_time` int(11) NOT NULL COMMENT '付款结束时间',
+  `goods_id` varchar(256) NOT NULL COMMENT '商品id',
+  `front_money` float(10,2) NOT NULL DEFAULT '0.00',
+  `deduction` float(10,2) NOT NULL DEFAULT '0.00' COMMENT '抵扣金额',
+  `goods_info` varchar(512) NOT NULL COMMENT '商品信息',
+  `is_refund` int(1) NOT NULL DEFAULT '0' COMMENT '0=不退款 1退款',
+  `status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '状态 1有效 0无效',
+  `create_time` int(11) NOT NULL COMMENT '创建时间',
+  `update_time` int(11) DEFAULT NULL COMMENT '修改时间',
+  `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='商品-预售';
+
+-- ----------------------------
+-- Records of shop_advance_sale
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for `shop_after_info`
 -- ----------------------------
 DROP TABLE IF EXISTS `shop_after_info`;
@@ -146,6 +117,7 @@ CREATE TABLE `shop_after_info` (
   `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `key` char(6) NOT NULL DEFAULT '' COMMENT '唯一标识符',
   `merchant_id` int(11) NOT NULL COMMENT '商户id',
+  `user_name` varchar(50) NOT NULL DEFAULT '' COMMENT '姓名',
   `after_phone` varchar(25) DEFAULT '0' COMMENT '退款电话',
   `province` varchar(20) NOT NULL DEFAULT '' COMMENT '省',
   `province_code` int(8) NOT NULL COMMENT '省行政区代码',
@@ -163,6 +135,9 @@ CREATE TABLE `shop_after_info` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8 COMMENT='商户退款信息表';
 
+-- ----------------------------
+-- Records of shop_after_info
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_agent_user`
@@ -192,6 +167,10 @@ CREATE TABLE `shop_agent_user` (
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT COMMENT='代理商';
 
 -- ----------------------------
+-- Records of shop_agent_user
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for `shop_assemble`
 -- ----------------------------
 DROP TABLE IF EXISTS `shop_assemble`;
@@ -215,8 +194,13 @@ CREATE TABLE `shop_assemble` (
   `create_time` int(11) NOT NULL COMMENT '创建时间',
   `update_time` int(11) DEFAULT NULL COMMENT '修改时间',
   `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
+  `assemble_group_discount` varchar(255) NOT NULL DEFAULT '' COMMENT '团长优惠比例',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='商品拼团信息表';
+
+-- ----------------------------
+-- Records of shop_assemble
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_assemble_access`
@@ -265,7 +249,9 @@ CREATE TABLE `shop_assemble_record` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
 
-
+-- ----------------------------
+-- Records of shop_assemble_record
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_attribute`
@@ -309,6 +295,9 @@ CREATE TABLE `shop_auth_group` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=535 DEFAULT CHARSET=utf8 COMMENT='电商权限组表';
 
+-- ----------------------------
+-- Records of shop_auth_group
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_auth_group_access`
@@ -327,6 +316,9 @@ CREATE TABLE `shop_auth_group_access` (
   KEY `group_id` (`group_ids`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='权限对应表';
 
+-- ----------------------------
+-- Records of shop_auth_group_access
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_auth_rule`
@@ -375,6 +367,9 @@ CREATE TABLE `shop_balance_ratio` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8 COMMENT='电商-充值配置表';
 
+-- ----------------------------
+-- Records of shop_balance_ratio
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_banner`
@@ -398,7 +393,6 @@ CREATE TABLE `shop_banner` (
 -- ----------------------------
 -- Records of shop_banner
 -- ----------------------------
-
 INSERT INTO `shop_banner` VALUES ('29', 'ccvWPn', '13', '1', 'https://imgs.juanpao.com/shop%2Fbanner%2F2019%2F07%2F16%2F15632607535d2d775108543.jpeg', '1', '1', '1', '1563260753', null, null);
 
 -- ----------------------------
@@ -412,8 +406,8 @@ CREATE TABLE `shop_bargain_info` (
   `supplier_id` int(11) NOT NULL,
   `goods_id` int(11) NOT NULL DEFAULT '0' COMMENT '商品id',
   `stock_id` int(11) NOT NULL DEFAULT '0',
-  `goods_price` int(11) NOT NULL COMMENT '当前商品价格',
-  `price` int(11) NOT NULL COMMENT '砍的价格',
+  `goods_price` float(11,2) NOT NULL COMMENT '当前商品价格',
+  `price` float(11,2) NOT NULL COMMENT '砍的价格',
   `user_id` int(8) NOT NULL COMMENT '砍价 人',
   `is_promoter` int(1) NOT NULL DEFAULT '0' COMMENT '是否发起者 0否 1是',
   `promoter_sn` varchar(20) NOT NULL,
@@ -543,7 +537,7 @@ CREATE TABLE `shop_dianwoda_account` (
 -- ----------------------------
 -- Records of shop_dianwoda_account
 -- ----------------------------
-INSERT INTO `shop_dianwoda_account` VALUES ('1', 'ccvWPn', '13', '1000398', '5e2654c2c7b767b1901f1dd2449b45cd', 'b7ae693f-0f12-46b3-b952-fb8bcb9eca45', '1582981594', '1583139840', null);
+INSERT INTO `shop_dianwoda_account` VALUES ('1', 'ccvWPn', '13', '', '', '', '1582981594', '1583139840', null);
 
 -- ----------------------------
 -- Table structure for `shop_dianwoda_order`
@@ -565,7 +559,9 @@ CREATE TABLE `shop_dianwoda_order` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='商户点我达订单表';
 
-
+-- ----------------------------
+-- Records of shop_dianwoda_order
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_distribution_access`
@@ -579,13 +575,16 @@ CREATE TABLE `shop_distribution_access` (
   `balance_sn` varchar(18) DEFAULT NULL COMMENT '提现单号',
   `order_sn` varchar(18) NOT NULL DEFAULT '' COMMENT '订单编号',
   `money` decimal(8,2) NOT NULL COMMENT '金额 正数增加 负数减少',
-  `type` int(11) NOT NULL DEFAULT '1' COMMENT '佣金来源 1=下线提佣 2=股权分佣 3=自购提佣 4=退款减佣',
+  `type` int(11) NOT NULL DEFAULT '1',
   `create_time` int(11) NOT NULL COMMENT '创建时间',
   `update_time` int(11) DEFAULT NULL COMMENT '更新时间',
   `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='分销会员佣金记录表';
 
+-- ----------------------------
+-- Records of shop_distribution_access
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_diy_config`
@@ -605,13 +604,14 @@ CREATE TABLE `shop_diy_config` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=83 DEFAULT CHARSET=utf8mb4 COMMENT='商户自定义配置表';
 
+-- ----------------------------
+-- Records of shop_diy_config
+-- ----------------------------
 INSERT INTO `shop_diy_config` VALUES ('19', 'ccvWPn', '13', '5', '<p>用户协议</p>', '2', '1', '1562837661', '1562837661', null);
 INSERT INTO `shop_diy_config` VALUES ('20', 'ccvWPn', '13', '6', '<p>隐私政策</p>', '2', '1', '1562837673', '1562837673', null);
 INSERT INTO `shop_diy_config` VALUES ('21', 'ccvWPn', '13', '7', '<p><span style=\"color: rgb(102, 102, 102); font-family: 思源字体, sans-serif; font-size: 14px; background-color: rgb(255, 255, 255);\">资质</span></p>', '2', '1', '1562837678', '1564726739', null);
 INSERT INTO `shop_diy_config` VALUES ('23', 'ccvWPn', '13', '2', '<p>申请团长</p>', '2', '1', '1562942539', '1583191920', null);
 INSERT INTO `shop_diy_config` VALUES ('25', 'ccvWPn', '13', '1', '<p>申请门店</p>', '2', '1', '1563348998', '1583191931', null);
-
-
 
 -- ----------------------------
 -- Table structure for `shop_diy_express_template`
@@ -636,30 +636,6 @@ CREATE TABLE `shop_diy_express_template` (
 ) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8 COMMENT='店铺diy快递模板表';
 
 -- ----------------------------
--- Records of shop_diy_express_template
--- ----------------------------
-INSERT INTO `shop_diy_express_template` VALUES ('1', '000546', '225', '3', '[{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"67\",\"name\":\"商品ID\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_id\"},{\"id\":\"68\",\"name\":\"货号\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_code\"},{\"id\":\"17\",\"name\":\"短标题\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"short_name\"},{\"id\":\"16\",\"name\":\"标签\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"label\"},{\"id\":\"66\",\"name\":\"规格\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"property\"},{\"id\":\"4\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"number\"},{\"id\":\"7\",\"name\":\"单价\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"price\"}]},{\"id\":2,\"name\":\"商家信息\",\"type\":0,\"child\":[{\"id\":\"19\",\"name\":\"小程序名称\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"widget_name\"}]}]', '<div class=\"edit-box\" style=\"width: 3482px; height: 3510px;\">\n					<div class=\"item item-table\" data-name=\"name-table\" style=\"left: 0px; top: 113px; position: absolute; cursor: move; z-index: 0; width: 909.409px; height: 114px;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"goods_id\" style=\"border:1px solid black;padding:10px;\">商品ID</th><th data-englishname=\"goods_code\" style=\"border:1px solid black;padding:10px;\">货号</th><th data-englishname=\"short_name\" style=\"border:1px solid black;padding:10px;\">短标题</th><th data-englishname=\"label\" style=\"border:1px solid black;padding:10px;\">标签</th><th data-englishname=\"property\" style=\"border:1px solid black;padding:10px;\">规格</th><th data-englishname=\"number\" style=\"border:1px solid black;padding:10px;\">数量</th><th data-englishname=\"price\" style=\"border:1px solid black;padding:10px;\">单价</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 19 item-active\" id=\"item-active\" data-name=\"19\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; font-size: 19px; z-index: 0; left: 349px; top: 25px; width: 240px;\"><span>小程序名称:$widget_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '999.99', '999.99', null, '1', null, '1566874463', '1566874861', null);
-INSERT INTO `shop_diy_express_template` VALUES ('2', '000546', '225', '4', '[{\"id\":1,\"name\":\"商品信息\",\"type\":0,\"child\":[{\"id\":\"43\",\"name\":\"短标题\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"short_name\"},{\"id\":\"44\",\"name\":\"规格\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"property\"},{\"id\":\"3\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"number\"}]},{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"65\",\"name\":\"路线\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"route\"},{\"id\":\"62\",\"name\":\"团长小区\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_area_name\"},{\"id\":\"71\",\"name\":\"取货点\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_addr\"},{\"id\":\"18\",\"name\":\"团长姓名\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_name\"},{\"id\":\"60\",\"name\":\"团长电话\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_phone\"}]}]', '<div class=\"edit-box\" style=\"width: 2482px; height: 3510px;\">\n					<div class=\"item 43\" id=\"item-active\" data-name=\"43\" data-englishname=\"short_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 45px; top: 12px; width: 369px; height: 42.5092px; font-size: 17px;\"><span>短标题:$short_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 44\" id=\"item-active\" data-name=\"44\" data-englishname=\"property\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 44px; top: 65px; font-size: 17px;\"><span>规格:$property</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 3\" id=\"item-active\" data-name=\"3\" data-englishname=\"number\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 330px; top: 69px; font-size: 17px;\"><span>数量:$number</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item item-table item-active\" data-name=\"name-table\" style=\"left: 0px; top: 108px; position: absolute; cursor: move; width: 901.818px; height: 124px;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"route\" style=\"border:1px solid black;padding:10px;\">路线</th><th data-englishname=\"leader_area_name\" style=\"border:1px solid black;padding:10px;\">团长小区</th><th data-englishname=\"leader_addr\" style=\"border:1px solid black;padding:10px;\">取货点</th><th data-englishname=\"leader_name\" style=\"border:1px solid black;padding:10px;\">团长姓名</th><th data-englishname=\"leader_phone\" style=\"border:1px solid black;padding:10px;\">团长电话</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '999.99', '999.99', null, '1', null, '1566874870', '1566875164', null);
-INSERT INTO `shop_diy_express_template` VALUES ('3', '000546', '225', '1', '[{\"id\":2,\"name\":\"商家信息\",\"type\":0,\"child\":[{\"id\":\"70\",\"name\":\"商家姓名\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_name\"},{\"id\":\"21\",\"name\":\"商家地址\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_addr\"},{\"id\":\"20\",\"name\":\"商家电话\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_phone\"},{\"id\":\"19\",\"name\":\"小程序名称\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"widget_name\"}]},{\"id\":5,\"name\":\"团长信息\",\"type\":0,\"child\":[{\"id\":\"37\",\"name\":\"团长ID\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_uid\"},{\"id\":\"35\",\"name\":\"团长姓名\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_name\"},{\"id\":\"34\",\"name\":\"团长昵称\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_nickname\"},{\"id\":\"36\",\"name\":\"团长电话\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_phone\"},{\"id\":\"69\",\"name\":\"取货点\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_addr\"},{\"id\":\"38\",\"name\":\"团长小区\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_area_name\"},{\"id\":\"40\",\"name\":\"配送方式\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"express_type\"},{\"id\":\"39\",\"name\":\"团长城市\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_city\"}]},{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"67\",\"name\":\"商品ID\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_id\"},{\"id\":\"68\",\"name\":\"货号\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_code\"},{\"id\":\"17\",\"name\":\"短标题\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"short_name\"},{\"id\":\"16\",\"name\":\"标签\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"label\"},{\"id\":\"66\",\"name\":\"规格\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"property\"},{\"id\":\"4\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"number\"},{\"id\":\"7\",\"name\":\"单价\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"price\"}]}]', '<div class=\"edit-box\" style=\"width: 380px; height: 982px;\">\n					<div class=\"item 70\" id=\"item-active\" data-name=\"70\" data-englishname=\"merchant_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 0px;\"><span>商家姓名:$merchant_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 21\" id=\"item-active\" data-name=\"21\" data-englishname=\"merchant_addr\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; height: 26px; z-index: 0; left: 0px; top: 21px;\"><span>商家地址:$merchant_addr</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 20\" id=\"item-active\" data-name=\"20\" data-englishname=\"merchant_phone\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 43px;\"><span>商家电话:$merchant_phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 19\" id=\"item-active\" data-name=\"19\" data-englishname=\"widget_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 62px;\"><span>小程序名称:$widget_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 37\" id=\"item-active\" data-name=\"37\" data-englishname=\"leader_uid\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 163px; top: 0px;\"><span>团长ID:$leader_uid</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 35\" id=\"item-active\" data-name=\"35\" data-englishname=\"leader_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 162px; top: 22px;\"><span>团长姓名:$leader_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 34\" id=\"item-active\" data-name=\"34\" data-englishname=\"leader_nickname\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 163px; top: 42px;\"><span>团长昵称:$leader_nickname</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 36\" id=\"item-active\" data-name=\"36\" data-englishname=\"leader_phone\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 163px; top: 65px;\"><span>团长电话:$leader_phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 69\" id=\"item-active\" data-name=\"69\" data-englishname=\"leader_addr\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 86px;\"><span>取货点:$leader_addr</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 38\" id=\"item-active\" data-name=\"38\" data-englishname=\"leader_area_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 162px; top: 91px;\"><span>团长小区:$leader_area_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 40\" id=\"item-active\" data-name=\"40\" data-englishname=\"express_type\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 115px;\"><span>配送方式:$express_type</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 39\" id=\"item-active\" data-name=\"39\" data-englishname=\"leader_city\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 162px; top: 114px;\"><span>团长城市:$leader_city</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item item-table item-active\" data-name=\"name-table\" style=\"left: 0px; top: 143px; position: absolute; cursor: move; z-index: 0;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"goods_id\" style=\"border:1px solid black;padding:10px;\">商品ID</th><th data-englishname=\"goods_code\" style=\"border:1px solid black;padding:10px;\">货号</th><th data-englishname=\"short_name\" style=\"border:1px solid black;padding:10px;\">短标题</th><th data-englishname=\"label\" style=\"border:1px solid black;padding:10px;\">标签</th><th data-englishname=\"property\" style=\"border:1px solid black;padding:10px;\">规格</th><th data-englishname=\"number\" style=\"border:1px solid black;padding:10px;\">数量</th><th data-englishname=\"price\" style=\"border:1px solid black;padding:10px;\">单价</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '378.00', '980.00', null, '1', null, '1566875176', '1566875176', null);
-INSERT INTO `shop_diy_express_template` VALUES ('4', 'jqXkVh', '108', '2', '[{\"id\":2,\"name\":\"商家信息\",\"type\":0,\"child\":[{\"id\":\"19\",\"name\":\"小程序名称\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"widget_name\"}]},{\"id\":4,\"name\":\"买家信息\",\"type\":0,\"child\":[{\"id\":\"9\",\"name\":\"买家电话\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"phone\"},{\"id\":\"6\",\"name\":\"买家姓名\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"name\"},{\"id\":\"26\",\"name\":\"买家地址\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"address\"},{\"id\":\"31\",\"name\":\"买家留言\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"remark\"},{\"id\":\"29\",\"name\":\"实付金额\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"payment_money\"}]},{\"id\":5,\"name\":\"团长信息\",\"type\":0,\"child\":[{\"id\":\"40\",\"name\":\"配送方式\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"express_type\"},{\"id\":\"35\",\"name\":\"团长姓名\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_name\"},{\"id\":\"69\",\"name\":\"取货点\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_addr\"},{\"id\":\"36\",\"name\":\"团长电话\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_phone\"},{\"id\":\"38\",\"name\":\"团长小区\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_area_name\"}]},{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"67\",\"name\":\"商品ID\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_id\"},{\"id\":\"2\",\"name\":\"商品名称\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goodsname\"},{\"id\":\"4\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"number\"}]}]', '<div class=\"edit-box\" style=\"width: 602px; height: 802px;\">\n					<div class=\"item 19\" id=\"item-active\" data-name=\"19\" data-englishname=\"widget_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 198px; top: 3px;\"><span>小程序名称:$widget_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 9\" id=\"item-active\" data-name=\"9\" data-englishname=\"phone\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 4px; top: 57px;\"><span>买家电话:$phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 6\" id=\"item-active\" data-name=\"6\" data-englishname=\"name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 5px; top: 34px;\"><span>买家姓名:$name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 26\" id=\"item-active\" data-name=\"26\" data-englishname=\"address\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 3px; top: 79px;\"><span>买家地址:$address</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 40\" id=\"item-active\" data-name=\"40\" data-englishname=\"express_type\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 398px; top: 73px;\"><span>配送方式:$express_type</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 31\" id=\"item-active\" data-name=\"31\" data-englishname=\"remark\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 2px; top: 104px;\"><span>买家留言:$remark</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 35\" id=\"item-active\" data-name=\"35\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 398px; top: 27px;\"><span>团长姓名:$leader_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 69\" id=\"item-active\" data-name=\"69\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 397px; top: 118px;\"><span>取货点:$leader_addr</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 36\" id=\"item-active\" data-name=\"36\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 398px; top: 50px;\"><span>团长电话:$leader_phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item item-table\" data-name=\"name-table\" style=\"left: 1px; top: 193px; position: absolute; cursor: move; width: 591px; z-index: 0;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"goods_id\" style=\"border:1px solid black;padding:10px;\">商品ID</th><th data-englishname=\"goodsname\" style=\"border:1px solid black;padding:10px;\">商品名称</th><th data-englishname=\"number\" style=\"border:1px solid black;padding:10px;\">数量</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 29\" id=\"item-active\" data-name=\"29\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 1px; top: 127px;\"><span>实付金额:$payment_money</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 38\" id=\"item-active\" data-name=\"38\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 397px; top: 96px;\"><span>团长小区:$leader_area_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '600.00', '800.00', null, '1', null, '1566886237', '1569051787', null);
-INSERT INTO `shop_diy_express_template` VALUES ('5', 'jqXkVh', '108', '5', '[{\"id\":2,\"name\":\"商家信息\",\"type\":0,\"child\":[{\"id\":\"19\",\"name\":\"小程序名称\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"widget_name\"}]},{\"id\":4,\"name\":\"买家信息\",\"type\":0,\"child\":[{\"id\":\"6\",\"name\":\"买家姓名\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"name\"},{\"id\":\"9\",\"name\":\"买家电话\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"phone\"},{\"id\":\"31\",\"name\":\"买家留言\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"remark\"},{\"id\":\"29\",\"name\":\"实付金额\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"payment_money\"},{\"id\":\"26\",\"name\":\"买家地址\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"address\"}]},{\"id\":5,\"name\":\"团长信息\",\"type\":0,\"child\":[{\"id\":\"35\",\"name\":\"团长姓名\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_name\"},{\"id\":\"36\",\"name\":\"团长电话\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_phone\"},{\"id\":\"69\",\"name\":\"取货点\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_addr\"},{\"id\":\"38\",\"name\":\"团长小区\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_area_name\"}]},{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"68\",\"name\":\"货号\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_code\"},{\"id\":\"2\",\"name\":\"商品名称\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goodsname\"},{\"id\":\"4\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"number\"}]}]', '<div class=\"edit-box\" style=\"width: 602px; height: 682px;\">\n					<div class=\"item 19\" id=\"item-active\" data-name=\"19\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 215px; top: 10px;\"><span>小程序名称:$widget_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 6\" id=\"item-active\" data-name=\"6\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 16px; top: 54px;\"><span>买家姓名:$name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 9\" id=\"item-active\" data-name=\"9\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 17px; top: 73px;\"><span>买家电话:$phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 31\" id=\"item-active\" data-name=\"31\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 17px; top: 113px;\"><span>买家留言:$remark</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 29\" id=\"item-active\" data-name=\"29\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 17px; top: 132px;\"><span>实付金额:$payment_money</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 26\" id=\"item-active\" data-name=\"26\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 17px; top: 93px;\"><span>买家地址:$address</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 35\" id=\"item-active\" data-name=\"35\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 266px; top: 53px;\"><span>团长姓名:$leader_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 36\" id=\"item-active\" data-name=\"36\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 267px; top: 93px;\"><span>团长电话:$leader_phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 69\" id=\"item-active\" data-name=\"69\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 267px; top: 113px;\"><span>取货点:$leader_addr</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 38\" id=\"item-active\" data-name=\"38\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 266px; top: 73px;\"><span>团长小区:$leader_area_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item item-table\" data-name=\"name-table\" style=\"left: 3px; top: 157px; position: absolute; cursor: move; width: 595px;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"goods_code\" style=\"border:1px solid black;padding:10px;\">货号</th><th data-englishname=\"goodsname\" style=\"border:1px solid black;padding:10px;\">商品名称</th><th data-englishname=\"number\" style=\"border:1px solid black;padding:10px;\">数量</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '600.00', '680.00', null, '1', null, '1566887706', '1566906796', null);
-INSERT INTO `shop_diy_express_template` VALUES ('6', 'jqXkVh', '108', '4', '[{\"id\":1,\"name\":\"商品信息\",\"type\":0,\"child\":[{\"id\":\"45\",\"name\":\"商品ID\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"goods_id\"},{\"id\":\"46\",\"name\":\"货号\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"goods_code\"},{\"id\":\"1\",\"name\":\"商品名称\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"goodsname\"},{\"id\":\"43\",\"name\":\"短标题\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"short_name\"},{\"id\":\"42\",\"name\":\"标签\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"label\"},{\"id\":\"44\",\"name\":\"规格\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"property\"},{\"id\":\"3\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"number\"},{\"id\":\"8\",\"name\":\"单价\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"price\"}]},{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"65\",\"name\":\"路线\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"route\"},{\"id\":\"61\",\"name\":\"团长ID\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_uid\"},{\"id\":\"62\",\"name\":\"团长小区\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_area_name\"},{\"id\":\"71\",\"name\":\"取货点\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_addr\"},{\"id\":\"18\",\"name\":\"团长姓名\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_name\"},{\"id\":\"60\",\"name\":\"团长电话\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_phone\"}]}]', '<div class=\"edit-box\" style=\"width: 602px; height: 682px;\">\n					<div class=\"item 45\" id=\"item-active\" data-name=\"45\" data-englishname=\"goods_id\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 0px;\"><span>商品ID:$goods_id</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 46\" id=\"item-active\" data-name=\"46\" data-englishname=\"goods_code\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 52px;\"><span>货号:$goods_code</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 1\" id=\"item-active\" data-name=\"1\" data-englishname=\"goodsname\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 175px; top: 0px;\"><span>商品名称:$goodsname</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 43\" id=\"item-active\" data-name=\"43\" data-englishname=\"short_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 177px; top: 26px;\"><span>短标题:$short_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 42\" id=\"item-active\" data-name=\"42\" data-englishname=\"label\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 27px;\"><span>标签:$label</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 44\" id=\"item-active\" data-name=\"44\" data-englishname=\"property\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 176px; top: 54px;\"><span>规格:$property</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 3\" id=\"item-active\" data-name=\"3\" data-englishname=\"number\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 80px;\"><span>数量:$number</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 8\" id=\"item-active\" data-name=\"8\" data-englishname=\"price\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 173px; top: 80px;\"><span>单价:$price</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item item-table item-active\" data-name=\"name-table\" style=\"left: 0px; top: 169px; position: absolute; cursor: move; z-index: 0; width: 593px;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"route\" style=\"border:1px solid black;padding:10px;\">路线</th><th data-englishname=\"leader_uid\" style=\"border:1px solid black;padding:10px;\">团长ID</th><th data-englishname=\"leader_area_name\" style=\"border:1px solid black;padding:10px;\">团长小区</th><th data-englishname=\"leader_addr\" style=\"border:1px solid black;padding:10px;\">取货点</th><th data-englishname=\"leader_name\" style=\"border:1px solid black;padding:10px;\">团长姓名</th><th data-englishname=\"leader_phone\" style=\"border:1px solid black;padding:10px;\">团长电话</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '600.00', '680.00', null, '1', null, '1566888072', '1566906103', null);
-INSERT INTO `shop_diy_express_template` VALUES ('7', 'ccvWPn', '13', '2', '[{\"id\":4,\"name\":\"买家信息\",\"type\":0,\"child\":[{\"id\":\"9\",\"name\":\"买家电话\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"phone\"},{\"id\":\"6\",\"name\":\"买家姓名\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"name\"},{\"id\":\"33\",\"name\":\"买家区域\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"buyer_area\"},{\"id\":\"26\",\"name\":\"买家地址\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"address\"},{\"id\":\"31\",\"name\":\"买家留言\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"remark\"},{\"id\":\"29\",\"name\":\"实付金额\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"payment_money\"}]},{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"2\",\"name\":\"商品名称\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goodsname\"},{\"id\":\"66\",\"name\":\"规格\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"property\"},{\"id\":\"4\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"number\"}]},{\"id\":2,\"name\":\"商家信息\",\"type\":0,\"child\":[{\"id\":\"19\",\"name\":\"小程序名称\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"widget_name\"}]}]', '<div class=\"edit-box\" style=\"width: 752px; height: 796px;\">\n					<div class=\"item 9\" id=\"item-active\" data-name=\"9\" data-englishname=\"phone\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 433px; top: 66px; font-size: 16px;\"><span>买家电话:$phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 6\" id=\"item-active\" data-name=\"6\" data-englishname=\"name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 77px; top: 70px; font-size: 16px;\"><span>买家姓名:$name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 33\" id=\"item-active\" data-name=\"33\" data-englishname=\"buyer_area\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 71px; top: 123px; height: 26px; font-size: 16px;\"><span>买家区域:$buyer_area</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 26\" id=\"item-active\" data-name=\"26\" data-englishname=\"address\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 71px; top: 182px; font-size: 16px;\"><span>买家地址:$address</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 31\" id=\"item-active\" data-name=\"31\" data-englishname=\"remark\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 439px; top: 126px; height: 26px; font-size: 16px;\"><span>买家留言:$remark</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 29\" id=\"item-active\" data-name=\"29\" data-englishname=\"payment_money\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 444px; top: 181px; font-size: 16px;\"><span>实付金额:$payment_money</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item item-table\" data-name=\"name-table\" style=\"left: 21px; top: 228px; position: absolute; cursor: move; z-index: 0; width: 709px; height: 94px;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"goodsname\" style=\"border:1px solid black;padding:10px;\">商品名称</th><th data-englishname=\"property\" style=\"border:1px solid black;padding:10px;\">规格</th><th data-englishname=\"number\" style=\"border:1px solid black;padding:10px;\">数量</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 19\" id=\"item-active\" data-name=\"19\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 262px; top: 16px; font-family: 微软雅黑; font-size: 20px;\"><span>小程序名称:$widget_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '750.00', '794.00', null, '1', null, '1567145039', '1583558542', null);
-INSERT INTO `shop_diy_express_template` VALUES ('8', '000613', '301', '5', '[]', '<div class=\"edit-box\" style=\"width: 380px; height: 682px;\">\n					</div>', '378.00', '680.00', null, '1', null, '1567581994', '1567581994', null);
-INSERT INTO `shop_diy_express_template` VALUES ('9', 'jqXkVh', '108', '3', '[{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"67\",\"name\":\"商品ID\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_id\"},{\"id\":\"68\",\"name\":\"货号\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_code\"},{\"id\":\"17\",\"name\":\"短标题\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"short_name\"},{\"id\":\"16\",\"name\":\"标签\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"label\"},{\"id\":\"66\",\"name\":\"规格\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"property\"},{\"id\":\"4\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"number\"},{\"id\":\"7\",\"name\":\"单价\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"price\"}]},{\"id\":2,\"name\":\"商家信息\",\"type\":0,\"child\":[{\"id\":\"19\",\"name\":\"小程序名称\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"widget_name\"}]}]', '<div class=\"edit-box\" style=\"width: 380px; height: 682px;\">\n					<div class=\"item item-table\" data-name=\"name-table\" style=\"left: 0px; top: 48px; position: absolute; cursor: move; z-index: 0;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"goods_id\" style=\"border:1px solid black;padding:10px;\">商品ID</th><th data-englishname=\"goods_code\" style=\"border:1px solid black;padding:10px;\">货号</th><th data-englishname=\"short_name\" style=\"border:1px solid black;padding:10px;\">短标题</th><th data-englishname=\"label\" style=\"border:1px solid black;padding:10px;\">标签</th><th data-englishname=\"property\" style=\"border:1px solid black;padding:10px;\">规格</th><th data-englishname=\"number\" style=\"border:1px solid black;padding:10px;\">数量</th><th data-englishname=\"price\" style=\"border:1px solid black;padding:10px;\">单价</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 19 item-active\" id=\"item-active\" data-name=\"19\" data-englishname=\"widget_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 94px; top: 11px;\"><span>小程序名称:$widget_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '378.00', '680.00', null, '1', null, '1567758662', '1567758662', null);
-INSERT INTO `shop_diy_express_template` VALUES ('10', '000619', '308', '2', '[{\"id\":4,\"name\":\"买家信息\",\"type\":0,\"child\":[{\"id\":\"6\",\"name\":\"买家姓名\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"name\"}]},{\"id\":5,\"name\":\"团长信息\",\"type\":0,\"child\":[{\"id\":\"38\",\"name\":\"团长小区\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_area_name\"},{\"id\":\"69\",\"name\":\"取货点\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_addr\"}]},{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"67\",\"name\":\"商品ID\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_id\"},{\"id\":\"2\",\"name\":\"商品名称\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goodsname\"},{\"id\":\"66\",\"name\":\"规格\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"property\"},{\"id\":\"4\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"number\"}]},{\"id\":2,\"name\":\"商家信息\",\"type\":0,\"child\":[{\"id\":\"19\",\"name\":\"小程序名称\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"widget_name\"}]}]', '<div class=\"edit-box\" style=\"width: 360px; height: 679px;\">\n					<div class=\"item 6\" id=\"item-active\" data-name=\"6\" data-englishname=\"name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 67px;\"><span>买家姓名:$name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 38\" id=\"item-active\" data-name=\"38\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 27px;\"><span>团长小区:$leader_area_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item item-table\" data-name=\"name-table\" style=\"left: 0px; top: 95px; position: absolute; cursor: move; z-index: 0;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"goods_id\" style=\"border:1px solid black;padding:10px;\">商品ID</th><th data-englishname=\"goodsname\" style=\"border:1px solid black;padding:10px;\">商品名称</th><th data-englishname=\"property\" style=\"border:1px solid black;padding:10px;\">规格</th><th data-englishname=\"number\" style=\"border:1px solid black;padding:10px;\">数量</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 69\" id=\"item-active\" data-name=\"69\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 46px;\"><span>取货点:$leader_addr</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 19\" id=\"item-active\" data-name=\"19\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 61px; top: 6px;\"><span>小程序名称:$widget_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '358.00', '677.00', null, '1', null, '1567925394', '1567928129', null);
-INSERT INTO `shop_diy_express_template` VALUES ('11', '000619', '308', '4', '[{\"id\":1,\"name\":\"商品信息\",\"type\":0,\"child\":[{\"id\":\"45\",\"name\":\"商品ID\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"goods_id\"},{\"id\":\"46\",\"name\":\"货号\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"goods_code\"},{\"id\":\"1\",\"name\":\"商品名称\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"goodsname\"},{\"id\":\"43\",\"name\":\"短标题\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"short_name\"},{\"id\":\"42\",\"name\":\"标签\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"label\"},{\"id\":\"44\",\"name\":\"规格\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"property\"},{\"id\":\"3\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"number\"},{\"id\":\"8\",\"name\":\"单价\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"price\"}]},{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"65\",\"name\":\"路线\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"route\"},{\"id\":\"61\",\"name\":\"团长ID\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_uid\"},{\"id\":\"62\",\"name\":\"团长小区\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_area_name\"},{\"id\":\"71\",\"name\":\"取货点\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_addr\"},{\"id\":\"18\",\"name\":\"团长姓名\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_name\"},{\"id\":\"60\",\"name\":\"团长电话\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_phone\"}]}]', '<div class=\"edit-box\" style=\"width: 380px; height: 682px;\">\n					<div class=\"item 45\" id=\"item-active\" data-name=\"45\" data-englishname=\"goods_id\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 0px;\"><span>商品ID:$goods_id</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 46\" id=\"item-active\" data-name=\"46\" data-englishname=\"goods_code\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 52px;\"><span>货号:$goods_code</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 1\" id=\"item-active\" data-name=\"1\" data-englishname=\"goodsname\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 175px; top: 0px;\"><span>商品名称:$goodsname</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 43\" id=\"item-active\" data-name=\"43\" data-englishname=\"short_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 177px; top: 26px;\"><span>短标题:$short_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 42\" id=\"item-active\" data-name=\"42\" data-englishname=\"label\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 27px;\"><span>标签:$label</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 44\" id=\"item-active\" data-name=\"44\" data-englishname=\"property\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 176px; top: 54px;\"><span>规格:$property</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 3\" id=\"item-active\" data-name=\"3\" data-englishname=\"number\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 80px;\"><span>数量:$number</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 8\" id=\"item-active\" data-name=\"8\" data-englishname=\"price\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 173px; top: 80px;\"><span>单价:$price</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item item-table item-active\" data-name=\"name-table\" style=\"left: 0px; top: 108px; position: absolute; cursor: move; z-index: 0;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"route\" style=\"border:1px solid black;padding:10px;\">路线</th><th data-englishname=\"leader_uid\" style=\"border:1px solid black;padding:10px;\">团长ID</th><th data-englishname=\"leader_area_name\" style=\"border:1px solid black;padding:10px;\">团长小区</th><th data-englishname=\"leader_addr\" style=\"border:1px solid black;padding:10px;\">取货点</th><th data-englishname=\"leader_name\" style=\"border:1px solid black;padding:10px;\">团长姓名</th><th data-englishname=\"leader_phone\" style=\"border:1px solid black;padding:10px;\">团长电话</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '378.00', '680.00', null, '1', null, '1567925456', '1567925456', '1567925470');
-INSERT INTO `shop_diy_express_template` VALUES ('12', '000619', '308', '1', '[{\"id\":2,\"name\":\"商家信息\",\"type\":0,\"child\":[{\"id\":\"19\",\"name\":\"小程序名称\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"widget_name\"}]},{\"id\":5,\"name\":\"团长信息\",\"type\":0,\"child\":[{\"id\":\"35\",\"name\":\"团长姓名\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_name\"},{\"id\":\"34\",\"name\":\"团长昵称\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_nickname\"},{\"id\":\"69\",\"name\":\"取货点\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_addr\"},{\"id\":\"38\",\"name\":\"团长小区\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_area_name\"}]},{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"67\",\"name\":\"商品ID\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_id\"},{\"id\":\"68\",\"name\":\"货号\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_code\"},{\"id\":\"17\",\"name\":\"短标题\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"short_name\"},{\"id\":\"66\",\"name\":\"规格\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"property\"},{\"id\":\"4\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"number\"}]}]', '<div class=\"edit-box\" style=\"width: 355px; height: 982px;\">\n					<div class=\"item 19\" id=\"item-active\" data-name=\"19\" data-englishname=\"widget_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 61px; top: 0px;\"><span>小程序名称:$widget_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 35\" id=\"item-active\" data-name=\"35\" data-englishname=\"leader_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 2px; top: 17px;\"><span>团长姓名:$leader_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 34\" id=\"item-active\" data-name=\"34\" data-englishname=\"leader_nickname\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 176px; top: 20px;\"><span>团长昵称:$leader_nickname</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 69\" id=\"item-active\" data-name=\"69\" data-englishname=\"leader_addr\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 55px;\"><span>取货点:$leader_addr</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 38\" id=\"item-active\" data-name=\"38\" data-englishname=\"leader_area_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 36px;\"><span>团长小区:$leader_area_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item item-table\" data-name=\"name-table\" style=\"left: 2px; top: 82px; position: absolute; cursor: move;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"goods_id\" style=\"border:1px solid black;padding:10px;\">商品ID</th><th data-englishname=\"goods_code\" style=\"border:1px solid black;padding:10px;\">货号</th><th data-englishname=\"short_name\" style=\"border:1px solid black;padding:10px;\">短标题</th><th data-englishname=\"property\" style=\"border:1px solid black;padding:10px;\">规格</th><th data-englishname=\"number\" style=\"border:1px solid black;padding:10px;\">数量</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '353.00', '980.00', null, '1', null, '1567927066', '1567927787', null);
-INSERT INTO `shop_diy_express_template` VALUES ('13', '000619', '308', '3', '[{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"67\",\"name\":\"商品ID\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_id\"},{\"id\":\"68\",\"name\":\"货号\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_code\"},{\"id\":\"17\",\"name\":\"短标题\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"short_name\"},{\"id\":\"66\",\"name\":\"规格\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"property\"},{\"id\":\"4\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"number\"}]},{\"id\":2,\"name\":\"商家信息\",\"type\":0,\"child\":[{\"id\":\"19\",\"name\":\"小程序名称\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"widget_name\"},{\"id\":\"20\",\"name\":\"商家电话\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_phone\"}]}]', '<div class=\"edit-box\" style=\"width: 353px; height: 668px;\">\n					<div class=\"item 19\" id=\"item-active\" data-name=\"19\" data-englishname=\"widget_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 80px; top: 0px;\"><span>小程序名称:$widget_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item item-table item-active\" data-name=\"name-table\" style=\"left: 8px; top: 41px; position: absolute; cursor: move; z-index: 0;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"goods_id\" style=\"border:1px solid black;padding:10px;\">商品ID</th><th data-englishname=\"goods_code\" style=\"border:1px solid black;padding:10px;\">货号</th><th data-englishname=\"short_name\" style=\"border:1px solid black;padding:10px;\">短标题</th><th data-englishname=\"property\" style=\"border:1px solid black;padding:10px;\">规格</th><th data-englishname=\"number\" style=\"border:1px solid black;padding:10px;\">数量</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 20\" id=\"item-active\" data-name=\"20\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 75px; top: 19px;\"><span>商家电话:$merchant_phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '351.00', '666.00', null, '1', null, '1567927069', '1567928564', null);
-INSERT INTO `shop_diy_express_template` VALUES ('14', '000619', '308', '5', '[{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"62\",\"name\":\"团长小区\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_area_name\"},{\"id\":\"5\",\"name\":\"买家姓名\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"name\"},{\"id\":\"17\",\"name\":\"短标题\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"short_name\"},{\"id\":\"4\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"number\"}]}]', '<div class=\"edit-box\" style=\"width: 380px; height: 682px;\">\n					<div class=\"item item-table item-active\" data-name=\"name-table\" style=\"left: 0px; top: 132px; position: absolute; cursor: move;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"leader_area_name\" style=\"border:1px solid black;padding:10px;\">团长小区</th><th data-englishname=\"name\" style=\"border:1px solid black;padding:10px;\">买家姓名</th><th data-englishname=\"short_name\" style=\"border:1px solid black;padding:10px;\">短标题</th><th data-englishname=\"number\" style=\"border:1px solid black;padding:10px;\">数量</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '378.00', '680.00', null, '1', null, '1567929031', '1567929287', null);
-INSERT INTO `shop_diy_express_template` VALUES ('15', '000609', '296', '5', '[]', '<div class=\"edit-box\" style=\"width: 380px; height: 682px;\">\n					</div>', '378.00', '680.00', null, '1', null, '1568210751', '1568210751', null);
-INSERT INTO `shop_diy_express_template` VALUES ('16', '000808', '448', '1', '[{\"id\":2,\"name\":\"商家信息\",\"type\":0,\"child\":[{\"id\":\"70\",\"name\":\"商家姓名\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_name\"},{\"id\":\"21\",\"name\":\"商家地址\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_addr\"},{\"id\":\"20\",\"name\":\"商家电话\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_phone\"},{\"id\":\"19\",\"name\":\"小程序名称\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"widget_name\"}]},{\"id\":5,\"name\":\"团长信息\",\"type\":0,\"child\":[{\"id\":\"37\",\"name\":\"团长ID\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_uid\"},{\"id\":\"35\",\"name\":\"团长姓名\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_name\"},{\"id\":\"34\",\"name\":\"团长昵称\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_nickname\"},{\"id\":\"36\",\"name\":\"团长电话\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_phone\"},{\"id\":\"69\",\"name\":\"取货点\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_addr\"},{\"id\":\"38\",\"name\":\"团长小区\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_area_name\"},{\"id\":\"40\",\"name\":\"配送方式\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"express_type\"},{\"id\":\"39\",\"name\":\"团长城市\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_city\"}]},{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"2\",\"name\":\"商品名称\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goodsname\"},{\"id\":\"66\",\"name\":\"规格\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"property\"},{\"id\":\"4\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"number\"},{\"id\":\"7\",\"name\":\"单价\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"price\"}]}]', '<div class=\"edit-box\" style=\"width: 380px; height: 982px;\">\n					<div class=\"item 70\" id=\"item-active\" data-name=\"70\" data-englishname=\"merchant_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 0px;\"><span>商家姓名:$merchant_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 21\" id=\"item-active\" data-name=\"21\" data-englishname=\"merchant_addr\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; height: 26px; z-index: 0; left: 0px; top: 21px;\"><span>商家地址:$merchant_addr</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 20\" id=\"item-active\" data-name=\"20\" data-englishname=\"merchant_phone\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 43px;\"><span>商家电话:$merchant_phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 19\" id=\"item-active\" data-name=\"19\" data-englishname=\"widget_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 62px;\"><span>小程序名称:$widget_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 37\" id=\"item-active\" data-name=\"37\" data-englishname=\"leader_uid\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 163px; top: 0px;\"><span>团长ID:$leader_uid</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 35\" id=\"item-active\" data-name=\"35\" data-englishname=\"leader_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 162px; top: 22px;\"><span>团长姓名:$leader_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 34\" id=\"item-active\" data-name=\"34\" data-englishname=\"leader_nickname\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 163px; top: 42px;\"><span>团长昵称:$leader_nickname</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 36\" id=\"item-active\" data-name=\"36\" data-englishname=\"leader_phone\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 163px; top: 65px;\"><span>团长电话:$leader_phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 69\" id=\"item-active\" data-name=\"69\" data-englishname=\"leader_addr\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 86px;\"><span>取货点:$leader_addr</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 38\" id=\"item-active\" data-name=\"38\" data-englishname=\"leader_area_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 162px; top: 91px;\"><span>团长小区:$leader_area_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 40\" id=\"item-active\" data-name=\"40\" data-englishname=\"express_type\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 115px;\"><span>配送方式:$express_type</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 39\" id=\"item-active\" data-name=\"39\" data-englishname=\"leader_city\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 162px; top: 114px;\"><span>团长城市:$leader_city</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item item-table item-active\" data-name=\"name-table\" style=\"left: 0px; top: 137px; position: absolute; cursor: move; z-index: 0; width: 377px;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"goodsname\" style=\"border:1px solid black;padding:10px;\">商品名称</th><th data-englishname=\"property\" style=\"border:1px solid black;padding:10px;\">规格</th><th data-englishname=\"number\" style=\"border:1px solid black;padding:10px;\">数量</th><th data-englishname=\"price\" style=\"border:1px solid black;padding:10px;\">单价</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '378.00', '980.00', null, '1', null, '1572094938', '1572346755', null);
-INSERT INTO `shop_diy_express_template` VALUES ('17', '000800', '441', '4', '[{\"id\":1,\"name\":\"商品信息\",\"type\":0,\"child\":[{\"id\":\"45\",\"name\":\"商品ID\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"goods_id\"},{\"id\":\"46\",\"name\":\"货号\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"goods_code\"},{\"id\":\"1\",\"name\":\"商品名称\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"goodsname\"},{\"id\":\"43\",\"name\":\"短标题\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"short_name\"},{\"id\":\"42\",\"name\":\"标签\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"label\"},{\"id\":\"44\",\"name\":\"规格\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"property\"},{\"id\":\"3\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"number\"},{\"id\":\"8\",\"name\":\"单价\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"price\"}]},{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"65\",\"name\":\"路线\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"route\"},{\"id\":\"61\",\"name\":\"团长ID\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_uid\"},{\"id\":\"62\",\"name\":\"团长小区\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_area_name\"},{\"id\":\"71\",\"name\":\"取货点\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_addr\"},{\"id\":\"18\",\"name\":\"团长姓名\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_name\"},{\"id\":\"60\",\"name\":\"团长电话\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_phone\"}]}]', '<div class=\"edit-box\" style=\"width: 380px; height: 682px;\">\n					<div class=\"item 45\" id=\"item-active\" data-name=\"45\" data-englishname=\"goods_id\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 0px;\"><span>商品ID:$goods_id</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 46\" id=\"item-active\" data-name=\"46\" data-englishname=\"goods_code\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 52px;\"><span>货号:$goods_code</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 1\" id=\"item-active\" data-name=\"1\" data-englishname=\"goodsname\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 175px; top: 0px;\"><span>商品名称:$goodsname</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 43\" id=\"item-active\" data-name=\"43\" data-englishname=\"short_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 177px; top: 26px;\"><span>短标题:$short_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 42\" id=\"item-active\" data-name=\"42\" data-englishname=\"label\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 27px;\"><span>标签:$label</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 44\" id=\"item-active\" data-name=\"44\" data-englishname=\"property\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 176px; top: 54px;\"><span>规格:$property</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 3\" id=\"item-active\" data-name=\"3\" data-englishname=\"number\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 80px;\"><span>数量:$number</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 8\" id=\"item-active\" data-name=\"8\" data-englishname=\"price\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 173px; top: 80px;\"><span>单价:$price</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item item-table item-active\" data-name=\"name-table\" style=\"left: 0px; top: 108px; position: absolute; cursor: move; z-index: 0;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"route\" style=\"border:1px solid black;padding:10px;\">路线</th><th data-englishname=\"leader_uid\" style=\"border:1px solid black;padding:10px;\">团长ID</th><th data-englishname=\"leader_area_name\" style=\"border:1px solid black;padding:10px;\">团长小区</th><th data-englishname=\"leader_addr\" style=\"border:1px solid black;padding:10px;\">取货点</th><th data-englishname=\"leader_name\" style=\"border:1px solid black;padding:10px;\">团长姓名</th><th data-englishname=\"leader_phone\" style=\"border:1px solid black;padding:10px;\">团长电话</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '378.00', '680.00', null, '1', null, '1573551801', '1573551801', null);
-INSERT INTO `shop_diy_express_template` VALUES ('18', '000800', '441', '2', '[{\"id\":2,\"name\":\"商家信息\",\"type\":0,\"child\":[{\"id\":\"19\",\"name\":\"小程序名称\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"widget_name\"},{\"id\":\"70\",\"name\":\"商家姓名\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_name\"},{\"id\":\"20\",\"name\":\"商家电话\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_phone\"},{\"id\":\"21\",\"name\":\"商家地址\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_addr\"}]},{\"id\":4,\"name\":\"买家信息\",\"type\":0,\"child\":[{\"id\":\"9\",\"name\":\"买家电话\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"phone\"},{\"id\":\"6\",\"name\":\"买家姓名\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"name\"},{\"id\":\"33\",\"name\":\"买家区域\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"buyer_area\"},{\"id\":\"32\",\"name\":\"买家城市\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"buyer_city\"},{\"id\":\"26\",\"name\":\"买家地址\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"address\"},{\"id\":\"31\",\"name\":\"买家留言\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"remark\"},{\"id\":\"29\",\"name\":\"实付金额\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"payment_money\"}]},{\"id\":5,\"name\":\"团长信息\",\"type\":0,\"child\":[{\"id\":\"40\",\"name\":\"配送方式\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"express_type\"}]},{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"67\",\"name\":\"商品ID\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_id\"},{\"id\":\"2\",\"name\":\"商品名称\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goodsname\"},{\"id\":\"66\",\"name\":\"规格\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"property\"},{\"id\":\"7\",\"name\":\"单价\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"price\"},{\"id\":\"4\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"number\"}]}]', '<div class=\"edit-box\" style=\"width: 380px; height: 682px;\">\n					<div class=\"item 19\" id=\"item-active\" data-name=\"19\" data-englishname=\"widget_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 104px; top: 4px;\"><span>小程序名称:$widget_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 70\" id=\"item-active\" data-name=\"70\" data-englishname=\"merchant_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 24px;\"><span>商家姓名:$merchant_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 20\" id=\"item-active\" data-name=\"20\" data-englishname=\"merchant_phone\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 173px; top: 25px;\"><span>商家电话:$merchant_phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 21\" id=\"item-active\" data-name=\"21\" data-englishname=\"merchant_addr\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 47px;\"><span>商家地址:$merchant_addr</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 9\" id=\"item-active\" data-name=\"9\" data-englishname=\"phone\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 173px; top: 69px;\"><span>买家电话:$phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 6\" id=\"item-active\" data-name=\"6\" data-englishname=\"name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 68px;\"><span>买家姓名:$name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 33\" id=\"item-active\" data-name=\"33\" data-englishname=\"buyer_area\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 92px;\"><span>买家区域:$buyer_area</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 32\" id=\"item-active\" data-name=\"32\" data-englishname=\"buyer_city\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 171px; top: 91px;\"><span>买家城市:$buyer_city</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 26\" id=\"item-active\" data-name=\"26\" data-englishname=\"address\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 116px;\"><span>买家地址:$address</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 40\" id=\"item-active\" data-name=\"40\" data-englishname=\"express_type\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 171px; top: 117px;\"><span>配送方式:$express_type</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 31\" id=\"item-active\" data-name=\"31\" data-englishname=\"remark\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 137px;\"><span>买家留言:$remark</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 29\" id=\"item-active\" data-name=\"29\" data-englishname=\"payment_money\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 169px; top: 136px;\"><span>实付金额:$payment_money</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item item-table item-active\" data-name=\"name-table\" style=\"left: 4px; top: 171px; position: absolute; cursor: move; z-index: 0; width: 369px;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"goods_id\" style=\"border:1px solid black;padding:10px;\">商品ID</th><th data-englishname=\"goodsname\" style=\"border:1px solid black;padding:10px;\">商品名称</th><th data-englishname=\"property\" style=\"border:1px solid black;padding:10px;\">规格</th><th data-englishname=\"price\" style=\"border:1px solid black;padding:10px;\">单价</th><th data-englishname=\"number\" style=\"border:1px solid black;padding:10px;\">数量</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '378.00', '680.00', null, '1', null, '1573551809', '1573551809', null);
-INSERT INTO `shop_diy_express_template` VALUES ('19', '000847', '497', '2', '[{\"id\":2,\"name\":\"商家信息\",\"type\":0,\"child\":[{\"id\":\"70\",\"name\":\"商家姓名\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_name\"},{\"id\":\"20\",\"name\":\"商家电话\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_phone\"},{\"id\":\"21\",\"name\":\"商家地址\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_addr\"},{\"id\":\"19\",\"name\":\"小程序名称\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"widget_name\"}]},{\"id\":4,\"name\":\"买家信息\",\"type\":0,\"child\":[{\"id\":\"6\",\"name\":\"买家姓名\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"name\"},{\"id\":\"33\",\"name\":\"买家区域\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"buyer_area\"},{\"id\":\"29\",\"name\":\"实付金额\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"payment_money\"},{\"id\":\"26\",\"name\":\"买家地址\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"address\"},{\"id\":\"9\",\"name\":\"买家电话\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"phone\"}]},{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"67\",\"name\":\"商品ID\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_id\"},{\"id\":\"2\",\"name\":\"商品名称\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goodsname\"},{\"id\":\"4\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"number\"},{\"id\":\"7\",\"name\":\"单价\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"price\"},{\"id\":\"66\",\"name\":\"规格\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"property\"}]},{\"id\":5,\"name\":\"团长信息\",\"type\":0,\"child\":[{\"id\":\"38\",\"name\":\"团长小区\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_area_name\"}]}]', '<div class=\"edit-box\" style=\"width: 212px; height: 299px;\">\n					<div class=\"item 70\" id=\"item-active\" data-name=\"70\" data-englishname=\"merchant_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 24px;\"><span>商家姓名:$merchant_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 20\" id=\"item-active\" data-name=\"20\" data-englishname=\"merchant_phone\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 173px; top: 25px;\"><span>商家电话:$merchant_phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 21\" id=\"item-active\" data-name=\"21\" data-englishname=\"merchant_addr\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 47px;\"><span>商家地址:$merchant_addr</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 6\" id=\"item-active\" data-name=\"6\" data-englishname=\"name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 68px;\"><span>买家姓名:$name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 33\" id=\"item-active\" data-name=\"33\" data-englishname=\"buyer_area\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 92px;\"><span>买家区域:$buyer_area</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 29\" id=\"item-active\" data-name=\"29\" data-englishname=\"payment_money\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 169px; top: 136px;\"><span>实付金额:$payment_money</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 26\" id=\"item-active\" data-name=\"26\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move;\"><span>买家地址:$address</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 9\" id=\"item-active\" data-name=\"9\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move;\"><span>买家电话:$phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item item-table\" data-name=\"name-table\" style=\"left: 4px; top: 171px; position: absolute; cursor: move;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"goods_id\" style=\"border:1px solid black;padding:10px;\">商品ID</th><th data-englishname=\"goodsname\" style=\"border:1px solid black;padding:10px;\">商品名称</th><th data-englishname=\"number\" style=\"border:1px solid black;padding:10px;\">数量</th><th data-englishname=\"price\" style=\"border:1px solid black;padding:10px;\">单价</th><th data-englishname=\"property\" style=\"border:1px solid black;padding:10px;\">规格</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 19\" id=\"item-active\" data-name=\"19\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move;\"><span>小程序名称:$widget_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 38\" id=\"item-active\" data-name=\"38\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move;\"><span>团长小区:$leader_area_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '210.00', '297.00', null, '1', null, '1576826768', '1576828986', '1576829087');
-INSERT INTO `shop_diy_express_template` VALUES ('20', '000847', '497', '4', '[{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"71\",\"name\":\"取货点\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_addr\"},{\"id\":\"60\",\"name\":\"团长电话\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_phone\"},{\"id\":\"59\",\"name\":\"团长昵称\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_nickname\"},{\"id\":\"62\",\"name\":\"团长小区\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_area_name\"}]},{\"id\":1,\"name\":\"商品信息\",\"type\":0,\"child\":[{\"id\":\"45\",\"name\":\"商品ID\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"goods_id\"},{\"id\":\"44\",\"name\":\"规格\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"property\"},{\"id\":\"8\",\"name\":\"单价\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"price\"},{\"id\":\"3\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"number\"}]},{\"id\":2,\"name\":\"商家信息\",\"type\":0,\"child\":[{\"id\":\"19\",\"name\":\"小程序名称\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"widget_name\"},{\"id\":\"20\",\"name\":\"商家电话\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_phone\"},{\"id\":\"21\",\"name\":\"商家地址\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_addr\"},{\"id\":\"70\",\"name\":\"商家姓名\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_name\"}]}]', '<div class=\"edit-box\" style=\"width: 212px; height: 299px;\">\n					<div class=\"item item-table\" data-name=\"name-table\" style=\"left: 0px; top: 190px; position: absolute; cursor: move; z-index: 0;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"leader_addr\" style=\"border:1px solid black;padding:10px;\">取货点</th><th data-englishname=\"leader_phone\" style=\"border:1px solid black;padding:10px;\">团长电话</th><th data-englishname=\"leader_nickname\" style=\"border:1px solid black;padding:10px;\">团长昵称</th><th data-englishname=\"leader_area_name\" style=\"border:1px solid black;padding:10px;\">团长小区</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 45\" id=\"item-active\" data-name=\"45\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 4px; top: 27px;\"><span>商品ID:$goods_id</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 44\" id=\"item-active\" data-name=\"44\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 4px; top: 69px;\"><span>规格:$property</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 8\" id=\"item-active\" data-name=\"8\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 117px; top: 25px;\"><span>单价:$price</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 3\" id=\"item-active\" data-name=\"3\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 113px; top: 73px;\"><span>数量:$number</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 19\" id=\"item-active\" data-name=\"19\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 29px; top: 0px;\"><span>小程序名称:$widget_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 20\" id=\"item-active\" data-name=\"20\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 1px; top: 130px; height: 28px;\"><span>商家电话:$merchant_phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 21\" id=\"item-active\" data-name=\"21\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 5px; top: 102px;\"><span>商家地址:$merchant_addr</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 70\" id=\"item-active\" data-name=\"70\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 3px; top: 164px;\"><span>商家姓名:$merchant_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '210.00', '297.00', null, '1', null, '1576829099', '1576839306', null);
-
--- ----------------------------
 -- Table structure for `shop_electronics`
 -- ----------------------------
 DROP TABLE IF EXISTS `shop_electronics`;
@@ -676,7 +652,7 @@ CREATE TABLE `shop_electronics` (
   `company` varchar(255) DEFAULT NULL COMMENT '发件人公司',
   `name` varchar(255) DEFAULT NULL COMMENT '发件人名称',
   `tel` varchar(255) DEFAULT NULL COMMENT '发件人电话',
-  `phone` int(11) DEFAULT NULL COMMENT '发件人手机',
+  `phone` char(11) CHARACTER SET utf8 DEFAULT NULL COMMENT '发件人手机',
   `post_code` char(6) DEFAULT NULL COMMENT '发件人邮编',
   `addr` varchar(255) DEFAULT NULL COMMENT '发件人详细地址',
   `province_code` char(6) DEFAULT NULL COMMENT '省编码',
@@ -693,6 +669,9 @@ CREATE TABLE `shop_electronics` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COMMENT='商城-电子面单';
 
+-- ----------------------------
+-- Records of shop_electronics
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_express`
@@ -715,7 +694,6 @@ CREATE TABLE `shop_express` (
 -- ----------------------------
 -- Records of shop_express
 -- ----------------------------
-
 INSERT INTO `shop_express` VALUES ('35', 'ccvWPn', '13', '8', '0', '', '1', '1562844562', null, null);
 
 -- ----------------------------
@@ -726,6 +704,7 @@ CREATE TABLE `shop_express_template` (
   `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `key` char(6) NOT NULL COMMENT '唯一标识符',
   `merchant_id` int(11) NOT NULL COMMENT '商户id',
+  `supplier_id` int(10) NOT NULL DEFAULT '0' COMMENT '门店id（非门店为0）',
   `name` varchar(50) NOT NULL COMMENT '模板名称',
   `type` tinyint(1) NOT NULL COMMENT '类型 1记件 2记重 3距离',
   `status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '状态 1激活 0未激活',
@@ -738,10 +717,9 @@ CREATE TABLE `shop_express_template` (
 -- ----------------------------
 -- Records of shop_express_template
 -- ----------------------------
-
-INSERT INTO `shop_express_template` VALUES ('19', 'ccvWPn', '13', '全国统一运费', '1', '1', '1558581943', '1582781407', null);
-INSERT INTO `shop_express_template` VALUES ('223', 'ccvWPn', '13', '222', '3', '0', '1582218502', '1582781407', null);
-INSERT INTO `shop_express_template` VALUES ('224', 'ccvWPn', '13', '按照距离', '3', '0', '1582420584', '1582781407', null);
+INSERT INTO `shop_express_template` VALUES ('19', 'ccvWPn', '13', '0', '全国统一运费', '1', '1', '1558581943', '1582781407', null);
+INSERT INTO `shop_express_template` VALUES ('223', 'ccvWPn', '13', '0', '222', '3', '0', '1582218502', '1582781407', null);
+INSERT INTO `shop_express_template` VALUES ('224', 'ccvWPn', '13', '0', '按照距离', '3', '0', '1582420584', '1582781407', null);
 
 -- ----------------------------
 -- Table structure for `shop_express_template_details`
@@ -751,13 +729,14 @@ CREATE TABLE `shop_express_template_details` (
   `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `key` char(6) NOT NULL COMMENT '唯一标识符',
   `merchant_id` int(11) NOT NULL COMMENT '商户id',
+  `supplier_id` int(10) NOT NULL DEFAULT '0' COMMENT '门店id（非门店为0）',
   `shop_express_template_id` int(11) NOT NULL DEFAULT '0' COMMENT '快递模板id',
   `names` text NOT NULL COMMENT '城市名称,逗号分割',
   `first_num` int(10) NOT NULL COMMENT '首个(重)数量',
   `first_price` decimal(10,2) NOT NULL COMMENT '首个(重)价格',
   `expand_num` int(10) NOT NULL COMMENT '续个(重)数量',
   `expand_price` decimal(10,2) NOT NULL COMMENT '续个(重)价格',
-  `distance` text NOT NULL COMMENT '距离价格',
+  `distance` text COMMENT '距离价格',
   `status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '状态 1激活 0未激活',
   `create_time` int(11) NOT NULL COMMENT '创建时间',
   `update_time` int(11) DEFAULT NULL COMMENT '修改时间',
@@ -768,10 +747,10 @@ CREATE TABLE `shop_express_template_details` (
 -- ----------------------------
 -- Records of shop_express_template_details
 -- ----------------------------
-INSERT INTO `shop_express_template_details` VALUES ('345', 'ccvWPn', '13', '208', '', '0', '0.00', '0', '0.00', '{\"start_number\":[\"0\"],\"end_number\":[\"2\"],\"freight\":[\"3\"]}', '1', '1575338084', null, null);
-INSERT INTO `shop_express_template_details` VALUES ('374', 'ccvWPn', '13', '19', '全国统一运费', '1', '0.00', '1', '1.00', '', '1', '1576721823', null, null);
-INSERT INTO `shop_express_template_details` VALUES ('377', 'ccvWPn', '13', '223', '', '0', '0.00', '0', '0.00', '{\"start_number\":[\"0\"],\"end_number\":[\"5\"],\"freight\":[\"5\"]}', '1', '1582218502', null, null);
-INSERT INTO `shop_express_template_details` VALUES ('380', 'ccvWPn', '13', '224', '', '0', '0.00', '0', '0.00', '{\"start_number\":[\"0\",\"5\"],\"end_number\":[\"5\",\"1200\"],\"freight\":[\"5\",\"8\"]}', '1', '1582762747', null, null);
+INSERT INTO `shop_express_template_details` VALUES ('345', 'ccvWPn', '13', '0', '208', '', '0', '0.00', '0', '0.00', '{\"start_number\":[\"0\"],\"end_number\":[\"2\"],\"freight\":[\"3\"]}', '1', '1575338084', null, null);
+INSERT INTO `shop_express_template_details` VALUES ('374', 'ccvWPn', '13', '0', '19', '全国统一运费', '1', '0.00', '1', '1.00', '', '1', '1576721823', null, null);
+INSERT INTO `shop_express_template_details` VALUES ('377', 'ccvWPn', '13', '0', '223', '', '0', '0.00', '0', '0.00', '{\"start_number\":[\"0\"],\"end_number\":[\"5\"],\"freight\":[\"5\"]}', '1', '1582218502', null, null);
+INSERT INTO `shop_express_template_details` VALUES ('380', 'ccvWPn', '13', '0', '224', '', '0', '0.00', '0', '0.00', '{\"start_number\":[\"0\",\"5\"],\"end_number\":[\"5\",\"1200\"],\"freight\":[\"5\",\"8\"]}', '1', '1582762747', null, null);
 
 -- ----------------------------
 -- Table structure for `shop_flash_sale`
@@ -788,6 +767,7 @@ CREATE TABLE `shop_flash_sale` (
   `name` varchar(255) NOT NULL COMMENT '商品名称',
   `property` text NOT NULL COMMENT '属性信息（json：属性1 property1_name 属性2 property2_name 规格的秒杀数量 stocks 规格的秒杀价 flash_price)',
   `flash_price` decimal(10,2) NOT NULL COMMENT '秒杀的最低价格',
+  `line_price` decimal(10,2) NOT NULL,
   `stocks` int(10) NOT NULL COMMENT '秒杀商品的总库存',
   `pic_url` varchar(255) NOT NULL COMMENT '商品图片',
   `status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '状态 1有效 0无效',
@@ -839,6 +819,7 @@ CREATE TABLE `shop_goods` (
   `name` varchar(128) NOT NULL COMMENT '商品名称',
   `code` varchar(52) DEFAULT NULL COMMENT '商品编码',
   `pic_urls` text NOT NULL COMMENT '商品图片',
+  `thum_pic` text NOT NULL COMMENT '缩略图',
   `video_url` varchar(256) NOT NULL DEFAULT '' COMMENT '视频地址',
   `video_pic_url` varchar(256) NOT NULL DEFAULT '' COMMENT '视频图片地址',
   `video_id` varchar(32) NOT NULL DEFAULT '' COMMENT '视频id(回调使用)',
@@ -848,6 +829,8 @@ CREATE TABLE `shop_goods` (
   `weight` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '重量',
   `line_price` decimal(10,2) NOT NULL COMMENT '划线价',
   `stocks` int(10) NOT NULL COMMENT '总库存',
+  `time_icon` varchar(256) NOT NULL COMMENT '时效图标',
+  `is_stock_open` tinyint(1) NOT NULL DEFAULT '1' COMMENT '库存为0下架',
   `category_id` int(11) NOT NULL DEFAULT '0' COMMENT '类目id',
   `m_category_id` int(10) NOT NULL DEFAULT '0' COMMENT '分组id',
   `property1` varchar(256) DEFAULT NULL COMMENT '第一个属性',
@@ -863,6 +846,7 @@ CREATE TABLE `shop_goods` (
   `detail_info` text COMMENT '详细说明(富文本)',
   `simple_info` varchar(256) DEFAULT NULL COMMENT '简单说明',
   `label` varchar(256) DEFAULT NULL COMMENT '标签',
+  `label_id` varchar(50) NOT NULL COMMENT '标签id',
   `short_name` varchar(256) DEFAULT NULL COMMENT '短标题',
   `supplier_id` int(10) NOT NULL DEFAULT '0' COMMENT '供应商id，0为系统',
   `supplier_money` decimal(8,2) DEFAULT '0.00' COMMENT '供应商价格',
@@ -880,6 +864,9 @@ CREATE TABLE `shop_goods` (
   `look` tinyint(10) NOT NULL DEFAULT '0' COMMENT '查看量',
   `is_open_assemble` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否开启拼团 0不开启 1开启',
   `regimental_only` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否团长专属 1是 0否',
+  `is_cart` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否允许加入购物车，1允许 0不允许 为0时只能单独购买',
+  `is_parcel` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否单独包邮',
+  `is_advance_sale` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否预售商品',
   `status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '状态 1有效 0无效[下架]',
   `start_type` tinyint(1) DEFAULT '1' COMMENT '商家时间类型 1立即上架 2自定义 3暂不售卖',
   `start_time` int(11) DEFAULT NULL COMMENT '开始售卖时间',
@@ -897,14 +884,18 @@ CREATE TABLE `shop_goods` (
   `bargain_rule` text COMMENT '砍价规则',
   `is_recruits` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否参加新人专享 0未参加 1参加',
   `partner_id` int(11) NOT NULL DEFAULT '0' COMMENT '合伙人id',
+  `grouping_id` int(11) NOT NULL DEFAULT '0' COMMENT '集团分组ID',
+  `solitaire_id` int(11) NOT NULL DEFAULT '0' COMMENT '接龙活动ID',
   `distribution` decimal(8,2) NOT NULL DEFAULT '0.00' COMMENT '分销佣金',
   `create_time` int(11) NOT NULL COMMENT '创建时间',
   `update_time` int(11) DEFAULT NULL COMMENT '修改时间',
   `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='商品表';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='商品表';
 
-
+-- ----------------------------
+-- Records of shop_goods
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_goods_city_group`
@@ -926,6 +917,47 @@ CREATE TABLE `shop_goods_city_group` (
 
 -- ----------------------------
 -- Records of shop_goods_city_group
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `shop_goods_label`
+-- ----------------------------
+DROP TABLE IF EXISTS `shop_goods_label`;
+CREATE TABLE `shop_goods_label` (
+  `id` int(8) NOT NULL AUTO_INCREMENT,
+  `key` varchar(8) NOT NULL,
+  `merchant_id` int(8) NOT NULL DEFAULT '0',
+  `supplier_id` int(8) NOT NULL DEFAULT '0',
+  `title` varchar(10) NOT NULL,
+  `status` int(1) NOT NULL DEFAULT '1' COMMENT '0未开启 1开启',
+  `create_time` varchar(12) NOT NULL,
+  `update_time` varchar(12) DEFAULT NULL,
+  `delete_time` varchar(12) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of shop_goods_label
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `shop_grouping`
+-- ----------------------------
+DROP TABLE IF EXISTS `shop_grouping`;
+CREATE TABLE `shop_grouping` (
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `key` char(6) NOT NULL COMMENT '唯一标识符',
+  `merchant_id` int(11) NOT NULL COMMENT '商户id',
+  `name` varchar(128) NOT NULL COMMENT '集团分组名称',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态 1有效 0无效',
+  `create_time` int(11) NOT NULL COMMENT '创建时间',
+  `update_time` int(11) DEFAULT NULL COMMENT '修改时间',
+  `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='商品集团分组表';
+
+-- ----------------------------
+-- Records of shop_grouping
 -- ----------------------------
 
 -- ----------------------------
@@ -1066,6 +1098,34 @@ INSERT INTO `shop_leader_level` VALUES ('27', 'ccvWPn', '13', '二级团长', '1
 INSERT INTO `shop_leader_level` VALUES ('28', 'ccvWPn', '13', '三级团长', '100000', '3.00', '2', '1', '1571967715', '1571967715', null);
 
 -- ----------------------------
+-- Table structure for `shop_live`
+-- ----------------------------
+DROP TABLE IF EXISTS `shop_live`;
+CREATE TABLE `shop_live` (
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `name` varchar(50) CHARACTER SET utf8 NOT NULL DEFAULT '' COMMENT '直播房间名',
+  `roomid` int(11) NOT NULL COMMENT '直播房间ID',
+  `cover_img` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT '' COMMENT '封面图片地址',
+  `start_time` int(11) NOT NULL COMMENT '直播计划开始时间',
+  `end_time` int(11) NOT NULL COMMENT '直播计划结束时间',
+  `anchor_name` varchar(50) NOT NULL COMMENT '主播名',
+  `share_img` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT '' COMMENT '主播头像',
+  `goods` text CHARACTER SET utf8 NOT NULL COMMENT '商品列表json',
+  `live_status` int(5) NOT NULL COMMENT '直播状态 101: 直播中, 102: 未开始, 103: 已结束, 104: 禁播, 105: 暂停中, 106: 异常, 107: 已过期',
+  `sort` int(3) NOT NULL DEFAULT '0' COMMENT '排序(0~999 越大排越前)',
+  `replay` text CHARACTER SET utf8 COMMENT '回放源视频(json)',
+  `status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否在商品显示 0=否 1=是',
+  `create_time` int(11) NOT NULL COMMENT '创建时间',
+  `update_time` int(11) DEFAULT NULL COMMENT '修改时间',
+  `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT COMMENT='小程序直播房间表';
+
+-- ----------------------------
+-- Records of shop_live
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for `shop_lucky_voucher`
 -- ----------------------------
 DROP TABLE IF EXISTS `shop_lucky_voucher`;
@@ -1082,7 +1142,9 @@ CREATE TABLE `shop_lucky_voucher` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8 COMMENT='抵用券-拼手气表';
 
-
+-- ----------------------------
+-- Records of shop_lucky_voucher
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_marchant_category`
@@ -1093,6 +1155,7 @@ CREATE TABLE `shop_marchant_category` (
   `name` varchar(50) DEFAULT NULL COMMENT '类目名称',
   `key` char(6) NOT NULL COMMENT '唯一标识符',
   `merchant_id` int(11) NOT NULL COMMENT '商户id',
+  `supplier_id` int(11) NOT NULL,
   `parent_id` int(11) NOT NULL DEFAULT '0' COMMENT '父类',
   `pic_url` varchar(255) NOT NULL DEFAULT '' COMMENT '图片地址',
   `img_url` varchar(255) NOT NULL COMMENT '分类海报',
@@ -1104,9 +1167,153 @@ CREATE TABLE `shop_marchant_category` (
   `update_time` int(11) DEFAULT NULL COMMENT '修改时间',
   `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1015 DEFAULT CHARSET=utf8 COMMENT='店铺分组表';
+) ENGINE=InnoDB AUTO_INCREMENT=1017 DEFAULT CHARSET=utf8 COMMENT='店铺分组表';
 
+-- ----------------------------
+-- Records of shop_marchant_category
+-- ----------------------------
+INSERT INTO `shop_marchant_category` VALUES ('1015', '1', 'ccvWPn', '13', '0', '0', '', '', null, '0', '1', '1', '1590473627', null, null);
+INSERT INTO `shop_marchant_category` VALUES ('1016', '2', 'ccvWPn', '13', '0', '1015', '', '', null, '0', '2', '1', '1590473635', null, null);
 
+-- ----------------------------
+-- Table structure for `shop_menu`
+-- ----------------------------
+DROP TABLE IF EXISTS `shop_menu`;
+CREATE TABLE `shop_menu` (
+  `id` int(8) NOT NULL AUTO_INCREMENT,
+  `name` varchar(125) NOT NULL,
+  `path` varchar(125) NOT NULL,
+  `hidden` tinyint(1) NOT NULL,
+  `pid` int(8) NOT NULL,
+  `create_time` int(11) NOT NULL,
+  `update_time` int(11) DEFAULT NULL,
+  `delete_time` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=121 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of shop_menu
+-- ----------------------------
+INSERT INTO `shop_menu` VALUES ('1', '', '/login', '1', '0', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('2', '', '/404', '1', '0', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('3', '', '/', '1', '0', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('4', '应用列表', '/', '0', '3', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('5', '应用信息', '/appinfo', '0', '3', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('6', '', '/info/updatePW', '1', '0', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('7', '修改密码', '/', '0', '6', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('8', '总览', '/dashboard', '0', '0', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('9', '数据概览', '/dashboard', '0', '8', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('10', '升级日志', '/upgrade', '0', '8', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('11', '商品', '/goods/list', '0', '0', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('12', '商品列表', '/goods/list', '0', '11', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('13', '商品分组', '/goods/group', '0', '11', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('14', '回收站', '/goods/recyclebin', '0', '11', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('15', '商品添加', '/goods/add', '1', '11', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('16', '订单', '/order/manage', '0', '0', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('17', '订单管理', '/order/manage', '0', '16', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('18', '订单概述', '/order/summary', '0', '16', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('19', '评价管理', '/order/comment', '0', '16', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('20', '订单配送', '/order/print', '0', '16', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('21', '会员', '/vip/list', '0', '0', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('22', '会员列表', '/vip/list', '0', '21', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('23', '会员等级', '/vip/unpay', '0', '21', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('24', '团长', '/customers/head', '0', '0', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('25', '团长', '/customers/head', '0', '24', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('26', '团长审核', '/customers/audit', '0', '24', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('27', '团长等级', '/customers/leave', '0', '24', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('28', '路线', '/customers/warehouse', '0', '24', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('29', '设置', '/setting/tuanconfig', '0', '24', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('30', '佣金流水', '/finance/record', '0', '24', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('31', '分销', '/subCommission/setting', '0', '0', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('32', '超级会员', '/subCommission/setting', '0', '31', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('33', '代理商', '/subCommission/agent', '0', '31', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('34', '运营商', '/subCommission/operator', '0', '31', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('35', '佣金记录', '/subCommission/record', '0', '31', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('36', '会员审核', '/subCommission/upUser', '0', '31', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('37', '设置', '/subCommission/distribution', '0', '31', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('38', '分销商', '/subCommission/distributors', '0', '31', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('39', '应用', '/marketing/index', '0', '0', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('40', '应用管理', '/marketing/index', '0', '39', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('41', '优惠券', '/marketing/coupon', '1', '39', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('42', '购物返现', '/marketing/buyCashback', '1', '39', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('43', '秒杀', '/marketing/seckill', '1', '39', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('44', '签到', '/marketing/singin', '1', '39', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('45', '订阅消息', '/marketing/apptamplate', '1', '39', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('46', '拼团', '/marketing/assemble', '1', '39', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('47', '充值', '/marketing/pay', '1', '39', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('48', '砍价', '/marketing/bargain', '1', '39', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('49', '满减', '/marketing/reduction', '1', '39', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('50', '新人专享', '/marketing/recuits', '1', '39', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('51', '积分商城', '/marketing/score', '1', '39', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('52', '预约送达', '/marketing/estimated', '1', '39', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('53', '会员PLUS', '/vip/pay', '1', '39', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('54', '自定义版权', '/marketing/copyright', '1', '39', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('55', '数据', '/finance/apply', '0', '0', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('56', '提现申请', '/finance/apply', '0', '55', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('57', '销售统计', '/statistics/sales', '0', '55', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('58', '商品销售统计', '/statistics/goodsSales', '0', '55', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('59', '团长销售统计', '/statistics/leaderSales', '0', '55', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('60', '用户排行统计', '/statistics/userSales', '0', '55', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('61', '仓库', '/warehouse/list', '0', '0', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('62', '仓库管理', '/warehouse/list', '0', '61', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('63', '配送小区', '/warehouse/warehouseLeader', '0', '61', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('64', '入库管理', '/warehouse/inComings', '0', '61', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('65', '入库新增', '/warehouse/inComings/add', '1', '61', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('66', '入库详情', '/warehouse/inComings/info', '1', '61', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('67', '入库查询', '/warehouse/inComingsSearch', '0', '61', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('68', '出库管理', '/warehouse/outbounds', '0', '61', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('69', '出库新增', '/warehouse/outbounds/add', '1', '61', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('70', '出库详情', '/warehouse/outbounds/info', '1', '61', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('71', '出库查询', '/warehouse/outboundsSearch', '0', '61', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('72', '盘点管理', '/warehouse/inventories', '0', '61', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('73', '盘点新增', '/warehouse/inventories/add', '1', '61', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('74', '盘点详情', '/warehouse/inventories/info', '1', '61', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('75', '现有库存', '/warehouse/realStock', '0', '61', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('76', '门店', '/supplier/apply', '0', '0', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('77', '申请列表', '/supplier/apply', '0', '76', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('78', '配置', '/supplier/supplierConfig', '0', '76', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('79', '门店', '/supplier/list', '0', '76', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('80', '商品', '/supplier/goods', '0', '76', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('81', '订单', '/supplier/order', '0', '76', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('82', '提现', '/supplier/withdrawal', '0', '76', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('83', '到店付款', '/marketing/PaymentInStore', '0', '76', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('84', '小程序', '/applet/baseconfig', '0', '0', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('85', '基础设置', '/applet/baseconfig', '0', '84', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('86', '权限', '/employee/manage', '0', '0', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('87', '员工管理', '/employee/manage', '0', '86', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('88', '角色管理', '/employee/role', '0', '86', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('89', '客服管理', '/employee/kefu', '0', '86', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('90', '设置', '/setting/appsetting', '0', '0', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('91', '基础设置', '/setting/appsetting', '0', '90', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('92', '运费模板', '/setting/express', '0', '90', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('93', '收货信息', '/setting/takegoods', '0', '90', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('94', '电子面单', '/setting/expressdoc', '0', '90', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('95', '页面配置', '/setting/viewconfig', '0', '90', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('96', 'UU跑腿', '/setting/uu', '0', '90', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('97', '点我达', '/setting/dianwoda', '0', '90', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('98', '小票打印', '/setting/yly', '0', '90', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('99', '分享海报', '/setting/posters', '0', '90', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('100', '常见问题', '/setting/help', '0', '90', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('101', '附件', '/setting/enclosure', '0', '90', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('102', '短信', '/setting/sms', '0', '90', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('103', '物流查询', '/setting/logistics', '0', '90', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('104', '日志', '/operationlog', '0', '0', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('105', '操作记录', '/operationlog', '0', '104', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('106', '装修', '/goToOld', '0', '0', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('107', '装修', '/goToOld', '0', '106', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('108', '直播', '/liveBroadcast', '1', '0', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('109', '直播', '/liveBroadcast', '0', '108', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('110', '积分商城', '/score/list/add', '1', '0', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('111', '积分商品添加', '/score/list/add', '0', '110', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('112', '未授权', '/didopen', '1', '0', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('113', '未授权', '/didopen', '0', '112', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('114', '', '*', '1', '0', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('115', '集团分组', '/goods/groupGrouping', '1', '11', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('116', '商品标签', '/goods/label', '1', '11', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('117', '商品推荐', '/marketing/recommend', '1', '39', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('118', '开屏广告', '/applet/openadvertising', '1', '84', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('119', '小程序上传', '/applet/upload', '1', '84', '1586418114', '1586418114', null);
+INSERT INTO `shop_menu` VALUES ('120', '小票打印模板', '/setting/ylyTemplate', '1', '90', '1586418114', '1586418114', null);
 
 -- ----------------------------
 -- Table structure for `shop_operator_user`
@@ -1135,7 +1342,9 @@ CREATE TABLE `shop_operator_user` (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT COMMENT='运营商';
 
-
+-- ----------------------------
+-- Records of shop_operator_user
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_order`
@@ -1175,6 +1384,9 @@ CREATE TABLE `shop_order` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8 COMMENT='商品订单表';
 
+-- ----------------------------
+-- Records of shop_order
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_order_group`
@@ -1192,7 +1404,9 @@ CREATE TABLE `shop_order_group` (
   `total_price` decimal(8,2) DEFAULT '0.00' COMMENT '订单总额',
   `express_price` double(8,2) DEFAULT '0.00' COMMENT '快递费用',
   `payment_money` decimal(8,2) DEFAULT '0.00' COMMENT '付款总额(减去优惠)',
+  `modify_price` decimal(8,2) DEFAULT '0.00' COMMENT '卖家修改后原付款价格',
   `reduction_achieve` decimal(8,2) DEFAULT '0.00' COMMENT '满减',
+  `vip` decimal(8,2) DEFAULT '0.00' COMMENT 'vip 优惠',
   `voucher_id` int(10) DEFAULT '0' COMMENT '优惠券id',
   `is_tuan` tinyint(1) DEFAULT '0' COMMENT '是否社区团购 1=是 0=否',
   `express_type` tinyint(1) DEFAULT '0' COMMENT '发货方式 0=快递 1=自提 2=团长送货',
@@ -1221,6 +1435,7 @@ CREATE TABLE `shop_order_group` (
   `estimated_service_time` varchar(255) NOT NULL,
   `is_bargain` int(1) NOT NULL DEFAULT '0',
   `is_assemble` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否拼团 0=否 1=是',
+  `is_advance` int(1) NOT NULL DEFAULT '0' COMMENT '预购订单',
   `status` tinyint(1) DEFAULT '0' COMMENT '状态 0=待付款 1=待发货 2=已取消(24小时未支付) 3=已发货 4=已退款 5=退款中 6=待评价 7=已完成(评价后)  8=已删除  9一键退款  11=拼团中',
   `remark` varchar(255) DEFAULT '' COMMENT '备注',
   `admin_remark` varchar(255) DEFAULT '' COMMENT '管理员备注',
@@ -1231,13 +1446,18 @@ CREATE TABLE `shop_order_group` (
   `reduction_max_money` float(11,2) NOT NULL,
   `reduction_min_money` float(11,2) NOT NULL,
   `commission` float(11,2) NOT NULL COMMENT '分销总佣金',
-  `commissions_pool` decimal(11, 2) NOT NULL DEFAULT 0.00 COMMENT '未分配完的分销佣金',
   `create_time` int(11) NOT NULL COMMENT '创建时间',
   `update_time` int(11) DEFAULT NULL COMMENT '更新时间',
   `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
+  `send_express_type` tinyint(1) DEFAULT NULL COMMENT '卖家实际发货方式 0=快递 1=本地配送',
+  `commissions_pool` decimal(11,2) NOT NULL DEFAULT '0.00' COMMENT '未分配完的分销佣金',
+  `leader_money` float(8,2) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8 COMMENT='商品订单主表';
 
+-- ----------------------------
+-- Records of shop_order_group
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_outbound`
@@ -1301,14 +1521,14 @@ CREATE TABLE `shop_picture` (
   `name` varchar(52) NOT NULL DEFAULT '' COMMENT '名称',
   `width` double(8,2) NOT NULL COMMENT '宽度',
   `height` double(8,2) NOT NULL COMMENT '高度',
-  `pic_url` varchar(128) NOT NULL COMMENT '图片地址',
+  `pic_url` varchar(200) NOT NULL COMMENT '图片地址',
   `md5` varchar(32) NOT NULL COMMENT '图片md5值，防止重复',
   `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态 1=启用 0=禁用',
   `create_time` int(11) NOT NULL COMMENT '创建时间',
   `update_time` int(11) DEFAULT NULL COMMENT '更新时间',
   `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COMMENT='电商-图片表';
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COMMENT='电商-图片表';
 
 
 -- ----------------------------
@@ -1352,7 +1572,9 @@ CREATE TABLE `shop_poster` (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='商城生成海报表';
 
-
+-- ----------------------------
+-- Records of shop_poster
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_property`
@@ -1399,10 +1621,26 @@ CREATE TABLE `shop_recharge_balance_access` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=107 DEFAULT CHARSET=utf8mb4 COMMENT='电商充值记录表';
 
+
 -- ----------------------------
--- Records of shop_recharge_balance_access
+-- Table structure for `shop_recommend_goods`
 -- ----------------------------
-INSERT INTO `shop_recharge_balance_access` VALUES ('106', 'ccvWPn', '13', '10', '100.00', '100.00', '1', '202002291558138740', null, '0', '1582963093', '1582963093', null);
+DROP TABLE IF EXISTS `shop_recommend_goods`;
+CREATE TABLE `shop_recommend_goods` (
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `key` char(6) NOT NULL COMMENT '唯一标识符',
+  `merchant_id` int(11) NOT NULL COMMENT '商户id',
+  `supplier_id` int(10) NOT NULL DEFAULT '0' COMMENT '供应商id，0为系统',
+  `config` text NOT NULL COMMENT '推荐商品信息(json)',
+  `create_time` int(11) NOT NULL COMMENT '创建时间',
+  `update_time` int(11) DEFAULT NULL COMMENT '修改时间',
+  `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='推荐商品表';
+
+-- ----------------------------
+-- Records of shop_recommend_goods
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_score_banner`
@@ -1423,10 +1661,6 @@ CREATE TABLE `shop_score_banner` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='商户-积分商城横幅表';
 
--- ----------------------------
--- Records of shop_score_banner
--- ----------------------------
-INSERT INTO `shop_score_banner` VALUES ('1', 'ccvWPn', '13', '11', 'http://tuan.weikejs.com/api/web/./uploads/merchant/shop/goods_picture/13/ccvWPn/15822165525e4eb56878bc5.png', '', '2', '1', '1582376410', '1582376410', null);
 
 -- ----------------------------
 -- Table structure for `shop_score_goods`
@@ -1640,6 +1874,36 @@ CREATE TABLE `shop_sign_prize` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='签到奖励表';
 
 -- ----------------------------
+-- Records of shop_sign_prize
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `shop_solitaire`
+-- ----------------------------
+DROP TABLE IF EXISTS `shop_solitaire`;
+CREATE TABLE `shop_solitaire` (
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `key` char(6) NOT NULL COMMENT '唯一标识符',
+  `merchant_id` int(11) NOT NULL COMMENT '商户id',
+  `name` varchar(128) NOT NULL COMMENT '活动名称',
+  `end_time` int(11) NOT NULL COMMENT '截至时间',
+  `take_delivery_time` int(11) NOT NULL COMMENT '提货时间',
+  `is_comment` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否支持评论 0=否 1=是',
+  `video_url` varchar(255) NOT NULL DEFAULT '' COMMENT '视频地址',
+  `pic_urls` text NOT NULL COMMENT '介绍图',
+  `detail_info` text COMMENT '详细说明(富文本)',
+  `goods_ids` varchar(255) NOT NULL COMMENT '商品id',
+  `create_time` int(11) NOT NULL COMMENT '创建时间',
+  `update_time` int(11) DEFAULT NULL COMMENT '修改时间',
+  `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='接龙活动表';
+
+-- ----------------------------
+-- Records of shop_solitaire
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for `shop_stock`
 -- ----------------------------
 DROP TABLE IF EXISTS `shop_stock`;
@@ -1653,22 +1917,21 @@ CREATE TABLE `shop_stock` (
   `property2_name` varchar(32) DEFAULT NULL COMMENT '第二个属性名称',
   `name` varchar(256) NOT NULL COMMENT '商品名称',
   `code` varchar(52) DEFAULT NULL COMMENT '商品编码',
-  `weight` double(5,2) NOT NULL DEFAULT '0.00' COMMENT '商品重量',
+  `weight` double(10,2) NOT NULL DEFAULT '0.00' COMMENT '商品重量',
   `number` int(11) unsigned DEFAULT '0' COMMENT '库存数量',
   `price` decimal(10,2) NOT NULL COMMENT '价格',
   `cost_price` double(10,2) NOT NULL COMMENT '成本价',
-  `assemble_price` decimal(10, 2) NOT NULL COMMENT '拼团价',
   `storehouse_number` int(11) NOT NULL DEFAULT '0' COMMENT '库存量出入库专用',
   `outbound_number` int(11) NOT NULL DEFAULT '0' COMMENT '出库数量',
   `incoming_number` int(11) NOT NULL DEFAULT '0' COMMENT '入库数量',
-  `pic_url` varchar(128) NOT NULL DEFAULT '' COMMENT '图片',
+  `pic_url` varchar(200) NOT NULL DEFAULT '' COMMENT '图片',
   `status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '状态 1有效 0无效',
   `create_time` int(11) NOT NULL COMMENT '创建时间',
   `update_time` int(11) DEFAULT NULL COMMENT '修改时间',
   `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
+  `assemble_price` decimal(10,2) NOT NULL COMMENT '拼团价',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=355 DEFAULT CHARSET=utf8 COMMENT='商品库存表';
-
+) ENGINE=InnoDB AUTO_INCREMENT=359 DEFAULT CHARSET=utf8 COMMENT='商品库存表';
 
 -- ----------------------------
 -- Table structure for `shop_store_payment`
@@ -1692,7 +1955,9 @@ CREATE TABLE `shop_store_payment` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8 COMMENT='商户-门店付款';
 
-
+-- ----------------------------
+-- Records of shop_store_payment
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_storehouse`
@@ -1713,7 +1978,9 @@ CREATE TABLE `shop_storehouse` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COMMENT='仓库表';
 
-
+-- ----------------------------
+-- Records of shop_storehouse
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_super_user`
@@ -1739,7 +2006,9 @@ CREATE TABLE `shop_super_user` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COMMENT='超级会员设置';
 
-
+-- ----------------------------
+-- Records of shop_super_user
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_supplier`
@@ -1847,6 +2116,10 @@ CREATE TABLE `shop_tuan_config` (
 ) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8mb4 COMMENT='电商-团购插件-配置表';
 
 -- ----------------------------
+-- Records of shop_tuan_config
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for `shop_tuan_leader`
 -- ----------------------------
 DROP TABLE IF EXISTS `shop_tuan_leader`;
@@ -1872,6 +2145,7 @@ CREATE TABLE `shop_tuan_leader` (
   `goods_ids` varchar(255) NOT NULL,
   `phone` varchar(20) NOT NULL,
   `recommend_uid` int(11) NOT NULL DEFAULT '0' COMMENT '推荐人uid',
+  `level_reward_ratio` float(8,2) NOT NULL,
   `remarks` varchar(512) NOT NULL DEFAULT '' COMMENT '备注',
   `admin_uid` int(11) NOT NULL DEFAULT '0' COMMENT '审核人uid',
   `admin_sub_uid` int(11) NOT NULL DEFAULT '0' COMMENT '审核 子账号uid',
@@ -1882,10 +2156,17 @@ CREATE TABLE `shop_tuan_leader` (
   `create_time` int(11) NOT NULL COMMENT '创建时间',
   `update_time` int(11) DEFAULT NULL COMMENT '更新时间',
   `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
+  `alipay_name` varchar(20) CHARACTER SET utf8 NOT NULL DEFAULT '' COMMENT '支付宝姓名',
+  `alipay_account` varchar(20) CHARACTER SET utf8 NOT NULL DEFAULT '' COMMENT '支付宝账号',
+  `bank_card_id` varchar(20) CHARACTER SET utf8 NOT NULL DEFAULT '' COMMENT '银行卡号',
+  `bank_card_branch` varchar(100) NOT NULL COMMENT '银行卡所属分行',
+  `name_of_cardholder` varchar(100) CHARACTER SET utf8 NOT NULL DEFAULT '' COMMENT '持卡人姓名',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COMMENT='电商-团购插件-团长表';
 
-
+-- ----------------------------
+-- Records of shop_tuan_leader
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_tuan_user`
@@ -1905,6 +2186,9 @@ CREATE TABLE `shop_tuan_user` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COMMENT='电商-团购团员表';
 
+-- ----------------------------
+-- Records of shop_tuan_user
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_tuan_warehouse`
@@ -1914,8 +2198,10 @@ CREATE TABLE `shop_tuan_warehouse` (
   `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `key` char(6) NOT NULL COMMENT '唯一标识符',
   `merchant_id` int(11) NOT NULL COMMENT '商户id',
+  `leaders` varchar(200) NOT NULL,
   `leader_uid` int(11) NOT NULL,
   `name` varchar(128) NOT NULL COMMENT '仓库名称',
+  `houses` varchar(200) NOT NULL COMMENT '团长id',
   `realname` varchar(16) NOT NULL COMMENT '联系人姓名',
   `phone` char(11) NOT NULL COMMENT '联系电话',
   `addr` varchar(128) NOT NULL COMMENT '仓库地址',
@@ -1960,7 +2246,6 @@ INSERT INTO `shop_unpaid_vip` VALUES ('1', 'ccvWPn', '13', '青铜会员', '50',
 INSERT INTO `shop_unpaid_vip` VALUES ('2', 'ccvWPn', '13', '白银会员', '500', '0.80', '2', '22', '1.20', '1', '1563439648', '1582782498', null);
 INSERT INTO `shop_unpaid_vip` VALUES ('3', 'ccvWPn', '13', '黄金会员', '1000', '0.80', '2', '22', '1.20', '1', '1563439678', '1563439678', null);
 INSERT INTO `shop_unpaid_vip` VALUES ('4', 'ccvWPn', '13', '黑铁会员', '10', '0.80', '2', '22', '1.20', '1', '1563439761', '1574675942', null);
-I
 
 -- ----------------------------
 -- Table structure for `shop_user`
@@ -1979,6 +2264,7 @@ CREATE TABLE `shop_user` (
   `salt` char(32) NOT NULL DEFAULT '' COMMENT '盐',
   `sex` tinyint(1) NOT NULL COMMENT '性别 1=男 2=女',
   `score` int(11) DEFAULT '0' COMMENT '积分',
+  `total_score` int(11) DEFAULT '0' COMMENT '总积分(计算积分等级不会减少)',
   `balance` decimal(8,2) DEFAULT '0.00' COMMENT '用户余额(可提现)',
   `recharge_balance` decimal(8,2) DEFAULT '0.00' COMMENT '充值余额(不可提现 可购物)',
   `avatar` varchar(255) DEFAULT NULL COMMENT '头像',
@@ -1999,22 +2285,27 @@ CREATE TABLE `shop_user` (
   `status` tinyint(1) DEFAULT '1' COMMENT '用户状态 1=正常 0=禁用(黑名单)',
   `last_login_time` int(11) NOT NULL COMMENT '最后登录时间',
   `level` int(1) NOT NULL DEFAULT '0' COMMENT '会员等级   0=普通会员  1=超级会员（才能推广） 2=代理商  3=运营商',
-  `level_id` int(8) DEFAULT 0 COMMENT '分销小等级ID',
   `parent_id` int(11) DEFAULT NULL COMMENT '推荐父id',
   `parent_url` varchar(50) CHARACTER SET utf8 DEFAULT NULL COMMENT '父节点路径化  顺序为   父  祖父  曾祖父  曾曾祖父',
   `fan_number` int(11) DEFAULT '0' COMMENT '直推粉丝数',
   `secondhand_fan_number` int(11) DEFAULT '0' COMMENT '非直推粉丝数',
   `commission` decimal(8,2) NOT NULL COMMENT '预估分销佣金',
   `withdrawable_commission` decimal(8,2) NOT NULL COMMENT '可提现分销佣金',
-  `up_level` int(11) NOT NULL DEFAULT '0' COMMENT '手动审核的会员等级   0=普通会员  1=超级会员（才能推广） 2=代理商  3=运营商',
-  `up_level_id` int(8) DEFAULT 0 COMMENT '手动审核的分销小等级ID',
+  `up_level` int(11) NOT NULL DEFAULT '0' COMMENT '手动审核的会员等级   0=普通会员  1=超级会员（才能推广） 2=代理商  3=运营商''',
   `is_check` int(8) NOT NULL DEFAULT '1',
+  `reg_time` int(11) DEFAULT NULL,
+  `check_time` int(11) DEFAULT NULL,
   `create_time` int(11) NOT NULL COMMENT '创建时间',
   `update_time` int(11) DEFAULT NULL COMMENT '更新时间',
   `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
+  `level_id` int(8) DEFAULT '0' COMMENT '分销小等级ID',
+  `up_level_id` int(8) DEFAULT '0' COMMENT '手动审核的分销小等级ID',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COMMENT='电商用户表';
 
+-- ----------------------------
+-- Records of shop_user
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_user_balance`
@@ -2076,6 +2367,9 @@ CREATE TABLE `shop_user_cart` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='用户购物车表';
 
+-- ----------------------------
+-- Records of shop_user_cart
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_user_comment`
@@ -2135,6 +2429,10 @@ CREATE TABLE `shop_user_contact` (
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COMMENT='电商用户联系地址表';
 
 -- ----------------------------
+-- Records of shop_user_contact
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for `shop_user_score`
 -- ----------------------------
 DROP TABLE IF EXISTS `shop_user_score`;
@@ -2153,7 +2451,9 @@ CREATE TABLE `shop_user_score` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COMMENT='电商-用户积分表';
 
-
+-- ----------------------------
+-- Records of shop_user_score
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_uu_account`
@@ -2171,6 +2471,10 @@ CREATE TABLE `shop_uu_account` (
   `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='商户UU跑腿账号表';
+
+-- ----------------------------
+-- Records of shop_uu_account
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_uu_order`
@@ -2269,7 +2573,9 @@ CREATE TABLE `shop_vip_config` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COMMENT='电商会员配置表';
 
-
+-- ----------------------------
+-- Records of shop_vip_config
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_voucher`
@@ -2300,6 +2606,9 @@ CREATE TABLE `shop_voucher` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COMMENT='抵用券表';
 
+-- ----------------------------
+-- Records of shop_voucher
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_voucher_type`
@@ -2333,6 +2642,9 @@ CREATE TABLE `shop_voucher_type` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='商户-抵用券类型';
 
+-- ----------------------------
+-- Records of shop_voucher_type
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `shop_ylyprint`
@@ -2342,11 +2654,13 @@ CREATE TABLE `shop_ylyprint` (
   `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `key` char(6) NOT NULL COMMENT '唯一标识符',
   `merchant_id` int(11) NOT NULL COMMENT '商户id',
+  `supplier_id` int(11) NOT NULL DEFAULT '0' COMMENT '门店id',
   `name` varchar(255) NOT NULL COMMENT '打印机名称',
   `apikey` varchar(100) NOT NULL COMMENT 'API密钥',
   `machine_code` varchar(50) NOT NULL COMMENT '打印机终端号',
   `msign` varchar(50) NOT NULL COMMENT '打印机终端密钥',
-  `partner` int(11) NOT NULL COMMENT '易联云用户id',
+  `partner` varchar(40) NOT NULL DEFAULT '' COMMENT '易联云用户id',
+  `type` tinyint(1) NOT NULL DEFAULT '1' COMMENT '类型 1=易联云 2=飞鹅云',
   `status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '状态 1启用 0关闭',
   `create_time` int(11) NOT NULL COMMENT '创建时间',
   `update_time` int(11) DEFAULT NULL COMMENT '修改时间',
@@ -2357,8 +2671,44 @@ CREATE TABLE `shop_ylyprint` (
 -- ----------------------------
 -- Records of shop_ylyprint
 -- ----------------------------
-INSERT INTO `shop_ylyprint` VALUES ('1', 'ccvWPn', '13', '易联云K4打印机', '06d5bed87e8d2e8b30bf549181ca87e6a67a2cf3', '4004620341', '085312265596', '56233', '1', '1568873632', '1575594749', null);
 
+-- ----------------------------
+-- Table structure for `shop_ylyprint_template`
+-- ----------------------------
+DROP TABLE IF EXISTS `shop_ylyprint_template`;
+CREATE TABLE `shop_ylyprint_template` (
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `key` char(6) NOT NULL COMMENT '唯一标识符',
+  `merchant_id` int(11) NOT NULL COMMENT '商户id',
+  `name` varchar(255) NOT NULL COMMENT '字段名称',
+  `sign` varchar(100) NOT NULL COMMENT '字段标识',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态 1启用 0关闭',
+  `create_time` int(11) NOT NULL COMMENT '创建时间',
+  `update_time` int(11) DEFAULT NULL COMMENT '修改时间',
+  `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='易联云小票模板表';
+
+-- ----------------------------
+-- Records of shop_ylyprint_template
+-- ----------------------------
+INSERT INTO `shop_ylyprint_template` VALUES ('1', 'ccvWPn', '13', '店铺名称', 'shop_name', '1', '1586856861', '1586859610', null);
+INSERT INTO `shop_ylyprint_template` VALUES ('2', 'ccvWPn', '13', '订单时间', 'order_time', '1', '1586856938', '1586856938', null);
+INSERT INTO `shop_ylyprint_template` VALUES ('3', 'ccvWPn', '13', '订单编号', 'order_sn', '1', '1586858701', '1586858701', null);
+INSERT INTO `shop_ylyprint_template` VALUES ('4', 'ccvWPn', '13', '商品', 'goods', '1', '1586858745', '1586858745', null);
+INSERT INTO `shop_ylyprint_template` VALUES ('5', 'ccvWPn', '13', '小计', 'total_price', '1', '1586858813', '1586858813', null);
+INSERT INTO `shop_ylyprint_template` VALUES ('6', 'ccvWPn', '13', '运费', 'express_price', '1', '1586858827', '1586858827', null);
+INSERT INTO `shop_ylyprint_template` VALUES ('7', 'ccvWPn', '13', '折扣', 'voucher_price', '1', '1586858844', '1586858844', null);
+INSERT INTO `shop_ylyprint_template` VALUES ('8', 'ccvWPn', '13', '订单总价', 'payment_money', '1', '1586858864', '1586858864', null);
+INSERT INTO `shop_ylyprint_template` VALUES ('9', 'ccvWPn', '13', '买家姓名', 'buyer_name', '1', '1586858914', '1586858914', null);
+INSERT INTO `shop_ylyprint_template` VALUES ('10', 'ccvWPn', '13', '买家电话', 'buyer_phone', '1', '1586858939', '1586858939', null);
+INSERT INTO `shop_ylyprint_template` VALUES ('11', 'ccvWPn', '13', '买家地址', 'buyer_address', '1', '1586858954', '1586858954', null);
+INSERT INTO `shop_ylyprint_template` VALUES ('12', 'ccvWPn', '13', '买家备注', 'buyer_remark', '1', '1586858970', '1586858970', null);
+INSERT INTO `shop_ylyprint_template` VALUES ('13', 'ccvWPn', '13', '商家备注', 'merchant_remark', '1', '1586859001', '1586859001', null);
+INSERT INTO `shop_ylyprint_template` VALUES ('14', 'ccvWPn', '13', '团长姓名', 'leader_name', '1', '1586859055', '1586859055', null);
+INSERT INTO `shop_ylyprint_template` VALUES ('15', 'ccvWPn', '13', '团长电话', 'leader_phone', '1', '1586859071', '1586859071', null);
+INSERT INTO `shop_ylyprint_template` VALUES ('16', 'ccvWPn', '13', '团长地址', 'leader_address', '1', '1586859100', '1586859100', null);
+INSERT INTO `shop_ylyprint_template` VALUES ('17', 'ccvWPn', '13', '团长小区', 'leader_area', '1', '1586859148', '1586863724', null);
 
 -- ----------------------------
 -- Table structure for `system_app`
@@ -2446,19 +2796,24 @@ CREATE TABLE `system_app_access` (
   `distribution` varchar(255) NOT NULL DEFAULT '0.00',
   `commissions_pool` decimal(8,2) NOT NULL COMMENT '分销未分配佣金池(每月结算股权后清零,无运营商则不动)',
   `commissions` decimal(8,2) NOT NULL COMMENT '平台分销佣金(每月结算股权之后佣金池剩余部分的累计)',
+  `is_show_supplier_goods` int(1) NOT NULL DEFAULT '0' COMMENT '是否显示门店商品',
   `lodop` varchar(200) NOT NULL COMMENT 'lodop的授权码',
   `type` tinyint(1) NOT NULL DEFAULT '0' COMMENT '类型 1审核成功 0待审核 2审核失败',
   `status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '状态 1激活 0未激活',
   `create_time` int(11) NOT NULL COMMENT '创建时间',
   `update_time` int(11) DEFAULT NULL COMMENT '修改时间',
   `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
+  `supplier_pic_url` varchar(255) NOT NULL DEFAULT '' COMMENT '门店海报',
+  `thum_is_open` tinyint(1) NOT NULL DEFAULT '0' COMMENT '缩略图开关  1为开启  0为关闭',
+  `thum_width` int(8) NOT NULL COMMENT '缩略图宽度（px）',
+  `open_advertisement` text COMMENT '开屏广告信息（json）',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=332 DEFAULT CHARSET=utf8 COMMENT='应用对应表';
 
 -- ----------------------------
 -- Records of system_app_access
 -- ----------------------------
-INSERT INTO `system_app_access` VALUES ('331', 'ccvWPn', '新鲜生活每一天！', '区小蜜', '15950765862', 'http://ceshi.juanpao.cn/api/web/./uploads/merchant/shop/goods_picture/13/ccvWPn/15837421385e65fcbae7660.png', 'http://ceshi.juanpao.cn/api/web/./uploads/merchant/shop/goods_picture/13/ccvWPn/15837421745e65fcde765c4.png', '2', '13', '2', '{\"is_large_scale\":\"1\",\"number\":\"100000\"}', '1590076800', '16', '1', '15950765862', '15950765862', '5', '3', '6', '0', '1', '0', '1', '1', '1', '1', '1', '1', '0', '0', '0', '1', '1', '1', '0', '1', 'https://api.juanpao.com/uploads/bargain_poster.jpg', 'https://imgs.juanpao.com/merchant%2Fshop%2Fgoods_picture%2F13%2FccvWPn%2F15650754955d49282751e04.jpeg,https://imgs.juanpao.com/merchant%2Fshop%2Fgoods_picture%2F13%2FccvWPn%2F15650805395d493bdb27965.jpeg,https://imgs.juanpao.com/merchant%2Fshop%2Fgoods_picture%2F13%2FccvWPn%2F15650035625d480f2a7c8c3.jpeg,https://imgs.juanpao.com/merchant%2Fshop%2Fgoods_picture%2F13%2FccvWPn%2F15748386985dde21aa6d33d.jpeg,https://imgs.juanpao.com/merchant%2Fshop%2Fgoods_picture%2F13%2FccvWPn%2F15650754955d49282751e04.jpeg,https://imgs.juanpao.com/merchant%2Fshop%2Fgoods_picture%2F13%2FccvWPn%2F15650805395d493bdb27965.jpeg,https://imgs.juanpao.com/merchant%2Fshop%2Fgoods_picture%2F13%2FccvWPn%2F15650035625d480f2a7c8c3.jpeg,https://imgs.juanpao.com/merchant%2Fshop%2Fgoods_picture%2F13%2FccvWPn%2F15748386985dde21aa6d33d.jpeg,', 'https://imgs.juanpao.com/merchant%2Fshop%2Fgoods_picture%2F13%2FccvWPn%2F15758787415dee00559781d.png', '{\"is_estimated\":\"0\",\"estimated_type\":\"1\"}', '{\"is_reduction\":\"0\",\"reduction_achieve\":[\"1000\"],\"reduction_decrease\":[\"1\"],\"free_shipping\":[\"false\"]}', '1', '1', '1', '1', '1', '1', '1', '2', '119.22291,34.621236', '10.00', '1', '{\"isopen\":\"true\",\"qrcode\":\"true\"}', '', '0.00', '0.00', '', '0', '1', '1970', '1583839342', null);
+INSERT INTO `system_app_access` VALUES ('331', 'ccvWPn', '新鲜生活每一天！', '区小蜜', '15950765862', 'http://ceshi.juanpao.cn/api/web/./uploads/merchant/shop/goods_picture/13/ccvWPn/15837421385e65fcbae7660.png', 'http://ceshi.juanpao.cn/api/web/./uploads/merchant/shop/goods_picture/13/ccvWPn/15837421745e65fcde765c4.png', '2', '13', '2', '{\"is_large_scale\":\"1\",\"number\":\"100000\"}', '1590076800', '16', '1', '15950765862', '15950765862', '5', '3', '6', '0', '1', '0', '1', '1', '1', '1', '1', '1', '0', '0', '0', '1', '1', '1', '0', '1', 'https://api.juanpao.com/uploads/bargain_poster.jpg', 'https://imgs.juanpao.com/merchant%2Fshop%2Fgoods_picture%2F13%2FccvWPn%2F15650754955d49282751e04.jpeg,https://imgs.juanpao.com/merchant%2Fshop%2Fgoods_picture%2F13%2FccvWPn%2F15650805395d493bdb27965.jpeg,https://imgs.juanpao.com/merchant%2Fshop%2Fgoods_picture%2F13%2FccvWPn%2F15650035625d480f2a7c8c3.jpeg,https://imgs.juanpao.com/merchant%2Fshop%2Fgoods_picture%2F13%2FccvWPn%2F15748386985dde21aa6d33d.jpeg,https://imgs.juanpao.com/merchant%2Fshop%2Fgoods_picture%2F13%2FccvWPn%2F15650754955d49282751e04.jpeg,https://imgs.juanpao.com/merchant%2Fshop%2Fgoods_picture%2F13%2FccvWPn%2F15650805395d493bdb27965.jpeg,https://imgs.juanpao.com/merchant%2Fshop%2Fgoods_picture%2F13%2FccvWPn%2F15650035625d480f2a7c8c3.jpeg,https://imgs.juanpao.com/merchant%2Fshop%2Fgoods_picture%2F13%2FccvWPn%2F15748386985dde21aa6d33d.jpeg,', 'https://imgs.juanpao.com/merchant%2Fshop%2Fgoods_picture%2F13%2FccvWPn%2F15758787415dee00559781d.png', '{\"is_estimated\":\"0\",\"estimated_type\":\"1\"}', '{\"is_reduction\":\"0\",\"reduction_achieve\":[\"1000\"],\"reduction_decrease\":[\"1\"],\"free_shipping\":[\"false\"]}', '1', '1', '1', '1', '1', '1', '1', '2', '119.22291,34.621236', '10.00', '1', '{\"isopen\":\"true\",\"qrcode\":\"true\"}', '', '0.00', '0.00', '0', '', '0', '1', '1970', '1583839342', null, '', '0', '0', null);
 
 -- ----------------------------
 -- Table structure for `system_app_access_help`
@@ -2509,7 +2864,9 @@ CREATE TABLE `system_app_access_help_category` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8 COMMENT='系统-常见问题分组表';
 
-
+-- ----------------------------
+-- Records of system_app_access_help_category
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `system_app_access_version`
@@ -2584,7 +2941,6 @@ CREATE TABLE `system_app_combo` (
 -- ----------------------------
 INSERT INTO `system_app_combo` VALUES ('1', '标准版', '1', 'http://juanpao999-1255754174.cos.cn-south.myqcloud.com/combo%2F2019%2F02%2F21%2F15507275295c6e3969cf61b.png', '3', '0.00', '365', '标准版终身免费', '0', '1524980952', '1556588711', '1581505122');
 INSERT INTO `system_app_combo` VALUES ('2', '全功能版', '2', 'https://imgs.juanpao.com/combo%2F2019%2F05%2F31%2F15592961435cf0f88f4e506.png', '2', '0.00', '765', '社区团购小程序', '1', '1541052843', '1559356912', null);
-
 
 -- ----------------------------
 -- Table structure for `system_app_version`
@@ -6361,7 +6717,9 @@ CREATE TABLE `system_authorizer_wechat` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='授权公众号表';
 
-
+-- ----------------------------
+-- Records of system_authorizer_wechat
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `system_auto_words`
@@ -6385,7 +6743,9 @@ CREATE TABLE `system_auto_words` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COMMENT='系统-自动回复';
 
-
+-- ----------------------------
+-- Records of system_auto_words
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `system_banner`
@@ -6406,7 +6766,9 @@ CREATE TABLE `system_banner` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 COMMENT='系统-横幅表';
 
-
+-- ----------------------------
+-- Records of system_banner
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `system_config`
@@ -6426,6 +6788,10 @@ CREATE TABLE `system_config` (
   `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统配置表';
+
+-- ----------------------------
+-- Records of system_config
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `system_config_category`
@@ -6523,9 +6889,9 @@ INSERT INTO `system_diy_config` VALUES ('1', '2', '供货商宣传单页', '供�
 INSERT INTO `system_diy_config` VALUES ('2', '2', '团长宣传单页', '团长宣传单页', 'groupbrochure', '<p><img src=\"https://imgs.juanpao.com/merchant%2Fshop%2Fgoods_picture%2F13%2FccvWPn%2F15647266575d43d5813c269.png\" width=\"100%\" alt=\"团长招募详情.png\"/></p>', '2', '1', '1561778473', '1562665720', null);
 INSERT INTO `system_diy_config` VALUES ('3', '2', '团长联系手机号', '团长联系手机号', 'groupphone', '13999999999', '2', '1', '1562055531', '1562056394', '1564538589');
 INSERT INTO `system_diy_config` VALUES ('4', '2', '供货商联系电话', '供货商联系电话', 'supplierphone', '13999999999', '2', '1', '1562056332', '1562056401', '1564538586');
-INSERT INTO `system_diy_config` VALUES ('5', '2', '资质规格', '用户协议', 'user_protocol', '<p>用户协议</p>', '2', '1', '1562837497', '1562837497', null);
-INSERT INTO `system_diy_config` VALUES ('6', '2', '资质规格', '隐私政策', 'privacy_policy', '<p>隐私政策</p>', '2', '1', '1562837553', '1562837553', null);
-INSERT INTO `system_diy_config` VALUES ('7', '2', '资质规格', '资质', 'qualifications', '<p><span style=\"color: rgb(102, 102, 102); font-family: 思源字体, sans-serif; font-size: 14px; background-color: rgb(255, 255, 255);\">资质</span></p>', '2', '1', '1562837590', '1562837590', null);
+INSERT INTO `system_diy_config` VALUES ('5', '2', '资质规则', '用户协议', 'user_protocol', '<p>用户协议</p>', '2', '1', '1562837497', '1562837497', null);
+INSERT INTO `system_diy_config` VALUES ('6', '2', '资质规则', '隐私政策', 'privacy_policy', '<p>隐私政策</p>', '2', '1', '1562837553', '1562837553', null);
+INSERT INTO `system_diy_config` VALUES ('7', '2', '资质规则', '资质', 'qualifications', '<p><span style=\"color: rgb(102, 102, 102); font-family: 思源字体, sans-serif; font-size: 14px; background-color: rgb(255, 255, 255);\">资质</span></p>', '2', '1', '1562837590', '1562837590', null);
 INSERT INTO `system_diy_config` VALUES ('8', '2', '常见问题', '什么时候发货', 'when_to_ship', '<p>什么时候发货</p>', '2', '1', '1562837651', '1562837651', '1564456710');
 INSERT INTO `system_diy_config` VALUES ('9', '2', '客服电话', '客服电话', 'wolive_phone', '<p>1</p>', '2', '1', '1564456397', '1564456397', '1564456429');
 INSERT INTO `system_diy_config` VALUES ('10', '2', '详情顶部', '', 'info_header', '', '2', '1', '1564456397', '1564456397', null);
@@ -6552,17 +6918,18 @@ CREATE TABLE `system_diy_express_template` (
   `update_time` int(11) DEFAULT NULL COMMENT '更新时间',
   `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COMMENT='系统快递模板表';
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8 COMMENT='系统快递模板表';
 
 -- ----------------------------
 -- Records of system_diy_express_template
 -- ----------------------------
-INSERT INTO `system_diy_express_template` VALUES ('1', '团长单', 'leader_order', '2', '[{\"name\":\"商家信息\",\"id\":\"2\",\"type\":\"0\",\"child\":[{\"name\":\"商家姓名\",\"id\":\"70\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_name\"},{\"name\":\"商家地址\",\"id\":\"21\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_addr\"},{\"name\":\"商家电话\",\"id\":\"20\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_phone\"},{\"name\":\"小程序名称\",\"id\":\"19\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"widget_name\"}]},{\"name\":\"表格信息\",\"id\":\"3\",\"type\":\"1\",\"child\":[{\"name\":\"货号\",\"id\":\"68\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"goods_code\"},{\"name\":\"商品ID\",\"id\":\"67\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"goods_id\"},{\"name\":\"规格\",\"id\":\"66\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"property\"},{\"name\":\"单价\",\"id\":\"7\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"price\"},{\"name\":\"数量\",\"id\":\"4\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"number\"},{\"name\":\"商品名称\",\"id\":\"2\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"goodsname\"},{\"name\":\"标签\",\"id\":\"16\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"label\"},{\"name\":\"短标题\",\"id\":\"17\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"short_name\"}]},{\"name\":\"团长信息\",\"id\":\"5\",\"type\":\"0\",\"child\":[{\"name\":\"路线\",\"id\":\"41\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"route\"},{\"name\":\"配送方式\",\"id\":\"40\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"express_type\"},{\"name\":\"团长城市\",\"id\":\"39\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_city\"},{\"name\":\"团长小区\",\"id\":\"38\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_area_name\"},{\"name\":\"团长ID\",\"id\":\"37\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_uid\"},{\"name\":\"取货点\",\"id\":\"69\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_addr\"},{\"name\":\"团长电话\",\"id\":\"36\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_phone\"},{\"name\":\"团长姓名\",\"id\":\"35\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_name\"},{\"name\":\"团长昵称\",\"id\":\"34\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_nickname\"}]},{\"name\":\"图片信息\",\"id\":\"6\",\"type\":\"2\",\"child\":[{\"name\":\"小程序码\",\"id\":\"24\",\"parentId\":\"6\",\"pic_url\":\"https://imgs.juanpao.com/admin%2Fprint%2F15622281435d1db5af6d82a.jpeg\",\"english_name\":\"widget_code\"},{\"name\":\"LOGO\",\"id\":\"23\",\"parentId\":\"6\",\"pic_url\":\"https://imgs.juanpao.com/admin%2Fprint%2F15622281705d1db5ca42e1b.jpeg\",\"english_name\":\"logo\"}]}]', '[{\"id\":2,\"name\":\"商家信息\",\"type\":0,\"child\":[{\"id\":\"70\",\"name\":\"商家姓名\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_name\"},{\"id\":\"21\",\"name\":\"商家地址\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_addr\"},{\"id\":\"20\",\"name\":\"商家电话\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_phone\"},{\"id\":\"19\",\"name\":\"小程序名称\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"widget_name\"}]},{\"id\":5,\"name\":\"团长信息\",\"type\":0,\"child\":[{\"id\":\"37\",\"name\":\"团长ID\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_uid\"},{\"id\":\"35\",\"name\":\"团长姓名\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_name\"},{\"id\":\"34\",\"name\":\"团长昵称\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_nickname\"},{\"id\":\"36\",\"name\":\"团长电话\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_phone\"},{\"id\":\"69\",\"name\":\"取货点\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_addr\"},{\"id\":\"38\",\"name\":\"团长小区\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_area_name\"},{\"id\":\"40\",\"name\":\"配送方式\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"express_type\"},{\"id\":\"39\",\"name\":\"团长城市\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_city\"}]},{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"67\",\"name\":\"商品ID\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_id\"},{\"id\":\"68\",\"name\":\"货号\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_code\"},{\"id\":\"17\",\"name\":\"短标题\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"short_name\"},{\"id\":\"16\",\"name\":\"标签\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"label\"},{\"id\":\"66\",\"name\":\"规格\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"property\"},{\"id\":\"4\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"number\"},{\"id\":\"7\",\"name\":\"单价\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"price\"}]}]', '<div class=\"edit-box\" style=\"width: 380px; height: 982px;\">\n					<div class=\"item 70\" id=\"item-active\" data-name=\"70\" data-englishname=\"merchant_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 0px;\"><span>商家姓名:$merchant_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 21\" id=\"item-active\" data-name=\"21\" data-englishname=\"merchant_addr\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; height: 26px; z-index: 0; left: 0px; top: 21px;\"><span>商家地址:$merchant_addr</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 20\" id=\"item-active\" data-name=\"20\" data-englishname=\"merchant_phone\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 43px;\"><span>商家电话:$merchant_phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 19\" id=\"item-active\" data-name=\"19\" data-englishname=\"widget_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 62px;\"><span>小程序名称:$widget_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 37\" id=\"item-active\" data-name=\"37\" data-englishname=\"leader_uid\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 163px; top: 0px;\"><span>团长ID:$leader_uid</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 35\" id=\"item-active\" data-name=\"35\" data-englishname=\"leader_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 162px; top: 22px;\"><span>团长姓名:$leader_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 34\" id=\"item-active\" data-name=\"34\" data-englishname=\"leader_nickname\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 163px; top: 42px;\"><span>团长昵称:$leader_nickname</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 36\" id=\"item-active\" data-name=\"36\" data-englishname=\"leader_phone\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 163px; top: 65px;\"><span>团长电话:$leader_phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 69\" id=\"item-active\" data-name=\"69\" data-englishname=\"leader_addr\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 86px;\"><span>取货点:$leader_addr</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 38\" id=\"item-active\" data-name=\"38\" data-englishname=\"leader_area_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 162px; top: 91px;\"><span>团长小区:$leader_area_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 40\" id=\"item-active\" data-name=\"40\" data-englishname=\"express_type\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 115px;\"><span>配送方式:$express_type</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 39\" id=\"item-active\" data-name=\"39\" data-englishname=\"leader_city\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 162px; top: 114px;\"><span>团长城市:$leader_city</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item item-table item-active\" data-name=\"name-table\" style=\"left: 0px; top: 143px; position: absolute; cursor: move; z-index: 0;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"goods_id\" style=\"border:1px solid black;padding:10px;\">商品ID</th><th data-englishname=\"goods_code\" style=\"border:1px solid black;padding:10px;\">货号</th><th data-englishname=\"short_name\" style=\"border:1px solid black;padding:10px;\">短标题</th><th data-englishname=\"label\" style=\"border:1px solid black;padding:10px;\">标签</th><th data-englishname=\"property\" style=\"border:1px solid black;padding:10px;\">规格</th><th data-englishname=\"number\" style=\"border:1px solid black;padding:10px;\">数量</th><th data-englishname=\"price\" style=\"border:1px solid black;padding:10px;\">单价</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '378.00', '980.00', null, '1', null, '1562233324', '1564731984', null);
-INSERT INTO `system_diy_express_template` VALUES ('2', '发货单', 'Invoice', '2', '[{\"name\":\"商家信息\",\"id\":\"2\",\"type\":\"0\",\"child\":[{\"name\":\"商家姓名\",\"id\":\"70\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_name\"},{\"name\":\"商家地址\",\"id\":\"21\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_addr\"},{\"name\":\"商家电话\",\"id\":\"20\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_phone\"},{\"name\":\"小程序名称\",\"id\":\"19\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"widget_name\"}]},{\"name\":\"表格信息\",\"id\":\"3\",\"type\":\"1\",\"child\":[{\"name\":\"商品ID\",\"id\":\"67\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"goods_id\"},{\"name\":\"规格\",\"id\":\"66\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"property\"},{\"name\":\"单价\",\"id\":\"7\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"price\"},{\"name\":\"数量\",\"id\":\"4\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"number\"},{\"name\":\"商品名称\",\"id\":\"2\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"goodsname\"}]},{\"name\":\"买家信息\",\"id\":\"4\",\"type\":\"0\",\"child\":[{\"name\":\"买家电话\",\"id\":\"9\",\"parentId\":\"4\",\"pic_url\":\"\",\"english_name\":\"phone\"},{\"name\":\"买家姓名\",\"id\":\"6\",\"parentId\":\"4\",\"pic_url\":\"\",\"english_name\":\"name\"},{\"name\":\"买家区域\",\"id\":\"33\",\"parentId\":\"4\",\"pic_url\":\"\",\"english_name\":\"buyer_area\"},{\"name\":\"买家城市\",\"id\":\"32\",\"parentId\":\"4\",\"pic_url\":\"\",\"english_name\":\"buyer_city\"},{\"name\":\"买家留言\",\"id\":\"31\",\"parentId\":\"4\",\"pic_url\":\"\",\"english_name\":\"remark\"},{\"name\":\"实付金额\",\"id\":\"29\",\"parentId\":\"4\",\"pic_url\":\"\",\"english_name\":\"payment_money\"},{\"name\":\"买家地址\",\"id\":\"26\",\"parentId\":\"4\",\"pic_url\":\"\",\"english_name\":\"address\"}]},{\"name\":\"团长信息\",\"id\":\"5\",\"type\":\"0\",\"child\":[{\"name\":\"路线\",\"id\":\"41\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"route\"},{\"name\":\"配送方式\",\"id\":\"40\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"express_type\"},{\"name\":\"团长城市\",\"id\":\"39\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_city\"},{\"name\":\"团长小区\",\"id\":\"38\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_area_name\"},{\"name\":\"团长ID\",\"id\":\"37\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_uid\"},{\"name\":\"取货点\",\"id\":\"69\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_addr\"},{\"name\":\"团长电话\",\"id\":\"36\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_phone\"},{\"name\":\"团长姓名\",\"id\":\"35\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_name\"},{\"name\":\"团长昵称\",\"id\":\"34\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_nickname\"}]}]', '[{\"id\":2,\"name\":\"商家信息\",\"type\":0,\"child\":[{\"id\":\"19\",\"name\":\"小程序名称\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"widget_name\"},{\"id\":\"70\",\"name\":\"商家姓名\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_name\"},{\"id\":\"20\",\"name\":\"商家电话\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_phone\"},{\"id\":\"21\",\"name\":\"商家地址\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_addr\"}]},{\"id\":4,\"name\":\"买家信息\",\"type\":0,\"child\":[{\"id\":\"9\",\"name\":\"买家电话\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"phone\"},{\"id\":\"6\",\"name\":\"买家姓名\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"name\"},{\"id\":\"33\",\"name\":\"买家区域\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"buyer_area\"},{\"id\":\"32\",\"name\":\"买家城市\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"buyer_city\"},{\"id\":\"26\",\"name\":\"买家地址\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"address\"},{\"id\":\"31\",\"name\":\"买家留言\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"remark\"},{\"id\":\"29\",\"name\":\"实付金额\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"payment_money\"}]},{\"id\":5,\"name\":\"团长信息\",\"type\":0,\"child\":[{\"id\":\"40\",\"name\":\"配送方式\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"express_type\"}]},{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"67\",\"name\":\"商品ID\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_id\"},{\"id\":\"2\",\"name\":\"商品名称\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goodsname\"},{\"id\":\"66\",\"name\":\"规格\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"property\"},{\"id\":\"7\",\"name\":\"单价\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"price\"},{\"id\":\"4\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"number\"}]}]', '<div class=\"edit-box\" style=\"width: 380px; height: 682px;\">\n					<div class=\"item 19\" id=\"item-active\" data-name=\"19\" data-englishname=\"widget_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 104px; top: 4px;\"><span>小程序名称:$widget_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 70\" id=\"item-active\" data-name=\"70\" data-englishname=\"merchant_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 24px;\"><span>商家姓名:$merchant_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 20\" id=\"item-active\" data-name=\"20\" data-englishname=\"merchant_phone\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 173px; top: 25px;\"><span>商家电话:$merchant_phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 21\" id=\"item-active\" data-name=\"21\" data-englishname=\"merchant_addr\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 47px;\"><span>商家地址:$merchant_addr</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 9\" id=\"item-active\" data-name=\"9\" data-englishname=\"phone\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 173px; top: 69px;\"><span>买家电话:$phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 6\" id=\"item-active\" data-name=\"6\" data-englishname=\"name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 68px;\"><span>买家姓名:$name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 33\" id=\"item-active\" data-name=\"33\" data-englishname=\"buyer_area\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 92px;\"><span>买家区域:$buyer_area</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 32\" id=\"item-active\" data-name=\"32\" data-englishname=\"buyer_city\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 171px; top: 91px;\"><span>买家城市:$buyer_city</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 26\" id=\"item-active\" data-name=\"26\" data-englishname=\"address\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 116px;\"><span>买家地址:$address</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 40\" id=\"item-active\" data-name=\"40\" data-englishname=\"express_type\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 171px; top: 117px;\"><span>配送方式:$express_type</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 31\" id=\"item-active\" data-name=\"31\" data-englishname=\"remark\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 137px;\"><span>买家留言:$remark</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 29\" id=\"item-active\" data-name=\"29\" data-englishname=\"payment_money\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 169px; top: 136px;\"><span>实付金额:$payment_money</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item item-table item-active\" data-name=\"name-table\" style=\"left: 4px; top: 171px; position: absolute; cursor: move; z-index: 0; width: 369px;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"goods_id\" style=\"border:1px solid black;padding:10px;\">商品ID</th><th data-englishname=\"goodsname\" style=\"border:1px solid black;padding:10px;\">商品名称</th><th data-englishname=\"property\" style=\"border:1px solid black;padding:10px;\">规格</th><th data-englishname=\"price\" style=\"border:1px solid black;padding:10px;\">单价</th><th data-englishname=\"number\" style=\"border:1px solid black;padding:10px;\">数量</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '378.00', '680.00', null, '1', null, '1562233713', '1566292006', null);
-INSERT INTO `system_diy_express_template` VALUES ('3', '采购单', 'purchasing_order', '2', '[{\"name\":\"商家信息\",\"id\":\"2\",\"type\":\"0\",\"child\":[{\"name\":\"商家姓名\",\"id\":\"70\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_name\"},{\"name\":\"商家地址\",\"id\":\"21\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_addr\"},{\"name\":\"商家电话\",\"id\":\"20\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_phone\"},{\"name\":\"小程序名称\",\"id\":\"19\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"widget_name\"}]},{\"name\":\"表格信息\",\"id\":\"3\",\"type\":\"1\",\"child\":[{\"name\":\"货号\",\"id\":\"68\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"goods_code\"},{\"name\":\"商品ID\",\"id\":\"67\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"goods_id\"},{\"name\":\"规格\",\"id\":\"66\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"property\"},{\"name\":\"单价\",\"id\":\"7\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"price\"},{\"name\":\"数量\",\"id\":\"4\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"number\"},{\"name\":\"标签\",\"id\":\"16\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"label\"},{\"name\":\"短标题\",\"id\":\"17\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"short_name\"}]},{\"name\":\"图片信息\",\"id\":\"6\",\"type\":\"2\",\"child\":[{\"name\":\"小程序码\",\"id\":\"24\",\"parentId\":\"6\",\"pic_url\":\"https://imgs.juanpao.com/admin%2Fprint%2F15622281435d1db5af6d82a.jpeg\",\"english_name\":\"widget_code\"},{\"name\":\"LOGO\",\"id\":\"23\",\"parentId\":\"6\",\"pic_url\":\"https://imgs.juanpao.com/admin%2Fprint%2F15622281705d1db5ca42e1b.jpeg\",\"english_name\":\"logo\"}]}]', '[{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"67\",\"name\":\"商品ID\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_id\"},{\"id\":\"68\",\"name\":\"货号\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_code\"},{\"id\":\"17\",\"name\":\"短标题\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"short_name\"},{\"id\":\"16\",\"name\":\"标签\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"label\"},{\"id\":\"66\",\"name\":\"规格\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"property\"},{\"id\":\"4\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"number\"},{\"id\":\"7\",\"name\":\"单价\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"price\"}]},{\"id\":2,\"name\":\"商家信息\",\"type\":0,\"child\":[{\"id\":\"19\",\"name\":\"小程序名称\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"widget_name\"}]}]', '<div class=\"edit-box\" style=\"width: 380px; height: 682px;\">\n					<div class=\"item item-table\" data-name=\"name-table\" style=\"left: 0px; top: 48px; position: absolute; cursor: move; z-index: 0;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"goods_id\" style=\"border:1px solid black;padding:10px;\">商品ID</th><th data-englishname=\"goods_code\" style=\"border:1px solid black;padding:10px;\">货号</th><th data-englishname=\"short_name\" style=\"border:1px solid black;padding:10px;\">短标题</th><th data-englishname=\"label\" style=\"border:1px solid black;padding:10px;\">标签</th><th data-englishname=\"property\" style=\"border:1px solid black;padding:10px;\">规格</th><th data-englishname=\"number\" style=\"border:1px solid black;padding:10px;\">数量</th><th data-englishname=\"price\" style=\"border:1px solid black;padding:10px;\">单价</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 19 item-active\" id=\"item-active\" data-name=\"19\" data-englishname=\"widget_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 94px; top: 11px;\"><span>小程序名称:$widget_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '378.00', '680.00', null, '1', null, '1562233991', '1564731958', null);
-INSERT INTO `system_diy_express_template` VALUES ('4', '配货单', 'distribution_bill', '2', '[{\"name\":\"商品信息\",\"id\":\"1\",\"type\":\"0\",\"child\":[{\"name\":\"货号\",\"id\":\"46\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"goods_code\"},{\"name\":\"商品ID\",\"id\":\"45\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"goods_id\"},{\"name\":\"规格\",\"id\":\"44\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"property\"},{\"name\":\"短标题\",\"id\":\"43\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"short_name\"},{\"name\":\"标签\",\"id\":\"42\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"label\"},{\"name\":\"单价\",\"id\":\"8\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"price\"},{\"name\":\"数量\",\"id\":\"3\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"number\"},{\"name\":\"商品名称\",\"id\":\"1\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"goodsname\"}]},{\"name\":\"商家信息\",\"id\":\"2\",\"type\":\"0\",\"child\":[{\"name\":\"商家姓名\",\"id\":\"70\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_name\"},{\"name\":\"商家地址\",\"id\":\"21\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_addr\"},{\"name\":\"商家电话\",\"id\":\"20\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_phone\"},{\"name\":\"小程序名称\",\"id\":\"19\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"widget_name\"}]},{\"name\":\"表格信息\",\"id\":\"3\",\"type\":\"1\",\"child\":[{\"name\":\"取货点\",\"id\":\"71\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_addr\"},{\"name\":\"路线\",\"id\":\"65\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"route\"},{\"name\":\"配送方式\",\"id\":\"64\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"express_type\"},{\"name\":\"团长城市\",\"id\":\"63\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_city\"},{\"name\":\"团长小区\",\"id\":\"62\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_area_name\"},{\"name\":\"团长ID\",\"id\":\"61\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_uid\"},{\"name\":\"团长电话\",\"id\":\"60\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_phone\"},{\"name\":\"团长昵称\",\"id\":\"59\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_nickname\"},{\"name\":\"团长姓名\",\"id\":\"18\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_name\"}]}]', '[{\"id\":1,\"name\":\"商品信息\",\"type\":0,\"child\":[{\"id\":\"45\",\"name\":\"商品ID\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"goods_id\"},{\"id\":\"46\",\"name\":\"货号\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"goods_code\"},{\"id\":\"1\",\"name\":\"商品名称\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"goodsname\"},{\"id\":\"43\",\"name\":\"短标题\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"short_name\"},{\"id\":\"42\",\"name\":\"标签\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"label\"},{\"id\":\"44\",\"name\":\"规格\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"property\"},{\"id\":\"3\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"number\"},{\"id\":\"8\",\"name\":\"单价\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"price\"}]},{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"65\",\"name\":\"路线\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"route\"},{\"id\":\"61\",\"name\":\"团长ID\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_uid\"},{\"id\":\"62\",\"name\":\"团长小区\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_area_name\"},{\"id\":\"71\",\"name\":\"取货点\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_addr\"},{\"id\":\"18\",\"name\":\"团长姓名\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_name\"},{\"id\":\"60\",\"name\":\"团长电话\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_phone\"}]}]', '<div class=\"edit-box\" style=\"width: 380px; height: 682px;\">\n					<div class=\"item 45\" id=\"item-active\" data-name=\"45\" data-englishname=\"goods_id\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 0px;\"><span>商品ID:$goods_id</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 46\" id=\"item-active\" data-name=\"46\" data-englishname=\"goods_code\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 52px;\"><span>货号:$goods_code</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 1\" id=\"item-active\" data-name=\"1\" data-englishname=\"goodsname\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 175px; top: 0px;\"><span>商品名称:$goodsname</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 43\" id=\"item-active\" data-name=\"43\" data-englishname=\"short_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 177px; top: 26px;\"><span>短标题:$short_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 42\" id=\"item-active\" data-name=\"42\" data-englishname=\"label\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 27px;\"><span>标签:$label</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 44\" id=\"item-active\" data-name=\"44\" data-englishname=\"property\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 176px; top: 54px;\"><span>规格:$property</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 3\" id=\"item-active\" data-name=\"3\" data-englishname=\"number\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 80px;\"><span>数量:$number</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 8\" id=\"item-active\" data-name=\"8\" data-englishname=\"price\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 173px; top: 80px;\"><span>单价:$price</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item item-table item-active\" data-name=\"name-table\" style=\"left: 0px; top: 108px; position: absolute; cursor: move; z-index: 0;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"route\" style=\"border:1px solid black;padding:10px;\">路线</th><th data-englishname=\"leader_uid\" style=\"border:1px solid black;padding:10px;\">团长ID</th><th data-englishname=\"leader_area_name\" style=\"border:1px solid black;padding:10px;\">团长小区</th><th data-englishname=\"leader_addr\" style=\"border:1px solid black;padding:10px;\">取货点</th><th data-englishname=\"leader_name\" style=\"border:1px solid black;padding:10px;\">团长姓名</th><th data-englishname=\"leader_phone\" style=\"border:1px solid black;padding:10px;\">团长电话</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '378.00', '680.00', null, '1', null, '1562234447', '1564731945', null);
-INSERT INTO `system_diy_express_template` VALUES ('5', '路线单', 'route_sheet', '2', '[{\"name\":\"商品信息\",\"id\":\"1\",\"type\":\"0\",\"child\":[{\"name\":\"货号\",\"id\":\"46\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"goods_code\"},{\"name\":\"商品ID\",\"id\":\"45\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"goods_id\"},{\"name\":\"规格\",\"id\":\"44\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"property\"},{\"name\":\"短标题\",\"id\":\"43\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"short_name\"},{\"name\":\"标签\",\"id\":\"42\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"label\"},{\"name\":\"单价\",\"id\":\"8\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"price\"},{\"name\":\"数量\",\"id\":\"3\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"number\"},{\"name\":\"商品名称\",\"id\":\"1\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"goodsname\"}]},{\"name\":\"商家信息\",\"id\":\"2\",\"type\":\"0\",\"child\":[{\"name\":\"商家姓名\",\"id\":\"70\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_name\"},{\"name\":\"商家地址\",\"id\":\"21\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_addr\"},{\"name\":\"商家电话\",\"id\":\"20\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_phone\"},{\"name\":\"小程序名称\",\"id\":\"19\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"widget_name\"}]},{\"name\":\"表格信息\",\"id\":\"3\",\"type\":\"1\",\"child\":[{\"name\":\"取货点\",\"id\":\"71\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_addr\"},{\"name\":\"实付金额\",\"id\":\"54\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"payment_money\"},{\"name\":\"买家昵称\",\"id\":\"53\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"buyer_nickname\"},{\"name\":\"商家地址\",\"id\":\"48\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"merchant_addr\"},{\"name\":\"小程序名称\",\"id\":\"47\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"widget_name\"},{\"name\":\"付款时间\",\"id\":\"55\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"pay_time\"},{\"name\":\"买家留言\",\"id\":\"56\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"remark\"},{\"name\":\"货号\",\"id\":\"68\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"goods_code\"},{\"name\":\"商品ID\",\"id\":\"67\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"goods_id\"},{\"name\":\"规格\",\"id\":\"66\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"property\"},{\"name\":\"路线\",\"id\":\"65\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"route\"},{\"name\":\"配送方式\",\"id\":\"64\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"express_type\"},{\"name\":\"团长城市\",\"id\":\"63\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_city\"},{\"name\":\"团长小区\",\"id\":\"62\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_area_name\"},{\"name\":\"团长ID\",\"id\":\"61\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_uid\"},{\"name\":\"团长电话\",\"id\":\"60\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_phone\"},{\"name\":\"团长昵称\",\"id\":\"59\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_nickname\"},{\"name\":\"买家区域\",\"id\":\"58\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"buyer_area\"},{\"name\":\"买家城市\",\"id\":\"57\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"buyer_city\"},{\"name\":\"商家电话\",\"id\":\"15\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"merchant_phone\"},{\"name\":\"商家姓名\",\"id\":\"14\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"merchant_name\"},{\"name\":\"库存\",\"id\":\"13\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"stock_number\"},{\"name\":\"买家电话\",\"id\":\"12\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"phone\"},{\"name\":\"订单号\",\"id\":\"11\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"order_sn\"},{\"name\":\"买家地址\",\"id\":\"10\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"address\"},{\"name\":\"单价\",\"id\":\"7\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"price\"},{\"name\":\"买家姓名\",\"id\":\"5\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"name\"},{\"name\":\"数量\",\"id\":\"4\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"number\"},{\"name\":\"商品名称\",\"id\":\"2\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"goodsname\"},{\"name\":\"标签\",\"id\":\"16\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"label\"},{\"name\":\"短标题\",\"id\":\"17\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"short_name\"},{\"name\":\"团长姓名\",\"id\":\"18\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_name\"}]},{\"name\":\"买家信息\",\"id\":\"4\",\"type\":\"0\",\"child\":[{\"name\":\"买家电话\",\"id\":\"9\",\"parentId\":\"4\",\"pic_url\":\"\",\"english_name\":\"phone\"},{\"name\":\"买家姓名\",\"id\":\"6\",\"parentId\":\"4\",\"pic_url\":\"\",\"english_name\":\"name\"},{\"name\":\"买家区域\",\"id\":\"33\",\"parentId\":\"4\",\"pic_url\":\"\",\"english_name\":\"buyer_area\"},{\"name\":\"买家城市\",\"id\":\"32\",\"parentId\":\"4\",\"pic_url\":\"\",\"english_name\":\"buyer_city\"},{\"name\":\"买家留言\",\"id\":\"31\",\"parentId\":\"4\",\"pic_url\":\"\",\"english_name\":\"remark\"},{\"name\":\"付款时间\",\"id\":\"30\",\"parentId\":\"4\",\"pic_url\":\"\",\"english_name\":\"pay_time\"},{\"name\":\"实付金额\",\"id\":\"29\",\"parentId\":\"4\",\"pic_url\":\"\",\"english_name\":\"payment_money\"},{\"name\":\"订单号\",\"id\":\"28\",\"parentId\":\"4\",\"pic_url\":\"\",\"english_name\":\"order_sn\"},{\"name\":\"买家昵称\",\"id\":\"27\",\"parentId\":\"4\",\"pic_url\":\"\",\"english_name\":\"buyer_nickname\"},{\"name\":\"买家地址\",\"id\":\"26\",\"parentId\":\"4\",\"pic_url\":\"\",\"english_name\":\"address\"}]},{\"name\":\"团长信息\",\"id\":\"5\",\"type\":\"0\",\"child\":[{\"name\":\"路线\",\"id\":\"41\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"route\"},{\"name\":\"配送方式\",\"id\":\"40\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"express_type\"},{\"name\":\"团长城市\",\"id\":\"39\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_city\"},{\"name\":\"团长小区\",\"id\":\"38\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_area_name\"},{\"name\":\"团长ID\",\"id\":\"37\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_uid\"},{\"name\":\"取货点\",\"id\":\"69\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_addr\"},{\"name\":\"团长电话\",\"id\":\"36\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_phone\"},{\"name\":\"团长姓名\",\"id\":\"35\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_name\"},{\"name\":\"团长昵称\",\"id\":\"34\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_nickname\"}]},{\"name\":\"图片信息\",\"id\":\"6\",\"type\":\"2\",\"child\":[{\"name\":\"小程序码\",\"id\":\"24\",\"parentId\":\"6\",\"pic_url\":\"https://imgs.juanpao.com/admin%2Fprint%2F15622281435d1db5af6d82a.jpeg\",\"english_name\":\"widget_code\"},{\"name\":\"LOGO\",\"id\":\"23\",\"parentId\":\"6\",\"pic_url\":\"https://imgs.juanpao.com/admin%2Fprint%2F15622281705d1db5ca42e1b.jpeg\",\"english_name\":\"logo\"}]}]', '[]', '<div class=\"edit-box\" style=\"width: 380px; height: 682px;\">\n					</div>', '378.00', '680.00', null, '1', null, '1562234501', '1564731994', null);
+INSERT INTO `system_diy_express_template` VALUES ('1', '团长单', 'leader_order', '2', '[{\"name\":\"商家信息\",\"id\":\"2\",\"type\":\"0\",\"child\":[{\"name\":\"商家姓名\",\"id\":\"70\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_name\"},{\"name\":\"商家地址\",\"id\":\"21\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_addr\"},{\"name\":\"商家电话\",\"id\":\"20\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_phone\"},{\"name\":\"商家名称\",\"id\":\"19\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"widget_name\"}]},{\"name\":\"表格信息\",\"id\":\"3\",\"type\":\"1\",\"child\":[{\"name\":\"货号\",\"id\":\"68\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"goods_code\"},{\"name\":\"商品ID\",\"id\":\"67\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"goods_id\"},{\"name\":\"规格\",\"id\":\"66\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"property\"},{\"name\":\"单价\",\"id\":\"7\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"price\"},{\"name\":\"数量\",\"id\":\"4\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"number\"},{\"name\":\"商品名称\",\"id\":\"2\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"goodsname\"},{\"name\":\"标签\",\"id\":\"16\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"label\"},{\"name\":\"短标题\",\"id\":\"17\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"short_name\"}]},{\"name\":\"团长信息\",\"id\":\"5\",\"type\":\"0\",\"child\":[{\"name\":\"路线\",\"id\":\"41\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"route\"},{\"name\":\"配送方式\",\"id\":\"40\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"express_type\"},{\"name\":\"团长城市\",\"id\":\"39\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_city\"},{\"name\":\"团长小区\",\"id\":\"38\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_area_name\"},{\"name\":\"取货点\",\"id\":\"69\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_addr\"},{\"name\":\"团长ID\",\"id\":\"37\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_uid\"},{\"name\":\"团长电话\",\"id\":\"36\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_phone\"},{\"name\":\"团长姓名\",\"id\":\"35\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_name\"},{\"name\":\"团长昵称\",\"id\":\"34\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_nickname\"}]},{\"name\":\"图片信息\",\"id\":\"6\",\"type\":\"2\",\"child\":[{\"name\":\"小程序码\",\"id\":\"24\",\"parentId\":\"6\",\"pic_url\":\"https://imgs.juanpao.com/admin%2Fprint%2F15622281435d1db5af6d82a.jpeg\",\"english_name\":\"widget_code\"},{\"name\":\"LOGO\",\"id\":\"23\",\"parentId\":\"6\",\"pic_url\":\"https://imgs.juanpao.com/admin%2Fprint%2F15622281705d1db5ca42e1b.jpeg\",\"english_name\":\"logo\"}]}]', '[{\"id\":2,\"name\":\"商家信息\",\"type\":0,\"child\":[{\"id\":\"70\",\"name\":\"商家姓名\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_name\"},{\"id\":\"21\",\"name\":\"商家地址\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_addr\"},{\"id\":\"20\",\"name\":\"商家电话\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_phone\"},{\"id\":\"19\",\"name\":\"商家名称\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"widget_name\"}]},{\"id\":5,\"name\":\"团长信息\",\"type\":0,\"child\":[{\"id\":\"37\",\"name\":\"团长ID\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_uid\"},{\"id\":\"35\",\"name\":\"团长姓名\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_name\"},{\"id\":\"34\",\"name\":\"团长昵称\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_nickname\"},{\"id\":\"36\",\"name\":\"团长电话\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_phone\"},{\"id\":\"69\",\"name\":\"取货点\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_addr\"},{\"id\":\"38\",\"name\":\"团长小区\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_area_name\"},{\"id\":\"40\",\"name\":\"配送方式\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"express_type\"},{\"id\":\"39\",\"name\":\"团长城市\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"leader_city\"}]},{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"67\",\"name\":\"商品ID\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_id\"},{\"id\":\"68\",\"name\":\"货号\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_code\"},{\"id\":\"17\",\"name\":\"短标题\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"short_name\"},{\"id\":\"16\",\"name\":\"标签\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"label\"},{\"id\":\"66\",\"name\":\"规格\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"property\"},{\"id\":\"4\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"number\"},{\"id\":\"7\",\"name\":\"单价\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"price\"}]}]', '<div class=\"edit-box\" style=\"width: 380px; height: 982px;\">\n					<div class=\"item 70\" id=\"item-active\" data-name=\"70\" data-englishname=\"merchant_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 0px;\"><span>商家姓名:$merchant_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 21\" id=\"item-active\" data-name=\"21\" data-englishname=\"merchant_addr\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; height: 26px; z-index: 0; left: 0px; top: 21px;\"><span>商家地址:$merchant_addr</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 20\" id=\"item-active\" data-name=\"20\" data-englishname=\"merchant_phone\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 43px;\"><span>商家电话:$merchant_phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 37\" id=\"item-active\" data-name=\"37\" data-englishname=\"leader_uid\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 163px; top: 0px;\"><span>团长ID:$leader_uid</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 35\" id=\"item-active\" data-name=\"35\" data-englishname=\"leader_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 162px; top: 22px;\"><span>团长姓名:$leader_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 34\" id=\"item-active\" data-name=\"34\" data-englishname=\"leader_nickname\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 163px; top: 42px;\"><span>团长昵称:$leader_nickname</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 36\" id=\"item-active\" data-name=\"36\" data-englishname=\"leader_phone\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 163px; top: 65px;\"><span>团长电话:$leader_phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 69\" id=\"item-active\" data-name=\"69\" data-englishname=\"leader_addr\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 86px;\"><span>取货点:$leader_addr</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 38\" id=\"item-active\" data-name=\"38\" data-englishname=\"leader_area_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 162px; top: 91px;\"><span>团长小区:$leader_area_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 40\" id=\"item-active\" data-name=\"40\" data-englishname=\"express_type\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 115px;\"><span>配送方式:$express_type</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 39\" id=\"item-active\" data-name=\"39\" data-englishname=\"leader_city\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 162px; top: 114px;\"><span>团长城市:$leader_city</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item item-table\" data-name=\"name-table\" style=\"left: 0px; top: 143px; position: absolute; cursor: move; z-index: 0;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"goods_id\" style=\"border:1px solid black;padding:10px;\">商品ID</th><th data-englishname=\"goods_code\" style=\"border:1px solid black;padding:10px;\">货号</th><th data-englishname=\"short_name\" style=\"border:1px solid black;padding:10px;\">短标题</th><th data-englishname=\"label\" style=\"border:1px solid black;padding:10px;\">标签</th><th data-englishname=\"property\" style=\"border:1px solid black;padding:10px;\">规格</th><th data-englishname=\"number\" style=\"border:1px solid black;padding:10px;\">数量</th><th data-englishname=\"price\" style=\"border:1px solid black;padding:10px;\">单价</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 19 item-active\" id=\"item-active\" data-name=\"19\" data-englishname=\"widget_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 63px;\"><span>商家名称:$widget_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '378.00', '980.00', null, '1', null, '1562233324', '1588062284', null);
+INSERT INTO `system_diy_express_template` VALUES ('2', '发货单', 'Invoice', '2', '[{\"name\":\"商家信息\",\"id\":\"2\",\"type\":\"0\",\"child\":[{\"name\":\"商家姓名\",\"id\":\"70\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_name\"},{\"name\":\"商家地址\",\"id\":\"21\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_addr\"},{\"name\":\"商家电话\",\"id\":\"20\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_phone\"},{\"name\":\"商家名称\",\"id\":\"19\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"widget_name\"}]},{\"name\":\"表格信息\",\"id\":\"3\",\"type\":\"1\",\"child\":[{\"name\":\"商品ID\",\"id\":\"67\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"goods_id\"},{\"name\":\"规格\",\"id\":\"66\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"property\"},{\"name\":\"单价\",\"id\":\"7\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"price\"},{\"name\":\"数量\",\"id\":\"4\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"number\"},{\"name\":\"商品名称\",\"id\":\"2\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"goodsname\"}]},{\"name\":\"买家信息\",\"id\":\"4\",\"type\":\"0\",\"child\":[{\"name\":\"买家电话\",\"id\":\"9\",\"parentId\":\"4\",\"pic_url\":\"\",\"english_name\":\"phone\"},{\"name\":\"买家姓名\",\"id\":\"6\",\"parentId\":\"4\",\"pic_url\":\"\",\"english_name\":\"name\"},{\"name\":\"买家区域\",\"id\":\"33\",\"parentId\":\"4\",\"pic_url\":\"\",\"english_name\":\"buyer_area\"},{\"name\":\"买家城市\",\"id\":\"32\",\"parentId\":\"4\",\"pic_url\":\"\",\"english_name\":\"buyer_city\"},{\"name\":\"买家留言\",\"id\":\"31\",\"parentId\":\"4\",\"pic_url\":\"\",\"english_name\":\"remark\"},{\"name\":\"实付金额\",\"id\":\"29\",\"parentId\":\"4\",\"pic_url\":\"\",\"english_name\":\"payment_money\"},{\"name\":\"买家地址\",\"id\":\"26\",\"parentId\":\"4\",\"pic_url\":\"\",\"english_name\":\"address\"}]},{\"name\":\"团长信息\",\"id\":\"5\",\"type\":\"0\",\"child\":[{\"name\":\"路线\",\"id\":\"41\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"route\"},{\"name\":\"配送方式\",\"id\":\"40\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"express_type\"},{\"name\":\"团长城市\",\"id\":\"39\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_city\"},{\"name\":\"团长小区\",\"id\":\"38\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_area_name\"},{\"name\":\"取货点\",\"id\":\"69\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_addr\"},{\"name\":\"团长ID\",\"id\":\"37\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_uid\"},{\"name\":\"团长电话\",\"id\":\"36\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_phone\"},{\"name\":\"团长姓名\",\"id\":\"35\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_name\"},{\"name\":\"团长昵称\",\"id\":\"34\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"leader_nickname\"}]},{\"name\":\"图片信息\",\"id\":\"6\",\"type\":\"2\",\"child\":[{\"name\":\"小程序码\",\"id\":\"24\",\"parentId\":\"6\",\"pic_url\":\"https://imgs.juanpao.com/admin%2Fprint%2F15622281435d1db5af6d82a.jpeg\",\"english_name\":\"widget_code\"},{\"name\":\"LOGO\",\"id\":\"23\",\"parentId\":\"6\",\"pic_url\":\"https://imgs.juanpao.com/admin%2Fprint%2F15622281705d1db5ca42e1b.jpeg\",\"english_name\":\"logo\"}]}]', '[{\"id\":2,\"name\":\"商家信息\",\"type\":0,\"child\":[{\"id\":\"70\",\"name\":\"商家姓名\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_name\"},{\"id\":\"20\",\"name\":\"商家电话\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_phone\"},{\"id\":\"21\",\"name\":\"商家地址\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_addr\"},{\"id\":\"19\",\"name\":\"商家名称\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"widget_name\"}]},{\"id\":4,\"name\":\"买家信息\",\"type\":0,\"child\":[{\"id\":\"9\",\"name\":\"买家电话\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"phone\"},{\"id\":\"6\",\"name\":\"买家姓名\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"name\"},{\"id\":\"33\",\"name\":\"买家区域\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"buyer_area\"},{\"id\":\"32\",\"name\":\"买家城市\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"buyer_city\"},{\"id\":\"26\",\"name\":\"买家地址\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"address\"},{\"id\":\"31\",\"name\":\"买家留言\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"remark\"},{\"id\":\"29\",\"name\":\"实付金额\",\"pic_url\":\"\",\"parentId\":\"4\",\"english_name\":\"payment_money\"}]},{\"id\":5,\"name\":\"团长信息\",\"type\":0,\"child\":[{\"id\":\"40\",\"name\":\"配送方式\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"express_type\"}]},{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"67\",\"name\":\"商品ID\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_id\"},{\"id\":\"2\",\"name\":\"商品名称\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goodsname\"},{\"id\":\"66\",\"name\":\"规格\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"property\"},{\"id\":\"7\",\"name\":\"单价\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"price\"},{\"id\":\"4\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"number\"}]}]', '<div class=\"edit-box\" style=\"width: 380px; height: 682px;\">\n					<div class=\"item 70\" id=\"item-active\" data-name=\"70\" data-englishname=\"merchant_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 24px;\"><span>商家姓名:$merchant_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 20\" id=\"item-active\" data-name=\"20\" data-englishname=\"merchant_phone\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 173px; top: 25px;\"><span>商家电话:$merchant_phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 21\" id=\"item-active\" data-name=\"21\" data-englishname=\"merchant_addr\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 47px;\"><span>商家地址:$merchant_addr</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 9\" id=\"item-active\" data-name=\"9\" data-englishname=\"phone\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 173px; top: 69px;\"><span>买家电话:$phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 6\" id=\"item-active\" data-name=\"6\" data-englishname=\"name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 68px;\"><span>买家姓名:$name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 33\" id=\"item-active\" data-name=\"33\" data-englishname=\"buyer_area\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 92px;\"><span>买家区域:$buyer_area</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 32\" id=\"item-active\" data-name=\"32\" data-englishname=\"buyer_city\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 171px; top: 91px;\"><span>买家城市:$buyer_city</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 26\" id=\"item-active\" data-name=\"26\" data-englishname=\"address\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 116px;\"><span>买家地址:$address</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 40\" id=\"item-active\" data-name=\"40\" data-englishname=\"express_type\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 171px; top: 117px;\"><span>配送方式:$express_type</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 31\" id=\"item-active\" data-name=\"31\" data-englishname=\"remark\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 137px;\"><span>买家留言:$remark</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 29\" id=\"item-active\" data-name=\"29\" data-englishname=\"payment_money\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 169px; top: 136px;\"><span>实付金额:$payment_money</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item item-table\" data-name=\"name-table\" style=\"left: 4px; top: 171px; position: absolute; cursor: move; z-index: 0; width: 369px;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"goods_id\" style=\"border:1px solid black;padding:10px;\">商品ID</th><th data-englishname=\"goodsname\" style=\"border:1px solid black;padding:10px;\">商品名称</th><th data-englishname=\"property\" style=\"border:1px solid black;padding:10px;\">规格</th><th data-englishname=\"price\" style=\"border:1px solid black;padding:10px;\">单价</th><th data-englishname=\"number\" style=\"border:1px solid black;padding:10px;\">数量</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 19 item-active\" id=\"item-active\" data-name=\"19\" data-englishname=\"widget_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 92px; top: 3px;\"><span>商家名称:$widget_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '378.00', '680.00', null, '1', null, '1562233713', '1588062376', null);
+INSERT INTO `system_diy_express_template` VALUES ('3', '采购单', 'purchasing_order', '2', '[{\"name\":\"商家信息\",\"id\":\"2\",\"type\":\"0\",\"child\":[{\"name\":\"商家姓名\",\"id\":\"70\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_name\"},{\"name\":\"商家地址\",\"id\":\"21\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_addr\"},{\"name\":\"商家电话\",\"id\":\"20\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_phone\"},{\"name\":\"商家名称\",\"id\":\"19\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"widget_name\"}]},{\"name\":\"表格信息\",\"id\":\"3\",\"type\":\"1\",\"child\":[{\"name\":\"货号\",\"id\":\"68\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"goods_code\"},{\"name\":\"商品ID\",\"id\":\"67\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"goods_id\"},{\"name\":\"规格\",\"id\":\"66\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"property\"},{\"name\":\"单价\",\"id\":\"7\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"price\"},{\"name\":\"数量\",\"id\":\"4\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"number\"},{\"name\":\"标签\",\"id\":\"16\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"label\"},{\"name\":\"短标题\",\"id\":\"17\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"short_name\"}]},{\"name\":\"图片信息\",\"id\":\"6\",\"type\":\"2\",\"child\":[{\"name\":\"小程序码\",\"id\":\"24\",\"parentId\":\"6\",\"pic_url\":\"https://imgs.juanpao.com/admin%2Fprint%2F15622281435d1db5af6d82a.jpeg\",\"english_name\":\"widget_code\"},{\"name\":\"LOGO\",\"id\":\"23\",\"parentId\":\"6\",\"pic_url\":\"https://imgs.juanpao.com/admin%2Fprint%2F15622281705d1db5ca42e1b.jpeg\",\"english_name\":\"logo\"}]}]', '[{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"67\",\"name\":\"商品ID\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_id\"},{\"id\":\"68\",\"name\":\"货号\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"goods_code\"},{\"id\":\"17\",\"name\":\"短标题\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"short_name\"},{\"id\":\"16\",\"name\":\"标签\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"label\"},{\"id\":\"66\",\"name\":\"规格\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"property\"},{\"id\":\"4\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"number\"},{\"id\":\"7\",\"name\":\"单价\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"price\"}]},{\"id\":2,\"name\":\"商家信息\",\"type\":0,\"child\":[{\"id\":\"19\",\"name\":\"商家名称\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"widget_name\"}]}]', '<div class=\"edit-box\" style=\"width: 380px; height: 682px;\">\n					<div class=\"item item-table\" data-name=\"name-table\" style=\"left: 0px; top: 48px; position: absolute; cursor: move; z-index: 0;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"goods_id\" style=\"border:1px solid black;padding:10px;\">商品ID</th><th data-englishname=\"goods_code\" style=\"border:1px solid black;padding:10px;\">货号</th><th data-englishname=\"short_name\" style=\"border:1px solid black;padding:10px;\">短标题</th><th data-englishname=\"label\" style=\"border:1px solid black;padding:10px;\">标签</th><th data-englishname=\"property\" style=\"border:1px solid black;padding:10px;\">规格</th><th data-englishname=\"number\" style=\"border:1px solid black;padding:10px;\">数量</th><th data-englishname=\"price\" style=\"border:1px solid black;padding:10px;\">单价</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 19 item-active\" id=\"item-active\" data-name=\"19\" data-englishname=\"widget_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 98px; top: 15px;\"><span>商家名称:$widget_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '378.00', '680.00', null, '1', null, '1562233991', '1588062417', null);
+INSERT INTO `system_diy_express_template` VALUES ('4', '配货单', 'distribution_bill', '2', '[{\"name\":\"商品信息\",\"id\":\"1\",\"type\":\"0\",\"child\":[{\"name\":\"货号\",\"id\":\"46\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"goods_code\"},{\"name\":\"商品ID\",\"id\":\"45\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"goods_id\"},{\"name\":\"规格\",\"id\":\"44\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"property\"},{\"name\":\"短标题\",\"id\":\"43\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"short_name\"},{\"name\":\"标签\",\"id\":\"42\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"label\"},{\"name\":\"单价\",\"id\":\"8\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"price\"},{\"name\":\"数量\",\"id\":\"3\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"number\"},{\"name\":\"商品名称\",\"id\":\"1\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"goodsname\"}]},{\"name\":\"商家信息\",\"id\":\"2\",\"type\":\"0\",\"child\":[{\"name\":\"商家姓名\",\"id\":\"70\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_name\"},{\"name\":\"商家地址\",\"id\":\"21\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_addr\"},{\"name\":\"商家电话\",\"id\":\"20\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_phone\"},{\"name\":\"商家名称\",\"id\":\"19\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"widget_name\"}]},{\"name\":\"表格信息\",\"id\":\"3\",\"type\":\"1\",\"child\":[{\"name\":\"取货点\",\"id\":\"71\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_addr\"},{\"name\":\"路线\",\"id\":\"65\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"route\"},{\"name\":\"配送方式\",\"id\":\"64\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"express_type\"},{\"name\":\"团长城市\",\"id\":\"63\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_city\"},{\"name\":\"团长小区\",\"id\":\"62\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_area_name\"},{\"name\":\"团长ID\",\"id\":\"61\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_uid\"},{\"name\":\"团长电话\",\"id\":\"60\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_phone\"},{\"name\":\"团长昵称\",\"id\":\"59\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_nickname\"},{\"name\":\"数量\",\"id\":\"4\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"number\"},{\"name\":\"团长姓名\",\"id\":\"18\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_name\"}]}]', '[{\"id\":1,\"name\":\"商品信息\",\"type\":0,\"child\":[{\"id\":\"45\",\"name\":\"商品ID\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"goods_id\"},{\"id\":\"46\",\"name\":\"货号\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"goods_code\"},{\"id\":\"1\",\"name\":\"商品名称\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"goodsname\"},{\"id\":\"43\",\"name\":\"短标题\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"short_name\"},{\"id\":\"42\",\"name\":\"标签\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"label\"},{\"id\":\"44\",\"name\":\"规格\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"property\"},{\"id\":\"3\",\"name\":\"数量\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"number\"},{\"id\":\"8\",\"name\":\"单价\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"price\"}]},{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"65\",\"name\":\"路线\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"route\"},{\"id\":\"61\",\"name\":\"团长ID\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_uid\"},{\"id\":\"62\",\"name\":\"团长小区\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_area_name\"},{\"id\":\"71\",\"name\":\"取货点\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_addr\"},{\"id\":\"18\",\"name\":\"团长姓名\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_name\"},{\"id\":\"60\",\"name\":\"团长电话\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_phone\"}]}]', '<div class=\"edit-box\" style=\"width: 380px; height: 682px;\">\n					<div class=\"item 45\" id=\"item-active\" data-name=\"45\" data-englishname=\"goods_id\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 0px;\"><span>商品ID:$goods_id</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 46\" id=\"item-active\" data-name=\"46\" data-englishname=\"goods_code\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 52px;\"><span>货号:$goods_code</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 1\" id=\"item-active\" data-name=\"1\" data-englishname=\"goodsname\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 175px; top: 0px;\"><span>商品名称:$goodsname</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 43\" id=\"item-active\" data-name=\"43\" data-englishname=\"short_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 177px; top: 26px;\"><span>短标题:$short_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 42\" id=\"item-active\" data-name=\"42\" data-englishname=\"label\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 27px;\"><span>标签:$label</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 44\" id=\"item-active\" data-name=\"44\" data-englishname=\"property\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 176px; top: 54px;\"><span>规格:$property</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 3\" id=\"item-active\" data-name=\"3\" data-englishname=\"number\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 0px; top: 80px;\"><span>数量:$number</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 8\" id=\"item-active\" data-name=\"8\" data-englishname=\"price\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 173px; top: 80px;\"><span>单价:$price</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item item-table item-active\" data-name=\"name-table\" style=\"left: 0px; top: 108px; position: absolute; cursor: move; z-index: 0;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"route\" style=\"border:1px solid black;padding:10px;\">路线</th><th data-englishname=\"leader_uid\" style=\"border:1px solid black;padding:10px;\">团长ID</th><th data-englishname=\"leader_area_name\" style=\"border:1px solid black;padding:10px;\">团长小区</th><th data-englishname=\"leader_addr\" style=\"border:1px solid black;padding:10px;\">取货点</th><th data-englishname=\"leader_name\" style=\"border:1px solid black;padding:10px;\">团长姓名</th><th data-englishname=\"leader_phone\" style=\"border:1px solid black;padding:10px;\">团长电话</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '378.00', '680.00', null, '1', null, '1562234447', '1588062480', null);
+INSERT INTO `system_diy_express_template` VALUES ('5', '团长路线单', 'leader_route', '2', '[{\"name\":\"商家信息\",\"id\":\"2\",\"type\":\"0\",\"child\":[{\"name\":\"商家姓名\",\"id\":\"70\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_name\"},{\"name\":\"商家地址\",\"id\":\"21\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_addr\"},{\"name\":\"商家电话\",\"id\":\"20\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_phone\"},{\"name\":\"商家名称\",\"id\":\"19\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"widget_name\"}]},{\"name\":\"表格信息\",\"id\":\"3\",\"type\":\"1\",\"child\":[{\"name\":\"取货点\",\"id\":\"71\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_addr\"},{\"name\":\"团长小区\",\"id\":\"62\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_area_name\"},{\"name\":\"团长电话\",\"id\":\"60\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_phone\"},{\"name\":\"团长姓名\",\"id\":\"18\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_name\"}]},{\"name\":\"团长信息\",\"id\":\"5\",\"type\":\"0\",\"child\":[{\"name\":\"路线\",\"id\":\"41\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"route\"}]},{\"name\":\"图片信息\",\"id\":\"6\",\"type\":\"2\",\"child\":[{\"name\":\"小程序码\",\"id\":\"24\",\"parentId\":\"6\",\"pic_url\":\"https://imgs.juanpao.com/admin%2Fprint%2F15622281435d1db5af6d82a.jpeg\",\"english_name\":\"widget_code\"},{\"name\":\"LOGO\",\"id\":\"23\",\"parentId\":\"6\",\"pic_url\":\"https://imgs.juanpao.com/admin%2Fprint%2F15622281705d1db5ca42e1b.jpeg\",\"english_name\":\"logo\"}]}]', '[{\"id\":2,\"name\":\"商家信息\",\"type\":0,\"child\":[{\"id\":\"70\",\"name\":\"商家姓名\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_name\"},{\"id\":\"21\",\"name\":\"商家地址\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_addr\"},{\"id\":\"20\",\"name\":\"商家电话\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_phone\"},{\"id\":\"19\",\"name\":\"商家名称\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"widget_name\"}]},{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"18\",\"name\":\"团长姓名\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_name\"},{\"id\":\"60\",\"name\":\"团长电话\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_phone\"},{\"id\":\"62\",\"name\":\"团长小区\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_area_name\"},{\"id\":\"71\",\"name\":\"取货点\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_addr\"}]},{\"id\":5,\"name\":\"团长信息\",\"type\":0,\"child\":[{\"id\":\"41\",\"name\":\"路线\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"route\"}]}]', '<div class=\"edit-box\" style=\"width: 380px; height: 682px;\">\n					<div class=\"item 70\" id=\"item-active\" data-name=\"70\" data-englishname=\"merchant_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 8px; top: 36px;\"><span>商家姓名:$merchant_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 21\" id=\"item-active\" data-name=\"21\" data-englishname=\"merchant_addr\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 184px; top: 40px;\"><span>商家地址:$merchant_addr</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 20\" id=\"item-active\" data-name=\"20\" data-englishname=\"merchant_phone\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 6px; top: 62px;\"><span>商家电话:$merchant_phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 41\" id=\"item-active\" data-name=\"41\" data-englishname=\"route\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 133px; top: 9px;\"><span>路线:$route</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item item-table\" data-name=\"name-table\" style=\"left: 4px; top: 92px; position: absolute; cursor: move; z-index: 0;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"leader_name\" style=\"border:1px solid black;padding:10px;\">团长姓名</th><th data-englishname=\"leader_phone\" style=\"border:1px solid black;padding:10px;\">团长电话</th><th data-englishname=\"leader_area_name\" style=\"border:1px solid black;padding:10px;\">团长小区</th><th data-englishname=\"leader_addr\" style=\"border:1px solid black;padding:10px;\">取货点</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 19 item-active\" id=\"item-active\" data-name=\"19\" data-englishname=\"widget_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 181px; top: 63px;\"><span>商家名称:$widget_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '378.00', '680.00', null, '1', null, '1562234501', '1588062521', null);
 INSERT INTO `system_diy_express_template` VALUES ('6', '测试', 'test', '2', '[{\"name\":\"商品信息\",\"id\":\"1\",\"type\":\"0\",\"child\":[{\"name\":\"货号\",\"id\":\"46\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"goods_code\"},{\"name\":\"商品ID\",\"id\":\"45\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"goods_id\"},{\"name\":\"短标题\",\"id\":\"43\",\"parentId\":\"1\",\"pic_url\":\"\",\"english_name\":\"short_name\"}]},{\"name\":\"商家信息\",\"id\":\"2\",\"type\":\"0\",\"child\":[{\"name\":\"商家姓名\",\"id\":\"70\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_name\"},{\"name\":\"商家地址\",\"id\":\"21\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_addr\"},{\"name\":\"商家电话\",\"id\":\"20\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_phone\"}]},{\"name\":\"表格信息\",\"id\":\"3\",\"type\":\"1\",\"child\":[{\"name\":\"取货点\",\"id\":\"71\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"leader_addr\"},{\"name\":\"商家地址\",\"id\":\"48\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"merchant_addr\"},{\"name\":\"小程序名称\",\"id\":\"47\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"widget_name\"},{\"name\":\"付款时间\",\"id\":\"55\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"pay_time\"}]}]', '[{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"71\",\"name\":\"取货点\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"leader_addr\"},{\"id\":\"48\",\"name\":\"商家地址\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"merchant_addr\"},{\"id\":\"47\",\"name\":\"小程序名称\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"widget_name\"}]},{\"id\":1,\"name\":\"商品信息\",\"type\":0,\"child\":[{\"id\":\"46\",\"name\":\"货号\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"goods_code\"},{\"id\":\"45\",\"name\":\"商品ID\",\"pic_url\":\"\",\"parentId\":\"1\",\"english_name\":\"goods_id\"}]}]', '<div class=\"edit-box\" style=\"width: 380px; height: 682px;\">\n					<div class=\"item item-table\" data-name=\"name-table\" style=\"left: 6px; top: 83px; position: absolute; cursor: move; z-index: 0;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"leader_addr\" style=\"border:1px solid black;padding:10px;\">取货点</th><th data-englishname=\"merchant_addr\" style=\"border:1px solid black;padding:10px;\">商家地址</th><th data-englishname=\"widget_name\" style=\"border:1px solid black;padding:10px;\">小程序名称</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 46\" id=\"item-active\" data-name=\"46\" data-englishname=\"goods_code\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move;\"><span>货号:$goods_code</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 45 item-active\" id=\"item-active\" data-name=\"45\" data-englishname=\"goods_id\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 157px; top: 10px;\"><span>商品ID:$goods_id</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '378.00', '680.00', null, '1', null, '1562315393', '1566291232', '1566291232');
+INSERT INTO `system_diy_express_template` VALUES ('7', '仓库路线单', 'warehouse_route', '2', '[{\"name\":\"商家信息\",\"id\":\"2\",\"type\":\"0\",\"child\":[{\"name\":\"商家姓名\",\"id\":\"70\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_name\"},{\"name\":\"商家地址\",\"id\":\"21\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_addr\"},{\"name\":\"商家电话\",\"id\":\"20\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"merchant_phone\"},{\"name\":\"商家名称\",\"id\":\"19\",\"parentId\":\"2\",\"pic_url\":\"\",\"english_name\":\"widget_name\"}]},{\"name\":\"表格信息\",\"id\":\"3\",\"type\":\"1\",\"child\":[{\"name\":\"仓库地址\",\"id\":\"73\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"warehouse_addr\"},{\"name\":\"仓库名称\",\"id\":\"72\",\"parentId\":\"3\",\"pic_url\":\"\",\"english_name\":\"warehouse_name\"}]},{\"name\":\"团长信息\",\"id\":\"5\",\"type\":\"0\",\"child\":[{\"name\":\"路线\",\"id\":\"41\",\"parentId\":\"5\",\"pic_url\":\"\",\"english_name\":\"route\"}]},{\"name\":\"图片信息\",\"id\":\"6\",\"type\":\"2\",\"child\":[{\"name\":\"小程序码\",\"id\":\"24\",\"parentId\":\"6\",\"pic_url\":\"https://imgs.juanpao.com/admin%2Fprint%2F15622281435d1db5af6d82a.jpeg\",\"english_name\":\"widget_code\"},{\"name\":\"LOGO\",\"id\":\"23\",\"parentId\":\"6\",\"pic_url\":\"https://imgs.juanpao.com/admin%2Fprint%2F15622281705d1db5ca42e1b.jpeg\",\"english_name\":\"logo\"}]}]', '[{\"id\":5,\"name\":\"团长信息\",\"type\":0,\"child\":[{\"id\":\"41\",\"name\":\"路线\",\"pic_url\":\"\",\"parentId\":\"5\",\"english_name\":\"route\"}]},{\"id\":2,\"name\":\"商家信息\",\"type\":0,\"child\":[{\"id\":\"70\",\"name\":\"商家姓名\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_name\"},{\"id\":\"21\",\"name\":\"商家地址\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_addr\"},{\"id\":\"20\",\"name\":\"商家电话\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"merchant_phone\"},{\"id\":\"19\",\"name\":\"商家名称\",\"pic_url\":\"\",\"parentId\":\"2\",\"english_name\":\"widget_name\"}]},{\"id\":3,\"name\":\"表格信息\",\"type\":1,\"child\":[{\"id\":\"72\",\"name\":\"仓库名称\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"warehouse_name\"},{\"id\":\"73\",\"name\":\"仓库地址\",\"pic_url\":\"\",\"parentId\":\"3\",\"english_name\":\"warehouse_addr\"}]}]', '<div class=\"edit-box\" style=\"width: 380px; height: 682px;\">\n					<div class=\"item 41\" id=\"item-active\" data-name=\"41\" data-englishname=\"route\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 141px; top: 12px;\"><span>路线:$route</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 70\" id=\"item-active\" data-name=\"70\" data-englishname=\"merchant_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 7px; top: 38px;\"><span>商家姓名:$merchant_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 21\" id=\"item-active\" data-name=\"21\" data-englishname=\"merchant_addr\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 182px; top: 37px;\"><span>商家地址:$merchant_addr</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 20\" id=\"item-active\" data-name=\"20\" data-englishname=\"merchant_phone\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 6px; top: 58px;\"><span>商家电话:$merchant_phone</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item item-table\" data-name=\"name-table\" style=\"left: 8px; top: 89px; position: absolute; cursor: move; z-index: 0;\" l_zoom_mode=\"auto\"><table style=\"white-space:normal;border:1px solid black;\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><th data-englishname=\"warehouse_name\" style=\"border:1px solid black;padding:10px;\">仓库名称</th><th data-englishname=\"warehouse_addr\" style=\"border:1px solid black;padding:10px;\">仓库地址</th></tr></tbody></table><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div><div class=\"item 19 item-active\" id=\"item-active\" data-name=\"19\" data-englishname=\"widget_name\" l_zoom_mode=\"auto\" style=\"position: absolute; cursor: move; z-index: 0; left: 181px; top: 60px;\"><span>商家名称:$widget_name</span><div class=\"zoom_right\"></div><div class=\"zoom_rb\"></div><div class=\"zoom_bottom\"></div></div></div>', '378.00', '680.00', null, '1', null, '1587368291', '1588062544', null);
 
 -- ----------------------------
 -- Table structure for `system_express`
@@ -6572,6 +6939,7 @@ CREATE TABLE `system_express` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL COMMENT '物流名称',
   `simple_name` varchar(100) NOT NULL DEFAULT '' COMMENT '缩写名称',
+  `abbreviation_name` varchar(100) NOT NULL DEFAULT '' COMMENT '拼音名称（阿里云）',
   `phone` varchar(255) NOT NULL DEFAULT '' COMMENT '联系电话',
   `img_url` varchar(512) NOT NULL DEFAULT '' COMMENT '图片地址',
   `url` varchar(512) NOT NULL DEFAULT '' COMMENT '官网地址',
@@ -6587,248 +6955,248 @@ CREATE TABLE `system_express` (
 -- ----------------------------
 -- Records of system_express
 -- ----------------------------
-INSERT INTO `system_express` VALUES ('1', '顺丰速运', 'SF', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('2', '百世快递', 'HTKY', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('3', '中通快递', 'ZTO', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('4', '申通快递', 'STO', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('5', '圆通速递', 'YTO', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('6', '韵达速递', 'YD', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('7', '邮政快递包裹', 'YZPY', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('8', 'EMS', 'EMS', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('9', '天天快递', 'HHTT', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('10', '京东快递', 'JD', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('11', '优速快递', 'UC', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('12', '德邦快递', 'DBL', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('13', '宅急送', 'ZJS', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('14', 'TNT快递', 'TNT', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('15', 'UPS', 'UPS', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('16', 'DHL', 'DHL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('17', 'FEDEX联邦(国内件）', 'FEDEX', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('18', 'FEDEX联邦(国际件）', 'FEDEX_GJ', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('19', '安捷快递', 'AJ', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('20', '阿里跨境电商物流', 'ALKJWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('21', '安迅物流', 'AX', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('22', '安邮美国', 'AYUS', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('23', '亚马逊物流', 'AMAZON', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('24', '澳门邮政', 'AOMENYZ', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('25', '安能物流', 'ANE', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('26', '澳多多', 'ADD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('27', '澳邮专线', 'AYCA', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('28', '安鲜达', 'AXD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('29', '安能快运', 'ANEKY', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('30', '八达通  ', 'BDT', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('31', '百腾物流', 'BETWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('32', '北极星快运', 'BJXKY', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('33', '奔腾物流', 'BNTWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('34', '百福东方', 'BFDF', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('35', '贝海国际 ', 'BHGJ', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('36', '八方安运', 'BFAY', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('37', '百世快运', 'BTWL', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('38', '春风物流', 'CFWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('39', '诚通物流', 'CHTWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('40', '传喜物流', 'CXHY', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('41', '程光   ', 'CG', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('42', '城市100', 'CITY100', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('43', '城际快递', 'CJKD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('44', 'CNPEX中邮快递', 'CNPEX', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('45', 'COE东方快递', 'COE', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('46', '长沙创一', 'CSCY', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('47', '成都善途速运', 'CDSTKY', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('48', '联合运通', 'CTG', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('49', '疯狂快递', 'CRAZY', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('50', 'CBO钏博物流', 'CBO', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('51', '承诺达', 'CND', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('52', 'D速物流', 'DSWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('53', '到了港', 'DLG ', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('54', '大田物流', 'DTWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('55', '东骏快捷物流', 'DJKJWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('56', '德坤', 'DEKUN', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('57', '德邦快运', 'DBLKY', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('58', '大马鹿', 'DML', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('59', 'E特快', 'ETK', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('60', 'EWE', 'EWE', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('61', '快服务', 'KFW', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('62', '飞康达', 'FKD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('63', '富腾达  ', 'FTD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('64', '凡宇货的', 'FYKD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('65', '速派快递', 'FASTGO', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('66', '丰通快运', 'FT', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('67', '冠达   ', 'GD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('68', '国通快递', 'GTO', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('69', '广东邮政', 'GDEMS', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('70', '共速达', 'GSD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('71', '广通       ', 'GTONG', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('72', '迦递快递', 'GAI', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('73', '港快速递', 'GKSD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('74', '高铁速递', 'GTSD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('75', '汇丰物流', 'HFWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('76', '黑狗冷链', 'HGLL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('77', '恒路物流', 'HLWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('78', '天地华宇', 'HOAU', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('79', '鸿桥供应链', 'HOTSCM', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('80', '海派通物流公司', 'HPTEX', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('81', '华强物流', 'hq568', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('82', '环球速运  ', 'HQSY', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('83', '华夏龙物流', 'HXLWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('84', '豪翔物流 ', 'HXWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('85', '合肥汇文', 'HFHW', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('86', '辉隆物流', 'HLONGWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('87', '华企快递', 'HQKD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('88', '韩润物流', 'HRWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('89', '青岛恒通快递', 'HTKD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('90', '货运皇物流', 'HYH', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('91', '好来运快递', 'HYLSD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('92', '皇家物流', 'HJWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('93', '捷安达  ', 'JAD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('94', '京广速递', 'JGSD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('95', '九曳供应链', 'JIUYE', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('96', '急先达', 'JXD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('97', '晋越快递', 'JYKD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('98', '加运美', 'JYM', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('99', '景光物流', 'JGWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('100', '佳怡物流', 'JYWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('101', '京东快运', 'JDKY', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('102', '佳吉快运', 'CNEX', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('103', '跨越速运', 'KYSY', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('104', '跨越物流', 'KYWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('105', '快速递物流', 'KSDWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('106', '快8速运', 'KBSY', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('107', '龙邦快递', 'LB', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('108', '立即送', 'LJSKD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('109', '联昊通速递', 'LHT', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('110', '民邦快递', 'MB', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('111', '民航快递', 'MHKD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('112', '美快    ', 'MK', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('113', '门对门快递', 'MDM', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('114', '迈隆递运', 'MRDY', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('115', '明亮物流', 'MLWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('116', '南方', 'NF', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('117', '能达速递', 'NEDA', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('118', '平安达腾飞快递', 'PADTF', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('119', '泛捷快递', 'PANEX', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('120', '品骏快递', 'PJ', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('121', 'PCA Express', 'PCA', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('122', '全晨快递', 'QCKD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('123', '全日通快递', 'QRT', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('124', '快客快递', 'QUICK', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('125', '全信通', 'QXT', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('126', '荣庆物流', 'RQ', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('127', '七曜中邮', 'QYZY', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('128', '如风达', 'RFD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('129', '日日顺物流', 'RRS', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('130', '瑞丰速递', 'RFEX', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('131', '赛澳递', 'SAD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('132', '苏宁物流', 'SNWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('133', '圣安物流', 'SAWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('134', '晟邦物流', 'SBWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('135', '上大物流', 'SDWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('136', '盛丰物流', 'SFWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('137', '速通物流', 'ST', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('138', '速腾快递', 'STWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('139', '速必达物流', 'SUBIDA', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('140', '速递e站', 'SDEZ', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('141', '速呈宅配', 'SCZPDS', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('142', '速尔快递', 'SURE', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('143', '闪送', 'SS', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('144', '盛通快递', 'STKD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('145', '台湾邮政', 'TAIWANYZ', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('146', '唐山申通', 'TSSTO', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('147', '特急送', 'TJS', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('148', '通用物流', 'TYWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('149', '腾林物流', 'TLWL', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('150', '全一快递', 'UAPEX', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('151', '优联吉运', 'ULUCKEX', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('152', 'UEQ Express', 'UEQ', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('153', '万家康  ', 'WJK', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('154', '万家物流', 'WJWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('155', '武汉同舟行', 'WHTZX', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('156', '维普恩', 'WPE', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('157', '万象物流', 'WXWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('158', '微特派', 'WTP', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('159', '温通物流', 'WTWL', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('160', '迅驰物流  ', 'XCWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('161', '信丰物流', 'XFEX', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('162', '希优特', 'XYT', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('163', '新杰物流', 'XJ', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('164', '源安达快递', 'YADEX', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('165', '远成物流', 'YCWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('166', '远成快运', 'YCSY', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('167', '义达国际物流', 'YDH', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('168', '易达通  ', 'YDT', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('169', '原飞航物流', 'YFHEX', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('170', '亚风快递', 'YFSD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('171', '运通快递', 'YTKD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('172', '亿翔快递', 'YXKD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('173', '运东西网', 'YUNDX', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('174', '壹米滴答', 'YMDD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('175', '邮政国内标快', 'YZBK', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('176', '一站通速运', 'YZTSY', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('177', '驭丰速运', 'YFSUYUN', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('178', '余氏东风', 'YSDF', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('179', '耀飞快递', 'YF', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('180', '韵达快运', 'YDKY', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('181', '云路', 'YL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('182', '增益快递', 'ZENY', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('183', '汇强快递', 'ZHQKD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('184', '众通快递', 'ZTE', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('185', '中铁快运', 'ZTKY', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('186', '中铁物流', 'ZTWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('187', '郑州速捷', 'SJ', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('188', '中通快运', 'ZTOKY', '', '', '', '', '1', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('189', '中邮快递', 'ZYKD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('190', '中粮我买网', 'WM', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('191', '芝麻开门', 'ZMKM', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('192', '中骅物流', 'ZHWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('193', '', '', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('194', 'AAE全球专递', 'AAE', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('195', 'ACS雅仕快递', 'ACS', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('196', 'ADP Express Tracking', 'ADP', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('197', '安圭拉邮政', 'ANGUILAYOU', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('198', 'APAC', 'APAC', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('199', 'Aramex', 'ARAMEX', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('200', '奥地利邮政', 'AT', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('201', 'Australia Post Tracking', 'AUSTRALIA', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('202', '比利时邮政', 'BEL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('203', 'BHT快递', 'BHT', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('204', '秘鲁邮政', 'BILUYOUZHE', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('205', '巴西邮政', 'BR', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('206', '不丹邮政', 'BUDANYOUZH', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('207', 'CDEK', 'CDEK', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('208', '加拿大邮政', 'CA', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('209', '递必易国际物流', 'DBYWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('210', '大道物流', 'DDWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('211', '德国云快递', 'DGYKD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('212', '到乐国际', 'DLGJ', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('213', 'DHL德国', 'DHL_DE', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('214', 'DHL(英文版)', 'DHL_EN', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('215', 'DHL全球', 'DHL_GLB', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('216', 'DHL Global Mail', 'DHLGM', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('217', '丹麦邮政', 'DK', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('218', 'DPD', 'DPD', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('219', 'DPEX', 'DPEX', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('220', '递四方速递', 'D4PX', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('221', 'EMS国际', 'EMSGJ', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('222', '易客满', 'EKM', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('223', 'EPS (联众国际快运)', 'EPS', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('224', 'EShipper', 'ESHIPPER', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('225', '丰程物流', 'FCWL', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('226', '法翔速运', 'FX', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('227', 'FQ', 'FQ', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('228', '芬兰邮政', 'FLYZ', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('229', '方舟国际速递', 'FZGJ', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('230', '国际e邮宝', 'GJEYB', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('231', '国际邮政包裹', 'GJYZ', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('232', 'GE2D', 'GE2D', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('233', '冠泰', 'GT', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('234', 'GLS', 'GLS', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('235', '欧洲专线(邮政)', 'IOZYZ', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('236', '澳大利亚邮政', 'IADLYYZ', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('237', '阿尔巴尼亚邮政', 'IAEBNYYZ', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('238', '阿尔及利亚邮政', 'IAEJLYYZ', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('239', '阿富汗邮政', 'IAFHYZ', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('240', '安哥拉邮政', 'IAGLYZ', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('241', '埃及邮政', 'IAJYZ', '', '', '', '', '0', '1', '1540524600', null, null);
-INSERT INTO `system_express` VALUES ('242', '阿鲁巴邮政', 'IALBYZ', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('1', '顺丰速运', 'SF', 'shunfeng', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('2', '百世快递', 'HTKY', 'huitong', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('3', '中通快递', 'ZTO', 'zhongtong', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('4', '申通快递', 'STO', 'shentong', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('5', '圆通速递', 'YTO', 'yuantong', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('6', '韵达速递', 'YD', 'yunda', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('7', '邮政快递包裹', 'YZPY', 'pingyou', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('8', 'EMS', 'EMS', 'emsen', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('9', '天天快递', 'HHTT', 'tiantian', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('10', '京东快递', 'JD', 'jingdong', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('11', '优速快递', 'UC', 'yousu', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('12', '德邦快递', 'DBL', 'debang', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('13', '宅急送', 'ZJS', 'zhaijisong', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('14', 'TNT快递', 'TNT', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('15', 'UPS', 'UPS', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('16', 'DHL', 'DHL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('17', 'FEDEX联邦(国内件）', 'FEDEX', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('18', 'FEDEX联邦(国际件）', 'FEDEX_GJ', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('19', '安捷快递', 'AJ', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('20', '阿里跨境电商物流', 'ALKJWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('21', '安迅物流', 'AX', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('22', '安邮美国', 'AYUS', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('23', '亚马逊物流', 'AMAZON', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('24', '澳门邮政', 'AOMENYZ', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('25', '安能物流', 'ANE', 'anneng', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('26', '澳多多', 'ADD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('27', '澳邮专线', 'AYCA', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('28', '安鲜达', 'AXD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('29', '安能快运', 'ANEKY', '', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('30', '八达通  ', 'BDT', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('31', '百腾物流', 'BETWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('32', '北极星快运', 'BJXKY', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('33', '奔腾物流', 'BNTWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('34', '百福东方', 'BFDF', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('35', '贝海国际 ', 'BHGJ', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('36', '八方安运', 'BFAY', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('37', '百世快运', 'BTWL', '', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('38', '春风物流', 'CFWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('39', '诚通物流', 'CHTWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('40', '传喜物流', 'CXHY', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('41', '程光   ', 'CG', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('42', '城市100', 'CITY100', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('43', '城际快递', 'CJKD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('44', 'CNPEX中邮快递', 'CNPEX', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('45', 'COE东方快递', 'COE', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('46', '长沙创一', 'CSCY', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('47', '成都善途速运', 'CDSTKY', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('48', '联合运通', 'CTG', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('49', '疯狂快递', 'CRAZY', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('50', 'CBO钏博物流', 'CBO', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('51', '承诺达', 'CND', '', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('52', 'D速物流', 'DSWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('53', '到了港', 'DLG ', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('54', '大田物流', 'DTWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('55', '东骏快捷物流', 'DJKJWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('56', '德坤', 'DEKUN', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('57', '德邦快运', 'DBLKY', '', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('58', '大马鹿', 'DML', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('59', 'E特快', 'ETK', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('60', 'EWE', 'EWE', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('61', '快服务', 'KFW', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('62', '飞康达', 'FKD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('63', '富腾达  ', 'FTD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('64', '凡宇货的', 'FYKD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('65', '速派快递', 'FASTGO', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('66', '丰通快运', 'FT', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('67', '冠达   ', 'GD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('68', '国通快递', 'GTO', 'guotong', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('69', '广东邮政', 'GDEMS', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('70', '共速达', 'GSD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('71', '广通       ', 'GTONG', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('72', '迦递快递', 'GAI', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('73', '港快速递', 'GKSD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('74', '高铁速递', 'GTSD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('75', '汇丰物流', 'HFWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('76', '黑狗冷链', 'HGLL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('77', '恒路物流', 'HLWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('78', '天地华宇', 'HOAU', '', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('79', '鸿桥供应链', 'HOTSCM', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('80', '海派通物流公司', 'HPTEX', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('81', '华强物流', 'hq568', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('82', '环球速运  ', 'HQSY', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('83', '华夏龙物流', 'HXLWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('84', '豪翔物流 ', 'HXWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('85', '合肥汇文', 'HFHW', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('86', '辉隆物流', 'HLONGWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('87', '华企快递', 'HQKD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('88', '韩润物流', 'HRWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('89', '青岛恒通快递', 'HTKD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('90', '货运皇物流', 'HYH', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('91', '好来运快递', 'HYLSD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('92', '皇家物流', 'HJWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('93', '捷安达  ', 'JAD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('94', '京广速递', 'JGSD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('95', '九曳供应链', 'JIUYE', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('96', '急先达', 'JXD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('97', '晋越快递', 'JYKD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('98', '加运美', 'JYM', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('99', '景光物流', 'JGWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('100', '佳怡物流', 'JYWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('101', '京东快运', 'JDKY', '', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('102', '佳吉快运', 'CNEX', '', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('103', '跨越速运', 'KYSY', '', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('104', '跨越物流', 'KYWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('105', '快速递物流', 'KSDWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('106', '快8速运', 'KBSY', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('107', '龙邦快递', 'LB', 'longbang', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('108', '立即送', 'LJSKD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('109', '联昊通速递', 'LHT', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('110', '民邦快递', 'MB', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('111', '民航快递', 'MHKD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('112', '美快    ', 'MK', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('113', '门对门快递', 'MDM', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('114', '迈隆递运', 'MRDY', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('115', '明亮物流', 'MLWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('116', '南方', 'NF', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('117', '能达速递', 'NEDA', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('118', '平安达腾飞快递', 'PADTF', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('119', '泛捷快递', 'PANEX', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('120', '品骏快递', 'PJ', 'pjbest', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('121', 'PCA Express', 'PCA', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('122', '全晨快递', 'QCKD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('123', '全日通快递', 'QRT', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('124', '快客快递', 'QUICK', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('125', '全信通', 'QXT', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('126', '荣庆物流', 'RQ', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('127', '七曜中邮', 'QYZY', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('128', '如风达', 'RFD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('129', '日日顺物流', 'RRS', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('130', '瑞丰速递', 'RFEX', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('131', '赛澳递', 'SAD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('132', '苏宁物流', 'SNWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('133', '圣安物流', 'SAWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('134', '晟邦物流', 'SBWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('135', '上大物流', 'SDWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('136', '盛丰物流', 'SFWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('137', '速通物流', 'ST', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('138', '速腾快递', 'STWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('139', '速必达物流', 'SUBIDA', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('140', '速递e站', 'SDEZ', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('141', '速呈宅配', 'SCZPDS', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('142', '速尔快递', 'SURE', 'sure', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('143', '闪送', 'SS', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('144', '盛通快递', 'STKD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('145', '台湾邮政', 'TAIWANYZ', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('146', '唐山申通', 'TSSTO', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('147', '特急送', 'TJS', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('148', '通用物流', 'TYWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('149', '腾林物流', 'TLWL', '', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('150', '全一快递', 'UAPEX', 'quanyi', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('151', '优联吉运', 'ULUCKEX', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('152', 'UEQ Express', 'UEQ', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('153', '万家康  ', 'WJK', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('154', '万家物流', 'WJWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('155', '武汉同舟行', 'WHTZX', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('156', '维普恩', 'WPE', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('157', '万象物流', 'WXWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('158', '微特派', 'WTP', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('159', '温通物流', 'WTWL', '', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('160', '迅驰物流  ', 'XCWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('161', '信丰物流', 'XFEX', 'xinfeng', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('162', '希优特', 'XYT', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('163', '新杰物流', 'XJ', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('164', '源安达快递', 'YADEX', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('165', '远成物流', 'YCWL', 'ycgky', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('166', '远成快运', 'YCSY', '', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('167', '义达国际物流', 'YDH', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('168', '易达通  ', 'YDT', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('169', '原飞航物流', 'YFHEX', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('170', '亚风快递', 'YFSD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('171', '运通快递', 'YTKD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('172', '亿翔快递', 'YXKD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('173', '运东西网', 'YUNDX', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('174', '壹米滴答', 'YMDD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('175', '邮政国内标快', 'YZBK', '', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('176', '一站通速运', 'YZTSY', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('177', '驭丰速运', 'YFSUYUN', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('178', '余氏东风', 'YSDF', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('179', '耀飞快递', 'YF', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('180', '韵达快运', 'YDKY', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('181', '云路', 'YL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('182', '增益快递', 'ZENY', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('183', '汇强快递', 'ZHQKD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('184', '众通快递', 'ZTE', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('185', '中铁快运', 'ZTKY', 'zhongtie', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('186', '中铁物流', 'ZTWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('187', '郑州速捷', 'SJ', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('188', '中通快运', 'ZTOKY', '', '', '', '', '', '1', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('189', '中邮快递', 'ZYKD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('190', '中粮我买网', 'WM', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('191', '芝麻开门', 'ZMKM', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('192', '中骅物流', 'ZHWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('193', '', '', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('194', 'AAE全球专递', 'AAE', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('195', 'ACS雅仕快递', 'ACS', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('196', 'ADP Express Tracking', 'ADP', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('197', '安圭拉邮政', 'ANGUILAYOU', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('198', 'APAC', 'APAC', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('199', 'Aramex', 'ARAMEX', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('200', '奥地利邮政', 'AT', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('201', 'Australia Post Tracking', 'AUSTRALIA', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('202', '比利时邮政', 'BEL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('203', 'BHT快递', 'BHT', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('204', '秘鲁邮政', 'BILUYOUZHE', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('205', '巴西邮政', 'BR', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('206', '不丹邮政', 'BUDANYOUZH', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('207', 'CDEK', 'CDEK', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('208', '加拿大邮政', 'CA', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('209', '递必易国际物流', 'DBYWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('210', '大道物流', 'DDWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('211', '德国云快递', 'DGYKD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('212', '到乐国际', 'DLGJ', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('213', 'DHL德国', 'DHL_DE', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('214', 'DHL(英文版)', 'DHL_EN', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('215', 'DHL全球', 'DHL_GLB', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('216', 'DHL Global Mail', 'DHLGM', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('217', '丹麦邮政', 'DK', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('218', 'DPD', 'DPD', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('219', 'DPEX', 'DPEX', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('220', '递四方速递', 'D4PX', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('221', 'EMS国际', 'EMSGJ', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('222', '易客满', 'EKM', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('223', 'EPS (联众国际快运)', 'EPS', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('224', 'EShipper', 'ESHIPPER', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('225', '丰程物流', 'FCWL', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('226', '法翔速运', 'FX', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('227', 'FQ', 'FQ', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('228', '芬兰邮政', 'FLYZ', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('229', '方舟国际速递', 'FZGJ', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('230', '国际e邮宝', 'GJEYB', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('231', '国际邮政包裹', 'GJYZ', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('232', 'GE2D', 'GE2D', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('233', '冠泰', 'GT', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('234', 'GLS', 'GLS', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('235', '欧洲专线(邮政)', 'IOZYZ', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('236', '澳大利亚邮政', 'IADLYYZ', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('237', '阿尔巴尼亚邮政', 'IAEBNYYZ', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('238', '阿尔及利亚邮政', 'IAEJLYYZ', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('239', '阿富汗邮政', 'IAFHYZ', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('240', '安哥拉邮政', 'IAGLYZ', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('241', '埃及邮政', 'IAJYZ', '', '', '', '', '', '0', '1', '1540524600', null, null);
+INSERT INTO `system_express` VALUES ('242', '阿鲁巴邮政', 'IALBYZ', '', '', '', '', '', '0', '1', '1540524600', null, null);
 
 -- ----------------------------
 -- Table structure for `system_express_keyword`
@@ -7047,6 +7415,25 @@ CREATE TABLE `system_log` (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for `system_logistics_config`
+-- ----------------------------
+DROP TABLE IF EXISTS `system_logistics_config`;
+CREATE TABLE `system_logistics_config` (
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `config` text CHARACTER SET utf8 NOT NULL COMMENT '配置信息(json)',
+  `type` int(5) NOT NULL DEFAULT '1' COMMENT '类型 1=快递鸟  2=阿里云',
+  `status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '状态 0=关闭 1=启用(全部关闭默认使用本地)',
+  `create_time` int(11) NOT NULL COMMENT '创建时间',
+  `update_time` int(11) DEFAULT NULL COMMENT '修改时间',
+  `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT COMMENT='物流查询api配置表';
+
+-- ----------------------------
+-- Records of system_logistics_config
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for `system_menu`
 -- ----------------------------
 DROP TABLE IF EXISTS `system_menu`;
@@ -7228,6 +7615,9 @@ CREATE TABLE `system_merchant_combo_access` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=651 DEFAULT CHARSET=utf8 COMMENT='商户套餐使用记录';
 
+-- ----------------------------
+-- Records of system_merchant_combo_access
+-- ----------------------------
 INSERT INTO `system_merchant_combo_access` VALUES ('179', 'ccvWPn', '13', 'combo_201907021451318482', '27', '0', '0', '0', '12000', '12000', '1', null, '1625155200', '1', '1562050290', '1562050311', null);
 INSERT INTO `system_merchant_combo_access` VALUES ('188', 'ccvWPn', '13', 'combo_201907121849175145', '13', '0', '20', '0', '0', '0', '9', null, '1594483200', '0', '1562928557', '1563863810', null);
 INSERT INTO `system_merchant_combo_access` VALUES ('192', 'ccvWPn', '13', 'combo_201907241322383107', '13', '0', '10', '0', '0', '0', '9', null, '1595520000', '0', '1563945758', '1563947910', null);
@@ -7254,6 +7644,7 @@ CREATE TABLE `system_merchant_design` (
   `name` varchar(32) NOT NULL COMMENT '自定义名称',
   `pic_url` varchar(256) NOT NULL DEFAULT '' COMMENT '模板图片',
   `info` longtext NOT NULL COMMENT '设计信息(json格式)',
+  `bg_color` char(10) NOT NULL DEFAULT '#F2F2F2' COMMENT '背景色',
   `is_wx_default` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否微信默认模板，0否 1是',
   `is_mini_default` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否小程序默认模板，0否 1是',
   `is_edit` tinyint(1) DEFAULT '0' COMMENT '是否编辑 0未编辑 1正在编辑',
@@ -7270,9 +7661,58 @@ CREATE TABLE `system_merchant_design` (
 -- ----------------------------
 -- Records of system_merchant_design
 -- ----------------------------
-INSERT INTO `system_merchant_design` VALUES ('21', 'ccvWPn', '39', '13', '男装专卖', 'http://tuan.weikejs.com/api/web/./uploads/shop/banner/2020/02/21/15822197925e4ec210801f5.png', '[{\"type\":1,\"edit\":false,\"details\":{\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F05%2F31%2F15592810425cf0bd92ab6eb.jpeg\",\"link\":\"link1\"}],\"dotShow\":true,\"color1\":\"#ff0000\",\"color2\":\"#fff\",\"boxHeight\":180},\"id\":0},{\"type\":22,\"edit\":false,\"details\":{\"text\":\"请输入\",\"color1\":\"#fff\",\"color2\":\"#fff\",\"color3\":\"#333\"},\"id\":1},{\"type\":3,\"edit\":false,\"details\":{\"col\":\"25%\",\"fontSize\":\"12px\",\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F06%2F04%2F15596399725cf637a483b17.png\",\"text\":\"母婴\",\"link\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F06%2F04%2F15596399835cf637af54a96.png\",\"link\":\"\",\"text\":\"家居\",\"title\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F06%2F04%2F15596400035cf637c37cc58.png\",\"link\":\"\",\"text\":\"我的\",\"title\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F06%2F04%2F15596399965cf637bc62549.png\",\"link\":\"\",\"text\":\"收藏\",\"title\":\"\"}],\"color1\":\"#333\",\"color2\":\"#fff\",\"radius\":100},\"id\":2},{\"type\":27,\"edit\":false,\"details\":{\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F05%2F31%2F15592809955cf0bd6302e17.png\",\"link\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F05%2F31%2F15592809965cf0bd64ca835.png\",\"link\":\"\",\"text\":\"\",\"title\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F05%2F31%2F15592809995cf0bd67303a4.png\",\"link\":\"\",\"text\":\"\",\"title\":\"\"}]},\"id\":3},{\"type\":7,\"edit\":false,\"details\":{\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F06%2F04%2F15596411595cf63c4790f01.png\",\"link\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F06%2F04%2F15596411625cf63c4abd362.png\",\"link\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F06%2F04%2F15596411665cf63c4e5c600.jpeg\",\"link\":\"\"}]},\"id\":4},{\"type\":28,\"edit\":false,\"details\":{\"style\":\"1\"},\"id\":5}]', '0', '1', '1', '0', '1', null, null, '1559614408', '1582219792', null);
-INSERT INTO `system_merchant_design` VALUES ('143', 'ccvWPn', '40', '13', '系统模版', 'http://tuan.weikejs.com/api/web/./uploads/shop/banner/2020/02/21/15822523845e4f4160417f7.png', '[{\"type\":13,\"edit\":false,\"details\":{\"style\":\"1\",\"color1\":\"#f5f5f5\",\"color2\":\"#fff\",\"boxHeight\":5,\"paddingTopBottom\":0},\"id\":0},{\"type\":1,\"edit\":false,\"details\":{\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677557975d720e15ef894.png\",\"link\":\"/pages/group/groupbrochure/groupbrochure\"},{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677579405d72167472d01.png\",\"link\":\"/pages/supplier/supplierbrochure/supplierbrochure\",\"text\":\"\",\"title\":\"\"}],\"dotShow\":true,\"color1\":\"#ff0000\",\"color2\":\"#fff\",\"boxHeight\":145,\"style\":\"1\"},\"id\":1},{\"type\":3,\"edit\":false,\"details\":{\"col\":\"25%\",\"fontSize\":\"12px\",\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677558415d720e41b2cf5.jpeg\",\"text\":\"甄选鲜果\",\"link\":\"/pages/goodsClassify/goodsClassify/goodsClassify?id=145&name=新鲜蔬菜\"},{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677558395d720e3fc9e31.jpeg\",\"link\":\"/pages/goodsClassify/goodsClassify/goodsClassify?id=145&name=新鲜蔬菜\",\"text\":\"新鲜蔬菜\",\"title\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677558575d720e51c1f4b.jpeg\",\"link\":\"/pages/goodsClassify/goodsClassify/goodsClassify?id=145&name=新鲜蔬菜\",\"text\":\"坚果零食\",\"title\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677558695d720e5d42ad6.jpeg\",\"link\":\"/pages/goodsClassify/goodsClassify/goodsClassify?id=145&name=新鲜蔬菜\",\"text\":\"家居日用\",\"title\":\"\"}],\"color1\":\"#787878\",\"color2\":\"#fff\",\"radius\":20,\"style\":\"3\"},\"id\":2},{\"type\":13,\"edit\":false,\"details\":{\"style\":\"1\",\"color1\":\"#f5f5f5\",\"color2\":\"#fff\",\"boxHeight\":5,\"paddingTopBottom\":0},\"id\":3},{\"type\":27,\"edit\":false,\"details\":{\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677565835d721127a3e20.png\",\"link\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677565865d72112a5b2bb.png\",\"link\":\"\",\"text\":\"\",\"title\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677565885d72112c6beda.png\",\"link\":\"\",\"text\":\"\",\"title\":\"\"}]},\"id\":4},{\"type\":13,\"edit\":false,\"details\":{\"style\":\"1\",\"color1\":\"#f5f5f5\",\"color2\":\"#fff\",\"boxHeight\":5,\"paddingTopBottom\":0},\"id\":5},{\"type\":6,\"edit\":false,\"details\":{\"style\":\"3\",\"color2\":\"#fff\",\"radius\":10,\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677577655d7215c51bfb2.jpeg\",\"text\":\"\",\"link\":\"/pages/goodsClassify/goodsClassify/goodsClassify?id=145&name=新鲜蔬菜\"},{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677577715d7215cb516b3.jpeg\",\"link\":\"/pages/seckill/seckill/seckill\",\"text\":\"\",\"title\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677577885d7215dc7c8ae.jpeg\",\"link\":\"/bargaining/pages/bargaining/Index/Index\",\"text\":\"\",\"title\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677577905d7215de4cad7.jpeg\",\"link\":\"/pages/clockIn/clockIn/clockIn\",\"text\":\"\",\"title\":\"\"}]},\"id\":6},{\"type\":28,\"edit\":true,\"details\":{\"style\":\"1\",\"show\":false},\"id\":7},{\"type\":14,\"edit\":false,\"details\":{\"positionRight\":5,\"positionBottom\":29,\"opacity\":0.9,\"goTop\":false,\"shire\":true,\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677597255d721d6da8ee1.png\",\"link\":\"link1\"}]},\"id\":8},{\"type\":17,\"edit\":false,\"details\":{\"positionRight\":5,\"positionBottom\":20,\"opacity\":0.9,\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F06%2F15%2F15605811505d04941ee6a43.png\",\"link\":\"link1\"}]},\"id\":9},{\"type\":1,\"edit\":false,\"details\":{\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F12%2F15682505515d799ab7272b3.jpeg\",\"link\":\"link1\"}],\"dotShow\":true,\"color1\":\"#ff0000\",\"color2\":\"#fff\",\"boxHeight\":180},\"id\":10}]', '0', '1', '1', '0', '1', null, null, '1567758309', '1582252384', null);
-INSERT INTO `system_merchant_design` VALUES ('226', 'ccvWPn', '40', '13', '系统模版', 'http://ceshi.juanpao.cn/api/web/./uploads/shop/banner/2020/03/10/15838392665e677822f3ed0.png', '[{\"type\":1,\"edit\":false,\"details\":{\"imgs\":[{\"link\":\"/pages/classification/classification/classification\",\"src\":\"http://tuan.weikejs.com/api/web/./uploads/2020/03/09/15837607365e6645604e1df.jpeg\"}],\"dotShow\":true,\"color1\":\"#ff0000\",\"color2\":\"#fff\",\"boxHeight\":145},\"id\":0},{\"type\":13,\"edit\":false,\"details\":{\"style\":\"1\",\"color1\":\"#f5f5f5\",\"color2\":\"#fff\",\"boxHeight\":5,\"paddingTopBottom\":0},\"id\":1},{\"type\":27,\"edit\":false,\"details\":{\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677565835d721127a3e20.png\",\"link\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677565865d72112a5b2bb.png\",\"link\":\"\",\"text\":\"\",\"title\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677565885d72112c6beda.png\",\"link\":\"\",\"text\":\"\",\"title\":\"\"}]},\"id\":2},{\"type\":13,\"edit\":false,\"details\":{\"style\":\"1\",\"color1\":\"#f5f5f5\",\"color2\":\"#fff\",\"boxHeight\":5,\"paddingTopBottom\":0},\"id\":3},{\"type\":13,\"edit\":false,\"details\":{\"style\":\"1\",\"color1\":\"#f5f5f5\",\"color2\":\"#fff\",\"boxHeight\":5,\"paddingTopBottom\":0},\"id\":4},{\"type\":28,\"edit\":false,\"details\":{\"style\":\"1\",\"show\":false},\"id\":5},{\"type\":14,\"edit\":true,\"details\":{\"positionRight\":5,\"positionBottom\":23,\"opacity\":0.84,\"goTop\":true,\"shire\":true,\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677595955d721ceb03326.png\",\"link\":\"link1\"}]},\"id\":6},{\"type\":17,\"edit\":false,\"details\":{\"positionRight\":5,\"positionBottom\":16,\"opacity\":0.9,\"imgs\":[{\"src\":\"./decoration/images/service.png\",\"link\":\"link1\"}]},\"id\":7}]', '0', '1', '1', '1', '1', null, null, '1575339268', '1583839267', null);
+INSERT INTO `system_merchant_design` VALUES ('21', 'ccvWPn', '39', '13', '男装专卖', 'http://tuan.weikejs.com/api/web/./uploads/shop/banner/2020/02/21/15822197925e4ec210801f5.png', '[{\"type\":1,\"edit\":false,\"details\":{\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F05%2F31%2F15592810425cf0bd92ab6eb.jpeg\",\"link\":\"link1\"}],\"dotShow\":true,\"color1\":\"#ff0000\",\"color2\":\"#fff\",\"boxHeight\":180},\"id\":0},{\"type\":22,\"edit\":false,\"details\":{\"text\":\"请输入\",\"color1\":\"#fff\",\"color2\":\"#fff\",\"color3\":\"#333\"},\"id\":1},{\"type\":3,\"edit\":false,\"details\":{\"col\":\"25%\",\"fontSize\":\"12px\",\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F06%2F04%2F15596399725cf637a483b17.png\",\"text\":\"母婴\",\"link\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F06%2F04%2F15596399835cf637af54a96.png\",\"link\":\"\",\"text\":\"家居\",\"title\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F06%2F04%2F15596400035cf637c37cc58.png\",\"link\":\"\",\"text\":\"我的\",\"title\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F06%2F04%2F15596399965cf637bc62549.png\",\"link\":\"\",\"text\":\"收藏\",\"title\":\"\"}],\"color1\":\"#333\",\"color2\":\"#fff\",\"radius\":100},\"id\":2},{\"type\":27,\"edit\":false,\"details\":{\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F05%2F31%2F15592809955cf0bd6302e17.png\",\"link\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F05%2F31%2F15592809965cf0bd64ca835.png\",\"link\":\"\",\"text\":\"\",\"title\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F05%2F31%2F15592809995cf0bd67303a4.png\",\"link\":\"\",\"text\":\"\",\"title\":\"\"}]},\"id\":3},{\"type\":7,\"edit\":false,\"details\":{\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F06%2F04%2F15596411595cf63c4790f01.png\",\"link\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F06%2F04%2F15596411625cf63c4abd362.png\",\"link\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F06%2F04%2F15596411665cf63c4e5c600.jpeg\",\"link\":\"\"}]},\"id\":4},{\"type\":28,\"edit\":false,\"details\":{\"style\":\"1\"},\"id\":5}]', '#F2F2F2', '0', '1', '1', '0', '1', null, null, '1559614408', '1582219792', null);
+INSERT INTO `system_merchant_design` VALUES ('143', 'ccvWPn', '40', '13', '系统模版', 'http://tuan.weikejs.com/api/web/./uploads/shop/banner/2020/02/21/15822523845e4f4160417f7.png', '[{\"type\":13,\"edit\":false,\"details\":{\"style\":\"1\",\"color1\":\"#f5f5f5\",\"color2\":\"#fff\",\"boxHeight\":5,\"paddingTopBottom\":0},\"id\":0},{\"type\":1,\"edit\":false,\"details\":{\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677557975d720e15ef894.png\",\"link\":\"/pages/group/groupbrochure/groupbrochure\"},{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677579405d72167472d01.png\",\"link\":\"/pages/supplier/supplierbrochure/supplierbrochure\",\"text\":\"\",\"title\":\"\"}],\"dotShow\":true,\"color1\":\"#ff0000\",\"color2\":\"#fff\",\"boxHeight\":145,\"style\":\"1\"},\"id\":1},{\"type\":3,\"edit\":false,\"details\":{\"col\":\"25%\",\"fontSize\":\"12px\",\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677558415d720e41b2cf5.jpeg\",\"text\":\"甄选鲜果\",\"link\":\"/pages/goodsClassify/goodsClassify/goodsClassify?id=145&name=新鲜蔬菜\"},{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677558395d720e3fc9e31.jpeg\",\"link\":\"/pages/goodsClassify/goodsClassify/goodsClassify?id=145&name=新鲜蔬菜\",\"text\":\"新鲜蔬菜\",\"title\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677558575d720e51c1f4b.jpeg\",\"link\":\"/pages/goodsClassify/goodsClassify/goodsClassify?id=145&name=新鲜蔬菜\",\"text\":\"坚果零食\",\"title\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677558695d720e5d42ad6.jpeg\",\"link\":\"/pages/goodsClassify/goodsClassify/goodsClassify?id=145&name=新鲜蔬菜\",\"text\":\"家居日用\",\"title\":\"\"}],\"color1\":\"#787878\",\"color2\":\"#fff\",\"radius\":20,\"style\":\"3\"},\"id\":2},{\"type\":13,\"edit\":false,\"details\":{\"style\":\"1\",\"color1\":\"#f5f5f5\",\"color2\":\"#fff\",\"boxHeight\":5,\"paddingTopBottom\":0},\"id\":3},{\"type\":27,\"edit\":false,\"details\":{\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677565835d721127a3e20.png\",\"link\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677565865d72112a5b2bb.png\",\"link\":\"\",\"text\":\"\",\"title\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677565885d72112c6beda.png\",\"link\":\"\",\"text\":\"\",\"title\":\"\"}]},\"id\":4},{\"type\":13,\"edit\":false,\"details\":{\"style\":\"1\",\"color1\":\"#f5f5f5\",\"color2\":\"#fff\",\"boxHeight\":5,\"paddingTopBottom\":0},\"id\":5},{\"type\":6,\"edit\":false,\"details\":{\"style\":\"3\",\"color2\":\"#fff\",\"radius\":10,\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677577655d7215c51bfb2.jpeg\",\"text\":\"\",\"link\":\"/pages/goodsClassify/goodsClassify/goodsClassify?id=145&name=新鲜蔬菜\"},{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677577715d7215cb516b3.jpeg\",\"link\":\"/pages/seckill/seckill/seckill\",\"text\":\"\",\"title\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677577885d7215dc7c8ae.jpeg\",\"link\":\"/bargaining/pages/bargaining/Index/Index\",\"text\":\"\",\"title\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677577905d7215de4cad7.jpeg\",\"link\":\"/pages/clockIn/clockIn/clockIn\",\"text\":\"\",\"title\":\"\"}]},\"id\":6},{\"type\":28,\"edit\":true,\"details\":{\"style\":\"1\",\"show\":false},\"id\":7},{\"type\":14,\"edit\":false,\"details\":{\"positionRight\":5,\"positionBottom\":29,\"opacity\":0.9,\"goTop\":false,\"shire\":true,\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677597255d721d6da8ee1.png\",\"link\":\"link1\"}]},\"id\":8},{\"type\":17,\"edit\":false,\"details\":{\"positionRight\":5,\"positionBottom\":20,\"opacity\":0.9,\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F06%2F15%2F15605811505d04941ee6a43.png\",\"link\":\"link1\"}]},\"id\":9},{\"type\":1,\"edit\":false,\"details\":{\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F12%2F15682505515d799ab7272b3.jpeg\",\"link\":\"link1\"}],\"dotShow\":true,\"color1\":\"#ff0000\",\"color2\":\"#fff\",\"boxHeight\":180},\"id\":10}]', '#F2F2F2', '0', '1', '1', '0', '1', null, null, '1567758309', '1582252384', null);
+INSERT INTO `system_merchant_design` VALUES ('226', 'ccvWPn', '40', '13', '系统模版', 'http://ceshi.juanpao.cn/api/web/./uploads/shop/banner/2020/03/10/15838392665e677822f3ed0.png', '[{\"type\":1,\"edit\":false,\"details\":{\"imgs\":[{\"link\":\"/pages/classification/classification/classification\",\"src\":\"http://tuan.weikejs.com/api/web/./uploads/2020/03/09/15837607365e6645604e1df.jpeg\"}],\"dotShow\":true,\"color1\":\"#ff0000\",\"color2\":\"#fff\",\"boxHeight\":145},\"id\":0},{\"type\":13,\"edit\":false,\"details\":{\"style\":\"1\",\"color1\":\"#f5f5f5\",\"color2\":\"#fff\",\"boxHeight\":5,\"paddingTopBottom\":0},\"id\":1},{\"type\":27,\"edit\":false,\"details\":{\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677565835d721127a3e20.png\",\"link\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677565865d72112a5b2bb.png\",\"link\":\"\",\"text\":\"\",\"title\":\"\"},{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677565885d72112c6beda.png\",\"link\":\"\",\"text\":\"\",\"title\":\"\"}]},\"id\":2},{\"type\":13,\"edit\":false,\"details\":{\"style\":\"1\",\"color1\":\"#f5f5f5\",\"color2\":\"#fff\",\"boxHeight\":5,\"paddingTopBottom\":0},\"id\":3},{\"type\":13,\"edit\":false,\"details\":{\"style\":\"1\",\"color1\":\"#f5f5f5\",\"color2\":\"#fff\",\"boxHeight\":5,\"paddingTopBottom\":0},\"id\":4},{\"type\":28,\"edit\":false,\"details\":{\"style\":\"1\",\"show\":false},\"id\":5},{\"type\":14,\"edit\":true,\"details\":{\"positionRight\":5,\"positionBottom\":23,\"opacity\":0.84,\"goTop\":true,\"shire\":true,\"imgs\":[{\"src\":\"https://imgs.juanpao.com/2019%2F09%2F06%2F15677595955d721ceb03326.png\",\"link\":\"link1\"}]},\"id\":6},{\"type\":17,\"edit\":false,\"details\":{\"positionRight\":5,\"positionBottom\":16,\"opacity\":0.9,\"imgs\":[{\"src\":\"./decoration/images/service.png\",\"link\":\"link1\"}]},\"id\":7}]', '#F2F2F2', '0', '1', '1', '1', '1', null, null, '1575339268', '1583839267', null);
+
+-- ----------------------------
+-- Table structure for `system_merchant_mini_subscribe_template`
+-- ----------------------------
+DROP TABLE IF EXISTS `system_merchant_mini_subscribe_template`;
+CREATE TABLE `system_merchant_mini_subscribe_template` (
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `key` char(6) NOT NULL DEFAULT '' COMMENT '唯一标识符',
+  `merchant_id` int(11) NOT NULL COMMENT '商户id',
+  `template_id` varchar(60) NOT NULL DEFAULT '' COMMENT '小程序订阅消息模板id',
+  `name` varchar(32) NOT NULL DEFAULT '' COMMENT '小程序订阅消息模板名称',
+  `content` text NOT NULL COMMENT '模板内容',
+  `example` text CHARACTER SET utf8 NOT NULL COMMENT '模板内容示例',
+  `template_purpose` varchar(32) CHARACTER SET utf8 NOT NULL DEFAULT '' COMMENT '小程序模板用途,例:pay_order',
+  `type` tinyint(1) NOT NULL DEFAULT '2' COMMENT '模版类型  2=一次性订阅 3=长期订阅',
+  `create_time` int(11) NOT NULL COMMENT '创建时间',
+  `update_time` int(11) DEFAULT NULL COMMENT '更新时间',
+  `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT COMMENT='系统-小程序订阅消息模板表';
+
+-- ----------------------------
+-- Records of system_merchant_mini_subscribe_template
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `system_merchant_mini_subscribe_template_access`
+-- ----------------------------
+DROP TABLE IF EXISTS `system_merchant_mini_subscribe_template_access`;
+CREATE TABLE `system_merchant_mini_subscribe_template_access` (
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `key` char(6) NOT NULL DEFAULT '' COMMENT '唯一标识符',
+  `merchant_id` int(11) NOT NULL COMMENT '商户id',
+  `mini_open_id` varchar(52) NOT NULL DEFAULT '' COMMENT '用户id',
+  `template_id` varchar(100) NOT NULL DEFAULT '' COMMENT '小程序订阅消息模板id',
+  `number` tinyint(1) NOT NULL DEFAULT '0' COMMENT '发送次数 大于5次不操作',
+  `template_params` text NOT NULL COMMENT '参数信息',
+  `template_purpose` varchar(32) CHARACTER SET utf8 NOT NULL DEFAULT '' COMMENT '小程序模板用途,例:pay_order',
+  `page` varchar(255) DEFAULT NULL COMMENT '跳转页',
+  `status` tinyint(1) DEFAULT '1' COMMENT '用户状态 1=推送成功 -1=未推送  0=推送中 2=推送失败',
+  `create_time` int(11) NOT NULL COMMENT '创建时间',
+  `update_time` int(11) DEFAULT NULL COMMENT '更新时间',
+  `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT COMMENT='系统-商户小程序订阅消息推送记录表';
+
+-- ----------------------------
+-- Records of system_merchant_mini_subscribe_template_access
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `system_merchant_mini_template`
@@ -7297,6 +7737,10 @@ CREATE TABLE `system_merchant_mini_template` (
 ) ENGINE=InnoDB AUTO_INCREMENT=583 DEFAULT CHARSET=utf8mb4 COMMENT='系统-商户小程序模板表';
 
 -- ----------------------------
+-- Records of system_merchant_mini_template
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for `system_mini_formid`
 -- ----------------------------
 DROP TABLE IF EXISTS `system_mini_formid`;
@@ -7313,6 +7757,9 @@ CREATE TABLE `system_mini_formid` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=169 DEFAULT CHARSET=utf8mb4 COMMENT='系统-小程序发送码表';
 
+-- ----------------------------
+-- Records of system_mini_formid
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `system_mini_template`
@@ -7333,6 +7780,10 @@ CREATE TABLE `system_mini_template` (
   `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COMMENT='系统-小程序模板表';
+
+-- ----------------------------
+-- Records of system_mini_template
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `system_mini_template_access`
@@ -7356,6 +7807,10 @@ CREATE TABLE `system_mini_template_access` (
 ) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8mb4 COMMENT='系统-商户小程序模板记录表';
 
 -- ----------------------------
+-- Records of system_mini_template_access
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for `system_mini_template_access_group`
 -- ----------------------------
 DROP TABLE IF EXISTS `system_mini_template_access_group`;
@@ -7373,6 +7828,10 @@ CREATE TABLE `system_mini_template_access_group` (
   `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COMMENT='系统-商户小程序模板记录表';
+
+-- ----------------------------
+-- Records of system_mini_template_access_group
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `system_news`
@@ -7480,8 +7939,14 @@ CREATE TABLE `system_operation_record` (
   `update_time` int(11) DEFAULT NULL COMMENT '更新时间',
   `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=844 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='应用操作记录表';
+) ENGINE=InnoDB AUTO_INCREMENT=847 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='应用操作记录表';
 
+-- ----------------------------
+-- Records of system_operation_record
+-- ----------------------------
+INSERT INTO `system_operation_record` VALUES ('844', 'ccvWPn', '13', '新增', '1015', '商品分组', '1590473627', '1590473627', null);
+INSERT INTO `system_operation_record` VALUES ('845', 'ccvWPn', '13', '新增', '1016', '商品分组', '1590473635', '1590473635', null);
+INSERT INTO `system_operation_record` VALUES ('846', 'ccvWPn', '13', '新增', '1', '商品列表', '1590473690', '1590473690', null);
 
 -- ----------------------------
 -- Table structure for `system_pay`
@@ -7506,7 +7971,9 @@ CREATE TABLE `system_pay` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=105 DEFAULT CHARSET=utf8 COMMENT='支付表';
 
-
+-- ----------------------------
+-- Records of system_pay
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `system_pay_alipay`
@@ -7590,7 +8057,28 @@ CREATE TABLE `system_pay_weixin` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8 COMMENT='微信支付表';
 
+-- ----------------------------
+-- Records of system_pay_weixin
+-- ----------------------------
 
+-- ----------------------------
+-- Table structure for `system_pic_server`
+-- ----------------------------
+DROP TABLE IF EXISTS `system_pic_server`;
+CREATE TABLE `system_pic_server` (
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `config` text CHARACTER SET utf8 NOT NULL COMMENT '服务器配置json',
+  `type` int(5) NOT NULL COMMENT '类型 1=腾讯云 2=阿里云 3=七牛云',
+  `status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '状态 0=关闭 1=启用(全部关闭默认使用本地)',
+  `create_time` int(11) NOT NULL COMMENT '创建时间',
+  `update_time` int(11) DEFAULT NULL COMMENT '修改时间',
+  `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT COMMENT='图片存储服务器';
+
+-- ----------------------------
+-- Records of system_pic_server
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `system_plug_in`
@@ -7654,8 +8142,9 @@ CREATE TABLE `system_plug_in_access` (
 DROP TABLE IF EXISTS `system_sms`;
 CREATE TABLE `system_sms` (
   `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
-  `appid` varchar(50) NOT NULL,
-  `appkey` varchar(50) NOT NULL,
+  `config` text CHARACTER SET utf8 NOT NULL COMMENT '短信配置(josn)',
+  `type` int(5) NOT NULL DEFAULT '1' COMMENT '类型 1=腾讯云',
+  `status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '状态 0=关闭 1=启用',
   `create_time` int(11) NOT NULL COMMENT '创建时间',
   `update_time` int(11) DEFAULT NULL COMMENT '修改时间',
   `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
@@ -7715,6 +8204,9 @@ CREATE TABLE `system_sms_sign` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8 COMMENT='腾讯云短信签名';
 
+-- ----------------------------
+-- Records of system_sms_sign
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `system_sms_template`
@@ -7737,7 +8229,46 @@ CREATE TABLE `system_sms_template` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8 COMMENT='短信模板表';
 
+-- ----------------------------
+-- Records of system_sms_template
+-- ----------------------------
 
+-- ----------------------------
+-- Table structure for `system_sms_template_access`
+-- ----------------------------
+DROP TABLE IF EXISTS `system_sms_template_access`;
+CREATE TABLE `system_sms_template_access` (
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `phone` char(11) NOT NULL COMMENT '手机号',
+  `template_id` int(11) NOT NULL DEFAULT '0' COMMENT '短信模板id',
+  `content` varchar(255) DEFAULT NULL COMMENT '短信参数',
+  `type` int(5) NOT NULL DEFAULT '0' COMMENT '短信类型 1=商家发货提醒',
+  `create_time` int(11) NOT NULL COMMENT '创建时间',
+  `update_time` int(11) DEFAULT NULL COMMENT '修改时间',
+  `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='模板短信记录表';
+
+-- ----------------------------
+-- Records of system_sms_template_access
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `system_sms_template_id`
+-- ----------------------------
+DROP TABLE IF EXISTS `system_sms_template_id`;
+CREATE TABLE `system_sms_template_id` (
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `config` text NOT NULL COMMENT '模板id信息(json)',
+  `create_time` int(11) NOT NULL COMMENT '创建时间',
+  `update_time` int(11) DEFAULT NULL COMMENT '修改时间',
+  `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='短信模板ID表';
+
+-- ----------------------------
+-- Records of system_sms_template_id
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `system_sub_admin`
@@ -7758,14 +8289,18 @@ CREATE TABLE `system_sub_admin` (
   `points` double(10,2) DEFAULT '0.00' COMMENT '提现扣点（类型为供货商专属）',
   `self_leader_id` int(11) DEFAULT '0' COMMENT '绑定的自提点',
   `leader` text COMMENT '门店信息',
-  `yly_config` text COMMENT '门店易联云配置',
+  `yly_print` tinyint(1) NOT NULL DEFAULT '0' COMMENT '门店小票自动打印开关  0=关闭 1=开启',
   `status` tinyint(1) NOT NULL COMMENT '状态 1正常 0禁用',
+  `sort` int(4) NOT NULL,
   `create_time` int(11) NOT NULL COMMENT '创建时间',
   `update_time` int(11) DEFAULT NULL COMMENT '修改时间',
   `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=116 DEFAULT CHARSET=utf8 COMMENT='管理员工表';
 
+-- ----------------------------
+-- Records of system_sub_admin
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `system_sub_admin_balance`
@@ -7795,6 +8330,11 @@ CREATE TABLE `system_sub_admin_balance` (
   `delete_time` int(11) DEFAULT NULL COMMENT '删除时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COMMENT='员工-金额表';
+
+-- ----------------------------
+-- Records of system_sub_admin_balance
+-- ----------------------------
+
 -- ----------------------------
 -- Table structure for `system_theme`
 -- ----------------------------
@@ -7853,8 +8393,7 @@ CREATE TABLE `system_unit` (
 -- ----------------------------
 -- Records of system_unit
 -- ----------------------------
-
-INSERT INTO `system_unit` VALUES ('320', 'ccvWPn', '自定义版权', 'copyright', 'https://api.juanpao.com/uploads/copyright.png', '\"http://tuan.weikejs.com/api/web/./uploads/merchant/shop/goods_picture/13/ccvWPn/15828126685e57cdfc5e0c5.jpeg\"', '13', '1590422400', '1', '1558839283', '1582812671', null);
+INSERT INTO `system_unit` VALUES ('320', 'ccvWPn', '自定义版权', 'copyright', 'https://api.juanpao.com/uploads/copyright.png', '\"https://juanpao999-1255754174.cos.ap-guangzhou.myqcloud.com/ui/%E6%B0%B4%E5%8D%B0.png\"', '13', '1590422400', '1', '1558839283', '1582812671', null);
 INSERT INTO `system_unit` VALUES ('373', 'ccvWPn', '签到', 'signIn', '', '{\"status\":\"0\"}', '13', '0', '1', '1563517381', '1564989917', null);
 INSERT INTO `system_unit` VALUES ('401', 'ccvWPn', '闪送', 'shansong', '', '{\"md5\":\"hfsi0g69pplp\",\"m_id\":\"SS8850\",\"partnerNo\":\"8850\",\"token\":\"Es5ZpQrw/J4mnmSg2zLNdtApN4jYTJMftYK6CiALJKE=\",\"mobile\":\"18961303123\"}', '13', '0', '1', '1565691325', '1575339897', null);
 
@@ -8028,6 +8567,9 @@ CREATE TABLE `system_voucher` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COMMENT='抵用券表';
 
+-- ----------------------------
+-- Records of system_voucher
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `system_voucher_channel`
@@ -8042,7 +8584,9 @@ CREATE TABLE `system_voucher_channel` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COMMENT='抵用券活动名称';
 
-
+-- ----------------------------
+-- Records of system_voucher_channel
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `system_voucher_type`
@@ -8067,6 +8611,9 @@ CREATE TABLE `system_voucher_type` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='抵用券类型';
 
+-- ----------------------------
+-- Records of system_voucher_type
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `system_wx_config`
@@ -8096,7 +8643,7 @@ CREATE TABLE `system_wx_config` (
 -- ----------------------------
 -- Records of system_wx_config
 -- ----------------------------
-INSERT INTO `system_wx_config` VALUES ('331', '13', 'wxb1d07a2d8ae4c0fb', 'wx7a9f6ca0cb3a4197', 'ccvWPn', '', '', 'wxb1d07a2d8ae4c0fb', '{\"app_id\":\"wxb1d07a2d8ae4c0fb\",\"secret\":\"badd2c0ce20cc5ee4304d51fc3b39104\"}', '', '{\"key\":\"dVjmDo3Z16Fy0iQffs9fzIcVPFKPNsVX\",\"app_id\":\"wxb1d07a2d8ae4c0fb\",\"mch_id\":\"1568621401\",\"wx_pay_type\":\"1\",\"cert_path\":\"/uploads/pem/13/apiclient_cert.pem\",\"key_path\":\"/uploads/pem/13/apiclient_key.pem\"}', '{\"app_id\":\"wxb1d07a2d8ae4c0fb\",\"merchant_no\":\"\",\"terminal_id\":\"\",\"saobei_access_token\":\"\"}', '1', '1558575631', '1583805241', null, '1');
+INSERT INTO `system_wx_config` VALUES ('331', '13', '', '', 'ccvWPn', '', '', '', '{\"app_id\":\"\",\"secret\":\"\"}', '', '{\"key\":\"\",\"app_id\":\"\",\"mch_id\":\"\",\"wx_pay_type\":\"1\",\"cert_path\":\"/uploads/pem/13/apiclient_cert.pem\",\"key_path\":\"/uploads/pem/13/apiclient_key.pem\"}', '{\"app_id\":\"wxb1d07a2d8ae4c0fb\",\"merchant_no\":\"\",\"terminal_id\":\"\",\"saobei_access_token\":\"\"}', '1', '1558575631', '1583805241', null, '1');
 
 -- ----------------------------
 -- Table structure for `tencent_instance_log`
@@ -8119,7 +8666,9 @@ CREATE TABLE `tencent_instance_log` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4;
 
-
+-- ----------------------------
+-- Records of tencent_instance_log
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `testsign`
@@ -8131,6 +8680,10 @@ CREATE TABLE `testsign` (
   `signtime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `type` int(1) DEFAULT '0' COMMENT '为0表示签到数据，1表示签到日期字典数据'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of testsign
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `wolive_business`
@@ -9613,6 +10166,10 @@ CREATE TABLE `wolive_visiter` (
   KEY `visiter` (`visiter_id`) USING BTREE,
   KEY `time` (`timestamp`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=110 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of wolive_visiter
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `wolive_weixin`

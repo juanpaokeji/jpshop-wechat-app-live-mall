@@ -29,10 +29,6 @@ class TotalController extends MerchantController {
 //        ];
 //    }
     public $config = [
-        'app_id' => 'wx8df3a6f4a4f9ec54',
-        'secret' => '7188287cd30aa902d5933654fed60559',
-        'token' => 'juanPao',
-        'aes_key' => '9ILejPm7rpu5kJykkY13oHMO80bYJkNbQfCvL3otaWA',
     ];
 
     /**
@@ -44,7 +40,6 @@ class TotalController extends MerchantController {
             $request = request(); //获取地址栏参数
             $params = $request['params'];
             $params['`key`'] = $params['key'];
-           // setConfig($params['key'] . "total");
             $res = getRedis($params['key'] . "total");
             if ($res == false) {
                 $params['merchant_id'] = yii::$app->session['uid'];
@@ -71,16 +66,16 @@ class TotalController extends MerchantController {
         $table = new TableModel();
         $startTime = strtotime(date('Y-m-d'),time());
         $endTime = time();
-        $sql = "select sum(payment_money) as payment_money  from  shop_order_group where create_time>{$startTime} and create_time <{$endTime}  and (status !=2 or status != 0 or status!=4 or status!=5 or status!=8 or status !=9) and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . ";";
+        $sql = "select sum(payment_money) as payment_money  from  shop_order_group where create_time>{$startTime} and create_time <{$endTime}  and (status= 6 or status=7 or status = 1 or status = 3 ) and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . ";";
         $money = $table->querySql($sql);
 
-        $sql = "select count(distinct ip) as num  from  system_log where create_time>{$startTime} and create_time <{$endTime}  and `key`='" . $key . "' and sub_id = 0 and user_id!=0 and merchant_id = " . yii::$app->session['uid'] . ";";
+        $sql = "select count(id) as num  from  shop_user where create_time>{$startTime} and create_time <{$endTime}  and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . ";";
         $user = $table->querySql($sql);
 
 //        $sql = "select count(distinct ip) as num  from  system_log where create_time>{$startTime} and create_time <{$endTime}  and `key`='" . $key . "' and sub_id = 0 and user_id!=0 and merchant_id = " . yii::$app->session['uid'] . ";";
 //        $longin_user = $table->querySql($sql);
         //状态 0=待付款 1=待发货 2=已取消(24小时未支付) 3=已发货 4=已退款 5=退款中 6=待评价 7=已完成(评价后)  8=已删除  9一键退款  11=拼团中
-        $sql = "select count(id) as num  from  shop_order_group where create_time>{$startTime} and create_time <{$endTime} and (status !=2 or status != 0 or status!=4 or status!=5 or status!=8 or status !=9) and delete_time is null and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . " ;";
+        $sql = "select count(id) as num  from  shop_order_group where create_time>{$startTime} and create_time <{$endTime} and  (status= 6 or status=7 or status = 1 or status = 3 ) and delete_time is null and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . " ;";
         $order = $table->querySql($sql);
         $data['today_turnover'] = $money[0]['payment_money'] == null ? 0 : $money[0]['payment_money'];
         $data['today_visitor'] = $user[0]['num'] + $user[0]['num'];
@@ -91,16 +86,16 @@ class TotalController extends MerchantController {
 
     public function week($key) {
         $table = new TableModel();
-        $sql = "select sum(payment_money) as payment_money  from  shop_order_group where DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(FROM_UNIXTIME(create_time)) and (status <> 2 and status <> 0 or status <>9) and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . ";";
+        $sql = "select sum(payment_money) as payment_money  from  shop_order_group where DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(FROM_UNIXTIME(create_time)) and (status = 6 or status = 7 or status = 1 or status = 3 ) and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . ";";
         $money = $table->querySql($sql);
 
-        $sql = "select count(distinct ip) as num  from  system_log where DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(FROM_UNIXTIME(create_time))  and `key`='" . $key . "' and sub_id = 0 and user_id!=0 and merchant_id = " . yii::$app->session['uid'] . ";";
+        $sql = "select count(id) as num  from  shop_user where DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(FROM_UNIXTIME(create_time))  and `key`='" . $key . "'  and merchant_id = " . yii::$app->session['uid'] . ";";
         $user = $table->querySql($sql);
 
-        $sql = "select count(distinct ip) as num  from  system_log where DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(FROM_UNIXTIME(create_time))  and `key`='" . $key . "' and sub_id = 0 and user_id!=0 and merchant_id = " . yii::$app->session['uid'] . ";";
+        $sql = "select count(id) as num  from  shop_user where DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(FROM_UNIXTIME(create_time))  and `key`='" . $key . "'  and merchant_id = " . yii::$app->session['uid'] . ";";
         $longin_user = $table->querySql($sql);
 
-        $sql = "select count(id) as num  from  shop_order_group where DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(FROM_UNIXTIME(create_time)) and (status !=2 or status != 0 or status!=4 or status!=5 or status!=8 or status !=9) and delete_time is null and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . ";";
+        $sql = "select count(id) as num  from  shop_order_group where DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(FROM_UNIXTIME(create_time)) and (status = 6 or status=7 or status = 1 or status = 3 ) and delete_time is null and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . ";";
         $order = $table->querySql($sql);
         $data['seven_day_turnover'] = $money[0]['payment_money'] == null ? 0 : $money[0]['payment_money'];
         $data['seven_day_visitor'] = $user[0]['num'] + $longin_user[0]['num'];
@@ -111,16 +106,16 @@ class TotalController extends MerchantController {
 
     public function month($key) {
         $table = new TableModel();
-        $sql = "select sum(payment_money) as payment_money  from  shop_order_group where DATE_SUB(CURDATE(), INTERVAL 30 DAY) <= date(FROM_UNIXTIME(create_time)) and (status !=2 or status != 0 or status!=4 or status!=5 or status!=8 or status !=9) and delete_time is null and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . ";";
+        $sql = "select sum(payment_money) as payment_money  from  shop_order_group where DATE_SUB(CURDATE(), INTERVAL 30 DAY) <= date(FROM_UNIXTIME(create_time)) and (status = 6 or status=7 or status = 1 or status = 3 ) and delete_time is null and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . ";";
         $money = $table->querySql($sql);
 
-        $sql = "select count(distinct ip) as num  from  system_log where DATE_SUB(CURDATE(), INTERVAL 30 DAY) <= date(FROM_UNIXTIME(create_time))  and `key`='" . $key . "' and sub_id = 0 and user_id!=0 and merchant_id = " . yii::$app->session['uid'] . ";";
+        $sql = "select count(id) as num  from  shop_user where DATE_SUB(CURDATE(), INTERVAL 30 DAY) <= date(FROM_UNIXTIME(create_time))  and `key`='" . $key . "'  and merchant_id = " . yii::$app->session['uid'] . ";";
         $user = $table->querySql($sql);
 
-        $sql = "select count(distinct ip) as num  from  system_log where DATE_SUB(CURDATE(), INTERVAL 30 DAY) <= date(FROM_UNIXTIME(create_time))  and `key`='" . $key . "' and sub_id = 0 and user_id!=0 and merchant_id = " . yii::$app->session['uid'] . ";";
+        $sql = "select count(id) as num  from  shop_user where DATE_SUB(CURDATE(), INTERVAL 30 DAY) <= date(FROM_UNIXTIME(create_time))  and `key`='" . $key . "'  and merchant_id = " . yii::$app->session['uid'] . ";";
         $longin_user = $table->querySql($sql);
 
-        $sql = "select count(id) as num  from  shop_order_group where DATE_SUB(CURDATE(), INTERVAL 30 DAY) <= date(FROM_UNIXTIME(create_time)) and (status !=2 or status != 0 or status!=4 or status!=5 or status!=8 or status !=9) and delete_time is null and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . ";";
+        $sql = "select count(id) as num  from  shop_order_group where DATE_SUB(CURDATE(), INTERVAL 30 DAY) <= date(FROM_UNIXTIME(create_time)) and (status = 6 or status=7 or status = 1 or status = 3 ) and delete_time is null and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . ";";
         $order = $table->querySql($sql);
         $data['thirty_days_turnover'] = $money[0]['payment_money'] == null ? 0 : $money[0]['payment_money'];
         $data['thirty_days_visitor'] = $user[0]['num'] + $longin_user[0]['num'];
@@ -137,7 +132,7 @@ class TotalController extends MerchantController {
         $sql = "select count(id)as num  from  shop_order_group where status =5 and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . ";";
         $tuikuan = $table->querySql($sql);
 
-        $sql = "select count(id) as num  from  shop_goods where  status =0 and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . ";";
+        $sql = "select count(id) as num  from  shop_goods where  status =1 and stocks<5 and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . ";";
         $xiajia = $table->querySql($sql);
         $data['un_shipped_order'] = $fahuo[0]['num'];
         $data['refund_order'] = $tuikuan[0]['num'];
@@ -153,9 +148,9 @@ class TotalController extends MerchantController {
             $data['day'][] = date("Y-m-d", strtotime("-{$i} day"));
         }
 
-        $sql = "select sum(payment_money) as payment_money,FROM_UNIXTIME( create_time, '%Y-%m-%d' ) AS data_time  from  shop_order_group where create_time > UNIX_TIMESTAMP( date_sub( curdate( ), INTERVAL 29 DAY ) )  and (status !=2 or status != 0 or status!=4 or status!=5 or status!=8 or status !=9) and delete_time is null and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . " GROUP BY data_time";
+        $sql = "select sum(payment_money) as payment_money,FROM_UNIXTIME( create_time, '%Y-%m-%d' ) AS data_time  from  shop_order_group where create_time > UNIX_TIMESTAMP( date_sub( curdate( ), INTERVAL 29 DAY ) )  and (status=6 or status = 8 or status = 1 or status = 3 ) and delete_time is null and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . " GROUP BY data_time";
         $money = $table->querySql($sql);
-        $sql = "select count(*) as visit_num,count(distinct ip) as num,FROM_UNIXTIME( create_time, '%Y-%m-%d' ) AS data_time from  system_log where create_time > UNIX_TIMESTAMP( date_sub( curdate( ), INTERVAL 29 DAY ) )  and `key`='" . $key . "' and sub_id = 0 and user_id!=0 and merchant_id = " . yii::$app->session['uid'] . " GROUP BY data_time;";
+        $sql = "select count(*) as visit_num,count(id) as num,FROM_UNIXTIME( create_time, '%Y-%m-%d' ) AS data_time from  shop_user where create_time > UNIX_TIMESTAMP( date_sub( curdate( ), INTERVAL 29 DAY ) )  and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . " GROUP BY data_time;";
         $user = $table->querySql($sql);
 
         foreach ($data['day'] as $key=>$val){
@@ -203,17 +198,18 @@ class TotalController extends MerchantController {
     public function yesterday($key){
         $table = new TableModel();
         $startTime =strtotime( date("Y-m-d",strtotime("-1 day")));
-        $endTime =$startTime+(60*60+24);
-        $sql = "select sum(payment_money) as payment_money  from  shop_order_group where create_time>{$startTime} and create_time <{$endTime}  and (status !=2 or status != 0 or status!=4 or status!=5 or status!=8 or status !=9) and delete_time is null and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . ";";
+        $endTime =$startTime+(60*60*24);
+        $sql = "select sum(payment_money) as payment_money  from  shop_order_group where create_time>{$startTime} and create_time <{$endTime}  and (status= 6 or status =7 or status = 1 or status = 3 ) and delete_time is null and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . ";";
+
         $money = $table->querySql($sql);
 
-        $sql = "select count(distinct ip) as num  from  system_log where create_time>{$startTime} and create_time <{$endTime}  and `key`='" . $key . "' and sub_id = 0 and user_id!=0 and merchant_id = " . yii::$app->session['uid'] . ";";
+        $sql = "select count(id) as num  from  shop_user where create_time>{$startTime} and create_time <{$endTime}  and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . ";";
         $user = $table->querySql($sql);
 
 //        $sql = "select count(distinct ip) as num  from  system_log where create_time>{$startTime} and create_time <{$endTime}  and `key`='" . $key . "' and sub_id = 0 and user_id!=0 and merchant_id = " . yii::$app->session['uid'] . ";";
 //        $longin_user = $table->querySql($sql);
 
-        $sql = "select count(id) as num  from  shop_order_group where create_time>{$startTime} and create_time <{$endTime} and (status !=2 or status != 0 or status!=4 or status!=5 or status!=8 or status !=9) and delete_time is null and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . ";";
+        $sql = "select count(id) as num  from  shop_order_group where create_time>{$startTime} and create_time <{$endTime} and (status=6 or status=7 or status = 1 or status = 3 ) and delete_time is null and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . ";";
         $order = $table->querySql($sql);
         $data['today_turnover'] = $money[0]['payment_money'] == null ? 0 : $money[0]['payment_money'];
         $data['today_visitor'] = $user[0]['num'] + $user[0]['num'];
@@ -233,7 +229,7 @@ class TotalController extends MerchantController {
         }
         $time = date('Y-m-d H:00:00');
         //查询结果为当前整点到下一个小时的数据，下面循环会做处理，如当前9：20，结果中9的订单金额合计是9：00-9：20的合计
-        $sql = "select sum(payment_money) as payment_money,FROM_UNIXTIME( create_time, '%k' ) AS data_time  from  shop_order_group where create_time > UNIX_TIMESTAMP( date_sub( '{$time}', INTERVAL {$h} HOUR ) )  and (status !=2 or status != 0 or status!=4 or status!=5 or status!=8 or status !=9) and delete_time is null and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . " GROUP BY data_time";
+        $sql = "select sum(payment_money) as payment_money,FROM_UNIXTIME( create_time, '%k' ) AS data_time  from  shop_order_group where create_time > UNIX_TIMESTAMP( date_sub( '{$time}', INTERVAL {$h} HOUR ) )  and (status =6 or status =7 or status = 1 or status = 3 ) and delete_time is null and `key`='" . $key . "' and merchant_id = " . yii::$app->session['uid'] . " GROUP BY data_time";
         $money = $table->querySql($sql);
 
         $sql = "select count(*) as visit_num,count(distinct ip) as num,FROM_UNIXTIME( create_time, '%k' ) AS data_time from  system_log where create_time > UNIX_TIMESTAMP( date_sub( '{$time}', INTERVAL {$h} HOUR ) )  and `key`='" . $key . "' and sub_id = 0 and user_id!=0 and merchant_id = " . yii::$app->session['uid'] . " GROUP BY data_time;";

@@ -2,6 +2,8 @@
 
 namespace app\controllers\shop;
 
+use app\models\merchant\app\SystemAppAccessModel;
+use app\models\shop\GroupOrderModel;
 use yii;
 use yii\web\ShopController;
 use yii\db\Exception;
@@ -36,16 +38,16 @@ class UserController extends ShopController
             'token' => [
                 'class' => 'yii\filters\ShopFilter', //调用过滤器
 //                'only' => ['single'],//指定控制器应用到哪些动作
-                'except' => ['login', 'callback', 'useraddress', 'user', 'address', 'appinfo', 'list'], //指定控制器不应用到哪些动作
+                'except' => ['login', 'callback', 'useraddress', 'user', 'address', 'appinfo', 'list', 'open-advertisement'], //指定控制器不应用到哪些动作
             ]
         ];
     }
 
     public $config = [
-        'app_id' => 'wx8df3a6f4a4f9ec54',
-        'secret' => '7188287cd30aa902d5933654fed60559',
-        'token' => 'juanPao',
-        'aes_key' => '9ILejPm7rpu5kJykkY13oHMO80bYJkNbQfCvL3otaWA',
+        'app_id' => '',
+        'secret' => '',
+        'token' => '',
+        'aes_key' => '',
     ];
 
     /**
@@ -83,9 +85,9 @@ class UserController extends ShopController
                 }
             } else if ($params['type'] == "miniprogram") {
 
-               // $openPlatform = Factory::openPlatform($this->config);
+                // $openPlatform = Factory::openPlatform($this->config);
                 // 代小程序实现业务
-            //    $miniProgram = $openPlatform->miniProgram($config['app_id'], $config['refresh_token']);
+                //    $miniProgram = $openPlatform->miniProgram($config['app_id'], $config['refresh_token']);
                 $miniProgram = Factory::miniProgram($config);
                 $user = $miniProgram->auth->session($params['code']);
                 if (isset($user['openid'])) {
@@ -129,19 +131,21 @@ class UserController extends ShopController
 //            if (!isset($rs['unionId'])) {
 //                return result(500, "请先关注公众账号");
 //            } else {
-                $merchant_id = $this->getMerchant($params['key']);
-                if ($merchant_id != false) {
-                    $rs['type'] = 2;
-                    $users = $this->user($rs, $params['key'], $merchant_id);
-                    if ($users['status'] == 200) {
-                        $jwt = $this->jwt($users['data'], $params['key'], $merchant_id, 2);
-                    }
-                    return result(200, "添加成功", $jwt['data']);
+            $merchant_id = $this->getMerchant($params['key']);
+            if ($merchant_id != false) {
+                $rs['type'] = 2;
+                $users = $this->user($rs, $params['key'], $merchant_id);
+                if ($users['status'] == 200) {
+                    $jwt = $this->jwt($users['data'], $params['key'], $merchant_id, 2);
                 } else {
-                    return result(500, "登陆失败,未找到商户信息");
+                    return $users;
                 }
+                return result(200, "添加成功", $jwt['data']);
+            } else {
+                return result(500, "登陆失败,未找到商户信息");
+            }
 
-       //     }
+            //     }
 
         }
     }
@@ -154,13 +158,13 @@ class UserController extends ShopController
 //            if ($config == false) {
 //                return result(500, "未配置小程序信息");
 //            }
-//            //微信公众号 授权 
+//            //微信公众号 授权
 //            $openPlatform = Factory::openPlatform($this->config);
 //            // 代公众号实现业务
 //            $app = $openPlatform->officialAccount($config['app_id'], $config['refresh_token']);
 //            $res = $app->encryptor->decryptData($params['sessionKey'], $params['iv'], $params['encryptedData']);
 //            if($res['status']=='success'){
-//                
+//
 //            }
 //            return result(200, "请求成功", $res);
 //        }
@@ -300,6 +304,12 @@ class UserController extends ShopController
                         $userinfo['data']['is_self'] = $leader['data']['is_self'] == 0 ? false : true;
                     }
                 }
+                $orderModel = new GroupOrderModel();
+                $res = $orderModel->one(['user_id' => $params['id']]);
+                if ($res['status'] == 200) {
+                    $userinfo['data']['name'] = $res['data']['name'];
+                    $userinfo['data']['phone'] = $res['data']['phone'];
+                }
                 $vipModel = new \app\models\merchant\vip\VipConfigModel();
                 $vip = $vipModel->one(['key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['merchant_id']]);
                 if ($vip['status'] == 200) {
@@ -387,7 +397,7 @@ class UserController extends ShopController
         if ($result['status'] == 200) {
             $data = array(
                 'id' => $result['data']['id'],
-                'union_id' => $user['unionid'],
+                //   'union_id' => $user['unionid'],
                 'nickname' => $user['nickname'],
                 'merchant_id' => $merchant_id,
                 '`key`' => $key,
@@ -409,7 +419,7 @@ class UserController extends ShopController
             $array = $userModel->update($data);
         } else {
             $data = array(
-                'union_id' => $user['unionid'],
+                //  'union_id' => $user['unionid'],
                 'nickname' => $user['nickname'],
                 '`key`' => $key,
                 'merchant_id' => $merchant_id,
@@ -519,12 +529,32 @@ class UserController extends ShopController
                 unset($res['data']['create_time']);
                 unset($res['data']['update_time']);
                 unset($res['data']['delete_time']);
+                $res['data']['open_advertisement'] = json_decode($res['data']['open_advertisement'], true);
             }
 
 //            if ($merchant['status'] == 200) {
 //                $res['data']['phone'] = $merchant['data']['phone'];
 //            }
             return $res;
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
+
+    public function actionOpenAdvertisement()
+    {
+        if (yii::$app->request->isGet) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->get(); //获取body传参
+
+            $model = new SystemAppAccessModel();
+            $where['field'] = "id,open_advertisement";
+            $where['key'] = $params['key'];
+            $array = $model->do_one($where);
+            if ($array['status'] == 200) {
+                $array['data']['open_advertisement'] = json_decode($array['data']['open_advertisement'], true);
+            }
+            return $array;
         } else {
             return result(500, "请求方式错误");
         }
@@ -595,11 +625,10 @@ class UserController extends ShopController
             $miniProgram = Factory::miniProgram($config);
             $data = $miniProgram->auth->session($params['code']);
 
-            return result(200, "请求成功",$data);
+            return result(200, "请求成功", $data);
         } else {
             return result(500, "请求方式错误");
         }
-
 
 
     }
@@ -624,39 +653,40 @@ class UserController extends ShopController
 
     }
 
-	public function actionUsercode(){
-            if (yii::$app->request->isGet) {
-                $request = yii::$app->request; //获取 request 对象
-                $params = $request->get(); //获取地址栏参数
-				$model = new UserModel();
-				$user = $model->find(['id'=>yii::$app->session['user_id']]);
-				if($user['status']!=200){
-					return result(500,'找不到此用户');
-				}
-				error_reporting(E_ERROR);
-                require_once yii::getAlias('@vendor/wxpay/example/qrcode.php');
-                    creat_mulu1('uploads/qrcode');
-                $qrcode = "./uploads/qrcode/" . time() . rand(1000, 9999) . ".png";
-                $order_sn = order_sn();
-                $str = 'user_id='.yii::$app->session['user_id'].'&order_sn='.$order_sn.'&merchant_id='.yii::$app->session['merchant_id'].'&time='.time();
-                \QRcode::png($str, $qrcode);
-				$res['url'] ="http://".$_SERVER['SERVER_NAME']."/api/web/".$qrcode;
-				$res['money'] = $user['data']['recharge_balance'];
-				$res['order_sn'] = $order_sn;
-                return result(200, '请求成功', $res);
-            } else {
-                return result(500, "请求方式错误");
+    public function actionUsercode()
+    {
+        if (yii::$app->request->isGet) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->get(); //获取地址栏参数
+            $model = new UserModel();
+            $user = $model->find(['id' => yii::$app->session['user_id']]);
+            if ($user['status'] != 200) {
+                return result(500, '找不到此用户');
             }
+            error_reporting(E_ERROR);
+            require_once yii::getAlias('@vendor/wxpay/example/qrcode.php');
+            creat_mulu1('uploads/qrcode');
+            $qrcode = "./uploads/qrcode/" . time() . rand(1000, 9999) . ".png";
+            $order_sn = order_sn();
+            $str = 'user_id=' . yii::$app->session['user_id'] . '&order_sn=' . $order_sn . '&merchant_id=' . yii::$app->session['merchant_id'] . '&time=' . time();
+            \QRcode::png($str, $qrcode);
+            $res['url'] = "http://" . $_SERVER['SERVER_NAME'] . "/api/web/" . $qrcode;
+            $res['money'] = $user['data']['recharge_balance'];
+            $res['order_sn'] = $order_sn;
+            return result(200, '请求成功', $res);
+        } else {
+            return result(500, "请求方式错误");
+        }
 
     }
-    
-  
-    
-    public function actionPayment(){
+
+
+    public function actionPayment()
+    {
         if (yii::$app->request->isPost) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
-            
+
             $data['key'] = yii::$app->session['key'];
             $data['merchant_id'] = yii::$app->session['merchant_id'];
             $data['user_id'] = yii::$app->session['user_id'];
@@ -669,12 +699,18 @@ class UserController extends ShopController
             return result(500, "请求方式错误");
         }
     }
-    
-    public function actionPaymentList(){
-    	if (yii::$app->request->isGet) {
+
+    public function actionTest()
+    {
+        $server = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+    }
+
+    public function actionPaymentList()
+    {
+        if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
-            
+
             $data['key'] = yii::$app->session['key'];
             $data['merchant_id'] = yii::$app->session['merchant_id'];
             $data['user_id'] = yii::$app->session['user_id'];
@@ -682,6 +718,26 @@ class UserController extends ShopController
             $payMentModel = new StorePaymentModel();
             $array = $payMentModel->do_select($data);
             return $array;
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
+
+    public function actionUserOrder()
+    {
+        if (yii::$app->request->isGet) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->get(); //获取地址栏参数
+            //待付款 $a，待发货 $b，待收货 $c
+            $orderModel = new GroupOrderModel();
+            $a = $orderModel->do_select(['status' => 0,'limit'=>false,'user_id'=>yii::$app->session['user_id']]);
+            $b = $orderModel->do_select(['status' => 1,'limit'=>false,'user_id'=>yii::$app->session['user_id']]);
+            $c = $orderModel->do_select(['status' => 3,'limit'=>false,'user_id'=>yii::$app->session['user_id']]);
+
+            $result['a'] = $a['status'] == 200 ? count($a['data']) : 0;
+            $result['b'] = $b['status'] == 200 ? count($b['data']) : 0;
+            $result['c'] = $c['status'] == 200 ? count($c['data']) : 0;
+            return result(200,'请求成功',$result);
         } else {
             return result(500, "请求方式错误");
         }

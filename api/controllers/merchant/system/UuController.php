@@ -129,7 +129,6 @@ class UuController extends MerchantController {
             //查询收件人地址
             $orderModel = new GroupOrderModel();
             $orderWhere['shop_order_group.order_sn'] = $params['order_sn'];
-            $orderWhere['shop_order_group.express_type'] = 0;  //只有快递发货才使用UU跑腿
             $sonWhere['field'] = "shop_user_contact.*";
             $orderWhere['join'][] = ['left join', 'shop_user_contact', 'shop_order_group.user_contact_id = shop_user_contact.id'];;
             $order = $orderModel->do_select($orderWhere);
@@ -238,7 +237,6 @@ class UuController extends MerchantController {
             //查询收件人信息,
             $receiverModel = new GroupOrderModel();
             $receiverWhere['order_sn'] = $params['order_sn'];
-            $receiverWhere['express_type'] = 0;  //只有快递发货才使用UU跑腿
             $receiver = $receiverModel->one($receiverWhere);
             if ($receiver['status'] != 200){
                 return result(500, '未查询到订单信息');
@@ -297,8 +295,9 @@ class UuController extends MerchantController {
                 $orderWhere['order_sn'] = $params['order_sn'];
                 $order = $orderModel->find($orderWhere);
                 if ($order['status'] == 200) {
-                    $orderWhere['express_id'] = 0;
-                    $orderWhere['express_number'] = "UU跑腿配送";
+                    $orderWhere['send_express_type'] = 0;  //实际发货方式 0=快递
+                    $orderWhere['express_id'] = 243; //system_express表中UU跑腿的ID
+                    $orderWhere['express_number'] = $res['ordercode'];  //UU跑腿订单号
                     if ($order['data']['is_tuan'] == 1) {
                         $type = 2;
                     } else {

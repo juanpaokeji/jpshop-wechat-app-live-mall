@@ -88,17 +88,6 @@ class TemplateController extends MerchantController
             if ($config == false) {
                 return result(500, "小程序信息错误");
             }
-            $openPlatform = Factory::openPlatform($this->config);
-            $miniProgram = $openPlatform->miniProgram($config['app_id'], $config['refresh_token']);
-            $test = $miniProgram->subscribe_message->getTemplates();
-            var_dump($test);die;
-
-
-
-
-
-
-
 
             if ($params['purpose'] == "message") {
                 if ($array['status'] == 200) {

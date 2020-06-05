@@ -39,7 +39,7 @@ class ThemeController extends ShopController {
             if ($res['status'] == 204) {
                 $res = yii::$app->params['theme'];
                 $res['navigation'] = json_decode(yii::$app->params['theme']['navigation'], true);
-                $res['copyright'] = yii::$app->params['unit']['copyright']['pic_url'];
+                $res['copyright']['bottom_url'] = yii::$app->params['unit']['copyright']['pic_url'];
                 return result(200, "请求成功", $res);
             }
             if ($res['status'] == 200) {
@@ -57,7 +57,7 @@ class ThemeController extends ShopController {
             if ($array['status'] == 200) {
                 $res['data']['copyright'] = json_decode($array['data'][0]['config'], true);
             } else {
-                $res['data']['copyright'] = yii::$app->params['unit']['copyright']['pic_url'];
+                $res['data']['copyright']['bottom_url'] = yii::$app->params['unit']['copyright']['pic_url'];
             }
             return $res;
         } else {

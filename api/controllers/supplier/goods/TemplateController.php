@@ -14,7 +14,8 @@ use app\models\shop\ShopExpressTemplateDetailsModel;
  * @throws Exception if the model cannot be found
  * @return array
  */
-class TemplateController extends SupplierController {
+class TemplateController extends SupplierController
+{
 
     public $enableCsrfValidation = false; //禁用CSRF令牌验证，可以在基类中设置
 
@@ -24,20 +25,15 @@ class TemplateController extends SupplierController {
      * @return array
      */
 
-    public function actionList() {
+    public function actionList()
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
             $model = new ShopExpressTemplateModel();
-//            if (isset($params['key'])) {
-//                $params['`key`'] = $params['key'];
-//                unset($params['key']);
-//            }
-//            $params['shop_express.`key`'] = $params['key'];
-//            unset($params['key']);
             $params['`key`'] = yii::$app->session['key'];
             $params['merchant_id'] = yii::$app->session['uid'];
-            // $params['fields'] ="";
+            $params['supplier_id'] = yii::$app->session['sid'];
             $array = $model->findall($params);
             return $array;
         } else {
@@ -46,7 +42,8 @@ class TemplateController extends SupplierController {
     }
 
     //快递公司列表
-    public function actionAll() {
+    public function actionAll()
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
@@ -63,12 +60,14 @@ class TemplateController extends SupplierController {
         }
     }
 
-    public function actionSingle($id) {
+    public function actionSingle($id)
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
             $category = new ShopExpressTemplateModel();
             $params['id'] = $id;
+            $params['supplier_id'] = yii::$app->session['sid'];
             $array = $category->find($params);
             return $array;
         } else {
@@ -76,24 +75,36 @@ class TemplateController extends SupplierController {
         }
     }
 
-    public function actionAdd() {
+    public function actionAdd()
+    {
         if (yii::$app->request->isPost) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
 
             $model = new ShopExpressTemplateModel();
             //设置类目 参数
-            $must = ['names'];
-            $rs = $this->checkInput($must, $params);
-            if ($rs != false) {
-                return $rs;
+            if ($params['type'] != 3) {
+                $must = ['names'];
+                $rs = $this->checkInput($must, $params);
+                if ($rs != false) {
+                    return $rs;
+                }
+            } else {
+                $must = ['distance'];
+                $rs = $this->checkInput($must, $params);
+                if ($rs != false) {
+                    return $rs;
+                }
             }
 
-            $params['`key`'] = $params['key'];
-            $templateData['`key`'] = $params['key'];
-            $data['`key`'] = $params['key'];
+
+            $params['`key`'] = yii::$app->session['key'];
+            $templateData['`key`'] = yii::$app->session['key'];
+            $templateData['supplier_id'] = yii::$app->session['sid'];
+            $data['`key`'] = yii::$app->session['key'];
             unset($params['key']);
             $params['merchant_id'] = yii::$app->session['uid'];
+            $params['supplier_id'] = yii::$app->session['sid'];
             $params['status'] = 1;
             $temp = $model->find($templateData); //模板
 
@@ -108,16 +119,24 @@ class TemplateController extends SupplierController {
                 $templateData['status'] = $status;
                 $list = $model->add($templateData); //模板
                 $data['merchant_id'] = yii::$app->session['uid'];
-                //模板详情信息
-                for ($i = 0; $i < count($params['names']); $i++) {
-                    $data['shop_express_template_id'] = $list['data'];
-                    $data['names'] = $params['names'][$i];
-                    $data['first_num'] = $params['first_num'][$i];
-                    $data['first_price'] = $params['first_price'][$i];
-                    $data['expand_num'] = $params['expand_num'][$i];
-                    $data['expand_price'] = $params['expand_price'][$i];
+                $data['supplier_id'] = yii::$app->session['sid'];
+                //模板详情信息'
+                if ($params['type'] == 3) {
                     $data['status'] = 1;
+                    $data['shop_express_template_id'] = $list['data'];
+                    $data['distance'] = json_encode($params['distance']);
                     $array = $templateModel->add($data);
+                } else {
+                    for ($i = 0; $i < count($params['names']); $i++) {
+                        $data['shop_express_template_id'] = $list['data'];
+                        $data['names'] = $params['names'][$i];
+                        $data['first_num'] = $params['first_num'][$i];
+                        $data['first_price'] = $params['first_price'][$i];
+                        $data['expand_num'] = $params['expand_num'][$i];
+                        $data['expand_price'] = $params['expand_price'][$i];
+                        $data['status'] = 1;
+                        $array = $templateModel->add($data);
+                    }
                 }
                 $transaction->commit(); //只有执行了commit(),对于上面数据库的操作才会真正执行
                 return result(200, "新增成功");
@@ -130,7 +149,8 @@ class TemplateController extends SupplierController {
         }
     }
 
-    public function actionUpdate($id) {
+    public function actionUpdate($id)
+    {
         if (yii::$app->request->isPut) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
@@ -143,27 +163,38 @@ class TemplateController extends SupplierController {
                 unset($params['key']);
             }
 
-            $params['merchant_id'] = yii::$app->session['uid'];
+            $params['supplier_id'] = yii::$app->session['sid'];
             $transaction = yii::$app->db->beginTransaction();
             $templateModel = new ShopExpressTemplateDetailsModel();
             try {
                 $templateData['id'] = $params['id'];
+                $templateData['`key`'] = yii::$app->session['key'];
                 $templateData['merchant_id'] = yii::$app->session['uid'];
+                $templateData['supplier_id'] = yii::$app->session['sid'];
                 $templateData['name'] = $params['name'];
                 $templateData['type'] = $params['type'];
                 $array = $model->update($templateData); //模板
+                $data['`key`'] = yii::$app->session['key'];
                 $data['merchant_id'] = yii::$app->session['uid'];
+                $data['supplier_id'] = yii::$app->session['sid'];
                 //模板详情信息
                 $templateModel->deleteTrue(['shop_express_template_id' => $params['id']]);
-                for ($i = 0; $i < count($params['names']); $i++) {
-                    $data['shop_express_template_id'] = $params['id'];
-                    $data['names'] = $params['names'][$i];
-                    $data['first_num'] = $params['first_num'][$i];
-                    $data['first_price'] = $params['first_price'][$i];
-                    $data['expand_num'] = $params['expand_num'][$i];
-                    $data['expand_price'] = $params['expand_price'][$i];
+                if ($params['type'] == 3) {
                     $data['status'] = 1;
+                    $data['shop_express_template_id'] =$params['id'];
+                    $data['distance'] = json_encode($params['distance']);
                     $array = $templateModel->add($data);
+                } else {
+                    for ($i = 0; $i < count($params['names']); $i++) {
+                        $data['shop_express_template_id'] = $params['id'];
+                        $data['names'] = $params['names'][$i];
+                        $data['first_num'] = $params['first_num'][$i];
+                        $data['first_price'] = $params['first_price'][$i];
+                        $data['expand_num'] = $params['expand_num'][$i];
+                        $data['expand_price'] = $params['expand_price'][$i];
+                        $data['status'] = 1;
+                        $array = $templateModel->add($data);
+                    }
                 }
                 $transaction->commit(); //只有执行了commit(),对于上面数据库的操作才会真正执行
                 return result(200, "更新成功");
@@ -176,19 +207,16 @@ class TemplateController extends SupplierController {
         }
     }
 
-    public function actionUpdates($id) {
+    public function actionUpdates($id)
+    {
         if (yii::$app->request->isPut) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
             $model = new ShopExpressTemplateModel();
-            $must = ['key'];
-            $rs = $this->checkInput($must, $params);
-            if ($rs != false) {
-                return $rs;
-            }
-            $data['`key`'] = $params['key'];
+            $data['`key`'] = yii::$app->session['key'];
             unset($params['key']);
             $data['merchant_id'] = yii::$app->session['uid'];
+            $data['supplier_id'] = yii::$app->session['sid'];
             $data['status'] = 0;
             $array = $model->update($data);
             $data['id'] = $id;
@@ -200,7 +228,8 @@ class TemplateController extends SupplierController {
         }
     }
 
-    public function actionDelete($id) {
+    public function actionDelete($id)
+    {
         if (yii::$app->request->isDelete) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
@@ -212,6 +241,7 @@ class TemplateController extends SupplierController {
                 unset($params['key']);
             }
             $params['merchant_id'] = yii::$app->session['uid'];
+            $params['supplier_id'] = yii::$app->session['sid'];
             if (!isset($params['id'])) {
                 return result(400, "缺少参数 id");
             } else {
@@ -219,7 +249,7 @@ class TemplateController extends SupplierController {
                 $templateModel = new ShopExpressTemplateDetailsModel();
                 try {
                     $array = $model->delete($params);
-                    $templateModel->deleteTrue(['shop_express_template_id' => $params['id'], '`key`' => $params['`key`'], 'merchant_id' => $params['merchant_id']]);
+                    $templateModel->deleteTrue(['shop_express_template_id' => $params['id'], 'merchant_id' => $params['merchant_id'], 'supplier_id' => $params['supplier_id']]);
                     $transaction->commit(); //只有执行了commit(),对于上面数据库的操作才会真正执行
                     return result(200, "删除成功");
                 } catch (Exception $e) {
@@ -227,7 +257,6 @@ class TemplateController extends SupplierController {
                     return result(500, "删除失败");
                 }
             }
-            return $array;
         } else {
             return result(500, "请求方式错误");
         }

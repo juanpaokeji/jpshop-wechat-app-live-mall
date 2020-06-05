@@ -10,6 +10,7 @@ use app\models\shop\MerchantCategoryModel;
 use app\models\shop\MerchantsCategoryModel;
 use app\models\core\Base64Model;
 use app\models\core\CosModel;
+use app\models\admin\system\SystemCosModel;
 
 /**
  * 应用类目表控制器
@@ -36,7 +37,7 @@ class CategoryController extends SupplierController {
                 $params['`key`'] = $params['key'];
                 unset($params['key']);
             }
-            $params['merchant_id'] = yii::$app->session['uid'];
+            $params['supplier_id'] = yii::$app->session['sid'];
             $array = $model->findall($params);
             if ($array['status'] != 200) {
                 return $array;
@@ -72,10 +73,8 @@ class CategoryController extends SupplierController {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
-            $params['merchant_id'] = yii::$app->session['uid'];
+            $params['supplier_id'] = yii::$app->session['sid'];
             $array = MerchantsCategoryModel::instance()->get_list();
-            var_dump($array);
-            return;
             return $array;
         } else {
             return result(500, "请求方式错误");
@@ -87,7 +86,8 @@ class CategoryController extends SupplierController {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
             $category = new MerchantCategoryModel();
-            $data['`key`'] = $params['key'];
+            $data['`key`'] = yii::$app->session['key'];
+            $data['supplier_id'] = yii::$app->session['sid'];
             $data['fields'] = " id,name ";
             $data['parent_id'] = 0;
             $array = $category->finds($data);
@@ -102,6 +102,7 @@ class CategoryController extends SupplierController {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
             $model = new CategoryModel();
+            $params['supplier_id'] = yii::$app->session['sid'];
             $array = $model->findall($params);
             return $array;
         } else {
@@ -115,6 +116,7 @@ class CategoryController extends SupplierController {
             $params = $request->get(); //获取地址栏参数
             $category = new MerchantCategoryModel();
             $params['id'] = $id;
+            $params['supplier_id'] = yii::$app->session['sid'];
             $array = $category->find($params);
             return $array;
         } else {
@@ -134,34 +136,9 @@ class CategoryController extends SupplierController {
             if ($rs != false) {
                 return $rs;
             }
-            if ($params['pic_url'] != "") {
-                $params['pic_url'] = $base->base64_image_content($params['pic_url'], "./uploads/merchant/shop/category");
-                $cos = new CosModel();
-                $cosRes = $cos->putObject($params['pic_url']);
-                if ($cosRes['status'] == '200') {
-                    $url = $cosRes['data'];
-                } else {
-                    unlink(Yii::getAlias('@webroot/') . $params['pic_url']);
-                    return json_encode($cosRes, JSON_UNESCAPED_UNICODE);
-                }
-                $params['pic_url'] = $url;
-            }
 
-            if ($params['img_url'] != "") {
-                $params['img_url'] = $base->base64_image_content($params['img_url'], "./uploads/merchant/shop/category");
-                $cos = new CosModel();
-                $cosRes = $cos->putObject($params['img_url']);
-                if ($cosRes['status'] == '200') {
-                    $url = $cosRes['data'];
-                } else {
-                    unlink(Yii::getAlias('@webroot/') . $params['img_url']);
-                    return json_encode($cosRes, JSON_UNESCAPED_UNICODE);
-                }
-                $params['img_url'] = $url;
-            }
-            $params['`key`'] = $params['key'];
-            unset($params['key']);
-            $params['merchant_id'] = yii::$app->session['uid'];
+            $params['`key`'] = yii::$app->session['key'];
+            $params['supplier_id'] = yii::$app->session['sid'];
             $array = $model->add($params);
             return $array;
         } else {
@@ -174,39 +151,9 @@ class CategoryController extends SupplierController {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
             $model = new MerchantCategoryModel();
-            $base = new Base64Model();
             $params['id'] = $id;
-            $params['`key`'] = $params['key'];
-            unset($params['key']);
-            $params['merchant_id'] = yii::$app->session['uid'];
-            if ($params['pic_url'] != "") {
-                $params['pic_url'] = $base->base64_image_content($params['pic_url'], "./uploads/admin/shop/category");
-                $cos = new CosModel();
-                $cosRes = $cos->putObject($params['pic_url']);
-                if ($cosRes['status'] == '200') {
-                    $url = $cosRes['data'];
-                } else {
-                    unlink(Yii::getAlias('@webroot/') . $params['pic_url']);
-                    return json_encode($cosRes, JSON_UNESCAPED_UNICODE);
-                }
-                $params['pic_url'] = $url;
-            } else {
-                unset($params['pic_url']);
-            }
-            if ($params['img_url'] != "") {
-                $params['img_url'] = $base->base64_image_content($params['img_url'], "./uploads/admin/shop/category");
-                $cos = new CosModel();
-                $cosRes = $cos->putObject($params['img_url']);
-                if ($cosRes['status'] == '200') {
-                    $url = $cosRes['data'];
-                } else {
-                    unlink(Yii::getAlias('@webroot/') . $params['img_url']);
-                    return json_encode($cosRes, JSON_UNESCAPED_UNICODE);
-                }
-                $params['img_url'] = $url;
-            } else {
-                unset($params['img_url']);
-            }
+            $params['`key`'] = yii::$app->session['key'];
+            $params['supplier_id'] = yii::$app->session['sid'];
             if (!isset($params['id'])) {
                 return result(400, "缺少参数 id");
             } else {
@@ -224,8 +171,8 @@ class CategoryController extends SupplierController {
             $params = $request->bodyParams; //获取body传参
             $model = new MerchantCategoryModel();
             $data['id'] = $id;
-            $data['`key`'] = $params['key'];
-            $data['merchant_id'] = yii::$app->session['uid'];
+            $data['`key`'] = yii::$app->session['key'];
+            $data['supplier_id'] = yii::$app->session['sid'];
             $data['status'] = $params['status'];
             if (!isset($data['id'])) {
                 return result(400, "缺少参数 id");
@@ -244,9 +191,9 @@ class CategoryController extends SupplierController {
             $params = $request->bodyParams; //获取body传参
             $model = new MerchantCategoryModel();
             $params['id'] = $id;
-            $params['`key`'] = $params['key'];
+            $params['`key`'] = yii::$app->session['key'];
             unset($params['key']);
-            $params['merchant_id'] = yii::$app->session['uid'];
+            $params['supplier_id'] = yii::$app->session['sid'];
             if (!isset($params['id'])) {
                 return result(400, "缺少参数 id");
             } else {
@@ -267,6 +214,7 @@ class CategoryController extends SupplierController {
             $params = $request->get(); //获取地址栏参数
             $model = new CategoryModel();
             $data['fields'] = " id,name,parent_id ";
+            $data['supplier_id'] = yii::$app->session['sid'];
             $data['parent_id'] = 0;
             $array = $model->finds($data);
             unset($data['parent_id']);
@@ -300,7 +248,12 @@ class CategoryController extends SupplierController {
             $data['fields'] = " id,name,parent_id ";
             $data['parent_id'] = 0;
             $data['`key`'] = yii::$app->session['key'];
-            $params['merchant_id'] = yii::$app->session['uid'];
+            $data['supplier_id'] = yii::$app->session['sid'];
+
+            if(isset($params['status'])){
+                $data['status'] = $params['status'];
+            }
+
             $array = $model->finds($data);
             if ($array['status'] != 200) {
                 return result(204, "查询失败");

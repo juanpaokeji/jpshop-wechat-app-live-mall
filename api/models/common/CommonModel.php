@@ -246,7 +246,7 @@ class CommonModel extends ActiveRecord {
             if ($this->groupBy != false) {
                 $res = $this->get_db()->select($this->field)->andWhere(["{$table}.delete_time" => null])->orderBy($this->tableName() . "." . $this->order)->groupBy($this->groupBy)->offset($this->offset);
             } else {
-                $res = $this->get_db()->select($this->field)->andWhere(["{$table}.delete_time" => null]);
+                $res = $this->get_db()->select($this->field)->andWhere(["{$table}.delete_time" => null])->orderBy($this->tableName() . "." . $this->order);
             }
         }
 
@@ -342,6 +342,9 @@ class CommonModel extends ActiveRecord {
             }
             if (!empty($this->or) && is_array($this->or)) {
                 $res->andWhere($this->or);
+            }
+            if (!empty($this->groupBy)) {
+                $res->groupBy($this->groupBy);
             }
             $list['count'] = $res->count(1);
         }

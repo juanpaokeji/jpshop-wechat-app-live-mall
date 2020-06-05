@@ -171,7 +171,7 @@ class DianWoDaController extends MerchantController {
             $sql = "SELECT sog.name,sog.phone,suc.address,suc.latitude,suc.longitude 
                     FROM `shop_order_group` AS sog 
                     LEFT JOIN `shop_user_contact` AS suc ON sog.user_contact_id = suc.id 
-                    WHERE sog.order_sn = {$params['order_sn']} AND sog.express_type = 0";
+                    WHERE sog.order_sn = {$params['order_sn']}";
             $orderInfo = $orderModel->querySql($sql);
             if (count($orderInfo) <= 0){
                 return result(500, '未查到订单信息');
@@ -250,8 +250,9 @@ class DianWoDaController extends MerchantController {
                 $orderWhere['order_sn'] = $params['order_sn'];
                 $order = $orderModel->find($orderWhere);
                 if ($order['status'] == 200) {
-                    $orderWhere['express_id'] = 0;
-                    $orderWhere['express_number'] = "点我达配送";
+                    $orderWhere['send_express_type'] = 0;  //实际发货方式 0=快递
+                    $orderWhere['express_id'] = 244;  //system_express表中点我达的ID
+                    $orderWhere['express_number'] = $array['dwd_order_id'];  //点我达订单号
                     if ($order['data']['is_tuan'] == 1) {
                         $type = 2;
                     } else {

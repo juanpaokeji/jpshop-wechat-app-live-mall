@@ -2,6 +2,7 @@
 
 namespace app\controllers\shop;
 
+use app\models\tuan\LeaderModel;
 use yii;
 use yii\db\Exception;
 use yii\web\ShopController;
@@ -32,7 +33,7 @@ class BalanceController extends ShopController
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数          
             $model = new BalanceModel();
-            $params['field'] = " money,remain_money,fee,send_type,status,create_time,update_time ";
+            // $params['field'] = " money,remain_money,fee,send_type,status,create_time,update_time ";
             $params['uid'] = yii::$app->session['user_id'];
             $params['merchant_id'] = yii::$app->session['merchant_id'];
             $params['is_send'] = 1;
@@ -52,6 +53,7 @@ class BalanceController extends ShopController
             $params['field'] = " shop_user_balance.order_sn,shop_user_balance.money,shop_user.avatar,shop_user.nickname,shop_user_balance.status,shop_order_group.payment_money as payment_money,shop_user_balance.create_time,shop_user_balance.update_time ";
             $params['uid'] = yii::$app->session['user_id'];
             $params['shop_user_balance.merchant_id'] = yii::$app->session['merchant_id'];
+            $params['shop_user_balance.type'] = [1,6];
             $params['<>'] = ["shop_user_balance.order_sn", "0"];
             $params['join'][] = ['inner join ', 'shop_order_group', 'shop_order_group.order_sn = shop_user_balance.order_sn'];
             $params['join'][] = ['inner join ', 'shop_user', 'shop_user.id = shop_order_group.user_id'];
@@ -67,6 +69,16 @@ class BalanceController extends ShopController
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
+
+            $leaderModel = new LeaderModel();
+            $leaderInfo = $leaderModel->do_one(['uid'=>yii::$app->session['user_id']]);
+            if ($leaderInfo['status'] == 200){
+                $array['data']['alipay_account'] = $leaderInfo['data']['alipay_account'];
+                $array['data']['alipay_name'] = $leaderInfo['data']['alipay_name'];
+                $array['data']['bank_card_id'] = $leaderInfo['data']['bank_card_id'];
+                $array['data']['bank_card_branch'] = $leaderInfo['data']['bank_card_branch'];
+                $array['data']['name_of_cardholder'] = $leaderInfo['data']['name_of_cardholder'];
+            }
             $user = new UserModel();
             $u = $user->find(['id' => yii::$app->session['user_id']]);
             if ($params['type'] == 1) {
@@ -114,7 +126,7 @@ class BalanceController extends ShopController
                     return result(500, '余额为不足');
                 }
 
-            }else{
+            } else {
                 $content = "分销佣金提现";
                 if ((float)$u['data']['withdrawable_commission'] == 0.00) {
                     return result(500, '余额为0');
@@ -140,9 +152,9 @@ class BalanceController extends ShopController
                 'uid' => yii::$app->session['user_id'],
                 'balance_sn' => order_sn(),
                 'order_sn' => 0,
-                'fee' => (float)$params['money'] * (float)$config['data']['withdraw_fee_ratio'],
+                'fee' => round((float)$params['money'] * ((float)$config['data']['withdraw_fee_ratio'] / 100)),
                 'money' => (float)$params['money'],
-                'remain_money' => (float)$params['money'] - ((float)$params['money'] * (float)$config['data']['withdraw_fee_ratio']),
+                'remain_money' => round((float)$params['money'] - ((float)$params['money'] * ((float)$config['data']['withdraw_fee_ratio'] / 100))),
                 'content' => $content,
                 'send_type' => $params['send_type'],
                 'is_send' => 1,
@@ -160,12 +172,23 @@ class BalanceController extends ShopController
             $array = $model->do_add($data);
 
             if ($array['status'] == 200) {
-                if($params['type']==1){
+                if ($params['type'] == 1) {
                     $user->update(['id' => yii::$app->session['user_id'], '`key`' => yii::$app->session['key'], 'balance' => (float)$u['data']['balance'] - (float)$params['money']]);
-                }else{
-                    $user->update(['id' => yii::$app->session['user_id'], '`key`' => yii::$app->session['key'], 'balance' => (float)$u['data']['withdrawable_commission'] - (float)$params['money']]);
+                } else {
+                    $user->update(['id' => yii::$app->session['user_id'], '`key`' => yii::$app->session['key'], 'withdrawable_commission' => (float)$u['data']['withdrawable_commission'] - (float)$params['money']]);
                 }
-
+                //更改团长支付宝、银行卡信息
+                $leaderModel = new LeaderModel();
+                if ($params['send_type'] == 2){
+                    $leaderData['alipay_name'] = $params['realname'];
+                    $leaderData['alipay_account'] = $params['pay_number'];
+                    $leaderModel->do_update(['uid'=>yii::$app->session['user_id']],$leaderData);
+                } elseif ($params['send_type'] == 3){
+                    $leaderData['name_of_cardholder'] = $params['realname'];
+                    $leaderData['bank_card_id'] = $params['pay_number'];
+                    $leaderData['bank_card_branch'] = $params['pay_bank'];
+                    $leaderModel->do_update(['uid'=>yii::$app->session['user_id']],$leaderData);
+                }
             }
             return $array;
         } else {
@@ -173,33 +196,5 @@ class BalanceController extends ShopController
         }
     }
 
-//
-//    public function actionUpdate($id) {
-//        if (yii::$app->request->isPut) {
-//            $request = yii::$app->request; //获取 request 对象
-//            $params = $request->bodyParams; //获取body传参
-//            $model = new BalanceModel();
-//            $where['id'] = $id;
-//            $where['merchant_id'] = yii::$app->session['uid'];
-//            $where['key'] = $params['key'];
-//            $array = $model->do_update($where, $params);
-//            return $array;
-//        } else {
-//            return result(500, "请求方式错误");
-//        }
-//    }
-//
-//    public function actionDelete($id) {
-//        if (yii::$app->request->isDelete) {
-//            $request = yii::$app->request; //获取 request 对象
-//            $params = $request->bodyParams; //获取body传参
-//            $model = new BalanceModel();
-//            $params['id'] = $id;
-//            $params['merchant_id'] = yii::$app->session['uid'];
-//            $array = $model->do_delete($params);
-//            return $array;
-//        } else {
-//            return result(500, "请求方式错误");
-//        }
-//    }
+
 }

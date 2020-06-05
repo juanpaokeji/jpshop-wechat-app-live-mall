@@ -89,6 +89,9 @@ class ShopExpressTemplateModel extends TableModel {
         if (isset($params['status'])) {
             $where['status'] = $params['status'];
         }
+        if (isset($params['supplier_id'])) {
+            $where['supplier_id'] = $params['supplier_id'];
+        }
         $where['delete_time is null'] = null;
         try {
             $app = $table->tableSingle($this->table, $where);
@@ -221,6 +224,10 @@ class ShopExpressTemplateModel extends TableModel {
         if (isset($params['id'])) {
             $where['id'] = $params['id'];
             unset($params['id']);
+        }
+        if (isset($params['supplier_id'])) {
+            $where['supplier_id'] = $params['supplier_id'];
+            unset($params['supplier_id']);
         }
         //params 参数值设置
         $params['update_time'] = time();

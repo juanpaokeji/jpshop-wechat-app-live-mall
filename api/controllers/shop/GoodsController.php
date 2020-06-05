@@ -4,10 +4,13 @@ namespace app\controllers\shop;
 
 use app\models\core\TableModel;
 use app\models\merchant\app\AppAccessModel;
+use app\models\merchant\system\ShopRecommendGoodsModel;
+use app\models\shop\GoodsLabelModel;
 use app\models\shop\OrderModel;
 use app\models\shop\ShopAssembleAccessModel;
 use app\models\shop\ShopAssembleModel;
 use app\models\shop\ShopBargainInfoModel;
+use app\models\shop\ShopGoodsModel;
 use app\models\shop\SubOrderModel;
 use app\models\shop\SubOrdersModel;
 use app\models\shop\UserModel;
@@ -40,16 +43,16 @@ class GoodsController extends ShopController
             'token' => [
                 'class' => 'yii\filters\ShopFilter', //调用过滤器
 //                'only' => ['single'],//指定控制器应用到哪些动作
-                'except' => ['list', 'sinleinfo', 'single', 'istop', 'stock', 'property', 'goods', 'buy-info'], //指定控制器不应用到哪些动作
+                'except' => ['list', 'sinleinfo', 'single', 'istop', 'stock', 'property', 'goods', 'buy-info', 'recommend'], //指定控制器不应用到哪些动作
             ]
         ];
     }
 
     public $config = [
-        'app_id' => 'wx8df3a6f4a4f9ec54',
-        'secret' => '7188287cd30aa902d5933654fed60559',
-        'token' => 'juanPao',
-        'aes_key' => '9ILejPm7rpu5kJykkY13oHMO80bYJkNbQfCvL3otaWA',
+        'app_id' => '',
+        'secret' => '',
+        'token' => '',
+        'aes_key' => '',
     ];
 
     public function actionList()
@@ -63,10 +66,12 @@ class GoodsController extends ShopController
             //$params['merchant_id'] = yii::$app->session['merchant_id'];
             //   $params['is_flash_sale'] = 0;
             $model->goodsOut($params); //查询商品数量是否为0  为0下架
+            //type = 1 即将开始商品
             if (isset($params['type']) && $params['type'] == 1) {
                 $time = time();
                 $params["start_time > {$time}"] = null;
-                $params["status"] = 1;
+                $params["status"] = 0;
+                unset($params['type']);
             } else {
                 $time = time();
                 $params["start_time <= {$time}"] = null;
@@ -74,15 +79,30 @@ class GoodsController extends ShopController
             }
 
             $appModel = new AppAccessModel();
-            $app = $appModel->find(['`key`'=>$params['`key`']]);
-            if($app['status']==200){
-                if($app['data']['is_recruits']==1){
-                    if($app['data']['is_recruits_show']==0){
-                        $params['is_recruits']=0;
+            $app = $appModel->find(['`key`' => $params['`key`']]);
+//            if ($app['status'] == 200) {
+//                if ($app['data']['is_recruits'] == 1) {
+//                    if ($app['data']['is_recruits_show'] == 0) {
+//                        $params['is_recruits'] = 0;
+//                    }
+//                }
+//            }
+            if (isset($params['supplier'])) {
+                if ($params['supplier'] == 0) {
+                    $params['supplier_id'] = 0;
+                    unset($params['supplier']);
+                }
+                unset($params['supplier']);
+            } else {
+                $appModel = new AppAccessModel();
+                $app = $appModel->find(['`key`' => 'ccvWPn', 'id' => 331]);
+                if ($app['data']['is_show_supplier_goods'] == 1) {
 
-                    }
+                } else {
+                    $params['supplier_id'] = 0;
                 }
             }
+
             $array = $model->finds($params);
 
             $goods_id = array();
@@ -100,14 +120,14 @@ class GoodsController extends ShopController
                         $val['is_group'] = "1";
                         $val['is_self'] = $groupInfo['data']['is_self'];
                         //获取拼团信息
-                        if($groupInfo['data']['type'] == 1){
+                        if ($groupInfo['data']['type'] == 1) {
                             $property_arr = json_decode($groupInfo['data']['property'], true);
-                            if($property_arr){
-                                foreach ($property_arr as $pro_key=>$pro_val){
+                            if ($property_arr) {
+                                foreach ($property_arr as $pro_key => $pro_val) {
                                     $val['max_group_price'] = max(array_column($pro_val, "price"));
                                 }
                             }
-                        }else{
+                        } else {
                             $val['max_group_price'] = $groupInfo['data']['min_price'];
                         }
                         $val['min_group_price'] = $groupInfo['data']['min_price'];
@@ -122,7 +142,7 @@ class GoodsController extends ShopController
 
                                     $val['stock'][$j]['number'] = $a['stocks'];
                                     $val['stock'][$j]['price'] = $a['flash_price'];
-                                    $val['price'] = $a['flash_price'];
+                                    $val['price'] = $res['data']['flash_price'];
                                 }
                             }
                         }
@@ -146,14 +166,15 @@ class GoodsController extends ShopController
                                 $array['data'][$i]['avatar'][] = $orders['data'][$k]['avatar'];
                             }
                         }
-                        if(count($array['data'][$i]['avatar'])<3){
-
-                            $t = 3-count($array['data'][$i]['avatar']);
-                            $sql = "select avatar from shop_user ORDER BY RAND() LIMIT {$t}";
-                            $table  = new TableModel();
-                            $rs  = $table->querySql($sql);
-                            for($k = 0;$k<$t;$k++){
-                                $array['data'][$i]['avatar'][] = $rs[$k]['avatar'];
+                        if ($array['data'][$i]['sales_number'] != 0) {
+                            if (count($array['data'][$i]['avatar']) < 3) {
+                                $t = 3 - count($array['data'][$i]['avatar']);
+                                $sql = "select avatar from shop_user ORDER BY RAND() LIMIT {$t}";
+                                $table = new TableModel();
+                                $rs = $table->querySql($sql);
+                                for ($k = 0; $k < $t; $k++) {
+                                    $array['data'][$i]['avatar'][] = $rs[$k]['avatar'];
+                                }
                             }
                         }
                     }
@@ -277,11 +298,11 @@ class GoodsController extends ShopController
                 $array = $model->find($params);
 
                 if ($array['status'] == 200) {
-                    $array['data']['attribute'] =json_decode($array['data']['attribute'],true) ;
+                    $array['data']['attribute'] = json_decode($array['data']['attribute'], true);
                     $array['data']['pic_urls'] = explode(",", $array['data']['pic_urls']);
                     $array['data']['pic_urls'] = array_filter($array['data']['pic_urls']);
                 } else {
-                    return $array;
+                    return result(500, "商品已下架");
                 }
 
                 $ip = yii::$app->request->getUserIP();
@@ -342,7 +363,6 @@ class GoodsController extends ShopController
                         $a = json_decode($property[$i], true);
                         for ($j = 0; $j < count($array['data']['stock']); $j++) {
                             if ($a['stock_id'] == $array['data']['stock'][$j]['id']) {
-
                                 $array['data']['stock'][$j]['number'] = $a['stocks'];
                                 $array['data']['stock'][$j]['price'] = $a['flash_price'];
                             }
@@ -367,18 +387,7 @@ class GoodsController extends ShopController
                         }
                     }
                 }
-                $len = count($array['data']['stock']); //  5
-//                for ($i = 0; $i < $len; $i++) {
-//                    for ($j = $i + 1; $j < count($len); $j++) {
-//                        if ($array['data']['stock'][$i]['price'] < $array['data']['stock'][$j]['price']) {
-//                            $array['data']['max_price'] = $array['data']['stock'][$j]['price'];
-//                        }
-//                        if ($array['data']['stock'][$i]['price'] > $array['data']['stock'][$j]['price']) {
-//                            $array['data']['min_price'] = $array['data']['stock'][$i]['price'];
-//                        }
-//                    }
-//                }
-//                $array['data']['avatar'] = $this->avatar($array['data']['id']);
+
             }
             if ($tuanConfig['status'] == 200 && $tuanConfig['data']['status']) {
                 $params['id'] = $id;
@@ -389,39 +398,9 @@ class GoodsController extends ShopController
                     $array['data']['pic_urls'] = explode(",", $array['data']['pic_urls']);
                     $array['data']['pic_urls'] = array_filter($array['data']['pic_urls']);
                 } else {
-                    return $array;
+                    return result(500, "商品已下架");
                 }
 
-                $ip = yii::$app->request->getUserIP();
-                $rs = $this->ipAddress($ip);
-
-               // $tempModel = new ShopExpressTemplateModel();
-                //$data['merchant_id'] = yii::$app->session['merchant_id'];
-               // $data['`key`'] = $params['`key`'];
-              //  $data['status'] = 1;
-              //  $temp = $tempModel->find($data);
-             //   if ($temp['status'] != 200) {
-             //       return result(500, "内部错误");
-              //  }
-              //  if ($rs['status'] == 0) {
-               //     $params['searchName'] = $rs['result']['ad_info']['province'];
-               // } else {
-               //     $params['searchName'] = "全国统一运费";
-               // }
-               // $kdmb = new ShopExpressTemplateDetailsModel();
-               // $params['shop_express_template_id'] = $temp['data']['id'];
-               // unset($params['id']);
-             //   $kdf = $kdmb->find($params);
-				//if($kdf['status']==204){
-				//	 return result(500, '未设置快递');
-			//	}
-              //  if ($kdf['status'] == 200) {
-              //      $array['data']['kdf'] = $kdf['data']['expand_price'];
-              //  } else {
-               //     $params['searchName'] = "全国统一运费";
-               //     $kdf = $kdmb->find($params);
-              //      $array['data']['kdf'] = $kdf['data']['expand_price'];
-              //  }
                 $month = $model->MonthSale($id);
                 $total = $model->TotalSale($id);
 
@@ -490,8 +469,8 @@ class GoodsController extends ShopController
                             }
                         }
                     }
-                    $array['data']['format_bargain_start_time'] =date('Y-m-d H:i:s', $array['data']['bargain_start_time']);
-                    $array['data']['format_bargain_end_time'] =date('Y-m-d H:i:s', $array['data']['bargain_end_time']);
+                    $array['data']['format_bargain_start_time'] = date('Y-m-d H:i:s', $array['data']['bargain_start_time']);
+                    $array['data']['format_bargain_end_time'] = date('Y-m-d H:i:s', $array['data']['bargain_end_time']);
                     $len = count($array['data']['stock']); //  5
                     $arr_pice = array();
                     for ($i = 0; $i < $len; $i++) {
@@ -499,7 +478,7 @@ class GoodsController extends ShopController
                     }
                     sort($arr_pice);
                     $array['data']['min_price'] = $arr_pice[0];
-                    if($array['data']['is_bargain']==1){
+                    if ($array['data']['is_bargain'] == 1) {
                         $array['data']['min_price'] = $array['data']['bargain_price'];
                     }
 
@@ -515,17 +494,51 @@ class GoodsController extends ShopController
             if (!empty($groupInfo) && $groupInfo['status'] == 200) {
                 $property_arr = json_decode($groupInfo['data']['property'], true);
                 $array['data']['property'] = $property_arr;
-                if($groupInfo['data']['type'] == 1){
-                    if($property_arr){
-                        foreach ($property_arr as $pro_key=>$pro_val){
+                if ($groupInfo['data']['type'] == 1) {
+                    if ($property_arr) {
+                        foreach ($property_arr as $pro_key => $pro_val) {
                             $array['data']['max_group_price'] = max(array_column($pro_val, "price"));
                         }
                     }
-                }else{
+                } else {
                     $array['data']['max_group_price'] = $groupInfo['data']['min_price'];
                 }
                 $array['data']['min_group_price'] = $groupInfo['data']['min_price'];
             }
+            if ($array['status'] == 200) {
+                if ($array['data']['supplier_id'] == 0) {
+                    $array['data']['supplier_name'] = "";
+                } else {
+                    $subUser = new \app\models\merchant\system\UserModel();
+                    $su = $subUser->find(['id' => $array['data']['supplier_id']]);
+                    if ($su['status'] == 200) {
+                        $leader = json_decode($su['data']['leader'], true);
+                        $array['data']['supplier_name'] = $leader['realname'];
+                    } else {
+                        $array['data']['supplier_name'] = "";
+                    }
+
+                }
+            }
+
+            $labelModel = new GoodsLabelModel();
+            $label = $labelModel->do_select(['limit' => false]);
+            if ($label['status'] == 200) {
+                if ($array['data']['label_id'] != "") {
+                    $label_id = array_filter(explode(",", $array['data']['label_id']));
+                    for ($i = 0; $i < count($label['data']); $i++) {
+                        for ($j = 0; $j < count($label_id); $j++) {
+                            if ($label_id[$j] == $label['data'][$i]['id']) {
+                                $array['data']['label_name'][] = $label['data'][$i]['title'];
+                            }
+                        }
+                    }
+                } else {
+                    $array['data']['label_name'] = array();
+                }
+            }
+            $sql = "update  shop_goods set look = look+1 where id = {$id}";
+            Yii::$app->db->createCommand($sql)->execute();
             return $array;
         } else {
             return result(500, "请求方式错误");
@@ -538,7 +551,7 @@ class GoodsController extends ShopController
 
         $time = time();
         $stime = time() + 24 * 3600;
-        $sql = "SELECT * FROM `shop_flash_sale_group` where FIND_IN_SET({$goods_id},goods_ids) and start_time <={$stime} and end_time >={$time};";
+        $sql = "SELECT * FROM `shop_flash_sale_group` where FIND_IN_SET({$goods_id},goods_ids) and start_time <={$stime} and end_time >={$time} and delete_time is null;";
         $res = yii::$app->db->createCommand($sql)->queryAll();
 
         if (count($res) == 0) {
@@ -559,9 +572,11 @@ class GoodsController extends ShopController
     {
         $sql = "select DISTINCT avatar from shop_order_group inner join shop_user on shop_user.id = shop_order_group.user_id inner join shop_order on shop_order.order_group_sn = shop_order_group.order_sn where shop_order.goods_id = {$id} and shop_order_group.status not in  (0,2,8)group by  shop_order.order_group_sn";
         $res = yii::$app->db->createCommand($sql)->queryAll();
-        if(count($res)==0){
-            $sql  = "select avatar from shop_user ORDER BY RAND() limit 7";
-            $res = yii::$app->db->createCommand($sql)->queryAll();
+        if (count($res) < 7) {
+            $a = 7 - count($res);
+            $sql = "select avatar from shop_user ORDER BY RAND() limit {$a}";
+            $res1 = yii::$app->db->createCommand($sql)->queryAll();
+            $res = array_merge($res, $res1);
         }
         return $res;
     }
@@ -790,7 +805,8 @@ class GoodsController extends ShopController
         }
     }
 
-    public function actionBargainInfo(){
+    public function actionBargainInfo()
+    {
         {
             if (yii::$app->request->isGet) {
                 $request = yii::$app->request; //获取 request 对象
@@ -809,8 +825,6 @@ class GoodsController extends ShopController
             }
         }
     }
-
-
 
 
     public function actionQcode()
@@ -918,7 +932,7 @@ class GoodsController extends ShopController
                             $val['avatar'] = $userInfo['data']['avatar'];
                         }
                     }
-                    array_push($list['data'], $leaderInfo['data']);
+                    array_unshift($list['data'], $leaderInfo['data']);
                 } else {
                     $list['data'][] = $leaderInfo['data'];
                 }
@@ -998,6 +1012,54 @@ class GoodsController extends ShopController
                 $res['number'] = $a[0]['number'];
             }
             return $res;
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
+
+    public function actionRecommend()
+    {
+        if (yii::$app->request->isGet) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->get(); //获取地址栏参数
+            $model = new ShopRecommendGoodsModel();
+            $where['key'] = $params['key'];
+            $where['merchant_id'] = yii::$app->session['uid'];
+            $where['supplier_id'] = 0;
+            $info = $model->do_one($where);
+            if ($info['status'] == 200) {
+                $config = json_decode($info['data']['config'], true);
+                $data['centre_show'] = $config['centre_show'];
+                $data['bottom_show'] = $config['bottom_show'];
+                $data['pay_finish_show'] = $config['pay_finish_show'];
+                $idStr = '';
+                for ($i = 0; $i < count($config['goods_ids']); $i++) {
+                    if ($i == 0) {
+                        $idStr .= $config['goods_ids'][$i];
+                    } else {
+                        $idStr .= ',' . $config['goods_ids'][$i];
+                    }
+                }
+
+                $tModel = new TableModel();
+                $sql = "SELECT id,name,pic_urls,price FROM `shop_goods` WHERE id IN ( {$idStr} ) ORDER BY rand() LIMIT 3";
+                $goodsInfo = $tModel->querySql($sql);
+                if (count($goodsInfo)) {
+                    foreach ($goodsInfo as $k => $v) {
+                        $temp['id'] = $v['id'];
+                        $temp['name'] = $v['name'];
+                        $pic = explode(',', $v['pic_urls']);
+                        $temp['pic_urls'] = $pic[0];
+                        $temp['price'] = $v['price'];
+                        $data[] = $temp;
+                    }
+                    return result(200, "请求成功", $data);
+                } else {
+                    return result(500, "查询失败");
+                }
+            } else {
+                return result(500, "查询失败");
+            }
         } else {
             return result(500, "请求方式错误");
         }

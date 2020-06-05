@@ -2,6 +2,7 @@
 
 namespace app\controllers\merchant\shop;
 
+use app\models\tuan\WarehouseModel;
 use Yii;
 use yii\web\MerchantController;
 use app\models\shop\PrintingTempModel;
@@ -186,13 +187,11 @@ ETO;
             //商户信息
             $merchantId = yii::$app->session['uid'];
             $merchantSql = "";
-            $merchantSql .= "SELECT mu.phone AS merchant_name,mu.phone AS merchant_phone";
+            $merchantSql .= "SELECT sai.user_name AS merchant_name,sai.after_phone AS merchant_phone,sai.after_addr AS merchant_addr";
             $merchantSql .= ",saa.NAME AS widget_name,saa.pic_url AS logo";
-            $merchantSql .= ",sai.after_addr AS merchant_addr";
-            $merchantSql .= " FROM `merchant_user` mu";
-            $merchantSql .= " LEFT JOIN system_app_access saa ON saa.merchant_id = mu.id AND saa.`key` = '$key'";
-            $merchantSql .= " LEFT JOIN shop_after_info sai ON sai.merchant_id = mu.id AND sai.`key` = '$key'";
-            $merchantSql .= " WHERE mu.id = '$merchantId'";
+            $merchantSql .= " FROM `shop_after_info` sai";
+            $merchantSql .= " LEFT JOIN system_app_access saa ON saa.merchant_id = sai.merchant_id AND saa.`key` = sai.`key`";
+            $merchantSql .= " WHERE sai.merchant_id = '$merchantId' and sai.`key` = '$key'";
 
             //团长单表格数据,根据商品分组
             $orderSql = "";
@@ -212,7 +211,7 @@ ETO;
             $leaderSql = "";
             $leaderSql .= "SELECT sog.leader_self_uid,sog.leader_uid,sog.express_type";
             $leaderSql .= ",su.nickname as leader_nickname,su.phone as leader_phone,su.city as leader_city";
-            $leaderSql .= ",stl.area_name as leader_area_name,stl.addr as leader_addr,stl.realname as leader_name";
+            $leaderSql .= ",stl.id as tuan_leader_id,stl.area_name as leader_area_name,stl.addr as leader_addr,stl.realname as leader_name";
             $leaderSql .= " FROM `shop_order_group` sog";
             $leaderSql .= " LEFT JOIN shop_user su ON su.id = sog.leader_self_uid";
             $leaderSql .= " LEFT JOIN shop_tuan_leader stl ON stl.uid = sog.leader_self_uid";
@@ -222,8 +221,8 @@ ETO;
             //发货单信息
             $buyerSql = "";
             $buyerSql .= "SELECT su.nickname as buyer_nickname";
-            $buyerSql .= ",suc.name,suc.phone,suc.city as buyer_city,suc.area as buyer_area,suc.address";
-            $buyerSql .= ",sog.order_sn,sog.payment_money,sog.remark,sog.express_type,sog.leader_uid";
+            $buyerSql .= ",suc.city as buyer_city,suc.area as buyer_area,suc.address";
+            $buyerSql .= ",sog.name,sog.phone,sog.order_sn,sog.payment_money,sog.remark,sog.express_type,sog.leader_uid";
             $buyerSql .= ",so.name as goodsname,so.goods_id,CONCAT(so.property1_name,so.property2_name) as property,so.number,so.price";
             $buyerSql .= ",sg.code as goods_code,sg.label,sg.short_name";
             $buyerSql .= ",sp.pay_time";
@@ -262,7 +261,7 @@ ETO;
             try{
                 $orderInfo = $model->querySql($orderSql);
                 $leaderInfo = $model->querySql($leaderSql);
-                $merchantInfo = $merchantModel->querySql($merchantSql);
+                $merchantInfo = $model->querySql($merchantSql);
                 $buyerInfo = $model->querySql($buyerSql);
                 $goodsInfo = $model->querySql($goodsSql);
                 $distributionInfo = $model->querySql($distributionSql);
@@ -349,13 +348,54 @@ ETO;
                         }
                         $dataInfo = $orderInfo;
                         break;
-                    case 'route_sheet':  //路线单
-                        return result(500, "暂无路线单");
+                    case 'leader_route':  //团长路线单
+                        if (count($leaderInfo) <= 0){
+                            return result(500, "订单无团长");
+                        }
+                        $warehouseModel = new WarehouseModel();
+                        $warehouseWhere['limit'] = false;
+                        $warehouseWhere['key'] = $params['key'];
+                        $warehouseWhere['status'] = 1;
+                        $warehouseInfo = $warehouseModel->do_select($warehouseWhere);
+                        if ($warehouseInfo['status'] != 200){
+                            return result(500, "未查询到路线信息");
+                        }
+                        foreach ($warehouseInfo['data'] as $k=>$v){
+                            if ($v['leaders'] != ''){
+                                $result['route'] = $v['name'];
+                                $result['merchant_name'] = $merchantInfo[0]['merchant_name'];
+                                $result['merchant_phone'] = $merchantInfo[0]['merchant_phone'];
+                                $result['widget_name'] = $merchantInfo[0]['widget_name'];
+                                $result['logo'] = $merchantInfo[0]['logo'];
+                                $result['merchant_addr'] = $merchantInfo[0]['merchant_addr'];
+                                $result['table'] = [];
+                                $temp = false;
+                                //当订单中的团长在路线中，才打印此路线单
+                                $leaderIds = json_decode($v['leaders'],true);
+                                foreach ($leaderInfo as $key=>$val){
+                                    foreach ($leaderIds as $lk=>$lv){
+                                        if ($lv == $val['tuan_leader_id']){
+                                            $result['table'][] = $val;
+                                            $temp = true;
+                                        }
+                                    }
+                                }
+                                if ($temp){
+                                    $dataInfo[] = $result;
+                                }
+                            }
+                        }
+                        if (!isset($dataInfo)){
+                            return result(500, "订单中的团长不在任何路线内");
+                        }
+                        break;
+                    case 'warehouse_route':  //仓库路线单
+                        return result(500, "暂无仓库路线单");
                         break;
                     default:
                         return result(500, "模板类型有误");
                 }
-
+//                var_dump($dataInfo);die;
                 foreach ($dataInfo as $datak=>$datav){
                     $tmpHtml = $html;
                     foreach ($keyInfo as $ki=>$kv){

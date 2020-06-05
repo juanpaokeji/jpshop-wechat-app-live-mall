@@ -241,6 +241,7 @@ class StockModel extends TableModel {
             $table = new TableModel();
             $params['delete_time is null'] = null;
             $params['table'] = $this->table;
+            $params['(select id from shop_goods where  shop_goods.id = shop_stock.goods_id) = 1'] = null;
             $res = $table->tableList($params);
             $app = $res['app'];
         } catch (Exception $ex) {

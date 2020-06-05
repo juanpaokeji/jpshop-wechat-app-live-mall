@@ -19,7 +19,8 @@ use app\models\shop\SignPrizeModel;
  * @throws Exception if the model cannot be found
  * @return array
  */
-class SigninController extends MerchantController {
+class SigninController extends MerchantController
+{
 
     public $enableCsrfValidation = false; //禁用CSRF令牌验证，可以在基类中设置
 
@@ -29,7 +30,8 @@ class SigninController extends MerchantController {
      * @return array
      */
 
-    public function actionList() {
+    public function actionList()
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
@@ -50,7 +52,8 @@ class SigninController extends MerchantController {
         }
     }
 
-    public function actionSingle($id) {
+    public function actionSingle($id)
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
@@ -72,7 +75,8 @@ class SigninController extends MerchantController {
         }
     }
 
-    public function actionAdd() {
+    public function actionAdd()
+    {
         if (yii::$app->request->isPost) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
@@ -80,7 +84,7 @@ class SigninController extends MerchantController {
             $base = new Base64Model();
 
             //设置类目 参数
-            $must = ['name', 'pic_url_activity', 'pic_url_sign', 'start_time', 'end_time', 'integral', 'pic_url_sign', 'pic_url_activity'];
+            $must = ['name', 'pic_url_activity', 'start_time', 'end_time', 'integral'];
             $rs = $this->checkInput($must, $params);
             if ($rs != false) {
                 return $rs;
@@ -123,7 +127,7 @@ class SigninController extends MerchantController {
 
             $params['merchant_id'] = yii::$app->session['uid'];
             $array = $model->add($params);
-            if ($array['status'] == 200){
+            if ($array['status'] == 200) {
                 //添加操作记录
                 $operationRecordModel = new OperationRecordModel();
                 $operationRecordData['key'] = $params['`key`'];
@@ -139,7 +143,8 @@ class SigninController extends MerchantController {
         }
     }
 
-    public function actionUpdate($id) {
+    public function actionUpdate($id)
+    {
         if (yii::$app->request->isPut) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
@@ -205,7 +210,7 @@ class SigninController extends MerchantController {
                 return result(500, "缺少参数 id");
             } else {
                 $array = $model->update($params);
-                if ($array['status'] == 200){
+                if ($array['status'] == 200) {
                     //添加操作记录
                     $operationRecordModel = new OperationRecordModel();
                     $operationRecordData['key'] = $params['`key`'];
@@ -222,7 +227,8 @@ class SigninController extends MerchantController {
         }
     }
 
-    public function actionDelete($id) {
+    public function actionDelete($id)
+    {
         if (yii::$app->request->isDelete) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
@@ -242,7 +248,7 @@ class SigninController extends MerchantController {
             } else {
                 $array = $model->delete($params);
             }
-            if ($array['status'] == 200){
+            if ($array['status'] == 200) {
                 //添加操作记录
                 $operationRecordModel = new OperationRecordModel();
                 $operationRecordData['key'] = $params['`key`'];
@@ -258,7 +264,8 @@ class SigninController extends MerchantController {
         }
     }
 
-    public function actionTime() {
+    public function actionTime()
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
@@ -279,7 +286,8 @@ class SigninController extends MerchantController {
         }
     }
 
-    public function actionSign($id) {
+    public function actionSign($id)
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
@@ -338,9 +346,8 @@ class SigninController extends MerchantController {
             $signModel = new SignModel();
             $sign = $signModel->findall(['merchant_id' => yii::$app->session['uid'], 'sign_id' => $id, 'orderby' => 'create_time asc ']);
             $merchant_id = yii::$app->session['uid'];
-            $sql = "select user_id  from shop_sign inner join shop_user on shop_user.id =  shop_sign.user_id where shop_sign.`key` ='{$params['shop_sign.`key`']}' and shop_sign.merchant_id={$merchant_id}  and sign_id = {$id} and  shop_sign.create_time >= {$res['data']['start']} and shop_sign.create_time <= {$res['data']['end']} group by user_id ";
+            $sql = "select user_id  from shop_sign inner join shop_user on shop_user.id =  shop_sign.user_id where shop_sign.`key` ='{$params['shop_sign.`key`']}' and shop_sign.merchant_id={$merchant_id}  and sign_id = {$id} and  shop_sign.create_time >= {$res['data']['start']} and shop_sign.create_time <= {$res['data']['end']}  group by user_id ";
             $user = $table->querySql($sql);
-
             $number = 0;
 
 
@@ -356,24 +363,8 @@ class SigninController extends MerchantController {
                     }
                 }
                 for ($i = 0; $i < count($user); $i++) {
-                    for ($j = 0; $j < count($arr[$i]); $j++) {
-                        if ($j != 0) {
-                            if ($j + 1 < count($arr[$i])) {
-                                if (date('Y-m-d', $arr[$i][$j]['time'] + (1 * 24 * 60 * 60)) == date('Y-m-d', $arr[$i][$j + 1]['time'])) {
-                                    $number = $number + 1;
-                                } else {
-                                    $number = 1;
-                                }
-                            } else if ($j + 1 == count($arr[$i]) && date('Y-m-d', $arr[$i][$j]['time'] - (1 * 24 * 60 * 60)) == date('Y-m-d', $arr[$i][$j - 1]['time'])) {
-                                $number = $number + 1;
-                            } else if ($j + 1 == count($arr[$i]) && date('Y-m-d', $arr[$i][$j]['time'] - (1 * 24 * 60 * 60)) != date('Y-m-d', $arr[$i][$j - 1]['time'])) {
-                                $number = 1;
-                            }
-                        } else {
-                            $number = 1;
-                        }
-                    }
 
+                    $number = $this->prize(yii::$app->session['uid'],$id,$user[$i]['user_id']);
                     $num[$i]['num'] = $number;
                     $num[$i]['user_id'] = $user[$i]['user_id'];
                 }
@@ -400,7 +391,8 @@ class SigninController extends MerchantController {
         }
     }
 
-    public function actionUsers($id) {
+    public function actionUsers($id)
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
@@ -421,6 +413,15 @@ class SigninController extends MerchantController {
             $params['shop_sign.merchant_id'] = yii::$app->session['uid'];
             $array = $model->findall($params);
 
+            $c_params = $params;
+            $c_params['fields'] = ' shop_sign.create_time ';
+            unset($c_params['limit']);
+            unset($c_params['page']);
+            $count_array = $model->findall($c_params);
+            if ($count_array['data']) {
+                $count = count($count_array['data']);
+                $array['count'] = $count;
+            }
 
             //连续签到次数计算
             $table = new TableModel();
@@ -447,24 +448,7 @@ class SigninController extends MerchantController {
                     }
                 }
                 for ($i = 0; $i < count($user); $i++) {
-                    $number = 1;
-                    for ($j = 0; $j < count($arr[$i]); $j++) {
-                        if ($j == 0) {
-                            $number = 1;
-                        } else {
-                            if ($j + 1 < count($arr[$i])) {
-                                if (date('Y-m-d', $arr[$i][$j]['time'] + (1 * 24 * 60 * 60)) == date('Y-m-d', $arr[$i][$j + 1]['time'])) {
-                                    $number = $number + 1;
-                                } else {
-                                    $number = 1;
-                                }
-                            } else if ($j + 1 == count($arr[$i]) && date('Y-m-d', $arr[$i][$j]['time'] - (1 * 24 * 60 * 60)) == date('Y-m-d', $arr[$i][$j - 1]['time'])) {
-                                $number = $number + 1;
-                            } else if ($j + 1 == count($arr[$i]) && date('Y-m-d', $arr[$i][$j]['time'] - (1 * 24 * 60 * 60)) != date('Y-m-d', $arr[$i][$j - 1]['time'])) {
-                                $number = 1;
-                            }
-                        }
-                    }
+                    $number = $this->prize(yii::$app->session['uid'],$id,$user[$i]['user_id']);
                     $num[$i]['num'] = $number;
                     $num[$i]['user_id'] = $user[$i]['user_id'];
                 }
@@ -485,13 +469,17 @@ class SigninController extends MerchantController {
                     }
                 }
             }
+
+
+
             return $array;
         } else {
             return result(500, "请求方式错误");
         }
     }
 
-    public function actionUser($id) {
+    public function actionUser($id)
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
@@ -502,22 +490,33 @@ class SigninController extends MerchantController {
             if ($rs != false) {
                 return $rs;
             }
-            $params['fields'] = " create_time ";
+            $params['fields'] = " shop_sign.create_time";
             $model = new SignModel();
             $params['sign_id'] = $id;
             unset($params['id']);
             $params['`key`'] = $params['key'];
             unset($params['key']);
-            $params['shop_sign.merchant_id'] = yii::$app->session['uid'];
-
+            $params['merchant_id'] = yii::$app->session['uid'];
             $array = $model->findall($params);
+
+
+            $params['fields'] = " give_type,give_value,create_time,update_time";
+            $signPrize = new SignPrizeModel();
+            $data = $signPrize->findall($params);
+
+            if ($data['status'] == 200) {
+                $array['prize'] = $data['data'];
+            } else {
+                $array['prize'] = array();
+            }
             return $array;
         } else {
             return result(500, "请求方式错误");
         }
     }
 
-    public function actionPrize() {
+    public function actionPrize()
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
@@ -541,7 +540,8 @@ class SigninController extends MerchantController {
         }
     }
 
-    public function actionUpdateprize($id) {
+    public function actionUpdateprize($id)
+    {
         if (yii::$app->request->isPut) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
@@ -562,22 +562,31 @@ class SigninController extends MerchantController {
         }
     }
 
-//    public function actionStatus() {
-//        if (yii::$app->request->isPut) {
-//            $request = yii::$app->request; //获取 request 对象
-//            $params = $request->bodyParams; //获取body传参
-//            $model = new UnitModel();
-//            $params['`key`'] = $params['key'];
-//            unset($params['key']);
-//            $params['merchant_id'] = yii::$app->session['uid'];
-//            $params['route'] = "signIn";
-//            $data['status'] = $params['status'];
-//            $params['config'] = json_encode($data);
-//            unset($params['status']);
-//            $array = $model->updateStatus($params);
-//            return $array;
-//        } else {
-//            return result(500, "请求方式错误");
-//        }
-//    }
+    public function prize($merchant_id, $id, $user_id)
+    {
+        $signModel = new SignModel();
+        $res = $signModel->findall(['merchant_id' => $merchant_id, 'user_id' => $user_id, 'sign_id' => $id, 'orderby' => ' create_time asc']);
+        $number = 1;
+        if ($res['status'] != 200) {
+            $number = 0;
+        }
+        if (count($res['data']) == 1) {
+            $number = 1;
+        } else {
+            for ($i = 0; $i < count($res['data']); $i++) {
+                if ($i + 1 < count($res['data'])) {
+                    if (date('Y-m-d', $res['data'][$i]['time'] + (1 * 24 * 60 * 60)) == date('Y-m-d', $res['data'][$i + 1]['time'])) {
+                        $number = $number + 1;
+                    } else {
+                        $number = 1;
+                    }
+                } else if ($i == count($res['data']) && date('Y-m-d', $res['data'][$i]['time'] - (1 * 24 * 60 * 60)) == date('Y-m-d', $res['data'][$i - 1]['time'])) {
+                    $number = $number + 1;
+                } else if ($i == count($res['data']) && date('Y-m-d', $res['data'][$i]['time'] - (1 * 24 * 60 * 60)) != date('Y-m-d', $res['data'][$i - 1]['time'])) {
+                    $number = 1;
+                }
+            }
+        }
+        return $number;
+    }
 }

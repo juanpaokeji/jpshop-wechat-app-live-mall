@@ -4,6 +4,7 @@ namespace app\controllers\merchant\spike;
 
 use app\models\merchant\app\AppAccessModel;
 use app\models\merchant\system\OperationRecordModel;
+use app\models\shop\SaleGoodsModel;
 use yii;
 use yii\web\MerchantController;
 use app\models\spike\FlashSaleModel;
@@ -11,7 +12,8 @@ use app\models\core\Base64Model;
 use app\models\core\CosModel;
 use app\models\spike\FlashSaleGroupModel;
 
-class FlashsaleController extends MerchantController {
+class FlashsaleController extends MerchantController
+{
 
     public $enableCsrfValidation = false; //禁用CSRF令牌验证，可以在基类中设置
 
@@ -25,7 +27,8 @@ class FlashsaleController extends MerchantController {
 //        ];
 //    }
 
-    public function actionList() {
+    public function actionList()
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数          
@@ -62,8 +65,8 @@ class FlashsaleController extends MerchantController {
             }
             for ($i = 0; $i < count($group['data']); $i++) {
                 $model = new FlashSaleModel();
-                $array = $model->do_select(['flash_sale_group_id' => $group['data'][$i]['id']]);
-                if ($array['status'] != 200){
+                $array = $model->do_select(['flash_sale_group_id' => $group['data'][$i]['id'],'limit'=>100]);
+                if ($array['status'] != 200) {
                     $array['data'] = array();
                 }
 //                if ($array['status'] == 200) {
@@ -88,27 +91,28 @@ class FlashsaleController extends MerchantController {
                 $group['data'][$i]['send_time'] = date('Y-m-d H:i:s', $group['data'][$i]['send_time']);
 
                 for ($j = 0; $j < count($array['data']); $j++) {
-                    $saleGoodsModel = new \app\models\shop\SaleGoodsModel();
-                    $goods = $saleGoodsModel->do_one(['id' => $array['data'][$j]['goods_id'], 'key' => $params['key'], 'merchant_id' => yii::$app->session['uid']]);
-                    //   $group['data'][$i]['sale'] = $goods['data'];
+                    $shop_flash_saleModel = new FlashSaleModel();
+                    $goods = $shop_flash_saleModel->do_one(['goods_id' => $array['data'][$j]['goods_id'], 'key' => $params['key'], 'merchant_id' => yii::$app->session['uid']]);
+
                     if ($goods['status'] != 200) {
                         return result(500, "系统错误！");
                     }
-                    $pic = explode(",", $goods['data']['pic_urls']);
+
                     //copy_id 暂时不需要
-                    $group['data'][$i]['sale'][$j]['copy_id'] = $goods['data']['id'];
-                    $group['data'][$i]['sale'][$j]['goods_id'] = $goods['data']['id'];
-                    $group['data'][$i]['sale'][$j]['pic_urls'] = $pic[0];
-                    $group['data'][$i]['sale'][$j]['name'] = $goods['data']['name'];
-                    $group['data'][$i]['sale'][$j]['stocks'] = $goods['data']['stocks'];
-                    $group['data'][$i]['sale'][$j]['is_top'] = $goods['data']['is_top'];
-                    $group['data'][$i]['sale'][$j]['property'] = $array['data'][$j]['property'];
+                    //$group['data'][$i]['goods_list'][$j]['copy_id'] = $goods['data']['id'];
+                    $group['data'][$i]['goods_list'][$j]['goods_id'] = $goods['data']['goods_id'];
+                    $group['data'][$i]['goods_list'][$j]['pic_urls'] = $goods['data']['pic_url'];
+                    $group['data'][$i]['goods_list'][$j]['name'] = $goods['data']['name'];
+                    $group['data'][$i]['goods_list'][$j]['flash_number'] = $goods['data']['stocks'];
+                    $group['data'][$i]['goods_list'][$j]['is_top'] = $goods['data']['is_top'];
+                    $group['data'][$i]['goods_list'][$j]['line_price'] = $goods['data']['line_price'];
+                    $group['data'][$i]['goods_list'][$j]['property'] = $array['data'][$j]['property'];
                     $property = explode("-", $array['data'][$j]['property']);
                     $propertys = array();
                     for ($k = 0; $k < count($property); $k++) {
                         $propertys[] = json_decode($property[$k], true);
                     }
-                    $group['data'][$i]['sale'][$j]['property'] = $propertys;
+                    $group['data'][$i]['goods_list'][$j]['property'] = $propertys;
                 }
             }
 
@@ -139,7 +143,8 @@ class FlashsaleController extends MerchantController {
 //        }
 //    }
 
-    public function actionAdd() {
+    public function actionAdd()
+    {
         if (yii::$app->request->isPost) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
@@ -163,7 +168,7 @@ class FlashsaleController extends MerchantController {
                 'send_time' => strtotime($params['send_time']),
                 'status' => 1,
             );
-
+            $str= "";
             for ($i = 0; $i < count($params['goods_list']); $i++) {
                 if ($i == 0) {
                     $str = $params['goods_list'][$i]['id'];
@@ -176,9 +181,25 @@ class FlashsaleController extends MerchantController {
                 return result(500, "请选择商品");
             }
 
+            $sql = "SELECT id FROM shop_goods WHERE id IN ({$str}) AND (is_open_assemble = 1 OR is_bargain = 1)";
+            $res = Yii::$app->db->createCommand($sql)->queryAll();
+            if (count($res) > 0){
+                $goodsIdStr = "";
+                for ($i = 0; $i < count($res); $i++) {
+                    if ($i == 0) {
+                        $goodsIdStr = $res[$i]['id'];
+                    } else {
+                        $goodsIdStr = $goodsIdStr . "," . $res[$i]['id'];
+                    }
+                }
+                return result(500, "ID为{$goodsIdStr}的商品，已开启拼团或砍价活动");
+            }
+
             try {
                 $model->begin();
                 $group_id = $model->do_add($groupData);
+                $sql = "update shop_goods  set is_flash_sale  =1 where id in({$groupData['goods_ids']})";
+                Yii::$app->db->createCommand($sql)->execute();
                 if ($group_id == false) {
                     throw new yii\db\Exception('新增失败');
                 }
@@ -198,7 +219,7 @@ class FlashsaleController extends MerchantController {
                             'stocks' => $params['goods_list'][$i]['flash_number'][$j],
                             'flash_price' => $params['goods_list'][$i]['flash_price'][$j],
                             'stock_id' => $params['goods_list'][$i]['flash_id'][$j],
-                                ), JSON_UNESCAPED_UNICODE);
+                        ), JSON_UNESCAPED_UNICODE);
                         if ($j == 0) {
                             $property = $str;
                         } else {
@@ -213,6 +234,7 @@ class FlashsaleController extends MerchantController {
                         'is_top' => $params['goods_list'][$i]['is_top'],
                         'goods_id' => $params['goods_list'][$i]['id'],
                         'flash_sale_group_id' => $group_id['data'],
+                        'line_price' => $params['goods_list'][$i]['line_price'],
                         'property' => $property,
                         'pic_url' => $params['goods_list'][$i]['pic_url'],
                         'flash_price' => $flash_price,
@@ -225,7 +247,7 @@ class FlashsaleController extends MerchantController {
                     }
                 }
 
-                if ($group_id['status'] == 200){
+                if ($group_id['status'] == 200) {
                     //添加操作记录
                     $operationRecordModel = new OperationRecordModel();
                     $operationRecordData['key'] = $params['key'];
@@ -248,7 +270,8 @@ class FlashsaleController extends MerchantController {
         }
     }
 
-    public function actionUpdate($id) {
+    public function actionUpdate($id)
+    {
         if (yii::$app->request->isPut) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
@@ -285,11 +308,36 @@ class FlashsaleController extends MerchantController {
                 return result(500, "请选择商品");
             }
 
+            $sql = "SELECT id FROM shop_goods WHERE id IN ({$str}) AND (is_open_assemble = 1 OR is_bargain = 1)";
+            $res = Yii::$app->db->createCommand($sql)->queryAll();
+            if (count($res) > 0){
+                $goodsIdStr = "";
+                for ($i = 0; $i < count($res); $i++) {
+                    if ($i == 0) {
+                        $goodsIdStr = $res[$i]['id'];
+                    } else {
+                        $goodsIdStr = $goodsIdStr . "," . $res[$i]['id'];
+                    }
+                }
+                return result(500, "ID为{$goodsIdStr}的商品，已开启拼团或砍价活动");
+            }
+
             try {
                 $model->begin();
+
+                $group = $model->do_one(['id'=>$id]);
+                if ($group['status'] == 200) {
+                    if ($group['data']['goods_ids'] != "") {
+                        $sql = "update shop_goods set is_flash_sale = 0 where id in ({$group['data']['goods_ids'] })";
+                        Yii::$app->db->createCommand($sql)->execute();
+                    }
+                }
+
                 $group_id = $model->do_update(['id' => $id], $groupData);
                 $saleModel = new FlashSaleModel();
                 $sale_id = $saleModel->do_delete(['flash_sale_group_id' => $id]);
+                $sql = "update shop_goods  set is_flash_sale  =1 where id in({$groupData['goods_ids']})";
+                $res = Yii::$app->db->createCommand($sql)->execute();
                 if ($group_id == false) {
                     throw new yii\db\Exception('更新失败');
                 }
@@ -309,7 +357,7 @@ class FlashsaleController extends MerchantController {
                             'flash_price' => $params['goods_list'][$i]['flash_price'][$j],
                             'flash_original_price' => $params['goods_list'][$i]['flash_original_price'][$j],
                             'stock_id' => $params['goods_list'][$i]['flash_id'][$j],
-                                ), JSON_UNESCAPED_UNICODE);
+                        ), JSON_UNESCAPED_UNICODE);
                         if ($j == 0) {
                             $property = $str;
                         } else {
@@ -323,6 +371,7 @@ class FlashsaleController extends MerchantController {
                         'name' => $params['goods_list'][$i]['name'],
                         'is_top' => $params['goods_list'][$i]['is_top'],
                         'goods_id' => $params['goods_list'][$i]['id'],
+                        'line_price' => $params['goods_list'][$i]['line_price'],
                         'flash_sale_group_id' => $id,
                         'property' => $property,
                         'pic_url' => $params['goods_list'][$i]['pic_url'],
@@ -357,13 +406,30 @@ class FlashsaleController extends MerchantController {
         }
     }
 
-    public function actionDelete($id) {
+    public function actionDelete($id)
+    {
         if (yii::$app->request->isDelete) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
             $model = new FlashSaleModel();
+            $groupModel = new FlashSaleGroupModel();
             $params['id'] = $id;
-            $array = $model->do_delete($params);
+            $group = $groupModel->do_one(['id' => $id]);
+            if ($group['status'] == 200) {
+
+                $goods = explode(',', $group['data']['goods_ids']);
+                $saleGoods = new SaleGoodsModel();
+                $saleGoods->do_update(['id'=>$goods],['is_flash_sale'=>0]);
+            }
+            $group = $model->do_one(['id'=>$id]);
+            if ($group['status'] == 200) {
+                if ($group['data']['goods_ids'] != "") {
+                    $sql = "update shop_goods set is_flash_sale = 0 where id in ({$group['data']['goods_ids'] })";
+                    Yii::$app->db->createCommand($sql)->execute();
+                }
+            }
+            $array = $groupModel->do_delete(['id' => $id]);
+            $array = $model->do_delete(['flash_sale_group_id' => $id]);
             return $array;
         } else {
             return result(500, "请求方式错误");
@@ -376,7 +442,8 @@ class FlashsaleController extends MerchantController {
      * @params ids  json 串 ["11","12"]
      * @return array
      */
-    public function actionUpdateshopflashsale() {
+    public function actionUpdateshopflashsale()
+    {
         if (yii::$app->request->isPut) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
@@ -424,7 +491,8 @@ class FlashsaleController extends MerchantController {
         }
     }
 
-    public function actionConfiglist() {
+    public function actionConfiglist()
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
@@ -437,10 +505,10 @@ class FlashsaleController extends MerchantController {
             $params['merchant_id'] = yii::$app->session['uid'];
             $appAccessModel = new AppAccessModel();
             $appAccessInfo = $appAccessModel->find(['`key`' => $params['key'], 'merchant_id' => yii::$app->session['uid']]);
-            if ($appAccessInfo['status'] == 200){
+            if ($appAccessInfo['status'] == 200) {
                 $array['id'] = $appAccessInfo['data']['id'];
                 $array['is_open'] = $appAccessInfo['data']['spike'];
-                return result(200, "请求成功",$array);
+                return result(200, "请求成功", $array);
             } else {
                 return $appAccessInfo;
             }
@@ -450,7 +518,8 @@ class FlashsaleController extends MerchantController {
     }
 
     //秒杀开关
-    public function actionConfig($id) {
+    public function actionConfig($id)
+    {
         if (yii::$app->request->isPut) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
@@ -465,7 +534,7 @@ class FlashsaleController extends MerchantController {
             $where['merchant_id'] = yii::$app->session['uid'];
             $where['spike'] = $params['is_open'];
             $res = $appAccessModel->update($where);
-            if ($res['status'] == 200){
+            if ($res['status'] == 200) {
                 //添加操作记录
                 $operationRecordModel = new OperationRecordModel();
                 $operationRecordData['key'] = $params['key'];

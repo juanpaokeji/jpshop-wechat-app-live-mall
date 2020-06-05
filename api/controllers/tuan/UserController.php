@@ -28,11 +28,13 @@ class UserController extends ShopController
 {
 
     public $enableCsrfValidation = false; //禁用CSRF令牌验证，可以在基类中设置
+
     /**
      * 地址:/admin/group/index 默认访问
      * @throws Exception if the model cannot be found
      * @return array
      */
+
 
     public function actionList()
     {
@@ -45,16 +47,6 @@ class UserController extends ShopController
             $params['latitude'] = (float)$params['latitude'];
             $params['longitude'] = (float)$params['longitude'];
 
-            if (isset($params['name'])) {
-                if (empty($params['name'])) {
-                    $where = '';
-                } else {
-                    $where = '  `area_name` like "%' . $params['name'] . '%" and ';
-                }
-            } else {
-                $where = '';
-            }
-
 
             $configModel = new ConfigModel();
             $res = $configModel->do_one(['merchant_id' => $params['merchant_id'], 'key' => yii::$app->session['key']]);
@@ -65,42 +57,69 @@ class UserController extends ShopController
             if ($res['status'] == 500) {
                 return result(500, '请求失败！');
             }
-            // $res['data']['leader_range'] = 100000000000; //测试使用
+
             //校验商户是否关闭合伙人设置
             $app = new \app\models\merchant\app\AppAccessModel();
             $info = $app->find(['key' => Yii::$app->session['key'], 'open_partner' => 1]);
             $partner = 0;
-            if($info['status'] == 200){
+            if ($info['status'] == 200) {
                 $partner = 1;
             }
-            $sql = "SELECT "
-                . " *, ("
-                . " 6371 * acos("
-                . " cos(radians({$params['latitude']})) * cos(radians(latitude)) * cos("
-                . " radians(longitude) - radians({$params['longitude']})"
-                . " ) + sin(radians({$params['latitude']})) * sin(radians(latitude))"
-                . " )"
-                . " ) AS juli "
-                . " FROM"
-                . " shop_tuan_leader"
-                . " HAVING"
-                . " juli < {$res['data']['leader_range']} and `key` = '{$params['key']}' and merchant_id = {$params['merchant_id']} and state = 0  and status =1";
-            if($partner && isset($params['partner_id']) && !empty($params['partner_id'])){
-                $sql .= " and partner_id = {$params['partner_id']}";
+
+            $data = array();
+            if ($partner && isset($params['partner_id']) && !empty($params['partner_id'])) {
+                $data['partner_id'] = $params['partner_id'];
             }
-            $sql .= " order by juli asc ";
-            $res = yii::$app->db->createCommand($sql)->queryAll();
-            if (empty($res)) {
-                return result(204, '查询失败');
-            } else {
-                foreach ($res as $k => $v) {
-                    $res[$k]['avatar'] = ShopUserModel::instance()->get_value2(['id' => $v['uid']], 'avatar') ?? '';
-                    $res[$k]['juli'] = round($v['juli'], 3);
+            if (isset($params['name'])) {
+                if (!empty($params['name'])) {
+                    $data['area_name'] = ['like', "{$params['name']}"];
+                }
+            }
+            $data['supplier_id'] = 0;
+            $leaderModel = new LeaderModel();
+            $data['status'] = 1;
+            $data['state'] = 0;
+            $data['limit'] = false;
+            $leader = $leaderModel->do_select($data);
+            $str = "";
+            for ($i = 0; $i < count($leader['data']); $i++) {
+                //https://restapi.amap.com/v3/distance?origins=116.481028,39.989643|114.481028,39.989643|115.481028,39.989643&destination=114.465302,40.004717&output=xml&key=<用户的key>
+                if ($i == 0) {
+                    $str = $leader['data'][$i]['longitude'] . "," . $leader['data'][$i]['latitude'];
+                } else {
+                    $str = $str . "|" . $leader['data'][$i]['longitude'] . "," . $leader['data'][$i]['latitude'];
+                }
+            }
+            $str = str_replace(";","|",bd_amap($str)); //将百度坐标转为高德坐标
+            $url = "https://restapi.amap.com/v3/distance?origins=" . $str . "&destination=" . $params['longitude'] . "," . $params['latitude'] . "&type=0&output=json&key=bc55956766e813d3deb1f95e45e97d73";
+            $map = json_decode(curlGet($url), true);
+            if ($map['status'] != 1) {
+                return result(500, '距离计算错误');
+            }
+            for ($i = 0; $i < count($leader['data']); $i++) {
+                $leader['data'][$i]['avatar'] = ShopUserModel::instance()->get_value2(['id' => $leader['data'][$i]['uid']], 'avatar') ?? '';
+                $leader['data'][$i]['juli'] = $map['results'][$i]['distance']/1000;
+                if($leader['data'][$i]['juli']>$res['data']['leader_range']){
+                    unset($leader['data'][$i]);
                 }
 
-                return ['status' => 200, 'message' => '请求成功', 'data' => $res];
             }
-            return $res;
+            $leader['data'] = array_values($leader['data']);
+            // 定义一个随机的数组
+
+            // 第一层可以理解为从数组中键为0开始循环到最后一个
+            for ($i = 0; $i < count($leader['data']); $i++) {
+                // 第二层为从$i+1的地方循环到数组最后
+                for ($j = $i + 1; $j < count($leader['data']); $j++) {
+                    // 比较数组中两个相邻值的大小
+                    if ($leader['data'][$i]['juli'] > $leader['data'][$j]['juli']) {
+                        $tem = $leader['data'][$i]; // 这里临时变量，存贮$i的值
+                        $leader['data'][$i] = $leader['data'][$j]; // 第一次更换位置
+                        $leader['data'][$j] = $tem; // 完成位置互换
+                    }
+                }
+            }
+            return $leader;
         } else {
             return result(500, "请求方式错误");
         }
@@ -172,51 +191,10 @@ class UserController extends ShopController
                 if ($user['status'] != 200) {
                     return result(500, "请求失败");
                 }
-//                if ($user['data']['phone'] == "") {
-//                    if (!isset($params['phone']) && !isset($params['vercode'])) {
-//                        return result(500, "请填写手机号和验证码");
-//                    } else {
-//                        $smsmodel = new SystemSmsAccessModel();
-//                        $data['phone'] = $params['phone'];
-//                        $rs = $smsmodel->find($data['phone']);
-//
-//                        if ($rs['status'] != 200) {
-//                            return result(500, "未查询到验证码!");
-//                        }
-//                        if ($rs['data']['code'] != $params['vercode']) {
-//                            return result(500, "验证码不正确!");
-//                        }
-//                        unset($params['vercode']);
-//                    }
-//                } else {
-//                    if ($user['data']['phone'] != $params['phone']) {
-//                        return result(500, "您填写的手机号与原手机号不相同");
-//                    }
-//                }
                 $must = array();
                 if (isset($params['is_self'])) {
-//                    if ($params['is_self'] == true || $params['is_self'] == 'true') {
-//                        $params['is_self'] = 1;
-//                    } else {
-//                        $params['is_self'] = 0;
-//                    }
                     if ($params['is_self'] == 1) {
                         $must = ['area_name', 'province_code', 'city_code', 'area_code', 'addr', 'longitude', 'latitude', 'realname'];
-//                        $url = "https://restapi.amap.com/v3/geocode/regeo?output=json&location={$params['longitude']},{$params['latitude']}&key=bc55956766e813d3deb1f95e45e97d73&poitype=&radius=1000&extensions=all&batch=true&roadlevel=0";
-//
-//                        $address = json_decode(curlGet($url), true);
-//
-//                        if ($address['status'] == 0) {
-//                            return result(500, $address['info']);
-//                        }
-//
-//                        $systemArea = new SystemAreaModel();
-//                        $province = $systemArea->do_one(['name' => $address['regeocodes'][0]['addressComponent']['province']]);
-//                        $params['province_code'] = $province['data']['code'];
-//                        $city = $systemArea->do_one(['name' => $address['regeocodes'][0]['addressComponent']['city']]);
-//                        $params['city_code'] = $city['data']['code'];
-//                        $area = $systemArea->do_one(['name' => $address['regeocodes'][0]['addressComponent']['district']]);
-//                        $params['area_code'] = $area['data']['code'];
                     } else {
                         $must = ['province_code', 'city_code', 'area_code', 'realname'];
                     }
@@ -239,7 +217,7 @@ class UserController extends ShopController
                 try {
                     $model->begin();
                     $userModel->update(['id' => yii::$app->session['user_id'], 'phone' => $params['phone'], '`key`' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['merchant_id']]);
-                    unset($params['phone']);
+                    //unset($params['phone']);
                     unset($params['user_id']);
                     unset($params['vercode']);
                     $params['status'] = 0;
@@ -253,12 +231,12 @@ class UserController extends ShopController
                     $app = new AppAccessModel();
                     $params['partner_id'] = 0;
                     $info = $app->find(['key' => $params['key'], 'open_partner' => 1]);
-                    if($info['status'] == 200){
+                    if ($info['status'] == 200) {
                         //查询合伙人id
                         $partnerModel = new PartnerUserModel();
                         $result = $partnerModel->getAddrGD($params['longitude'] . ',' . $params['latitude'], 1);
-                        $partnerInfo = $partnerModel->one(['adcode'=>$result]);
-                        if($partnerInfo['status'] == 200){
+                        $partnerInfo = $partnerModel->one(['adcode' => $result]);
+                        if ($partnerInfo['status'] == 200) {
                             $params['partner_id'] = $partnerInfo['data']['id'];
                         }
                     }
@@ -319,25 +297,26 @@ class UserController extends ShopController
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
-
+            $s_time = strtotime(date('Y-m-d'), time());
+            $e_time = time();
             $orderModel = new \app\models\shop\OrderModel();
-            $sql = "select count(*)as number  from shop_order_group where is_tuan =1 and leader_uid = " . yii::$app->session['user_id'] . " and create_time <=" . time() . "";
+            $sql = "select count(*)as number  from shop_order_group where is_tuan =1 and leader_uid = " . yii::$app->session['user_id'] . " and create_time >=" . $s_time . " and create_time <= " . $e_time . ";";
             $res = $orderModel->querySql($sql);
             $array['data']['orderCount'] = $res[0]['number'];
 
-            $sql = "select count(*)as number  from shop_order_group where is_tuan =1 and leader_uid = " . yii::$app->session['user_id'] . " and status = 1 and create_time <=" . time() . "";
+            $sql = "select count(*)as number  from shop_order_group where is_tuan =1 and leader_uid = " . yii::$app->session['user_id'] . " and create_time >=" . $s_time . " and create_time <= " . $e_time . ";";
             $res = $orderModel->querySql($sql);
             $array['data']['orderValid'] = $res[0]['number'];
 
-            $sql = "select count(*)as number  from shop_order_group where is_tuan =1 and leader_uid = " . yii::$app->session['user_id'] . " and status = 1 group by user_id and create_time <=" . time() . "";
+            $sql = "select count(*)as number  from shop_order_group where is_tuan =1 and leader_uid = " . yii::$app->session['user_id'] . " and create_time >=" . $s_time . " and create_time <= " . $e_time . ";";
             $res = $orderModel->querySql($sql);
             $array['data']['orderUser'] = count($res) == 0 ? 0 : $res[0]['number'];
 
-            $sql = "select sum(money)as number  from shop_user_balance where uid = " . yii::$app->session['user_id'] . " and type = 1 and create_time <=" . time() . "";
+            $sql = "select sum(money)as number  from shop_user_balance where (type=1 or type=6) and uid = " . yii::$app->session['user_id'] . " and create_time >=" . $s_time . " and create_time <= " . $e_time . ";";
             $res = $orderModel->querySql($sql);
             $array['data']['orderBalance'] = count($res) == 0 ? 0 : $res[0]['number'];
 
-            $sql = "select * from shop_user where id = " . yii::$app->session['user_id'] . "";
+            $sql = "select * from shop_user where id = " . yii::$app->session['user_id'] . ";";
             $res = $orderModel->querySql($sql);
             $array['userMoney'] = $res[0]['balance'];
             $array['status'] = 200;
@@ -727,69 +706,36 @@ class UserController extends ShopController
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
-//            $must = ['latitude', 'longitude'];
-//            $rs = $this->checkInput($must, $params);
-//            if ($rs != false) {
-//                return json_encode($rs, JSON_UNESCAPED_UNICODE);
-//            }
-//
-//            $params['latitude'] = (float) $params['latitude'];
-//            $params['longitude'] = (float) $params['longitude'];
-//            $data['user_id'] = yii::$app->session['user_id'];
-//            $data['merchant_id'] = yii::$app->session['merchant_id'];
-//            $data['`key`'] = yii::$app->session['key'];
-//            $data['leader_self_uid!=0'] = null;
-//            $orderModel = new \app\models\shop\OrderModel();
-//            $order = $orderModel->select($data);
-//
-//            if ($order['status'] != 200) {
-//                return $order;
-//            }
-//
-//            $configModel = new ConfigModel();
-//            $res = $configModel->do_one(['merchant_id' => $data['merchant_id'], 'key' => yii::$app->session['key']]);
-//
-//            if ($res['status'] == 204) {
-//                return result(500, '商户未配置团购信息！');
-//            }
-//            if ($res['status'] == 500) {
-//                return result(500, '请求失败！');
-//            }
-//            //  $res['data']['leader_range'] = 100000000000; //测试使用
-//            $sql = "select * from (SELECT*, ROUND(6378.138 * 2 * ASIN(	SQRT(POW(SIN(({$params['latitude']} * PI() / 180 - latitude * PI() / 180) / 2),2) + COS({$params['longitude']} * PI() / 180) * COS(latitude * PI() / 180) * POW(" .
-//                    "SIN(({$params['longitude']} * PI() / 180 - longitude * PI() / 180) / 2),2))) * 1000) AS juli FROM shop_tuan_leader where  merchant_id = {$data['merchant_id']} and `key` = '{$data['`key`']}' and status = 1 and is_self = 1 and uid = {$order['data']['leader_self_uid']}) " . "stl where juli <={$res['data']['leader_range']}   ORDER BY juli desc";
-//
-////            $sql = "select * from shop_tuan_leader ";
-//            $res = yii::$app->db->createCommand($sql)->queryAll();
 
-            //if (count($res) > 0) {
 
             $userModel = new \app\models\shop\UserModel();
-           // $user = $userModel->find(['id' => yii::$app->session['user_id']]);
-
-            $orderModel = new GroupOrderModel();
-            $order = $orderModel->one(['user_id'=> yii::$app->session['user_id']]);
+            $data = $userModel->find(['id' => yii::$app->session['user_id']]);
 
             $leaderModel = new LeaderModel();
-            $leader = $leaderModel->do_one(['key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['merchant_id'], 'uid' => $order['data']['leader_self_uid']]);
+            $leader = $leaderModel->do_one(['key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['merchant_id'], 'uid' => $data['data']['leader_uid']]);
 
-            //var_dump($leader);die();
-
-
-            $data = $userModel->find(['id' => $order['data']['leader_self_uid']]);
             if ($leader['status'] == 200) {
+                $data = $userModel->find(['id' => $data['data']['leader_uid']]);
                 $leader['data']['avatar'] = $data['data']['avatar'];
             }
+
+            $sql = "select count(id) as num  from shop_order_group where leader_uid = {$data['data']['leader_uid']} group by user_id ";
+            $res = $userModel->querySql($sql);
+            $leader['data']['fans'] =$res[0]['num'];
+
+            $sql = "select sum(payment_money) as num  from shop_order_group where leader_uid = {$data['data']['leader_uid']}";
+            $res = $userModel->querySql($sql);
+            $leader['data']['leader_money'] =floor($res[0]['num']*10);
+
             return $leader;
-//            } else {
-//                return result(204, "查询失败");
-//            }
+
         } else {
             return result(500, "请求方式错误");
         }
     }
 
-    public function actionSupplier(){
+    public function actionSupplier()
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
@@ -807,11 +753,11 @@ class UserController extends ShopController
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
-           $userModel = new \app\models\shop\UserModel();
+            $userModel = new \app\models\shop\UserModel();
 //            $user = $userModel->find(['id' => $id]);
 
             $leaderModel = new LeaderModel();
-            $leader = $leaderModel->do_one(['key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['merchant_id'], 'uid' =>$id]);
+            $leader = $leaderModel->do_one(['key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['merchant_id'], 'uid' => $id]);
             $data = $userModel->find(['id' => $id]);
             if ($leader['status'] == 200) {
                 $leader['data']['avatar'] = $data['data']['avatar'];
@@ -823,6 +769,7 @@ class UserController extends ShopController
         }
     }
 
+
     public function actionUpdate($id)
     {
         if (yii::$app->request->isPut) {
@@ -831,16 +778,16 @@ class UserController extends ShopController
             $model = new \app\models\shop\UserModel();
             $userId = yii::$app->session['user_id'];
             //当前登录用户信息
-            $userInfo = $model->find(['id'=>$userId]);
-            if ($userInfo['status'] != 200){
+            $userInfo = $model->find(['id' => $userId]);
+            if ($userInfo['status'] != 200) {
                 return $userInfo;
             }
-            if (!empty($userInfo['data']['parent_id']) && $userInfo['data']['leader_uid'] != 0){
+            if (!empty($userInfo['data']['parent_id']) && $userInfo['data']['leader_uid'] != 0) {
                 return result(500, "该用户已被推荐过");
             }
             //推荐人信息
-            $parentInfo = $model->find(['id'=>$params['id']]);
-            if ($parentInfo['status'] != 200){
+            $parentInfo = $model->find(['id' => $params['id']]);
+            if ($parentInfo['status'] != 200) {
                 return $parentInfo;
             }
             //查询当前被推荐用户以前是否推荐过别人
@@ -849,83 +796,84 @@ class UserController extends ShopController
             $userWhere['parent_id'] = $userId;
             $res = $model->findall($userWhere);
             //不能推荐自己，超级会员以上才能进行推广,当前被推荐人以前未被推荐过,当前被推荐人以前未推荐过别人
-            if ($params['id'] != $userId && $parentInfo['data']['level'] >= 1 && empty($userInfo['data']['parent_id']) && $res['status'] == 204){
+            if ($params['id'] != null && $params['id'] != $userId && $parentInfo['data']['level'] >= 1 && empty($userInfo['data']['parent_id']) && $res['status'] == 204) {
                 //上三级父节点url
                 $data['parent_url'] = '/' . $params['id'] . '/';
-                if (!empty($parentInfo['data']['parent_url'])){
-                    $parentUrl = explode('/',trim($parentInfo['data']['parent_url'],'/'));
+                if (!empty($parentInfo['data']['parent_url'])) {
+                    $parentUrl = explode('/', trim($parentInfo['data']['parent_url'], '/'));
                     $data['parent_url'] .= $parentUrl[0] . '/';
-                    if (isset($parentUrl[1])){
+                    if (isset($parentUrl[1])) {
                         $data['parent_url'] .= $parentUrl[1] . '/';
                     }
-                    if (isset($parentUrl[2])){
+                    if (isset($parentUrl[2])) {
                         $data['parent_url'] .= $parentUrl[2] . '/';
                     }
                 }
                 $data['parent_id'] = $params['id'];
-            }
 
+            }
             $data['id'] = $userId;
             $data['`key`'] = yii::$app->session['key'];
             $data['leader_uid'] = $id;
 
             $array = $model->update($data);
-
             $appAccessModel = new AppAccessModel();
-            $appInfo = $appAccessModel->find(['key'=>$userId]);
+            $appInfo = $appAccessModel->find(['key' => yii::$app->session['key']]);
             //不能推荐自己，超级会员以上才能进行推广,当前登陆用户以前未被推荐过,当前登陆用户以前未推荐过别人
-            if ($params['id'] != $userId && $array['status'] == 200 && $parentInfo['data']['level'] >= 1 && empty($userInfo['data']['parent_id']) && $res['status'] == 204){
+            if ($params['id'] != null && $params['id'] != $userId && $array['status'] == 200 && $parentInfo['data']['level'] >= 1 && empty($userInfo['data']['parent_id']) && $res['status'] == 204) {
                 //推荐完，查询父级是否可以升级，并修改信息,判断是否开启手动升级审核
-                $parentLev = $this->getLevel($params['id'],1);
-                if ($parentLev['up_level'] > $parentLev['level'] || ($parentLev['up_level'] == $parentLev['level'] && $parentLev['up_level_id'] != $parentLev['level_id'])){ //需要升级的等级比实际等级高
-                    $parentData['id'] = $params['id'];
-                    $parentData['`key`'] = yii::$app->session['key'];
+                $parentLev = $this->getLevel($params['id'], 1);
+                $parentData['id'] = $params['id'];
+                $parentData['`key`'] = yii::$app->session['key'];
+                $parentData['fan_number'] = $parentLev['fan_number'];
+                if ($parentLev['up_level'] > $parentLev['level'] || ($parentLev['up_level'] == $parentLev['level'] && $parentLev['up_level_id'] != $parentLev['level_id'])) { //需要升级的等级比实际等级高
                     $parentData['up_level'] = $parentLev['up_level'];
                     $parentData['up_level_id'] = $parentLev['up_level_id'];
-                    $parentData['fan_number'] = $parentLev['fan_number'];
-                    if ($appInfo['status'] == 200 && $appInfo['data']['distribution_is_open'] == 0){
+                    $parentData['reg_time'] = time();
+                    if ($appInfo['status'] == 200 && $appInfo['data']['distribution_is_open'] == 0) {
                         $parentData['level'] = $parentLev['up_level'];
                         $parentData['level_id'] = $parentLev['up_level_id'];
-                    }else{
+                    } else {
                         $parentData['is_check'] = 0;
                     }
-                    $model->update($parentData);
                 }
-                if (!empty($parentInfo['data']['parent_url'])){
+                $model->update($parentData);
+                if (!empty($parentInfo['data']['parent_url'])) {
                     //推荐完，查询祖父级是否可以升级，并修改信息,判断是否开启手动升级审核
-                    $grandFatherLev = $this->getLevel($parentUrl[0],2);
-                    if ($grandFatherLev['up_level'] > $grandFatherLev['level'] || ($grandFatherLev['up_level'] == $grandFatherLev['level'] && $grandFatherLev['up_level_id'] != $grandFatherLev['level_id'])){ //需要升级的等级比实际等级高
-                        $grandFatherData['id'] = $parentUrl[0];
-                        $grandFatherData['`key`'] = yii::$app->session['key'];
-                        $grandFatherData['secondhand_fan_number'] = $grandFatherLev['secondhand_fan_number'];
+                    $grandFatherLev = $this->getLevel($parentUrl[0], 2);
+                    $grandFatherData['id'] = $parentUrl[0];
+                    $grandFatherData['`key`'] = yii::$app->session['key'];
+                    $grandFatherData['secondhand_fan_number'] = $grandFatherLev['secondhand_fan_number'];
+                    if ($grandFatherLev['up_level'] > $grandFatherLev['level'] || ($grandFatherLev['up_level'] == $grandFatherLev['level'] && $grandFatherLev['up_level_id'] != $grandFatherLev['level_id'])) { //需要升级的等级比实际等级高
                         $grandFatherData['up_level'] = $grandFatherLev['up_level'];
                         $grandFatherData['up_level_id'] = $grandFatherLev['up_level_id'];
-                        if ($appInfo['status'] == 200 && $appInfo['data']['distribution_is_open'] == 0){
+                        $grandFatherData['reg_time'] = time();
+                        if ($appInfo['status'] == 200 && $appInfo['data']['distribution_is_open'] == 0) {
                             $grandFatherData['level'] = $grandFatherLev['up_level'];
                             $grandFatherData['level_id'] = $grandFatherLev['up_level_id'];
-
-                        }else{
+                        } else {
                             $grandFatherData['is_check'] = 0;
                         }
-                        $model->update($grandFatherData);
                     }
-                    if (isset($parentUrl[1])){
+                    $model->update($grandFatherData);
+                    if (isset($parentUrl[1])) {
                         //推荐完，查询曾祖父级是否可以升级，并修改信息,判断是否开启手动升级审核
-                        $ggFatherLev = $this->getLevel($parentUrl[1],2);
+                        $ggFatherLev = $this->getLevel($parentUrl[1], 2);
+                        $ggFatherData['id'] = $parentUrl[1];
+                        $ggFatherData['`key`'] = yii::$app->session['key'];
+                        $ggFatherData['secondhand_fan_number'] = $ggFatherLev['secondhand_fan_number'];
                         if ($ggFatherLev['up_level'] > $ggFatherLev['level'] || ($ggFatherLev['up_level'] == $ggFatherLev['level'] && $ggFatherLev['up_level_id'] != $ggFatherLev['level_id'])) { //需要升级的等级比实际等级高
-                            $ggFatherData['id'] = $parentUrl[1];
-                            $ggFatherData['`key`'] = yii::$app->session['key'];
                             $ggFatherData['up_level'] = $ggFatherLev['up_level'];
                             $ggFatherData['up_level_id'] = $ggFatherLev['up_level_id'];
-                            $ggFatherData['secondhand_fan_number'] = $ggFatherLev['secondhand_fan_number'];
-                            if ($appInfo['status'] == 200 && $appInfo['data']['distribution_is_open'] == 0){
+                            $ggFatherData['reg_time'] = time();
+                            if ($appInfo['status'] == 200 && $appInfo['data']['distribution_is_open'] == 0) {
                                 $ggFatherData['level'] = $ggFatherLev['up_level'];
                                 $ggFatherData['level_id'] = $ggFatherLev['up_level_id'];
-                            }else{
+                            } else {
                                 $ggFatherData['is_check'] = 0;
                             }
-                            $model->update($ggFatherData);
                         }
+                        $model->update($ggFatherData);
                     }
                 }
             }
@@ -936,19 +884,20 @@ class UserController extends ShopController
     }
 
     //获取目前符合的等级 type = 1为父级 type = 2为祖父、曾祖父级
-    public function getLevel($id,$type = 1){
+    public function getLevel($id, $type = 1)
+    {
         $model = new \app\models\shop\UserModel();
-        $userInfo = $model->find(['id'=>$id]);
+        $userInfo = $model->find(['id' => $id]);
 
-        if ($type == 1){
+        if ($type == 1) {
             $data['fan_number'] = $userInfo['data']['fan_number'] + 1;
             $data['secondhand_fan_number'] = $userInfo['data']['secondhand_fan_number'];
-        }else{
+        } else {
             $data['fan_number'] = $userInfo['data']['fan_number'];
             $data['secondhand_fan_number'] = $userInfo['data']['secondhand_fan_number'] + 1;
         }
 
-        $sql = "SELECT sum(sog.payment_money) as total FROM `shop_user` su RIGHT JOIN `shop_order_group` sog ON sog.user_id = su.id WHERE su.parent_id = {$id} AND sog.status = 6 OR sog.status = 7";
+        $sql = "SELECT sum(sog.payment_money) as total FROM `shop_user` su RIGHT JOIN `shop_order_group` sog ON sog.user_id = su.id WHERE su.parent_id = {$id} AND (sog.status = 6 OR sog.status = 7)";
         $total = $model->querySql($sql);
 
         $operatorModel = new OperatorModel();
@@ -957,9 +906,9 @@ class UserController extends ShopController
         $operatorWhere['status'] = 1;
         $operatorWhere['limit'] = false;
         $operatorInfo = $operatorModel->do_select($operatorWhere);
-        if (isset($operatorInfo['data'])){
-            foreach ($operatorInfo['data'] as $k=>$v){
-                if ($v['fan_number_buy'] <= $total[0]['total'] && $v['fan_number'] <= $data['fan_number'] && $v['secondhand_fan_number'] <= $data['secondhand_fan_number']){
+        if (isset($operatorInfo['data'])) {
+            foreach ($operatorInfo['data'] as $k => $v) {
+                if ($v['fan_number_buy'] <= $total[0]['total'] && $v['fan_number'] <= $data['fan_number'] && $v['secondhand_fan_number'] <= $data['secondhand_fan_number']) {
                     $data['level'] = $userInfo['data']['level'];
                     $data['level_id'] = $userInfo['data']['level_id'];
                     $data['up_level'] = 3;
@@ -975,9 +924,9 @@ class UserController extends ShopController
         $agentWhere['status'] = 1;
         $agentWhere['limit'] = false;
         $agentInfo = $agentModel->do_select($agentWhere);
-        if (isset($agentInfo['data'])){
-            foreach ($agentInfo['data'] as $k=>$v){
-                if ($v['fan_number_buy'] <= $total[0]['total'] && $v['fan_number'] <= $data['fan_number'] && $v['secondhand_fan_number'] <= $data['secondhand_fan_number']){
+        if (isset($agentInfo['data'])) {
+            foreach ($agentInfo['data'] as $k => $v) {
+                if ($v['fan_number_buy'] <= $total[0]['total'] && $v['fan_number'] <= $data['fan_number'] && $v['secondhand_fan_number'] <= $data['secondhand_fan_number']) {
                     $data['level'] = $userInfo['data']['level'];
                     $data['level_id'] = $userInfo['data']['level_id'];
                     $data['up_level'] = 2;
@@ -994,7 +943,22 @@ class UserController extends ShopController
         return $data;
     }
 
-
+    public function actionUpdateTuan($id)
+    {
+        if (yii::$app->request->isPut) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->bodyParams; //获取body传参
+            $model = new \app\models\shop\UserModel();
+            $userId = yii::$app->session['user_id'];
+            $data['id'] = $userId;
+            $data['`key`'] = yii::$app->session['key'];
+            $data['leader_uid'] = $id;
+            $array = $model->update($data);
+            return $array;
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
 
 
 }

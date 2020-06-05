@@ -47,20 +47,25 @@ class ConfigController extends ShopController {
             $array = $model->do_one($data);
             if ($array['status'] == 200) {
                 $time = date("Y-m-d", time());
-                if((int)$array['data']['open_time']<(int)$array['data']['close_time']){
-                    if ($array['data']['open_time'] + strtotime($time . " 00:00:00") <= time() && $array['data']['close_time'] + strtotime($time . " 00:00:00") >= time()) {
-                        $array['data']['is_bool'] = false;
-                    } else {
-                        $array['data']['is_bool'] = true;
+                if($array['data']['is_open']==1){
+                    if((int)$array['data']['open_time']<(int)$array['data']['close_time']){
+                        if ($array['data']['open_time'] + strtotime($time . " 00:00:00") <= time() && $array['data']['close_time'] + strtotime($time . " 00:00:00") >= time()) {
+                            $array['data']['is_bool'] = false;
+                        } else {
+                            $array['data']['is_bool'] = true;
+                        }
+                    }else{
+
+                        if ($array['data']['open_time'] + strtotime($time . " 00:00:00") <= time() && $array['data']['close_time'] + strtotime($time . " 00:00:00")+86400 >= time()) {
+                            $array['data']['is_bool'] = false;
+                        } else {
+                            $array['data']['is_bool'] = true;
+                        }
                     }
                 }else{
-
-                    if ($array['data']['open_time'] + strtotime($time . " 00:00:00") <= time() && $array['data']['close_time'] + strtotime($time . " 00:00:00")+86400 >= time()) {
-                        $array['data']['is_bool'] = false;
-                    } else {
-                        $array['data']['is_bool'] = true;
-                    }
+                    $array['data']['is_bool'] = true;
                 }
+
 
             }
             return $array;

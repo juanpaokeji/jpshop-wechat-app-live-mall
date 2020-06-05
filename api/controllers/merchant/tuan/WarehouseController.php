@@ -2,6 +2,7 @@
 
 namespace app\controllers\merchant\tuan;
 
+use app\models\merchant\storehouse\StorehouseModel;
 use app\models\merchant\system\OperationRecordModel;
 use app\models\tuan\LeaderModel;
 use app\models\tuan\UserModel;
@@ -11,7 +12,8 @@ use yii\web\MerchantController;
 use app\models\tuan\WarehouseModel;
 use app\models\shop\TuanLeaderModel;
 
-class WarehouseController extends MerchantController {
+class WarehouseController extends MerchantController
+{
 
     public $enableCsrfValidation = false; //禁用CSRF令牌验证，可以在基类中设置
 
@@ -35,19 +37,86 @@ class WarehouseController extends MerchantController {
             }
 
             $model = new WarehouseModel();
-            $sql = "SELECT count(shop_tuan_leader.warehouse_id) as leader_num,shop_tuan_warehouse.id FROM shop_tuan_leader LEFT JOIN shop_tuan_warehouse ON shop_tuan_warehouse.id = shop_tuan_leader.warehouse_id GROUP BY shop_tuan_warehouse.id";
-            $data = Yii::$app->db->createCommand($sql)->queryAll();
             $array = $model->do_select($params);
+
             if ($array['status'] == 200) {
-                foreach ($array['data'] as $key=>$val){
-                    foreach ($data as $k=>$v){
-                        if ($val['id'] == $v['id']){
-                            $array['data'][$key]['leader_num'] = $v['leader_num'];
+                for ($i = 0; $i < count($array['data']); $i++) {
+                    $array['data'][$i]['leaders'] = ($array['data'][$i]['leaders'] == "" || $array['data'][$i]['leaders'] == "Array") ? array() : json_decode($array['data'][$i]['leaders'], true);
+                    $array['data'][$i]['leaders_number'] = isset($array['data'][$i]['leaders'])?count($array['data'][$i]['leaders']):0;
+                    if (count($array['data'][$i]['leaders']) != 0) {
+                        $leaderModel = new LeaderModel();
+                        $leader = $leaderModel->do_select(['in' => ['id', $array['data'][$i]['leaders']], 'limit' => false]);
+                        if ($leader['status'] == 200) {
+                            $array['data'][$i]['leader_info'] = $leader['data'];
+                        } else {
+                            $array['data'][$i]['leader_info'] = array();
                         }
+                    } else {
+                        $array['data'][$i]['leader_info'] = array();
+                    }
+                    $array['data'][$i]['houses'] = $array['data'][$i]['houses'] == "" ? array() : json_decode($array['data'][$i]['houses'], true);
+                    $array['data'][$i]['houses_number'] = count($array['data'][$i]['houses']);
+                    if (count($array['data'][$i]['houses']) != 0) {
+                        $storehouses = new StorehouseModel();
+                        $house = $storehouses->do_select(['in' => ['id', $array['data'][$i]['houses']], 'limit' => false]);
+                        if ($house['status'] == 200) {
+                            $array['data'][$i]['house_info'] = $house['data'];
+                        } else {
+                            $array['data'][$i]['house_info'] = array();
+                        }
+                    } else {
+                        $array['data'][$i]['house_info'] = array();
                     }
                 }
+
             }
             return $array;
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
+
+    public function actionHouse($id)
+    {
+        if (yii::$app->request->isGet) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->get(); //获取地址栏参数
+            $model = new WarehouseModel();
+            $array = $model->do_one(['id' => $id]);
+            $storehouses = new StorehouseModel();
+            if ($array['data']['houses'] == "") {
+                $house = array();
+            } else {
+                $house = json_decode($array['data']['houses'], true);
+            }
+            $data['field'] = "id,name,address";
+            $data['not in'] = ['id', $house];
+            $data['limit'] = isset($params['limit']) ? $params['limit'] : 10;
+            $house = $storehouses->do_select($data);
+            return $house;
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
+
+    public function actionLeader($id)
+    {
+        if (yii::$app->request->isGet) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->get(); //获取地址栏参数
+            $model = new WarehouseModel();
+            $array = $model->do_one(['id' => $id]);
+            $leaderModel = new LeaderModel();
+            if ($array['data']['leaders'] == "") {
+                $leader = array();
+            } else {
+                $leader = json_decode($array['data']['leaders'], true);
+            }
+            $data['field'] = "id,realname,area_name";
+            $data['not in'] = ['id', $leader];
+            $data['limit'] = isset($params['limit']) ? $params['limit'] : 10;
+            $leader = $leaderModel->do_select($data);
+            return $leader;
         } else {
             return result(500, "请求方式错误");
         }
@@ -76,29 +145,15 @@ class WarehouseController extends MerchantController {
             $params = $request->bodyParams; //获取body传参
             $params['merchant_id'] = yii::$app->session['uid'];
 
-            $must = ['key', 'name', 'realname', 'phone', 'addr', 'coordinate', 'status'];
+            $must = ['key', 'name','status'];
             //设置类目 参数
             $rs = $this->checkInput($must, $params);
             if ($rs != false) {
                 return $rs;
             }
-            if (stristr($params['coordinate'],',')){
-                $coordinate = explode(',',$params['coordinate']);
-            } elseif (stristr($params['coordinate'],'，')) {
-                $coordinate = explode('，',$params['coordinate']);
-            } else {
-                return result(500, "坐标有误");
-            }
-            $params['longitude'] = $coordinate[0];
-            $params['latitude'] = $coordinate[1];
-            unset($params['coordinate']);
             $model = new WarehouseModel();
             $array = $model->do_add($params);
-
-            $userModel = new LeaderModel();
-         //   $userModel->do_update(['warehouse_id'=>$id],['warehouse_id'=>0]);
-            $userModel->do_update(['uid'=>$params['leader_uid']],['warehouse_id'=>$array['data']]);
-            if ($array['status'] == 200){
+            if ($array['status'] == 200) {
                 //添加操作记录
                 $operationRecordModel = new OperationRecordModel();
                 $operationRecordData['key'] = $params['key'];
@@ -123,7 +178,7 @@ class WarehouseController extends MerchantController {
             $model = new WarehouseModel();
             $params['id'] = $id;
             $array = $model->do_delete($params);
-            if ($array['status'] == 200){
+            if ($array['status'] == 200) {
                 //添加操作记录
                 $operationRecordModel = new OperationRecordModel();
                 $operationRecordData['key'] = $params['key'];
@@ -145,31 +200,23 @@ class WarehouseController extends MerchantController {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
 
-            if (isset($params['coordinate'])){
-                if (stristr($params['coordinate'],',')){
-                    $coordinate = explode(',',$params['coordinate']);
-                } elseif (stristr($params['coordinate'],'，')) {
-                    $coordinate = explode('，',$params['coordinate']);
-                } else {
-                    return result(500, "坐标有误");
-                }
-                $params['longitude'] = $coordinate[0];
-
-                $params['latitude'] = $coordinate[1];
-
-                unset($params['coordinate']);
-            }
-
             $model = new WarehouseModel();
             $where['id'] = $id;
+            if (isset($params['leaders'])) {
+                if ($params['leaders'] == "false") {
+                    $params['leaders'] = "";
+                }
+
+            }
+            if (isset($params['houses'])) {
+                if ($params['houses'] == "false") {
+                    $params['houses'] = "";
+                }
+
+            }
             $array = $model->do_update($where, $params);
 
-            if (isset($params['leader_uid'])){
-                $userModel = new LeaderModel();
-                $userModel->do_update(['warehouse_id'=>$id],['warehouse_id'=>0]);
-                $userModel->do_update(['uid'=>$params['leader_uid']],['warehouse_id'=>$id]);
-            }
-            if ($array['status'] == 200){
+            if ($array['status'] == 200) {
                 //添加操作记录
                 $operationRecordModel = new OperationRecordModel();
                 $operationRecordData['key'] = $params['key'];
@@ -178,27 +225,6 @@ class WarehouseController extends MerchantController {
                 $operationRecordData['operation_id'] = $id;
                 $operationRecordData['module_name'] = '路线';
                 $operationRecordModel->do_add($operationRecordData);
-            }
-            return $array;
-        } else {
-            return result(500, "请求方式错误");
-        }
-    }
-
-    public function actionLeader($id)
-    {
-        if (yii::$app->request->isGet) {
-            $request = yii::$app->request; //获取 request 对象
-            $params = $request->get(); //获取地址栏参数
-
-            $model = new TuanLeaderModel();
-            $params['warehouse_id'] = $id;
-            $params['`key`'] = $params['key'];
-            unset($params['key']);
-            unset($params['id']);
-            $array = $model->get_list($params);
-            if (!$array){
-                return result(204, "查询失败");
             }
             return $array;
         } else {

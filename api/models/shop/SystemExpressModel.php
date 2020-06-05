@@ -136,6 +136,9 @@ class SystemExpressModel extends TableModel {
         if (isset($params['merchant_id'])) {
             $where['merchant_id'] = $params['merchant_id'];
         }
+        if (isset($params['simple_name'])) {
+            $where['simple_name'] = $params['simple_name'];
+        }
         $where['delete_time is null'] = null;
         try {
             $app = $table->tableSingle($this->table, $where);

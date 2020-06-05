@@ -37,6 +37,7 @@ class GoodCircleController extends ShopController{
         if (yii::$app->request->isPost) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->post(); //获取地址栏参数
+            $params['key'] = 'ccvWPn';
             $must = ['key','goods_id'];
             $rs = $this->checkInput($must, $params);
             if ($rs != false) {
@@ -47,8 +48,12 @@ class GoodCircleController extends ShopController{
             if ($config == false) {
                 return result(500, "未配置小程序信息");
             }
-            $miniProgram = Factory::miniProgram($config);
-            $token = $miniProgram->access_token->getToken(true);// 强制重新从微信服务器获取 token
+            try{
+                $miniProgram = Factory::miniProgram($config);
+                $token = $miniProgram->access_token->getToken(true);// 强制重新从微信服务器获取 token
+            }catch (\EasyWeChat\Kernel\Exceptions\Exception $exception){
+                return result(500, "小程序信息错误");
+            }
             if (!isset($token['access_token'])) {
                 return result(500, "小程序access_token不存在");
             }
@@ -115,6 +120,7 @@ class GoodCircleController extends ShopController{
         if (yii::$app->request->isPost) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->post(); //获取地址栏参数
+            $params['key'] = 'ccvWPn';
             $must = ['order_id'];
             $rs = $this->checkInput($must, $params);
             if ($rs != false) {
@@ -238,6 +244,7 @@ class GoodCircleController extends ShopController{
         if (yii::$app->request->isPut) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取地址栏参数
+            $params['key'] = 'ccvWPn';
             $must = ['key'];
             $rs = $this->checkInput($must, $params);
             if ($rs != false) {
@@ -265,8 +272,12 @@ class GoodCircleController extends ShopController{
                 if ($config == false) {
                     return result(500, "未配置小程序信息");
                 }
-                $miniProgram = Factory::miniProgram($config);
-                $token = $miniProgram->access_token->getToken(true);// 强制重新从微信服务器获取 token
+                try{
+                    $miniProgram = Factory::miniProgram($config);
+                    $token = $miniProgram->access_token->getToken(true);// 强制重新从微信服务器获取 token
+                }catch (\EasyWeChat\Kernel\Exceptions\Exception $exception){
+                    return result(500, "小程序信息错误");
+                }
                 if (!isset($token['access_token'])) {
                     return result(500, "小程序access_token不存在");
                 }
@@ -340,8 +351,12 @@ class GoodCircleController extends ShopController{
             if ($config == false) {
                 return result(500, "未配置小程序信息");
             }
-            $miniProgram = Factory::miniProgram($config);
-            $token = $miniProgram->access_token->getToken(true);// 强制重新从微信服务器获取 token
+            try{
+                $miniProgram = Factory::miniProgram($config);
+                $token = $miniProgram->access_token->getToken(true);// 强制重新从微信服务器获取 token
+            }catch (\EasyWeChat\Kernel\Exceptions\Exception $exception){
+                return result(500, "小程序信息错误");
+            }
             if (!isset($token['access_token'])) {
                 return result(500, "小程序access_token不存在");
             }
@@ -435,6 +450,7 @@ class GoodCircleController extends ShopController{
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
+            $params['key'] = 'ccvWPn';
             $must = ['key'];
             $rs = $this->checkInput($must, $params);
             if ($rs != false) {
@@ -445,14 +461,16 @@ class GoodCircleController extends ShopController{
             if ($config == false) {
                 return result(500, "未配置小程序信息");
             }
-            $miniProgram = Factory::miniProgram($config);
-            $token = $miniProgram->access_token->getToken(true);// 强制重新从微信服务器获取 token
+            try{
+                $miniProgram = Factory::miniProgram($config);
+                $token = $miniProgram->access_token->getToken(true);// 强制重新从微信服务器获取 token
+            }catch (\EasyWeChat\Kernel\Exceptions\Exception $exception){
+                return result(500, "小程序信息错误");
+            }
             if (!isset($token['access_token'])) {
                 return result(500, "小程序access_token不存在");
             }
-
             $url = "https://api.weixin.qq.com/mall/queryproduct?access_token={$token['access_token']}&type=batchquery";
-
             $data['key_list'][0] = ['item_code'=>$id];
 
             $array = json_encode($data, JSON_UNESCAPED_UNICODE);

@@ -32,6 +32,7 @@ class UserController extends MerchantController
             $params['`key`'] = $params['key'];
             unset($params['key']);
             $params['merchant_id'] = yii::$app->session['uid'];
+            $params['orderby'] = " system_sub_admin.sort desc";
             $array = $model->findall($params);
             if ($array['status'] == 200) {
                 foreach ($array['data'] as $k => $v) {
@@ -42,7 +43,7 @@ class UserController extends MerchantController
                 $goodsModel = new SaleGoodsModel();
                 $table = new TableModel();
 
-                $number = $array['count'];
+                $number = count($array['data']);
                 for ($i = 0; $i < $number; $i++) {
                     if ($array['data'][$i]['type'] == 1) {
                         $res = $goodsModel->do_select(['supplier_id' => $array['data'][$i]['id'], 'status' => 1]);
@@ -325,7 +326,7 @@ class UserController extends MerchantController
                             );
                             $res = $leaderModel->do_update(['supplier_id' => $id], $data);
                             if ($res['status'] == 200) {
-                                unset($params['leader']);
+                                //unset($params['leader']);
                                 $array = $table->update($params);
                                 $transaction->commit(); //只有执行了commit(),对于上面数据库的操作才会真正执行
                             } else {

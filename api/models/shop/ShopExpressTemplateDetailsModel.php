@@ -85,6 +85,9 @@ class ShopExpressTemplateDetailsModel extends TableModel {
         if (isset($params['merchant_id'])) {
             $where['merchant_id'] = $params['merchant_id'];
         }
+        if (isset($params['supplier_id'])) {
+            $where['supplier_id'] = $params['supplier_id'];
+        }
         if (isset($params['searchName'])) {
             $where["names like '%{$params['searchName']}%'"] = null;
         }

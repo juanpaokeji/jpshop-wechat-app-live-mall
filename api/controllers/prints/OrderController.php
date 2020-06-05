@@ -2,8 +2,11 @@
 
 namespace app\controllers\prints;
 
+use app\models\shop\ContactModel;
 use app\models\shop\SubOrdersModel;
 use app\models\system\SystemMerchantMiniAccessModel;
+use app\models\system\SystemMerchantMiniSubscribeTemplateAccessModel;
+use app\models\system\SystemMerchantMiniSubscribeTemplateModel;
 use yii;
 use yii\db\Exception;
 use yii\web\MerchantController;
@@ -37,6 +40,10 @@ class OrderController extends MerchantController
                 return json_encode($rs, JSON_UNESCAPED_UNICODE);
             }
 
+            if ($params['electronics_id'] == 0){
+                return result(500, "本地发货,无法打印电子面单");
+            }
+
             $model = new OrderModel();
             $eModel = new ElectronicsModel();
 
@@ -51,81 +58,71 @@ class OrderController extends MerchantController
             }
 
             for ($i = 0; $i < count($params['order_sn']); $i++) {
-                $data = array();
+                $arr = [];
                 for ($j = 0; $j < count($params['order_sn'][$i]); $j++) {
-                    if ($params['type'] == 0) {
-                        if ($j == 0) {
-                            $order = $model->find(['order_sn' => $params['order_sn'][$i][$j]]);
-                            $eorder['ShipperCode'] = $express['data']['simple_name'];
-                            if ($express['data']['simple_name'] == "ZJS") {
-                                $eorder["LogisticCode"] = $params['LogisticCode'];
-                            }
-                            //物流公司信息
-                            $eorder["ThrOrderCode"] = $params['order_sn'][$i][$j];
-                            $eorder["OrderCode"] = date("Y-m-d H:i:s", time()) . rand(1000, 9999);
-                            $eorder['IsReturnPrintTemplate'] = 1;
-                            $eorder["PayType"] = 1;
-                            $eorder["ExpType"] = 1;
-                            if ($express['data']['simple_name'] != "SF") {
-                                $eorder["CustomerName"] = $eData['data']['customer_name'];
-                                $eorder["CustomerPwd"] = $eData['data']['customer_pwd'];
-                                $eorder['MonthCode'] = $eData['data']['month_code'];
-                                $eorder['SendSite'] = $eData['data']['dot_code'];
-                                $eorder['SendStaff'] = $eData['data']['dot_name'];
-                            }
-
-                            //发件人信息
-                            $sender["Name"] = $eData['data']['name'];
-                            $sender["Mobile"] = $eData['data']['phone'];
-                            $sender["ProvinceName"] = $eData['data']['province_name'];
-                            $sender["CityName"] = $eData['data']['city_name'];
-                            $sender["ExpAreaName"] = $eData['data']['area_name'];
-                            $sender["Address"] = $eData['data']['addr'];
-                            $sender["PostCode"] = $eData['data']['post_code'];
-
-                            //收件人信息
-                            $address = explode("-", $order['data']['address']);
-
-                            $receiver["Name"] = $order['data']['name'];
-                            $receiver["Mobile"] = $order['data']['phone'];
-                            $receiver["ProvinceName"] = $address[0];
-                            $receiver["CityName"] = $address[1];
-                            $receiver["ExpAreaName"] = $address[2];
-                            $receiver["Address"] = $address[3];
-                            $receiver["PostCode"] = $address[4];
-
-                            $commodityOne = [];
-                            $commodityOne["GoodsName"] = $eData['data']['towing_goods'];
-                            $commodity = [];
-                            $commodity[] = $commodityOne;
-
-                            $temp = electronics($eorder, $sender, $receiver, $commodity);
-                            $arr['PrintTemplate'] = $temp['PrintTemplate'];
-                            $arr['express_number'] = $temp['Order']['LogisticCode'];
-                            $arr['order_sn'] = $params['order_sn'][$i];
-                            $res[$i]['PrintTemplate'] = $temp['PrintTemplate'];
-                            $res[$i]['express_number'] = $temp['Order']['LogisticCode'];
-                            $res[$i]['order_sn'] = $params['order_sn'][$i];
-//
-                            $res[$i] = $arr;
-                            $data['express_id'] = $express['data']['id'];
-                            $data['express_number'] = $temp['Order']['LogisticCode'];
+                    if ($j == 0) {
+                        $order = $model->find(['order_sn' => $params['order_sn'][$i][$j]]);
+                        $eorder['ShipperCode'] = $express['data']['simple_name'];
+                        if ($express['data']['simple_name'] == "ZJS") {
+                            $eorder["LogisticCode"] = $params['LogisticCode'];
                         }
-                        $data['order_group_sn'] = $params['order_sn'][$i][$j];
-                        $subOrder = new SubOrdersModel();
-                        $subOrder->do_update(['order_group_sn' => $params['order_sn'][$i][$j]], $data);
-                        // $array = $model->updateSend($data);
-                    } else {
-                        $data['express_id'] = 0;
-                        $data['order_group_sn'] = $params['order_sn'][$i][$j];
-                        $data['express_number'] = "本地发货";
-                        $subOrder = new SubOrdersModel();
-                        $subOrder->do_update(['order_group_sn' => $params['order_sn'][$i][$j]], $data);
+                        //物流公司信息
+                        $eorder["ThrOrderCode"] = $params['order_sn'][$i][$j];
+                        $eorder["OrderCode"] = date("Y-m-d H:i:s", time()) . rand(1000, 9999);
+                        $eorder['IsReturnPrintTemplate'] = 1;
+                        $eorder["PayType"] = 1;
+                        $eorder["ExpType"] = 1;
+                        if ($express['data']['simple_name'] != "SF") {
+                            $eorder["CustomerName"] = $eData['data']['customer_name'];
+                            $eorder["CustomerPwd"] = $eData['data']['customer_pwd'];
+                            $eorder['MonthCode'] = $eData['data']['month_code'];
+                            $eorder['SendSite'] = $eData['data']['dot_code'];
+                            $eorder['SendStaff'] = $eData['data']['dot_name'];
+                        }
+
+                        //发件人信息
+                        $sender["Name"] = $eData['data']['name'];
+                        $sender["Mobile"] = $eData['data']['phone'];
+                        $sender["ProvinceName"] = $eData['data']['province_name'];
+                        $sender["CityName"] = $eData['data']['city_name'];
+                        $sender["ExpAreaName"] = $eData['data']['area_name'];
+                        $sender["Address"] = $eData['data']['addr'];
+                        $sender["PostCode"] = $eData['data']['post_code'];
+
+                        //收件人信息
+                        $contactModel = new ContactModel();
+                        $contactWhere['id'] = $order['data']['user_contact_id'];
+                        $contactInfo = $contactModel->find($contactWhere);
+                        if ($contactInfo['status'] != 200){
+                            return result(500, "订单_{$params['order_sn'][$i][$j]}用户信息有误");
+                        }
+
+                        $receiver["Name"] = $order['data']['name'];
+                        $receiver["Mobile"] = $order['data']['phone'];
+                        $receiver["ProvinceName"] = $contactInfo['data']['province'];
+                        $receiver["CityName"] = $contactInfo['data']['city'];
+                        $receiver["ExpAreaName"] = $contactInfo['data']['area'];
+                        $receiver["Address"] = $contactInfo['data']['address'];
+                        $receiver["PostCode"] = $contactInfo['data']['postcode'];
+
+                        $commodityOne = [];
+                        $commodityOne["GoodsName"] = $eData['data']['towing_goods'];
+                        $commodity = [];
+                        $commodity[] = $commodityOne;
+
+                        $temp = electronics($eorder, $sender, $receiver, $commodity);
+                        if ($temp['Success'] == false){
+                            return result(500, "订单_{$params['order_sn'][$i][$j]},{$temp['Reason']}");
+                        }
+                        $arr['PrintTemplate'] = $temp['PrintTemplate'];
+                        $arr['express_number'] = $temp['Order']['LogisticCode'];
+                        $arr['order_sn'] = $params['order_sn'][$i][$j];
                     }
-//                }
                 }
+                $res[$i] = $arr;
             }
-            return result(200, "请求成功");
+
+            return result(200, "请求成功",$res);
         } else {
             return result(500, "请求方式错误");
         }
@@ -227,6 +224,24 @@ class OrderController extends MerchantController
             if ($rs != false) {
                 return json_encode($rs, JSON_UNESCAPED_UNICODE);
             }
+            if (!isset($params['express_number'][0]) || empty($params['express_number'][0])){
+                return result(500, "快递单号不能为空");
+            }
+            if ($params['electronics_id'] == 0){
+                $express['data']['name'] = "本地配送";
+                $eData['data']['express_id'] = 0;
+            }else{
+                $eModel = new ElectronicsModel();
+                $eData = $eModel->do_one(['id' => $params['electronics_id']]);
+                if ($eData['status'] != 200){
+                    return result(500, "未查询到电子面单信息");
+                }
+                $expressModel = new SystemExpressModel();
+                $express = $expressModel->find(['id' => $eData['data']['express_id']]);
+                if ($express['status'] != 200){
+                    return result(500, "未查询到快递公司信息");
+                }
+            }
             $model = new OrderModel();
             if (isset($params['key'])) {
                 $data['`key`'] = $params['key'];
@@ -240,36 +255,6 @@ class OrderController extends MerchantController
                 } else {
                     $str = $str . "," . $params['order_sn'][$i];
                 }
-
-                $orderModel = new OrderModel;
-                $orderRs = $orderModel->find(['order_sn' => $params['order_sn'][$i]]);
-
-                $shopUserModel = new \app\models\shop\UserModel();
-                $shopUser = $shopUserModel->find(['id' => $orderRs['data']['user_id']]);
-
-                $tempModel = new \app\models\system\SystemMiniTemplateModel();
-                $minitemp = $tempModel->do_one(['id' => 29]);
-                //单号,金额,下单时间,物品名称,
-                $tempParams = array(
-                    'keyword1' => $params['express_number'][0],
-                    'keyword2' => date("Y-m-d h:i:sa", time()),
-                    'keyword3' => $orderRs['data']['create_time'],
-                    'keyword4' => $orderRs['data']['goodsname'],
-                );
-
-                $tempAccess = new SystemMerchantMiniAccessModel();
-                $taData = array(
-                    'key' => $orderRs['data']['key'],
-                    'merchant_id' => $orderRs['data']['merchant_id'],
-                    'mini_open_id' => $shopUser['data']['mini_open_id'],
-                    'template_id' => 29,
-                    'number' => '0',
-                    'template_params' => json_encode($tempParams),
-                    'template_purpose' => 'order',
-                    'page' => "/pages/orderItem/orderItem/orderItem?order_sn={$params['order_sn'][$i]}",
-                    'status' => '-1',
-                );
-                $tempAccess->do_add($taData);
             }
 
             $res = $model->findList(["order_sn in ({$str})" => null, 'merchant_id' => $data['merchant_id']]);
@@ -293,15 +278,84 @@ class OrderController extends MerchantController
 //            }
             for ($i = 0; $i < count($params['order_sn']); $i++) {
                 $data['order_sn'] = $params['order_sn'][$i];
+                if ($params['electronics_id'] == 0){
+                    $data['send_express_type'] = 1;  //实际发货方式
+                }else{
+                    $data['send_express_type'] = 0;  //实际发货方式
+                }
                 $data['express_number'] = $params['express_number'][0];
-                $data['express_id'] = $params['electronics_id'];
+                $data['express_id'] = $eData['data']['express_id'];
                 $data['status'] = 3;
                 if ($params['is_tuan'][$i] == 1) {
                     $array = $model->updateSend($data, 2);
                 } else {
                     $array = $model->updateSend($data);
                 }
+                //发货成功再处理微信消息
+                if ($array['status'] == 200){
+                    $orderModel = new OrderModel;
+                    $orderRs = $orderModel->find(['order_sn' => $params['order_sn'][$i]]);
 
+                    $shopUserModel = new \app\models\shop\UserModel();
+                    $shopUser = $shopUserModel->find(['id' => $orderRs['data']['user_id']]);
+
+                    $tempModel = new \app\models\system\SystemMiniTemplateModel();
+                    $minitemp = $tempModel->do_one(['id' => 29]);
+                    //单号,金额,下单时间,物品名称,
+                    $tempParams = array(
+                        'keyword1' => $params['express_number'][0],
+                        'keyword2' => date("Y-m-d h:i:sa", time()),
+                        'keyword3' => $orderRs['data']['create_time'],
+                        'keyword4' => $orderRs['data']['goodsname'],
+                    );
+
+                    $tempAccess = new SystemMerchantMiniAccessModel();
+                    $taData = array(
+                        'key' => $orderRs['data']['key'],
+                        'merchant_id' => $orderRs['data']['merchant_id'],
+                        'mini_open_id' => $shopUser['data']['mini_open_id'],
+                        'template_id' => 29,
+                        'number' => '0',
+                        'template_params' => json_encode($tempParams),
+                        'template_purpose' => 'order',
+                        'page' => "/pages/orderItem/orderItem/orderItem?order_sn={$params['order_sn'][$i]}",
+                        'status' => '-1',
+                    );
+                    $tempAccess->do_add($taData);
+
+                    //订阅消息
+                    $subscribeTempModel = new SystemMerchantMiniSubscribeTemplateModel();
+                    $subscribeTempInfo = $subscribeTempModel->do_one(['template_purpose'=>'send_goods']);
+                    if ($subscribeTempInfo['status'] == 200){
+                        if ($params['electronics_id'] == 0){  //本地配送
+                            $params['express_number'][0] = 0;
+                        }
+                        if (mb_strlen($orderRs['data']['goodsname'],'utf-8') > 20){
+                            $goodsName = mb_substr($orderRs['data']['goodsname'],0,17,'utf-8') .'...'; //商品名超过20个汉字截断
+                        }else{
+                            $goodsName = $orderRs['data']['goodsname'];
+                        }
+                        $accessParams = array(
+                            'character_string1' => ['value'=>$params['order_sn'][$i]],  //订单号
+                            'thing2' => ['value'=>$goodsName],  //商品名
+                            'thing8' => ['value'=>$express['data']['name']],    //快递公司
+                            'character_string9' => ['value'=>$params['express_number'][0]],   //快递单号
+                        );
+                        $subscribeTempAccessModel = new SystemMerchantMiniSubscribeTemplateAccessModel();
+                        $subscribeTempAccessData = array(
+                            'key' => $orderRs['data']['key'],
+                            'merchant_id' => $orderRs['data']['merchant_id'],
+                            'mini_open_id' => $shopUser['data']['mini_open_id'],
+                            'template_id' => $subscribeTempInfo['data']['template_id'],
+                            'number' => '0',
+                            'template_params' => json_encode($accessParams, JSON_UNESCAPED_UNICODE),
+                            'template_purpose' => 'send_goods',
+                            'page' => "/pages/orderItem/orderItem/orderItem?order_sn={$params['order_sn'][$i]}",
+                            'status' => '-1',
+                        );
+                        $subscribeTempAccessModel->do_add($subscribeTempAccessData);
+                    }
+                }
             }
             return $array;
         } else {

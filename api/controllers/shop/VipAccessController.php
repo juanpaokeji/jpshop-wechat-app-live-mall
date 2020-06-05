@@ -237,7 +237,7 @@ class VipAccessController extends ShopController {
                     'attach' => 'vip',
                     'out_trade_no' => $id,
                     'total_fee' => $accessInfo['data']['money'] * 100,
-                    'notify_url' => "http://api2.juanpao.com/pay/vip-access/notify",
+                    'notify_url' => "http://" . $_SERVER['HTTP_HOST'] . "/api/web/index.php/pay/vip-access/notify",  //回调地址
                     'trade_type' => 'JSAPI',
                 );
                 if ($params['pay_type'] == 1) {
@@ -264,7 +264,7 @@ class VipAccessController extends ShopController {
                 $mini_pay->setTerminal_time(date("YmdHis"));
                 $mini_pay->setTotal_fee($accessInfo['data']['money'] * 100);
                 $mini_pay->setOpen_id($userData['data']['mini_open_id']);
-                $mini_pay->setNotify_url("http://api2.juanpao.com/pay/vip-access/notify-sao-bei");
+                $mini_pay->setNotify_url("http://" . $_SERVER['HTTP_HOST'] . "/api/web/index.php/pay/vip-access/notify-sao-bei");  //回调地址
                 $pay_pre = Payx::miniPayRe($mini_pay, $config['saobei_access_token']);
                 if ($pay_pre->return_code == "01") {
                     $saobei_payinfo = [
@@ -300,6 +300,7 @@ class VipAccessController extends ShopController {
 
             $userInfo = $userModel->find($where);
             unset($where['id']);
+            $where['limit'] = false;
             $res = $model->do_select($where);
             if ($userInfo['status'] != 200){
                 return $userInfo;
@@ -308,29 +309,29 @@ class VipAccessController extends ShopController {
             if ($res['status'] == 200){
                 $minLev = reset($res['data']);//最低等级
                 $maxLev = end($res['data']);//最高等级
-                //消费金额小于最低等级时 0.39
-                if ($userInfo['data']['money'] < $minLev['min_score']){
-                    $array['info']['min_score'] = intval($userInfo['data']['money']);
+                //总积分小于最低等级时
+                if ($userInfo['data']['total_score'] < $minLev['min_score']){
+                    $array['info']['min_score'] = intval($userInfo['data']['total_score']);
                     $array['info']['name'] = "无等级";
                     $array['info']['discount_ratio'] = 1;
                     $array['next']['min_score'] = $minLev['min_score'];
                     $array['next']['name'] = $minLev['name'];
                 }
-                //消费金额大于等于最高等级
-                if ($userInfo['data']['money'] >= $maxLev['min_score']){
+                //总积分大于等于最高等级
+                if ($userInfo['data']['total_score'] >= $maxLev['min_score']){
                     $array['up']['min_score'] = $maxLev['min_score'];
                     $array['up']['name'] = $maxLev['name'];
-                    $array['info']['min_score'] = intval($userInfo['data']['money']);
+                    $array['info']['min_score'] = intval($userInfo['data']['total_score']);
                     $array['info']['name'] = $maxLev['name'];
                     $array['info']['discount_ratio'] = $maxLev['discount_ratio'];
                 }
-                //消费金额在最低和最高之间的
-                if ($userInfo['data']['money'] >= $minLev['min_score'] && $userInfo['data']['money'] < $maxLev['min_score']){
+                //总积分在最低和最高之间的
+                if ($userInfo['data']['total_score'] >= $minLev['min_score'] && $userInfo['data']['total_score'] < $maxLev['min_score']){
                     foreach ($res['data'] as $k=>$v){
-                        if ($userInfo['data']['money'] >= $v['min_score']){
+                        if ($userInfo['data']['total_score'] >= $v['min_score']){
                             $array['up']['min_score'] = $v['min_score'];
                             $array['up']['name'] = $v['name'];
-                            $array['info']['min_score'] = intval($userInfo['data']['money']);
+                            $array['info']['min_score'] = intval($userInfo['data']['total_score']);
                             $array['info']['name'] = $v['name'];
                             $array['info']['discount_ratio'] = $v['discount_ratio'];
                             $array['next']['min_score'] = $res['data'][$k+1]['min_score'];

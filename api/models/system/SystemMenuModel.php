@@ -30,7 +30,7 @@ class SystemMenuModel extends CommonModel {
 //     * @return string
 //     */
     public static function tableName() {
-        return 'system_menu';
+        return 'shop_menu';
     }
 
     /**

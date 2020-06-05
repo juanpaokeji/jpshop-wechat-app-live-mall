@@ -12,6 +12,7 @@
 namespace app\models\core;
 
 //引入各表实体
+use app\models\admin\app\AppAccessModel;
 use yii;
 use yii\db\Exception;
 use yii\web\Response;
@@ -58,6 +59,8 @@ class Base64Model {
 
         $base64_image_content = $str;
         $path = $this->creat_mulu($path);
+
+
         if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $base64_image_content, $result)) {
             $type = $result[2];
             $new_file = $path;
@@ -69,11 +72,30 @@ class Base64Model {
             if (file_put_contents($new_file, base64_decode(str_replace($result[1], '', $base64_image_content)))) {
                 $this->new_name = $new_file;
                 $this->file_folder = $path;
-                return $new_file;
+                //按设定尺寸压缩图片
+                $appModel = new AppAccessModel();
+                $appInfo = $appModel->find([]); //单应用商户，system_app_access表只有一条数据
+                if($appInfo['status'] == 200 && isset($appInfo['data']['thum_is_open']) && $appInfo['data']['thum_is_open'] == 1){
+                    $imgModel = new ImageModel($new_file,$appInfo['data']['thum_width']); //传入图片地址、指定宽度实例化model
+                    $imgModel->compressImg($new_file);//保存新图删除旧图
+                    return $new_file;
+                }else{
+                    return $new_file;
+                }
             } else {
                 return false;
             }
-        } else {
+        }else if (preg_match('/^(data:\s*image\/x\-icon;base64,)/', $base64_image_content, $result)) {
+            $path  =  $this->creat_mulu('./uploads/ico/'.time());
+            $new_file =$path.'favicon.ico';
+            if (file_put_contents($new_file, base64_decode(str_replace($result[1], '', $base64_image_content)))) {
+                $this->new_name = $new_file;
+                $this->file_folder = $path;
+                return  $new_file;
+            } else {
+                return  false;
+            }
+        }  else {
             return false;
         }
     }

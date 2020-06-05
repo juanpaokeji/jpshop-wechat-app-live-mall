@@ -6,6 +6,7 @@ use app\models\core\TableModel;
 use app\models\merchant\distribution\AgentModel;
 use app\models\merchant\distribution\OperatorModel;
 use app\models\merchant\system\OperationRecordModel;
+use app\models\merchant\vip\UnpaidVipModel;
 use app\models\shop\StorePaymentModel;
 use app\models\tuan\LeaderModel;
 use yii;
@@ -195,7 +196,7 @@ class UserController extends MerchantController
             }
         }
         //只为获取数量，分页使用
-        $sql = "SELECT su.id, su.nickname, su.`key`, su.status,su.level,su.level_id,su.fan_number,su.secondhand_fan_number,su.commission,su.withdrawable_commission,psu.nickname as parent_name,
+        $sql = "SELECT su.id, su.nickname, su.`key`, su.status,su.total_score,su.commission,su.withdrawable_commission,psu.nickname as parent_name,
                 (CASE su.sex WHEN 1 THEN '男' WHEN 2 THEN '女' WHEN 0 THEN '保密' END) sex, 
                 su.avatar, FROM_UNIXTIME( su.create_time, '%Y-%m-%d %H:%i:%s' ) create_time,su.score,su.money,su.recharge_balance, stl.realname,
                 CONCAT( suc.province, suc.city, suc.area ) pca, suc.address, suc.phone
@@ -208,7 +209,7 @@ class UserController extends MerchantController
                 GROUP BY su.id ORDER BY su.id desc";
         $count = count(yii::$app->db->createCommand($sql)->queryAll());
 
-        $sql = "SELECT su.id, su.nickname, su.`key`, su.status,su.level,su.level_id,su.fan_number,su.secondhand_fan_number,su.commission,su.withdrawable_commission,psu.nickname as parent_name,
+        $sql = "SELECT su.id, su.nickname, su.`key`, su.status,su.total_score,su.commission,su.withdrawable_commission,psu.nickname as parent_name,
                 (CASE su.sex WHEN 1 THEN '男' WHEN 2 THEN '女' WHEN 0 THEN '保密' END) sex, 
                 su.avatar, FROM_UNIXTIME( su.create_time, '%Y-%m-%d %H:%i:%s' ) create_time, su.score,su.money, su.recharge_balance,stl.realname,
                 CONCAT( suc.province, suc.city, suc.area ) pca, suc.address, suc.phone
@@ -225,45 +226,32 @@ class UserController extends MerchantController
             return result(204, '查询失败');
         }
 
-        //统计各会员的小等级名称
-        $agentModel = new AgentModel();
-        $agentWhere['key'] = $params['key'];
-        $agentWhere['merchant_id'] = yii::$app->session['uid'];
-        $agentWhere['status'] = 1;
-        $agentWhere['limit'] = false;
-        $agentInfo = $agentModel->do_select($agentWhere);  //可用的代理商等级
-        $operatorModel = new OperatorModel();
-        $operatorWhere['key'] = $params['key'];
-        $operatorWhere['merchant_id'] = yii::$app->session['uid'];
-        $operatorWhere['status'] = 1;
-        $operatorWhere['limit'] = false;
-        $operatorInfo = $operatorModel->do_select($operatorWhere);  //可用的运营商等级
+        //会员等级名称
+        $vipModel = new UnpaidVipModel();
+        $vipWhere['key'] = $params['key'];
+        $vipWhere['merchant_id'] = yii::$app->session['uid'];
+        $vipWhere['limit'] = false;
+        $vipInfo = $vipModel->do_select($vipWhere);
 
         foreach ($res as $k => $v) {
-            switch ($v['level']) {
-                case "0":
-                    $res[$k]['level_name'] = '普通会员';
-                    break;
-                case "1":
-                    $res[$k]['level_name'] = '超级会员';
-                    break;
-                case "2":
-                    foreach ($agentInfo['data'] as $key=>$val){
-                        if ($val['id'] == $v['level_id']){
+            $res[$k]['level_name'] = '会员';
+            if ($vipInfo['status'] == 200){
+                $minLev = reset($vipInfo['data']);//最低等级
+                $maxLev = end($vipInfo['data']);//最高等级
+                //总积分大于等于最高等级
+                if ($v['total_score'] >= $maxLev['min_score']){
+                    $res[$k]['level_name'] = $maxLev['name'];
+                }
+                //总积分在最低和最高之间的
+                if ($v['total_score'] >= $minLev['min_score'] && $v['total_score'] < $maxLev['min_score']){
+                    foreach ($vipInfo['data'] as $key=>$val){
+                        if ($v['total_score'] >= $val['min_score']){
                             $res[$k]['level_name'] = $val['name'];
                         }
                     }
-                    break;
-                case "3":
-                    foreach ($operatorInfo['data'] as $key=>$val){
-                        if ($val['id'] == $v['level_id']){
-                            $res[$k]['level_name'] = $val['name'];
-                        }
-                    }
-                    break;
-                default:
-                    break;
+                }
             }
+
 
             $res[$k]['pay_num'] = 0;
             $res[$k]['cart_num'] = 0;

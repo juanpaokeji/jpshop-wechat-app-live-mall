@@ -7,6 +7,7 @@ use app\models\merchant\distribution\AgentModel;
 use app\models\merchant\distribution\DistributionAccessModel;
 use app\models\merchant\distribution\OperatorModel;
 use app\models\merchant\distribution\SuperModel;
+use app\models\merchant\vip\UnpaidVipModel;
 use app\models\shop\GroupOrderModel;
 use app\models\shop\OrderModel;
 use app\models\shop\ScoreModel;
@@ -30,12 +31,6 @@ class TaskController extends Controller
 {
 
     public $enableCsrfValidation = false; //禁用CSRF令牌验证，可以在基类中设置
-    public $config = [
-        'app_id' => 'wx8df3a6f4a4f9ec54',
-        'secret' => '7188287cd30aa902d5933654fed60559',
-        'token' => 'juanPao',
-        'aes_key' => '9ILejPm7rpu5kJykkY13oHMO80bYJkNbQfCvL3otaWA'
-    ];
 
     public function actionIndex()
     {
@@ -86,50 +81,49 @@ class TaskController extends Controller
         }
     }
 
-    public function actionExp()
-    {
-        $bool = getConfig(date('Y-m-d'));
-        if ($bool) {
-            $day = date('d');
-            if ($day == "01") {
-                setConfig(date('Y-m-d'), true);
-                $sql = "update shop_user set leader_exp = ROUND(leader_exp/2)";
-                yii::$app->db->createCommand($sql)->execute();
-            }
-        }
-    }
-
-    public function actionLevel()
-    {
-        $bool = getConfig(date('Y-m-d'));
-        if ($bool) {
-            $day = date('d');
-            if ($day == "16") {
-                $userModel = new \app\models\shop\UserModel();
-                $users = $userModel->findall(['is_leader' => 1]);
-                $sql = "";
-                $levelModel = new \app\models\merchant\user\LevelModel();
-                $levels = $levelModel->do_select(['orderby' => 'min_exp asc']);
-                for ($i = 0; $i < count($users['data']); $i++) {
-                    $level = 0;
-                    for ($j = 0; $j < count($levels['data']); $j++) {
-                        if ($users['data'][$i]['leader_exp'] >= $levels['data'][$j]['min_exp']) {
-                            $level = $levels['data'][$j]['id'];
-                        }
-                    }
-                    $sql = $sql . " update shop_user set leader_level = " . $level . " where id = " . $users['data'][$i]['id'] . ";";
-                }
-                yii::$app->db->createCommand($sql)->execute();
-            }
-        }
-    }
+//    public function actionExp()
+//    {
+//        $bool = getConfig(date('Y-m-d'));
+//        if ($bool) {
+//            $day = date('d');
+//            if ($day == "01") {
+//                setConfig(date('Y-m-d'), true);
+//                $sql = "update shop_user set leader_exp = ROUND(leader_exp/2)";
+//                yii::$app->db->createCommand($sql)->execute();
+//            }
+//        }
+//    }
+//
+//    public function actionLevel()
+//    {
+//        $bool = getConfig(date('Y-m-d'));
+//        if ($bool) {
+//            $day = date('d');
+//            if ($day == "16") {
+//                $userModel = new \app\models\shop\UserModel();
+//                $users = $userModel->findall(['is_leader' => 1]);
+//                $sql = "";
+//                $levelModel = new \app\models\merchant\user\LevelModel();
+//                $levels = $levelModel->do_select(['orderby' => 'min_exp asc']);
+//                for ($i = 0; $i < count($users['data']); $i++) {
+//                    $level = 0;
+//                    for ($j = 0; $j < count($levels['data']); $j++) {
+//                        if ($users['data'][$i]['leader_exp'] >= $levels['data'][$j]['min_exp']) {
+//                            $level = $levels['data'][$j]['id'];
+//                        }
+//                    }
+//                    $sql = $sql . " update shop_user set leader_level = " . $level . " where id = " . $users['data'][$i]['id'] . ";";
+//                }
+//                yii::$app->db->createCommand($sql)->execute();
+//            }
+//        }
+//    }
 
     //订单状态 自动更新
     public function actionGoods()
     {
         $appModel = new AppAccessModel();
         $apps = $appModel->findall([]);
-        //    var_dump($apps);
         $orderModel = new GroupOrderModel();
         $orders = $orderModel->do_select(['limit' => false]);
 
@@ -171,9 +165,7 @@ class TaskController extends Controller
             }
 
         }
-        //  var_dump($leader_confirm);
-        //  var_dump($leader_send);
-        //var_dump($user_confirm);die();
+
         $res1 = $orderModel->do_update(['id' => $leader_confirm], ['tuan_status' => 2]);
         $res2 = $orderModel->do_update(['id' => $leader_send], ['status' => 6]);
         $res3 = $orderModel->do_update(['id' => $user_confirm], ['status' => 6]);
@@ -183,12 +175,6 @@ class TaskController extends Controller
             $params['order_sn'] = $leader_send_order_sn[$i];
             $orderModel = new \app\models\shop\OrderModel();
             $data['order_sn'] = $params['order_sn'];
-//            $data['`key`'] = yii::$app->session['key'];
-//            $data['merchant_id'] = yii::$app->session['merchant_id'];
-//            $data['leader_self_uid'] = yii::$app->session['user_id'];
-//            $data['status'] = 3;
-//            $data['tuan_status'] = 2;
-
             $array = $orderModel->queryOrder($data);
 
             if ($array['status'] != 200) {
@@ -209,11 +195,42 @@ class TaskController extends Controller
             $sql = "select is_vip,vip_validity_time from shop_user where id = " . $array['data'][0]['user_id'];
             $vipUser = $orderModel->querySql($sql);
             $vip = 1;
-            if ($vipUser[0]['is_vip'] == 1 && $vipUser[0]['vip_validity_time'] > time()) {
-                $sql = "select score_times from shop_vip_config where merchant_id = " . $array['data'][0]['merchant_id'] . " `key` = '" . $array['data'][0]['key'] . "'";
-                $vipConfig = $orderModel->querySql($sql);
-                if (count($vipConfig) != 0) {
-                    $vip = $vipConfig[0]['score_times'];
+            $appInfo = $appModel->find(['key' => $array['data'][0]['key']]);
+            if ($appInfo['status'] == 200 && $appInfo['data']['user_vip'] != 0){
+                if ($appInfo['data']['user_vip'] == 2){
+                    //积分会员等级
+                    $userModel = new UserModel;
+                    $userInfo = $userModel->find(['id' => $array['data'][0]['user_id']]);
+                    $unpaidVipModel = new UnpaidVipModel();
+                    $unpaidVipWhere = [];
+                    $unpaidVipWhere['key'] = $array['data'][0]['key'];
+                    $unpaidVipWhere['merchant_id'] = $array['data'][0]['merchant_id'];
+                    $unpaidVipWhere['limit'] = false;
+                    $unpaidVipInfo = $unpaidVipModel->do_select($unpaidVipWhere);
+                    if ($unpaidVipInfo['status'] == 200 && $userInfo['status'] == 200){
+                        $minLev = reset($unpaidVipInfo['data']);//最低等级
+                        $maxLev = end($unpaidVipInfo['data']);//最高等级
+                        //总积分大于等于最高等级
+                        if ($userInfo['data']['total_score'] >= $maxLev['min_score']){
+                            $vip = $maxLev['score_times'];
+                        }
+                        //总积分在最低和最高之间的
+                        if ($userInfo['data']['total_score'] >= $minLev['min_score'] && $userInfo['data']['total_score'] < $maxLev['min_score']){
+                            foreach ($unpaidVipInfo['data'] as $k=>$v){
+                                if ($userInfo['data']['total_score'] >= $v['min_score']){
+                                    $vip = $v['score_times'];
+                                }
+                            }
+                        }
+                    }
+                }else{
+                    if ($vipUser[0]['is_vip'] == 1 && $vipUser[0]['vip_validity_time'] > time()) {
+                        $sql = "select score_times from shop_vip_config where merchant_id = " . $array['data'][0]['merchant_id'] . " and `key` = '" . $array['data'][0]['key'] . "'";
+                        $vipConfig = $orderModel->querySql($sql);
+                        if (count($vipConfig) != 0) {
+                            $vip = $vipConfig[0]['score_times'];
+                        }
+                    }
                 }
             }
             $rs = $orderModel->tableSingle("shop_order_group", ['order_sn' => $params['order_sn'], 'delete_time is null' => null]);
@@ -233,51 +250,15 @@ class TaskController extends Controller
             $user_id = $array['data'][0]['user_id'];
             $userModel = new UserModel();
             $user = $userModel->find(['id' => $user_id]);
-            $userModel->update(['id' => $user_id, '`key`' => $array['data'][0]['key'], 'score' => $user['data']['score'] + $score]);
+            $userModel->update(['id' => $user_id, '`key`' => $array['data'][0]['key'],'total_score' => $user['data']['total_score'] + $score ,'score' => $user['data']['score'] + $score]);
 
-
-            if ($array['status'] == 200) {
-
-                $configModel = new \app\models\tuan\ConfigModel();
-                $bool = array();
-                $config = $configModel->do_one(['merchant_id' => $array['data'][0]['merchant_id'], 'key' => $array['data'][0]['key']]);
-                if ($config['status'] == 200 && $config['data']['status'] == 1) {
-                    //团长佣金
-                    $balanceModel = new \app\models\shop\BalanceModel();
-                    $balance = $balanceModel->do_one(['order_sn' => $params['order_sn'], 'uid' => $array['data'][0]['user_id'], 'type' => 1, 'key' => $array['data'][0]['key'], 'merchant_id' => $array['data'][0]['merchant_id']]);
-                    if ($balance['status'] == 200) {
-                        $userModel = new UserModel();
-                        $user = $userModel->find(['id' => $balance['data']['uid']]);
-                        $bool[0] = $userModel->update(['id' => $balance['data']['uid'], '`key`' => $array['data'][0]['key'], 'balance' => (float)$user['data']['balance'] + (float)$balance['data']['money']]);
-                    }
-                    //自提佣金
-                    $balanceModel = new \app\models\shop\BalanceModel();
-                    $balance = $balanceModel->do_one(['order_sn' => $params['order_sn'], 'uid' => $array['data'][0]['user_id'], 'type' => 3, 'key' => $array['data'][0]['key'], 'merchant_id' => $array['data'][0]['merchant_id']]);
-                    if ($balance['status'] == 200) {
-                        $userModel = new UserModel();
-                        $user = $userModel->find(['id' => $balance['data']['uid']]);
-                        $userModel->update(['id' => $balance['data']['uid'], '`key`' => yii::$app->session['key'], 'balance' => (float)$user['data']['balance'] + (float)$balance['data']['money'], 'leader_exp' => $user['data']['leader_exp'] + (int)$balance['data']['money']]);
-                        $bool[1] = $balanceModel->do_update(['order_sn' => $params['order_sn'], 'key' => $array['data'][0]['key'], 'merchant_id' => $array['data'][0]['merchant_id']], ['status' => 1]);
-                    }
-                }
-                if ($bool[0]['status'] == 200 && $bool[1]['status'] == 200) {
-                    //供应商金额
-                    $subBalanceModel = new \app\models\system\SystemSubAdminBalanceModel();
-                    $subBalance = $subBalanceModel->do_select(['order_sn' => $params['order_sn']]);
-                    if ($subBalance['status'] == 200) {
-                        $subBalanceModel->do_update(['order_sn' => $params['order_sn']], ['status' => 1]);
-                        for ($i = 0; $i < count($subBalance['data']); $i++) {
-                            $subUserModel = new \app\models\merchant\system\UserModel();
-                            $sql = "update system_sub_admin set balance = balance+{$subBalance['data'][$i]['money']} where id = {$subBalance['data'][$i]['sub_admin_id']}";
-                            $subUserModel->querySql($sql);
-                        }
-                    }
-                }
-
-
-                $balanceModel = new \app\models\shop\BalanceModel();
-                $balanceModel->do_update(['order_sn' => $data['order_sn']], ['status' => 1]);
+            //确认收货后更新团长等级、经验
+            $orderModel = new OrderModel;
+            $orderRs = $orderModel->find(['order_sn' => $params['order_sn']]);
+            if ($orderRs['data']['leader_uid'] != 0){
+                $this->level($orderRs['data']['leader_uid'],floor($orderRs['data']['payment_money']));
             }
+
         }
         //用户确认收货 加积分，团长佣金结算
         for ($i = 0; $i < count($user_confirm_order_sn); $i++) {
@@ -300,11 +281,42 @@ class TaskController extends Controller
             $sql = "select is_vip,vip_validity_time from shop_user where id = " . $array['data'][0]['user_id'];
             $vipUser = $subOrder->querySql($sql);
             $vip = 1;
-            if ($vipUser[0]['is_vip'] == 1 && $vipUser[0]['vip_validity_time'] > time()) {
-                $sql = "select score_times from shop_vip_config where merchant_id = " . $array['data'][0]['merchant_id'] . " `key` = '" . $array['data'][0]['key'] . "'";
-                $vipConfig = $subOrder->querySql($sql);
-                if (count($vipConfig) != 0) {
-                    $vip = $vipConfig[0]['score_times'];
+            $appInfo = $appModel->find(['key' => $array['data'][0]['key']]);
+            if ($appInfo['status'] == 200 && $appInfo['data']['user_vip'] != 0){
+                if ($appInfo['data']['user_vip'] == 2){
+                    //积分会员等级
+                    $userModel = new UserModel;
+                    $userInfo = $userModel->find(['id' => $array['data'][0]['user_id']]);
+                    $unpaidVipModel = new UnpaidVipModel();
+                    $unpaidVipWhere = [];
+                    $unpaidVipWhere['key'] = $array['data'][0]['key'];
+                    $unpaidVipWhere['merchant_id'] = $array['data'][0]['merchant_id'];
+                    $unpaidVipWhere['limit'] = false;
+                    $unpaidVipInfo = $unpaidVipModel->do_select($unpaidVipWhere);
+                    if ($unpaidVipInfo['status'] == 200 && $userInfo['status'] == 200){
+                        $minLev = reset($unpaidVipInfo['data']);//最低等级
+                        $maxLev = end($unpaidVipInfo['data']);//最高等级
+                        //总积分大于等于最高等级
+                        if ($userInfo['data']['total_score'] >= $maxLev['min_score']){
+                            $vip = $maxLev['score_times'];
+                        }
+                        //总积分在最低和最高之间的
+                        if ($userInfo['data']['total_score'] >= $minLev['min_score'] && $userInfo['data']['total_score'] < $maxLev['min_score']){
+                            foreach ($unpaidVipInfo['data'] as $k=>$v){
+                                if ($userInfo['data']['total_score'] >= $v['min_score']){
+                                    $vip = $v['score_times'];
+                                }
+                            }
+                        }
+                    }
+                }else{
+                    if ($vipUser[0]['is_vip'] == 1 && $vipUser[0]['vip_validity_time'] > time()) {
+                        $sql = "select score_times from shop_vip_config where merchant_id = " . $array['data'][0]['merchant_id'] . " and `key` = '" . $array['data'][0]['key'] . "'";
+                        $vipConfig = $orderModel->querySql($sql);
+                        if (count($vipConfig) != 0) {
+                            $vip = $vipConfig[0]['score_times'];
+                        }
+                    }
                 }
             }
             $rs = $model->tableSingle("shop_order_group", ['order_sn' => $params['order_sn'], 'delete_time is null' => null]);
@@ -321,33 +333,12 @@ class TaskController extends Controller
             );
             $scoreModel->add($scoreData);
 
-            $configModel = new \app\models\tuan\ConfigModel();
 
-            $config = $configModel->do_one(['merchant_id' => $array['data'][0]['merchant_id'], 'key' => $array['data'][0]['key']]);
-            if ($config['status'] == 200 && $config['data']['status'] == 1) {
-                //团长佣金
-                $balanceModel = new \app\models\shop\BalanceModel();
-                $balance = $balanceModel->do_one(['order_sn' => $params['order_sn'], 'type' => 1, 'key' => $array['data'][0]['key'], 'merchant_id' => $array['data'][0]['merchant_id']]);
-                if ($balance['status'] == 200) {
-                    $userModel = new UserModel();
-                    $user = $userModel->find(['id' => $balance['data']['uid']]);
-                    if ($user['status'] == 200) {
-                        $userModel->update(['id' => $balance['data']['uid'], '`key`' => $array['data'][0]['key'], 'balance' => (float)$user['data']['balance'] + (float)$balance['data']['money']]);
-                    }
-                }
-            }
-            //供应商金额
-            $subBalanceModel = new \app\models\system\SystemSubAdminBalanceModel();
-            $subBalance = $subBalanceModel->do_select(['order_sn' => $params['order_sn']]);
-            if ($subBalance['status'] == 200) {
-                $subBalanceModel->do_update(['order_sn' => $params['order_sn']], ['status' => 1]);
-                for ($i = 0; $i < count($subBalance['data']); $i++) {
-                    $subUserModel = new \app\models\merchant\system\UserModel();
-                    $sql = "update system_sub_admin set balance = balance+{$subBalance['data'][$i]['money']} where id = {$subBalance['data'][$i]['sub_admin_id']}";
-                    $subUserModel->querySql($sql);
-                }
-            }
-
+            $score = $rs['payment_money'] * $vip;
+            $user_id = $array['data'][0]['user_id'];
+            $userModel = new UserModel();
+            $user = $userModel->find(['id' => $user_id]);
+            $userModel->update(['id' => $user_id, '`key`' => $array['data'][0]['key'],'total_score' => $user['data']['total_score'] + $score ,'score' => $user['data']['score'] + $score]);
 
             $orderModel = new OrderModel();
             $orderRs = $orderModel->find(['order_sn' => $params['order_sn']]);
@@ -355,33 +346,6 @@ class TaskController extends Controller
             $shopUserModel = new \app\models\shop\UserModel();
             $shopUser = $shopUserModel->find(['id' => $orderRs['data']['user_id']]);
 
-            $tempModel = new \app\models\system\SystemMiniTemplateModel();
-            $minitemp = $tempModel->do_one(['id' => 32]);
-            //单号,金额,下单时间,物品名称,
-            // [{"keyword_id":"1","name":"订单号","example":"201703158237869"},
-            //{"keyword_id":"3","name":"完成时间","example":"2017-03-22 10:04:12"},
-            //{"keyword_id":"5","name":"订单号码","example":"201703158237869"},
-            //{"keyword_id":"12","name":"联系电话","example":"13899990000"},
-            $tempParams = array(
-                'keyword1' => $params['order_sn'],
-                'keyword2' => $orderRs['data']['update_time'],
-                'keyword3' => $orderRs['data']['create_time'],
-                'keyword4' => $orderRs['data']['phone'],
-            );
-
-            $tempAccess = new SystemMerchantMiniAccessModel();
-            $taData = array(
-                'key' => $orderRs['data']['key'],
-                'merchant_id' => $orderRs['data']['merchant_id'],
-                'mini_open_id' => $shopUser['data']['mini_open_id'],
-                'template_id' => 32,
-                'number' => '0',
-                'template_params' => json_encode($tempParams),
-                'template_purpose' => 'order',
-                'page' => "/pages/orderItem/orderItem/orderItem?order_sn={$params['order_sn']}",
-                'status' => '-1',
-            );
-            $tempAccess->do_add($taData);
 
             //用户确认收货后，查询普通会员是否可以升级为超级会员
             $appAccessModel = new \app\models\merchant\app\AppAccessModel();
@@ -407,12 +371,14 @@ class TaskController extends Controller
                             $levelData['`key`'] = $orderRs['data']['key'];
                             $levelData['level'] = 1;
                             $levelData['up_level'] = 1;
+                            $levelData['reg_time'] = time();
                             $userModel->update($levelData);
                         }else{
                             $levelData['id'] = $orderRs['data']['user_id'];
                             $levelData['`key`'] = $orderRs['data']['key'];
                             $levelData['up_level'] = 1;
                             $levelData['is_check'] = 0;
+                            $levelData['reg_time'] = time();
                             $userModel->update($levelData);
                         }
                     }
@@ -421,7 +387,7 @@ class TaskController extends Controller
             //判断父级是否可以升级
             if ($userInfo['status'] == 200 && !empty($userInfo['data']['parent_id'])){
                 $parentInfo = $userModel->find(['id'=>$userInfo['data']['parent_id']]);
-                $sql = "SELECT sum(sog.payment_money) as total FROM `shop_user` su RIGHT JOIN `shop_order_group` sog ON sog.user_id = su.id WHERE su.parent_id = {$userInfo['data']['parent_id']} AND sog.status = 6 OR sog.status = 7";
+                $sql = "SELECT sum(sog.payment_money) as total FROM `shop_user` su RIGHT JOIN `shop_order_group` sog ON sog.user_id = su.id WHERE su.parent_id = {$userInfo['data']['parent_id']} AND (sog.status = 6 OR sog.status = 7)";
                 $total = $userModel->querySql($sql); //$total[0]['total']
                 if (isset($parentInfo['data'])){
                     $fanNum = $parentInfo['data']['fan_number'];
@@ -460,6 +426,7 @@ class TaskController extends Controller
                         $levelData['id'] = $userInfo['data']['parent_id'];
                         $levelData['`key`'] = $orderRs['data']['key'];
                         $levelData['up_level'] = $level;
+                        $levelData['reg_time'] = time();
                         if (isset($levelId)){
                             $levelData['up_level_id'] = $levelId;
                         }
@@ -504,8 +471,28 @@ class TaskController extends Controller
             $appAccessModel->update($appData);
             
         }
+        $this->test();
 
+    }
 
+    public function level($leader_uid, $exp)
+    {
+        $table = new TableModel();
+        $sql = "select * from shop_user where id = " . $leader_uid;
+        $user = $table->querySql($sql);
+        if (count($user) > 0) {
+            $user[0]['leader_exp'] = $exp + $user[0]['leader_exp'];
+
+            $sql = "select * from shop_leader_level  where min_exp < {$user[0]['leader_exp']} and `key`='ccvWPn'  order by min_exp desc limit 1";
+            $res = $table->querySql($sql);
+            if (count($res) > 0) {
+                $sql = "update shop_user set leader_level = {$res[0]['id']},leader_exp = {$user[0]['leader_exp']}";
+                Yii::$app->db->createCommand($sql)->execute();
+            }else{
+                $sql = "update shop_user set leader_exp = {$user[0]['leader_exp']}";
+                Yii::$app->db->createCommand($sql)->execute();
+            }
+        }
     }
 
     /**
@@ -521,42 +508,12 @@ class TaskController extends Controller
 //            $orderModel->do_select(['status' => 0, 'create_time' =>]);
             $table = new TableModel();
             $time = time();
-            $sql = "select * from shop_order_group  where status = 0 and  create_time+(23*60*60)<={$time} and is_send_message = 0";
+            $sql = "select * from shop_order_group  where status = 0 and  create_time+(24*60*60)<={$time} and is_send_message = 0";
             $res = $table->querySql($sql);
 
             if (count($res) != 0) {
                 $order_sn = "";
                 for ($i = 0; $i < count($res); $i++) {
-
-                    $shopUserModel = new \app\models\shop\UserModel();
-                    $shopUser = $shopUserModel->find(['id' => $res[$i]['user_id']]);
-
-                    $appModel = new \app\models\admin\app\AppAccessModel();
-                    $app = $appModel->find(['`key`'=>$shopUser['data']['key']]);
-                    $tempModel = new \app\models\system\SystemMiniTemplateModel();
-                    $minitemp = $tempModel->do_one(['id' => 29]);
-                    //金额,物品名称,订单号,收货地址,备注,
-                    $tempParams = array(
-                        'keyword2' => $res[$i]['goodsname'],
-                        'keyword1' => $res[$i]['payment_money'],
-                        'keyword3' => $res[$i]['order_sn'],
-                        'keyword4' => $res[$i]['address'],
-                        'keyword5' => "亲，您的订单还未付款哦，订单即将关闭，再不付款就被别人买走了哦！感谢您对【".$app['data']['name']."】的支持，点击进入即可去付款哦！",
-                    );
-
-                    $tempAccess = new SystemMerchantMiniAccessModel();
-                    $taData = array(
-                        'key' => $shopUser['data']['key'],
-                        'merchant_id' => $shopUser['data']['merchant_id'],
-                        'mini_open_id' => $shopUser['data']['mini_open_id'],
-                        'template_id' => 36,
-                        'number' => '0',
-                        'template_params' => json_encode($tempParams),
-                        'template_purpose' => 'order',
-                        'page' => "/pages/orderItem/orderItem/orderItem?order_sn={$res[$i]['order_sn']}",
-                        'status' => '-1',
-                    );
-                    $tempAccess->do_add($taData);
                     if ($i == 0) {
                         $order_sn = $res[$i]['order_sn'];
                     } else {
@@ -568,6 +525,36 @@ class TaskController extends Controller
             }
         } else {
             return result(500, "请求方式错误");
+        }
+    }
+
+    public  function actionDelOrder(){
+        if (yii::$app->request->isGet) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->get(); //获取地址栏参数
+            $time = time();
+            $sql = " delete  from shop_order_group where status = 2 and create_time+(48*60*60)<={$time}";
+            Yii::$app->db->createCommand($sql)->execute();
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
+
+    public function test()
+    {
+        $table = new TableModel();
+        $sql = "select * from shop_order_group where status =6 or status =7 ";
+        $res = $table->querySql($sql);
+
+        for ($i = 0; $i < count($res); $i++) {
+            $sql = "select * from shop_user_balance where order_sn = '{$res[$i]['order_sn']}' and status = 0";
+            $balance = $table->querySql($sql);
+            for ($j = 0; $j < count($balance); $j++) {
+                $sql = "update shop_user  set balance =balance+{$balance[$j]['money']} where id = {$balance[$j]['uid']};";
+                Yii::$app->db->createCommand($sql)->execute();
+            }
+            $sql = "update shop_user_balance  set status =1 where order_sn = '{$res[$i]['order_sn']}' ";
+            Yii::$app->db->createCommand($sql)->execute();
         }
     }
 }

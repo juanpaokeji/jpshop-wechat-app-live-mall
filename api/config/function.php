@@ -370,35 +370,88 @@ function order_sn() {
     return $order_id;
 }
 
-function logistics($nu, $com) {
-    $redis = getConfig($nu);
-    if (!$redis) {
-        $requestData = "{'OrderCode':'','ShipperCode':'{$com}','LogisticCode':'{$nu}'}";
-
-        $datas = array(
-            'EBusinessID' => "1333816",
-            'RequestType' => '1002',
-            'RequestData' => urlencode($requestData),
-            'DataType' => '2',
-        );
-        $datas['DataSign'] = ems_encrypt($requestData, "cb26aafb-f391-4af7-8339-44aeec1c7453");
-        $data = sendPost("http://api.kdniao.com/Ebusiness/EbusinessOrderHandle.aspx", $datas);
-
-        //根据公司业务处理返回的信息......
-
-        $data = json_decode($data, true);
-
-        if ($data['State'] == 3) {
-            setConfig($nu, $data);
-            yii::$app->redis->expire($nu, 2592000);
-        } else {
-            setConfig($nu, $data);
-            yii::$app->redis->expire($nu, 7200);
+function logistics($nu, $com, $receiverPhone = "18200000000", $senderPhone = "18200000000") {
+//    $redis = getConfig($nu);
+//    if (!$redis) {
+        //查询物流API配置
+        $model = new \app\models\system\SystemLogisticsConfigModel();
+        $where['status'] = 1;
+        $info  = $model->do_one($where);
+        if ($info['status'] != 200){
+            return result(204, '未查询到物流配置信息');
         }
+        $info['data']['config'] = json_decode($info['data']['config'],true);
+        if ($info['data']['type'] == 1){ //快递鸟
+            $requestData = "{'OrderCode':'','ShipperCode':'{$com}','LogisticCode':'{$nu}'}";
+            $datas = array(
+                'EBusinessID' => $info['data']['config']['EBusinessID'],
+                'RequestType' => $info['data']['config']['RequestType'],
+                'RequestData' => urlencode($requestData),
+                'DataType' => '2',
+            );
+            $datas['DataSign'] = ems_encrypt($requestData, $info['data']['config']['appkey']);
+            $data = sendPost("http://api.kdniao.com/Ebusiness/EbusinessOrderHandle.aspx", $datas);
+            //根据公司业务处理返回的信息......
+            $data = json_decode($data, true);
+//            if ($data['State'] == 3) {
+//                setConfig($nu, $data);
+//                yii::$app->redis->expire($nu, 2592000);
+//            } else {
+//                setConfig($nu, $data);
+//                yii::$app->redis->expire($nu, 7200);
+//            }
+        }elseif ($info['data']['type'] == 2){ //阿里云
+            $expressModel = new \app\models\shop\SystemExpressModel();
+            $expressWhere['simple_name'] = $com;
+            $expressInfo = $expressModel->find($expressWhere);
+            if ($expressInfo['status'] != 200 || $expressInfo['data']['abbreviation_name'] == ''){
+                return result(204, '未查询到物流公司信息');
+            }
+            $host = "https://ali-deliver.showapi.com";
+            $path = "/showapi_expInfo";
+            $appcode = $info['data']['config']['appcode']; //你自己的AppCode
+            $headers = array();
+            array_push($headers, "Authorization:APPCODE " . $appcode);
+            $querys = "com={$expressInfo['data']['abbreviation_name']}&nu={$nu}&receiverPhone={$receiverPhone}&senderPhone={$senderPhone}";
+            $url = $host . $path . "?" . $querys;
+            $curl = curl_init();
+            curl_setopt($curl, CURLOPT_URL, $url);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+            if (1 == strpos("$".$host, "https://")){
+                curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+            }
+            if (!curl_exec($curl)) {
+                $res = '';
+            } else {
+                $res = curl_multi_getcontent($curl);
+            }
+            curl_close($curl);
+            $res = json_decode($res,true);
+            $data['LogisticCode'] = $nu;
+            if ($res['showapi_res_code'] == 0 && $res['showapi_res_body']['flag'] == true){
+                //将阿里云返回数据格式转为统一格式
+                foreach ($res['showapi_res_body']['data'] as $k=>$v){
+                    $temp['AcceptStation'] = $v['context'];
+                    $temp['AcceptTime'] = $v['time'];
+                    $data['Traces'][] = $temp;
+                }
+                $data['msg'] = $res['showapi_res_body']['msg'];
+//                if ($res['showapi_res_body']['status'] == 4) { //已签收
+//                    setConfig($nu, $data);
+//                    yii::$app->redis->expire($nu, 2592000);
+//                } else {
+//                    setConfig($nu, $data);
+//                    yii::$app->redis->expire($nu, 7200);
+//                }
+            }
+        }
+
         return $data;
-    } else {
-        return $redis;
-    }
+//    } else {
+//        return $redis;
+//    }
 }
 
 /**
@@ -577,14 +630,22 @@ function electronics($eorder, $sender, $receiver, $commodity) {
  * Json方式 调用电子面单接口
  */
 function submitEOrder($requestData) {
+    //查询物流API配置（快递鸟）
+    $model = new \app\models\system\SystemLogisticsConfigModel();
+    $where['type'] = 1;
+    $info  = $model->do_one($where);
+    if ($info['status'] != 200){
+        return result(204, '未查询到物流配置信息');
+    }
+    $info['data']['config'] = json_decode($info['data']['config'],true);
     $datas = array(
-        'EBusinessID' => 'test1333816',
+        'EBusinessID' => $info['data']['config']['EBusinessID'],
         'RequestType' => '1007',
         'RequestData' => urlencode($requestData),
         'DataType' => '2',
     );
-    $datas['DataSign'] = ems_encrypt($requestData, "87fcae6b-e5fc-4a3c-a7c9-69c66452d438");
-    $result = sendPost("http://sandboxapi.kdniao.com:8080/kdniaosandbox/gateway/exterfaceInvoke.json", $datas);
+    $datas['DataSign'] = ems_encrypt($requestData, $info['data']['config']['appkey']);
+    $result = sendPost("http://api.kdniao.com/api/EOrderService", $datas);
 
     //根据公司业务处理返回的信息......
 
@@ -672,4 +733,43 @@ function xzphp_curl_get($url)
     return $output;
 }
 
+/* * ************************************************************
+ *
+ *  百度坐标转高德坐标
+ *  @locations string       坐标点,经度和纬度用“,”分割，经度在前，纬度在后，经纬度小数点后不得超过6位。多个坐标对之间用“|”进行分隔最多支持40对坐标。
+ *  @coordsys string       原坐标系，可选值：gps;mapbar;baidu;autonavi(不进行转换)
+ *  @return array
+ *
+ * *********************************************************** */
+function bd_amap($locations,$coordsys = "baidu"){
+    $url = "https://restapi.amap.com/v3/assistant/coordinate/convert?locations={$locations}&coordsys={$coordsys}&output=json&key=bc55956766e813d3deb1f95e45e97d73";
+    $res = json_decode(curlGet($url), true);
+    if ($res['status'] == 1){
+        return $res['locations'];
+    }else{
+        return false;
+    }
+}
+
+
+function llenRedis($key) {
+    $key  = $key."-".$_SERVER['HTTP_HOST'];
+    $value = \Yii::$app->redis->llen($key);
+    return $value;
+}
+
+function rpopRedis($key) {
+    $key  = $key."-".$_SERVER['HTTP_HOST'];
+    $value = \Yii::$app->redis->rpop($key);
+    if ($value) {
+        $value = json_decode($value, true);
+    }
+    return $value;
+}
+
+function lpushRedis($key, $value = "") {
+    $key = $key."-".$_SERVER['HTTP_HOST'];
+    $result = \yii::$app->redis->lpush($key, json_encode($value));
+    return $result;
+}
 

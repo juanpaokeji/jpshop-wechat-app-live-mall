@@ -192,7 +192,7 @@ class TableModel extends Model {
 //                $data[$pKey] = addslashes($value);
 //            }
             for ($i = 0; $i < $count; $i++) {
-                $setStr .= $keys[$i] . "='" . $data[$keys[$i]] . "',";
+                    $setStr .= $keys[$i] . "='" . $data[$keys[$i]] . "',";
             }
             $setStr = trim($setStr, ',');
         }

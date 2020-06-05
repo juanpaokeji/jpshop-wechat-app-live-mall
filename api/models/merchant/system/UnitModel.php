@@ -24,7 +24,8 @@ use yii\db\Exception;
  *
  * @Bean()
  */
-class UnitModel extends TableModel {
+class UnitModel extends TableModel
+{
 
     public $table = "system_unit";
 
@@ -34,7 +35,8 @@ class UnitModel extends TableModel {
      * @throws Exception if the model cannot be found
      * @return array
      */
-    public function findall($params) {
+    public function findall($params)
+    {
         //数据库操作
         $table = new TableModel();
         try {
@@ -80,7 +82,8 @@ class UnitModel extends TableModel {
      * @throws Exception if the model cannot be found
      * @return array
      */
-    public function find($params) {
+    public function find($params)
+    {
 
         if (isset($params['id'])) {
             $where['id'] = $params['id'];
@@ -119,7 +122,8 @@ class UnitModel extends TableModel {
      * @throws Exception if the model cannot be found
      * @return array
      */
-    public function add($params) {
+    public function add($params)
+    {
         //data 新增数据参数设置
         //数据库操作
         try {
@@ -142,7 +146,8 @@ class UnitModel extends TableModel {
      * @throws Exception if the model cannot be found
      * @return array
      */
-    public function delete($params) {
+    public function delete($params)
+    {
         //where条件设置
         $where = ['id' => $params['id']];
         //params 参数设置
@@ -168,7 +173,8 @@ class UnitModel extends TableModel {
      * @throws Exception if the model cannot be found
      * @return array
      */
-    public function update($params) {
+    public function update($params)
+    {
         //where 条件设置
         $where = ['id' => $params['id']];
         unset($params['id']);
@@ -176,10 +182,10 @@ class UnitModel extends TableModel {
         $params['update_time'] = time();
         //数据库操作
         $table = new TableModel();
-
-        $res = $table->tableUpdate($this->table, $params, $where);
         try {
-            
+            $res = $table->tableUpdate($this->table, $params, $where);
+
+
         } catch (Exception $ex) {
             return result(500, '数据库操作失败');
         }
@@ -189,8 +195,9 @@ class UnitModel extends TableModel {
             return result(200, '请求成功');
         }
     }
-    
-    public function updateStatus($params) {
+
+    public function updateStatus($params)
+    {
 
         if (isset($params['id'])) {
             $where['id'] = $params['id'];
@@ -212,7 +219,7 @@ class UnitModel extends TableModel {
         //数据库操作
         try {
             $table = new TableModel();
-            $res = $table->tableUpdate($this->table,$params, $where);
+            $res = $table->tableUpdate($this->table, $params, $where);
         } catch (Exception $ex) {
             return result(500, '数据库操作失败');
         }

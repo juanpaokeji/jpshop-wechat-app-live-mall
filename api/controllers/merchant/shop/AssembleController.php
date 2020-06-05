@@ -5,6 +5,7 @@ namespace app\controllers\merchant\shop;
 use app\models\core\Base64Model;
 use app\models\shop\GoodsModel;
 use app\models\shop\ShopAssembleModel;
+use app\models\shop\ShopGoodsModel;
 use app\models\shop\StockModel;
 use Yii;
 use app\models\shop\AssembleRecordModel;
@@ -25,10 +26,13 @@ class AssembleController extends MaterialController{
             if (isset($params['searchName'])) {
                 $goodsWhere['searchName'] = $params['searchName'];
             }
-            $goodsWhere['fields'] = "id,name,pic_urls,status,m_category_id,create_time,update_time";
+            $goodsWhere['fields'] = "id,name,pic_urls,status,m_category_id,stocks,create_time,update_time";
             $goodsWhere['`key`'] = $params['key'];
             $goodsWhere['merchant_id'] = yii::$app->session['uid'];
             $goodsWhere['delete_time'] = 1;
+            $goodsWhere['is_bargain'] = 0;
+            $goodsWhere['is_open_assemble'] = 0;
+            $goodsWhere['is_flash_sale'] = 0;
             $array = $goodsModel->findall($goodsWhere);
             if ($array['status'] == 200){
                 //将已设置过拼团信息的商品排除
@@ -49,23 +53,6 @@ class AssembleController extends MaterialController{
                         }
                     }
                     array_multisort($array['data']);
-                }
-                //查询各规格信息
-                $stockModel = new StockModel();
-                $stockWhere = array(
-                    '`key`'=>$params['key'],
-                    'merchant_id'=>yii::$app->session['uid'],
-                );
-                $stockInfo = $stockModel->findall($stockWhere);
-                if ($stockInfo['status'] != 200){
-                    return result(500, "各规格库存信息有误");
-                }
-                foreach ($array['data'] as $k=>$v){
-                    foreach ($stockInfo['data'] as $key=>$val){
-                        if ($v['id'] == $val['goods_id']){
-                            $array['data'][$k]['stock'][] = $val;
-                        }
-                    }
                 }
             }
 
@@ -182,9 +169,9 @@ class AssembleController extends MaterialController{
             $where['join'][] = ['left join', 'shop_user', 'shop_assemble_access.uid = shop_user.id'];
             $where['join'][] = ['left join', 'shop_user_contact', 'shop_user_contact.user_id = shop_user.id'];
             $where['or'] = ['or',['=', 'shop_assemble_access.id', $id],['=', 'shop_assemble_access.leader_id', $id]];
+            $where['groupBy'] = "order_sn";
             $where['orderby'] = "create_time asc";
             $array = $model->do_select($where);
-
             if ($array['status'] == 200){
                 foreach ($array['data'] as $k=>$v){
                     if ($v['assemble_status'] == '2' || $v['assemble_status'] == '4' || $v['assemble_status'] == '5' || $v['assemble_status'] == '9' || $v['assemble_status'] == '8'){
@@ -213,15 +200,47 @@ class AssembleController extends MaterialController{
             }
 
             $assembleModel = new ShopAssembleModel();
-            $assembleWhere['key'] = $params['key'];
-            $assembleWhere['merchant_id'] = yii::$app->session['uid'];
+            $assembleWhere['shop_assemble.key'] = $params['key'];
+            $assembleWhere['shop_assemble.merchant_id'] = yii::$app->session['uid'];
+            if (isset($params['searchName'])) {
+                $assembleWhere['shop_goods.name'] = ['like', "{$params['searchName']}"];
+            }
             if (isset($params['limit'])){
                 $assembleWhere['limit'] = $params['limit'];
                 $assembleWhere['page'] = $params['page'];
             }
+            $assembleWhere['field'] = "shop_assemble.*,shop_goods.name,shop_goods.is_open_assemble";
+            $assembleWhere['join'][] = ['left join', 'shop_goods', 'shop_assemble.goods_id = shop_goods.id'];
             $assembleInfo = $assembleModel->do_select($assembleWhere);
+            if ($assembleInfo['status'] != 200){
+                return $assembleInfo;
+            }
 
+            //查询各规格信息
+            $stockModel = new StockModel();
+            $stockWhere = array(
+                '`key`'=>$params['key'],
+                'merchant_id'=>yii::$app->session['uid'],
+            );
+            $stockInfo = $stockModel->findall($stockWhere);
+            if ($stockInfo['status'] != 200){
+                return result(500, "各规格库存信息有误");
+            }
+            foreach ($assembleInfo['data'] as $k=>$v){
+                $assemble_number = json_decode($v['property'],true);
+                foreach ($assemble_number as $key=>$val){
+                    $assembleInfo['data'][$k]['assemble_number'][] = $key;
+                }
+                $assembleInfo['data'][$k]['assemble_group_discount'] = json_decode($v['assemble_group_discount'],true);
+                $assembleInfo['data'][$k]['group_price_discount'] = json_decode($v['group_price_discount'],true);
+                foreach ($stockInfo['data'] as $key=>$val){
+                    if ($v['goods_id'] == $val['goods_id']){
+                        $assembleInfo['data'][$k]['stock'][] = $val;
+                    }
+                }
+            }
 
+            return $assembleInfo;
         } else {
             return result(500, "请求方式错误");
         }
@@ -232,100 +251,107 @@ class AssembleController extends MaterialController{
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
 
-            $must = ['key','stock'];
+            $must = ['key'];
             //设置类目 参数
             $rs = $this->checkInput($must, $params);
             if ($rs != false) {
                 return $rs;
             }
 
-            $stockModel = new StockModel();
-            $delData['goods_id'] = $params['id'];
-            $stockModel->del($delData);
-            //循环处理规格数据
-            foreach ($params['stock'] as $k=>$v){
-                //规格表数据保存
-                $data['`key`'] = $params['key'];
-                $data['merchant_id'] = yii::$app->session['uid'];
-                $data['storehouse_id'] =  $v['storehouse_id'];
-                $data['goods_id'] = $v['goods_id'];
-                $data['property1_name'] = $v['property1_name'];
-                $data['property2_name'] = $v['property2_name'];
-                $data['name'] = $v['name'];
-                $data['code'] = $v['code'];
-                $data['weight'] = $v['weight'];
-                $data['number'] = $v['number'];
-                $data['price'] = $v['price'];
-                $data['cost_price'] = $v['cost_price'];
-                $data['assemble_price'] = $v['assemble_price'];
-                $data['storehouse_number'] = $v['storehouse_number'];
-                $data['outbound_number'] = $v['outbound_number'];
-                $data['incoming_number'] = $v['incoming_number'];
-                $data['pic_url'] = $v['pic_url'];
-                $data['status'] = 1;
-                $stockModel->add($data);
-                //组装拼团表所需的数据
-                $stock['pic_url'][] = $v['pic_url'];
-                $stock['property1_name'][] = $v['property1_name'];
-                $stock['property2_name'][] = $v['property2_name'];
-                $stock['price'][] = $v['price'];
-                $stock['weight'][] = $v['weight'];
-                $stock['number'][] = $v['number'];
-                $stock['code'][] = $v['code'];
-                $stock['cost_price'][] = $v['cost_price'];
-                $stock['assemble_price'][] = $v['assemble_price'];
-                $stock['assemble_price'][] = $v['assemble_price'];
-            }
-            $params['stock'] = $stock;
-            $params['assemble_price'] = min($stock['assemble_price']);
+            //修改商品表拼团状态
+            $goodsModel = new GoodsModel();
+            $goodsData['id'] = $params['id'];
+            $goodsData['is_open_assemble'] = $params['is_open_assemble'];
+            $array = $goodsModel->update($goodsData);
 
-
-            //添加拼团配置
-            $groupModel = new ShopAssembleModel();
-            $groupInfo = $groupModel->one(['goods_id' => $id, 'key' => $params['`key`']]);
-            $group_number = max($params['assemble_number']); //计算拼团人数
-            $new_group_arr = [];
-            $assemble_price = $params['stock']['assemble_price'];
-            foreach ($params['assemble_number'] as $ass_key => $ass_number) {
-                if (empty($ass_number)) {
-                    return result(500, "平团人数错误");
+            if (isset($params['stock'])){
+                $stockModel = new StockModel();
+                $delData['goods_id'] = $params['id'];
+                $stockModel->del($delData);
+                //循环处理规格数据
+                foreach ($params['stock'] as $k=>$v){
+                    //规格表数据保存
+                    $data['`key`'] = $params['key'];
+                    $data['merchant_id'] = yii::$app->session['uid'];
+                    $data['storehouse_id'] =  $v['storehouse_id'];
+                    $data['goods_id'] = $v['goods_id'];
+                    $data['property1_name'] = $v['property1_name'];
+                    $data['property2_name'] = $v['property2_name'];
+                    $data['name'] = $v['name'];
+                    $data['code'] = $v['code'];
+                    $data['weight'] = $v['weight'];
+                    $data['number'] = $v['number'];
+                    $data['price'] = $v['price'];
+                    $data['cost_price'] = $v['cost_price'];
+                    $data['assemble_price'] = $v['assemble_price'];
+                    $data['storehouse_number'] = $v['storehouse_number'];
+                    $data['outbound_number'] = $v['outbound_number'];
+                    $data['incoming_number'] = $v['incoming_number'];
+                    $data['pic_url'] = $v['pic_url'];
+                    $data['status'] = 1;
+                    $stockModel->add($data);
+                    //组装拼团表所需的数据
+                    $stock['pic_url'][] = $v['pic_url'];
+                    $stock['property1_name'][] = $v['property1_name'];
+                    $stock['property2_name'][] = $v['property2_name'];
+                    $stock['price'][] = $v['price'];
+                    $stock['weight'][] = $v['weight'];
+                    $stock['number'][] = $v['number'];
+                    $stock['code'][] = $v['code'];
+                    $stock['cost_price'][] = $v['cost_price'];
+                    $stock['assemble_price'][] = $v['assemble_price'];
                 }
-                foreach ($assemble_price as $price_key => $price_val) {
-                    $new_group_arr[$ass_number][$price_key]['property1_name'] = $params['stock']['property1_name'][$price_key];
-                    $new_group_arr[$ass_number][$price_key]['property2_name'] = $params['stock']['property2_name'][$price_key];
-                    $new_group_arr[$ass_number][$price_key]['price'] = $price_val;
-                    if ($params['is_leader_discount']) {
-                        $new_group_arr[$ass_number][$price_key]['tuan_price'] = $params['assemble_group_discount'][$ass_key];
-                    } else {
-                        $new_group_arr[$ass_number][$price_key]['tuan_price'] = 0;
+                $params['stock'] = $stock;
+                $params['assemble_price'] = min($stock['assemble_price']);
+
+                //添加拼团配置
+                $groupModel = new ShopAssembleModel();
+                $groupInfo = $groupModel->one(['goods_id' => $params['id'], 'key' => $params['key']]);
+                $group_number = max($params['assemble_number']); //计算拼团人数
+                $new_group_arr = [];
+                $assemble_price = $params['stock']['assemble_price'];
+                foreach ($params['assemble_number'] as $ass_key => $ass_number) {
+                    if (empty($ass_number)) {
+                        return result(500, "平团人数错误");
                     }
-                    if (isset($params['group_price_discount']) && $params['group_price_discount']) {
-                        $new_group_arr[$ass_number][$price_key]['price'] = bcmul($params['group_price_discount'][$ass_key] / 100, $price_val, 2);
+                    foreach ($assemble_price as $price_key => $price_val) {
+                        $new_group_arr[$ass_number][$price_key]['property1_name'] = $params['stock']['property1_name'][$price_key];
+                        $new_group_arr[$ass_number][$price_key]['property2_name'] = $params['stock']['property2_name'][$price_key];
+                        $new_group_arr[$ass_number][$price_key]['price'] = $price_val;
+                        if ($params['is_leader_discount']) {
+                            $new_group_arr[$ass_number][$price_key]['tuan_price'] = $params['assemble_group_discount'][$ass_key];
+                        } else {
+                            $new_group_arr[$ass_number][$price_key]['tuan_price'] = 0;
+                        }
+                        if (isset($params['group_price_discount']) && $params['group_price_discount']) {
+                            $new_group_arr[$ass_number][$price_key]['price'] = bcmul($params['group_price_discount'][$ass_key] / 100, $price_val, 2);
+                        }
                     }
                 }
-            }
 
-            $group = array(
-                'key'=>$params['key'],
-                'merchant_id'=>yii::$app->session['uid'],
-                'goods_id'=>$id,
-                'is_self'=>$params['is_self'] ?? 0,
-                'older_with_newer'=>$params['older_with_newer'] ?? 0,
-                'is_automatic'=>$params['is_automatic'] ?? 0,
-                'is_leader_discount'=>$params['is_leader_discount'] ?? 0,
-                'type'=>$params['tuan_type'] ?? 0,
-                'number'=>$group_number ?? 0,
-                'property'=>json_encode($new_group_arr),
-                'min_price'=>$params['assemble_price'] ?? 0,
-                'group_price_discount'=>isset($params['group_price_discount']) ? json_encode($params['group_price_discount']) : '',
-                'is_show'=>$params['is_show'] ?? 0,
-                'status'=>1,
-            );
+                $group = array(
+                    'key'=>$params['key'],
+                    'merchant_id'=>yii::$app->session['uid'],
+                    'goods_id'=>$params['id'],
+                    'is_self'=>$params['is_self'] ?? 0,
+                    'older_with_newer'=>$params['older_with_newer'] ?? 0,
+                    'is_automatic'=>$params['is_automatic'] ?? 0,
+                    'is_leader_discount'=>$params['is_leader_discount'] ?? 0,
+                    'type'=>$params['tuan_type'] ?? 0,
+                    'number'=>$group_number ?? 0,
+                    'property'=>json_encode($new_group_arr),
+                    'min_price'=>$params['assemble_price'] ?? 0,
+                    'assemble_group_discount'=>isset($params['assemble_group_discount']) ? json_encode($params['assemble_group_discount']) : '',
+                    'group_price_discount'=>isset($params['group_price_discount']) ? json_encode($params['group_price_discount']) : '',
+                    'is_show'=>$params['is_show'] ?? 0,
+                    'status'=>1,
+                );
 
-            if ($groupInfo['status'] == 200) {
-                $array = $groupModel->do_update(['id' => $id], $group);
-            } else {
-                $array = $groupModel->add($group);
+                if ($groupInfo['status'] == 200) {
+                    $array = $groupModel->do_update(['id' => $id], $group);
+                } else {
+                    $array = $groupModel->add($group);
+                }
             }
 
             return $array;
@@ -334,5 +360,28 @@ class AssembleController extends MaterialController{
         }
     }
 
+    public function actionDelete($id){
+        if (yii::$app->request->isDelete) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->bodyParams; //获取body传参
+
+            $must = ['goods_id'];
+            //设置类目 参数
+            $rs = $this->checkInput($must, $params);
+            if ($rs != false) {
+                return $rs;
+            }
+
+            $goodsModel = new ShopGoodsModel();
+            $assembleModel = new ShopAssembleModel();
+            $goodsWhere['id'] = $params['goods_id'];
+            $goodsModel->do_update($goodsWhere,['is_open_assemble' => 0]);
+            $assembleWhere['id'] = $id;
+            $array = $assembleModel->do_delete($assembleWhere);
+            return $array;
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
 
 }

@@ -131,7 +131,8 @@ class ImageModel {
     /**
      * 销毁图片
      */
-    public function __destruct() {
+    public function __destruct()
+    {
         if ($this->image != null) {
             imagedestroy($this->image);
         }

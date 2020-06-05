@@ -13,15 +13,15 @@ class FlashController extends ShopController {
 
     public $enableCsrfValidation = false; //禁用CSRF令牌验证，可以在基类中设置
 
-//    public function behaviors() {
-//        return [
-//            'token' => [
-//                'class' => 'yii\filters\MerchantFilter', //调用过滤器
-////                'only' => ['single'],//指定控制器应用到哪些动作
-//                'except' => ['sms', 'register', 'password', 'all'], //指定控制器不应用到哪些动作
-//            ]
-//        ];
-//    }
+    public function behaviors() {
+        return [
+            'token' => [
+                'class' => 'yii\filters\ShopFilter', //调用过滤器
+//                'only' => ['single'],//指定控制器应用到哪些动作
+                'except' => ['group', 'single'], //指定控制器不应用到哪些动作
+            ]
+        ];
+    }
     /**
      * 秒杀活动组
      */
@@ -31,12 +31,12 @@ class FlashController extends ShopController {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
             $model = new FlashSaleGroupModel();
-            $data['merchant_id'] = yii::$app->session['merchant_id'];
-            $data['key'] = yii::$app->session['key'];
+            $data['merchant_id'] = 13;
+            $data['key'] = 'ccvWPn';
             $s = 24 * 3600;
             $data['<='] = ['start_time', time() + $s];
             $data['>='] = ['end_time', time()];
-        
+            $data['orderby'] = "start_time asc";
             $array = $model->do_select($data);
 
             if ($array['status'] != 200) {
@@ -67,7 +67,7 @@ class FlashController extends ShopController {
                 $array['data'][$i]['start_time2'] = date('H:i', $array['data'][$i]['start_time']);
                 $array['data'][$i]['end_time2'] = date('H:i', $array['data'][$i]['end_time']);
             }
-
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             return $array;
         } else {
             return result(500, "请求方式错误");
@@ -84,8 +84,8 @@ class FlashController extends ShopController {
             $groupModel = new FlashSaleGroupModel();
             $params['id'] = $id;
             $group = $groupModel->do_one($params);
-
-
+            yii::$app->session['merchant_id'] =13;
+            yii::$app->session['key']= 'ccvWPn';
             $model = new FlashSaleModel();
             $array = $model->do_select(['flash_sale_group_id' => $group['data']['id']]);
 //                if ($array['status'] == 200) {
@@ -106,58 +106,49 @@ class FlashController extends ShopController {
                 $group['data']['state'] = 2;
             }
             $start_time = $group['data']['start_time'];
-            $end_time = $group['data']['start_time'];
+            $end_time = $group['data']['end_time'];
             $group['data']['start_time'] = date('Y-m-d H:i:s', $group['data']['start_time']);
             $group['data']['end_time'] = date('Y-m-d H:i:s', $group['data']['end_time']);
             $group['data']['send_time'] = date('Y-m-d H:i:s', $group['data']['send_time']);
 
 
-            for ($j = 0; $j < count($array['data']); $j++) {
-                $saleGoodsModel = new \app\models\shop\SaleGoodsModel();
-                $goods = $saleGoodsModel->do_one(['id' => $array['data'][$j]['goods_id'], 'key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['merchant_id']]);
 
-                //   $group['data'][$i]['sale'] = $goods['data'];
+            for ($j = 0; $j < count($array['data']); $j++) {
+                $shop_flash_saleModel  = new FlashSaleModel();
+                $goods = $shop_flash_saleModel->do_one(['goods_id' => $array['data'][$j]['goods_id'], 'key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['merchant_id']]);
                 if ($goods['status'] != 200) {
                     return result(500, "系统错误！");
                 }
-                $pic = explode(",", $goods['data']['pic_urls']);
+
+                $saleGoodsModel = new \app\models\shop\SaleGoodsModel();
+                $ptgoods = $saleGoodsModel->do_one(['id' => $array['data'][$j]['goods_id'], 'key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['merchant_id']]);
+
                 //copy_id 暂时不需要
-                $group['data']['goods'][$j]['goods_id'] = $goods['data']['id'];
-                $group['data']['goods'][$j]['pic_urls'] = $pic[0];
+                $group['data']['goods'][$j]['goods_id'] = $goods['data']['goods_id'];
+                $group['data']['goods'][$j]['price'] = $goods['data']['flash_price'];
+                $group['data']['goods'][$j]['pic_urls'] = $goods['data']['pic_url'];
                 $group['data']['goods'][$j]['name'] = $goods['data']['name'];
-                $group['data']['goods'][$j]['short_name'] = $goods['data']['short_name'];
-                $group['data']['goods'][$j]['price'] = $goods['data']['line_price'];
-                $group['data']['goods'][$j]['stocks'] = 0;
+                $group['data']['goods'][$j]['flash_number'] = $goods['data']['stocks'];
                 $group['data']['goods'][$j]['is_top'] = $goods['data']['is_top'];
+                $group['data']['goods'][$j]['line_price'] = $goods['data']['line_price'];
                 $group['data']['goods'][$j]['property'] = $array['data'][$j]['property'];
-                $property = explode("-", $array['data'][$j]['property']);
-                $propertys = array();
-                for ($k = 0; $k < count($property); $k++) {
-                    $a = json_decode($property[$k], true);
-                    $propertys[$k] = $a;
-                    $group['data']['goods'][$j]['property'] = $propertys;
-                    $group['data']['goods'][$j]['stocks'] = $group['data']['goods'][$j]['stocks'] + $a['stocks'];
-                    $group['data']['goods'][$j]['price'] = $a['flash_price'];
-                }
+                $group['data']['goods'][$j]['short_name'] = $ptgoods['data']['short_name'];
                 $sql = "select sum(number)as number  from shop_order where goods_id = " . $array['data'][$j]['goods_id'] . " and  create_time >= {$start_time} and  create_time <= {$end_time} ";
-                $number = yii::$app->db->createCommand($sql)->execute();
-                $group['data']['goods'][$j]['sold'] = $number['number'] == null ? 0 : $number['number'];
+                $number = yii::$app->db->createCommand($sql)->queryAll();
+
+                $group['data']['goods'][$j]['sold'] = $number[0]['number'] == null ? 0 : $number[0]['number'];
                 if ($group['data']['goods'][$j]['sold'] == 0) {
                     $group['data']['goods'][$j]['percentage'] = 100;
                 } else {
-                    if ($goods['data'][$j]['number'] - $goods['data'][$j]['sold'] == 0) {
+
+                    if ($array['data'][$j]['stocks'] - $goods['data'][$j]['sold'] == 0) {
                         $group['data']['goods'][$j]['percentage'] = 0;
                     } else {
-                        $group['data']['goods'][$j]['percentage'] = floor((($array['data'][$j]['stocks'] - $goods['data'][$j]['sold']) / $goods['data'][$j]['number']) * 100);
+                        $group['data']['goods'][$j]['percentage'] = floor((($array['data'][$j]['stocks'] - $group['data']['goods'][$j]['sold']) / $array['data'][$j]['stocks']) * 100);
                     }
                 }
             }
 
-//  
-//            $group['data']['goods'] = $goods['data'];
-//            $group['data']['start_time'] = date('m-d ', $group['data']['start_time']);
-//            $group['data']['end_time'] = date('m-d', $group['data']['end_time']);
-//            $group['data']['send_time'] = date('Y-m-d H:i:s', $group['data']['send_time']);
             return $group;
         } else {
             return result(500, "请求方式错误");

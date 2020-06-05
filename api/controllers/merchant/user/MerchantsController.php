@@ -186,7 +186,6 @@ class MerchantsController extends MerchantController {
                     return result(500, "修改失败");
                 }
             } else {
-                var_dump($params);die();
                 $array = $merchant->update($params);
             }
         }

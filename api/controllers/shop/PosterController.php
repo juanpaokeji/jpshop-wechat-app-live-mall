@@ -411,11 +411,10 @@ class PosterController extends ShopController{
                 $text_font2    = new Font($font_file, 16, $imagine->palette()->color('000'));
                 $text_font3    = new Font($font_file, 12, $imagine->palette()->color('000'));
                 $text_font1    = new Font($font_file, 20, $imagine->palette()->color('FF0000'));
-                $imagine->draw()->text('等已抢购'.$totals.'份', $text_font3, new Point(135, 431));
+                $imagine->draw()->text(' ', $text_font3, new Point(135, 431));
                 $pic_urls = explode(',',$array['data']['pic_urls']);
                 
                 $local_goods = self::getPicture($pic_urls[0], $rand,'goods');
-                
                 if($local_goods){
                     $pic_url = $image->open($local_goods);
                     $pic_url->resize(new Box(320, 320));
@@ -455,9 +454,9 @@ class PosterController extends ShopController{
                     }
                 }
                 $url_path = 'uploads/poster_detail/'.$key.'/'.$merchant_id.'/';
-              creat_mulu( 'uploads/poster_detail/'.$key.'/'.$merchant_id);
+                creat_mulu( 'uploads/poster_detail/'.$key.'/'.$merchant_id);
                 //保存的文件名
-                $save_name = 'poster_detail_'.$key.'_'.$merchant_id.'.png';
+                $save_name = 'poster_detail_'.$key.'_'.$merchant_id.$params['goods_id'].'.png';
                 //完整路径
                 $save_path = $url_path . $save_name;
                 $path = Yii::getAlias('@webroot') . $url_path;
