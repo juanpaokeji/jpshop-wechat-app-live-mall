@@ -58,26 +58,26 @@ layui.define(function (exports) {
             $('.choicePageUrl').empty();//每次请求清空
             //如果是自定义链接，则单独处理，否则请求后台获取数据
             if (type === 'customLinks') {
-                //不管是微信还是小程序，都需要添加标题
-                $('.choicePageUrl').append('<div class="layui-form-item">\n' +
-                    '                            <label style="width: 55px;" class="layui-form-label">链接标题</label>\n' +
-                    '                            <div class="layui-input-inline">\n' +
-                    '                                <input name="url_title" required lay-verify="required" placeholder="请输入链接标题" class="layui-input">\n' +
-                    '                            </div>\n' +
-                    '                        </div>');
-                if (choice_url_type == 'mini') {//如果是小程序，则添加小程序id
-                    $('.choicePageUrl').append('<div class="layui-form-item">\n' +
-                        '                            <label style="width: 55px;" class="layui-form-label">小程序id</label>\n' +
-                        '                            <div class="layui-input-inline">\n' +
-                        '                                <input name="app_id" required lay-verify="required" placeholder="请输入小程序id" class="layui-input">\n' +
-                        '                            </div>\n' +
-                        '                        </div>');
-                }
+                // //不管是微信还是小程序，都需要添加标题
+                // $('.choicePageUrl').append('<div class="layui-form-item">\n' +
+                //     '                            <label style="width: 55px;" class="layui-form-label">链接标题</label>\n' +
+                //     '                            <div class="layui-input-inline">\n' +
+                //     '                                <input name="url_title" required lay-verify="required" placeholder="请输入链接标题" class="layui-input">\n' +
+                //     '                            </div>\n' +
+                //     '                        </div>');
+                // if (choice_url_type == 'mini') {//如果是小程序，则添加小程序id
+                //     $('.choicePageUrl').append('<div class="layui-form-item">\n' +
+                //         '                            <label style="width: 55px;" class="layui-form-label">小程序id</label>\n' +
+                //         '                            <div class="layui-input-inline">\n' +
+                //         '                                <input name="app_id" required lay-verify="required" placeholder="请输入小程序id" class="layui-input">\n' +
+                //         '                            </div>\n' +
+                //         '                        </div>');
+                // }
                 //不管是微信还是小程序，都需要添加链接地址
                 $('.choicePageUrl').append('<div class="layui-form-item">\n' +
                     '                            <label style="width: 55px;" class="layui-form-label">链接地址</label>\n' +
                     '                            <div class="layui-input-inline">\n' +
-                    '                                <input name="url_link" required lay-verify="required" placeholder="请输入文本名称" class="layui-input">\n' +
+                    '                                <input name="url_link" required lay-verify="required" placeholder="请输入小程序内部链接地址" class="layui-input">\n' +
                     '                            </div>\n' +
                     '                        </div>');
                 return;

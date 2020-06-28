@@ -333,14 +333,13 @@ layui.define(function (exports) {
             }
             var subData = {
                 theme_text: $('input[name=theme_text]:checked').val(),
-                theme: $('input[name=theme]:checked').val(),
+                theme: $('input[name=theme]:checked').val() || $('input[name=theme]:checked').next().val(),
                 navigation: navigation,
                 bottom_text: $('#bottom_text').val(),
                 text_selection: $('#text_selection').val(),
                 key: saa_key,
                 type: 'mini'
             };
-
             $.ajax({
                 url: url,
                 type: 'put',

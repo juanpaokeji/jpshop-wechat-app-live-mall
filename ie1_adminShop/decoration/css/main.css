@@ -175,7 +175,7 @@ a, img, input[type=text], input[type=submit], input[type=password], textarea, se
 
 #uicut-app .g-rightParam .title2 { font-size: 14px; color: #666; font-weight: bold; line-height: 30px; padding: 0 10px; }
 
-#uicut-app .g-centerBox { width: 100%; height: 100%; overflow-x: hidden; overflow-y: scroll; /* 20190418 */ /* 20190418 结束 */ }
+#uicut-app .g-centerBox { width: 100%; height: 100%; overflow-x: hidden; overflow-y: scroll; position: relative; /* 20190418 */ /* 20190418 结束 */ }
 
 #uicut-app .g-centerBox .operate { padding: 10px 50px; }
 
@@ -183,7 +183,7 @@ a, img, input[type=text], input[type=submit], input[type=password], textarea, se
 
 #uicut-app .g-centerBox .operate .btn:hover { background-color: #1aad19; }
 
-#uicut-app .g-centerBox .right-operate { position: absolute; right: 50%; top: 50%; margin-right: -220px; -webkit-transform: translateY(-50%); -ms-transform: translateY(-50%); transform: translateY(-50%); }
+#uicut-app .g-centerBox .right-operate { position: absolute; right: 48%; top: 50%; margin-right: -220px; -webkit-transform: translateY(-50%); -ms-transform: translateY(-50%); transform: translateY(-50%); }
 
 #uicut-app .g-centerBox .right-operate .btn { display: block; margin: 5px 0; border: none; width: 40px; height: 40px; line-height: 40px; padding: 0; outline: none; }
 
@@ -481,3 +481,91 @@ a, img, input[type=text], input[type=submit], input[type=password], textarea, se
 
 
 .view-banner2{padding: 10px; box-sizing: border-box;}
+
+
+
+
+
+
+
+.coupons-item{
+  display: flex;
+  color: #ffffff;
+  background: red;
+  border-radius: 10px;
+}
+.coupons-left{
+  padding: 6px 11px 6px 13px;
+  flex: 1;
+}
+.coupons-price{
+  font-size: 24px;
+  text-align: center;
+}
+.coupons-price::before{
+  content: '￥';
+  font-size: 18px;
+}
+.coupons-full_price{
+  font-size: 12px;
+  text-align: center;
+}
+.conpons-right{
+  width: 28px;
+  font-size: 14px;
+  padding:5px 7px;
+  box-sizing: border-box;
+  white-space: pre-wrap;
+  border-left: 1px dotted #ffffff;
+  position: relative;
+}
+.conpons-right::after, .conpons-right::before{
+  content: ' ';
+  position: absolute;
+  top: -4.5px;
+  left: -4.5px;
+  width: 9px;
+  height: 9px;
+  background: #ffffff;
+  border-radius: 50%;
+}
+.conpons-right::after{
+  top: unset;
+  bottom: -4.5px;
+}
+
+.group{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+}
+
+.group-left{
+  flex: 1;
+  box-sizing: border-box;
+}
+.group-left > div{
+  margin-left: 4px;
+  font-size: 15px;
+  line-height: 15px;
+  padding: 10px 15px;
+  color: #fff;
+  border-radius: 50px;
+  background: red;
+  width: auto;
+  display: inline-block;
+}
+.group-right{
+  display: flex;
+  align-items: center;
+  background: #f2f2f2;
+  height: 35px;
+  border-radius: 25px;
+  padding-left: 10px;
+  box-sizing: border-box;
+  width: 123px;
+}
+.group-right > img{
+  width: 15px;
+}
