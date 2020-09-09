@@ -312,4 +312,45 @@ class TotalController extends MerchantController {
 
     }
 
+    public function actionTopGoods(){
+        if (yii::$app->request->isGet) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->get();
+
+            $must = ['key'];
+            //设置类目 参数
+            $rs = $this->checkInput($must, $params);
+            if ($rs != false) {
+                return $rs;
+            }
+
+            $model = new TableModel;
+            $startTime = strtotime(date("Y-m-d",strtotime("-30 day")));
+            $time = time();
+            $merchantId = yii::$app->session['uid'];
+            $sql = "SELECT `shop_order`.`name`,`shop_order`.`pic_url`,sum( shop_order.payment_money ) AS `money` 
+                    FROM `shop_order_group` 
+                    RIGHT JOIN `shop_order` ON shop_order.order_group_sn = shop_order_group.order_sn 
+                    WHERE ( `shop_order_group`.`delete_time` IS NULL ) 
+                    AND ( `shop_order_group`.`key` = '{$params['key']}' ) 
+                    AND ( `shop_order_group`.`merchant_id` = {$merchantId} ) 
+                    AND ( `shop_order_group`.`create_time` > {$startTime} ) 
+                    AND ( `shop_order_group`.`create_time` <= {$time} ) 
+                    AND ( `shop_order_group`.`status` != 0 ) 
+                    AND ( `shop_order_group`.`status` != 2 ) 
+                    AND ( `shop_order_group`.`status` != 8 ) 
+                    GROUP BY `shop_order`.`goods_id` 
+                    ORDER BY `money` DESC LIMIT 10";
+            $res = $model->querySql($sql);
+            if (count($res) > 0){
+                return result(200, "请求成功",$res);
+            }else{
+                return result(204, "查询失败");
+            }
+
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
+
 }

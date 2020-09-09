@@ -12,6 +12,7 @@ use Yii;
 use app\models\shop\GoodsModel;
 use app\models\tuan\LeaderModel;
 use Imagine\Gd\Imagine;
+use Imagine\Image\Palette\RGB;
 
 use yii\web\ShopController;
 
@@ -23,7 +24,7 @@ class PosterController extends ShopController{
         return [
             'token' => [
                 'class' => 'yii\filters\ShopFilter', //调用过滤器
-                'except' => ['test','home-images','detail-images'], //指定控制器不应用到哪些动作
+                //      'except' => ['test','home-images','detail-images'], //指定控制器不应用到哪些动作
             ]
         ];
     }
@@ -75,9 +76,10 @@ class PosterController extends ShopController{
                 }else{
                     $image_url = $posertInfo['data']['path'];
                 }
+                $palette = new RGB();
                 $imagine = $image->open($image_url);
                 $options['width'] = 110;
-                $options['auto_color'] = true;
+                $options['auto_color'] = false;
                 $options['is_hyaline'] = true;
                 $code_res = $this->createQrScene((string)$key,(int)$merchant_id,'home',$params['scene'],$options);// 二维码相对路径
                 if($code_res['code'] != 200){
@@ -86,8 +88,12 @@ class PosterController extends ShopController{
                 $code_str = $code_res['url'];
                 //合成小程序二维码
                 $code = $image->open($code_str);
-                $code->resize(new Box(110, 110));
-                $imagine->paste($code, new Point(242, 524));
+                $code->resize(new Box(300, 300));
+                $imagine->paste($code, new Point(440, 1020));
+                //加上白框
+                $pic_url = $image->open('./uploads/poster.png');
+                $pic_url->resize(new Box(690, 890));
+                $imagine->paste($pic_url, new Point(30, 110));
                 //合成商品信息
                 $model = new GoodsModel();
                 $where['`key`'] = $key;
@@ -98,139 +104,140 @@ class PosterController extends ShopController{
                     throw new \Exception('商品信息出错');
                 }
                 $font_file = Yii::getAlias('@webroot').'/uploads/default_poster/Alibaba-PuHuiTi-Regular.ttf';
-                $text_font    = new Font($font_file, 12, $imagine->palette()->color('000'));
-                $text_font2    = new Font($font_file, 16, $imagine->palette()->color('000'));
-                $text_font3    = new Font($font_file, 10, $imagine->palette()->color('000'));
-                $text_font1    = new Font($font_file, 10, $imagine->palette()->color('FF0000'));
+                $text_font    = new Font($font_file, 24, $imagine->palette()->color('000'));
+                $text_font2    = new Font($font_file, 32, $imagine->palette()->color('000'));
+                $text_font3    = new Font($font_file, 20, $imagine->palette()->color('000'));
+                $text_font1    = new Font($font_file, 20, $imagine->palette()->color('FF0000'));
+                $text_font4    = new Font($font_file, 28, $imagine->palette()->color('708090'));
                 foreach ($array['data'] as $keys=>$val){
                     if($keys == 0){
                         $local_goods = self::getPicture($val['pic_urls'][0], $rand,'goods');
                         if($local_goods){
                             $pic_url = $image->open($local_goods);
-                            $pic_url->resize(new Box(95, 95));
-                            $imagine->paste($pic_url, new Point(24, 25));
+                            $pic_url->resize(new Box(190, 190));
+                            $imagine->paste($pic_url, new Point(48, 120));
                         }
                         if(mb_strlen($val['name']) > 7){
                             $val['name'] = mb_substr($val['name'],0,5).'...';
                         }
-                        $imagine->draw()->text($val['name'], $text_font, new Point(24, 126));
-                        $imagine->draw()->text('￥', $text_font1, new Point(28, 145));
-                        $imagine->draw()->text($val['price'], $text_font1, new Point(39, 145));
+                        $imagine->draw()->text($val['name'], $text_font, new Point(48, 332));
+                        $imagine->draw()->text('￥', $text_font1, new Point(56, 370));
+                        $imagine->draw()->text($val['price'], $text_font1, new Point(78, 370));
                     }
                     if($keys == 1){
                         $local_goods = self::getPicture($val['pic_urls'][0], $rand,'goods');
                         if($local_goods){
                             $pic_url = $image->open($local_goods);
-                            $pic_url->resize(new Box(95, 95));
-                            $imagine->paste($pic_url, new Point(140, 25));
+                            $pic_url->resize(new Box(190, 190));
+                            $imagine->paste($pic_url, new Point(280, 120));
                         }
                         if(mb_strlen($val['name']) > 7){
                             $val['name'] = mb_substr($val['name'],0,5).'...';
                         }
-                        $imagine->draw()->text($val['name'], $text_font, new Point(140, 126));
-                        $imagine->draw()->text('￥', $text_font1, new Point(144, 149));
-                        $imagine->draw()->text($val['price'], $text_font1, new Point(156, 149));
+                        $imagine->draw()->text($val['name'], $text_font, new Point(280, 332));
+                        $imagine->draw()->text('￥', $text_font1, new Point(288, 370));
+                        $imagine->draw()->text($val['price'], $text_font1, new Point(312, 370));
                     }
                     if($keys == 2){
                         $local_goods = self::getPicture($val['pic_urls'][0], $rand,'goods');
                         if($local_goods){
                             $pic_url = $image->open($local_goods);
-                            $pic_url->resize(new Box(95, 95));
-                            $imagine->paste($pic_url, new Point(256, 25));
+                            $pic_url->resize(new Box(190, 190));
+                            $imagine->paste($pic_url, new Point(512, 120));
                         }
                         if(mb_strlen($val['name']) > 7){
                             $val['name'] = mb_substr($val['name'],0,5).'...';
                         }
-                        $imagine->draw()->text($val['name'], $text_font, new Point(256, 126));
-                        $imagine->draw()->text('￥', $text_font1, new Point(260, 149));
-                        $imagine->draw()->text($val['price'], $text_font1, new Point(271, 149));
+                        $imagine->draw()->text($val['name'], $text_font, new Point(512, 332));
+                        $imagine->draw()->text('￥', $text_font1, new Point(520, 370));
+                        $imagine->draw()->text($val['price'], $text_font1, new Point(542, 370));
                     }
                     if($keys == 3){
                         $local_goods = self::getPicture($val['pic_urls'][0], $rand,'goods');
                         if($local_goods){
                             $pic_url = $image->open($local_goods);
-                            $pic_url->resize(new Box(95, 95));
-                            $imagine->paste($pic_url, new Point(24, 191));
+                            $pic_url->resize(new Box(190, 190));
+                            $imagine->paste($pic_url, new Point(48, 402));
                         }
                         if(mb_strlen($val['name']) > 7){
                             $val['name'] = mb_substr($val['name'],0,5).'...';
                         }
-                        $imagine->draw()->text($val['name'], $text_font, new Point(24, 292));
-                        $imagine->draw()->text('￥', $text_font1, new Point(28, 315));
-                        $imagine->draw()->text($val['price'], $text_font1, new Point(39, 315));
+                        $imagine->draw()->text($val['name'], $text_font, new Point(48, 628));
+                        $imagine->draw()->text('￥', $text_font1, new Point(56, 680));
+                        $imagine->draw()->text($val['price'], $text_font1, new Point(78, 680));
                     }
                     if($keys == 4){
                         $local_goods = self::getPicture($val['pic_urls'][0], $rand,'goods');
                         if($local_goods){
                             $pic_url = $image->open($local_goods);
-                            $pic_url->resize(new Box(95, 95));
-                            $imagine->paste($pic_url, new Point(140, 191));
+                            $pic_url->resize(new Box(190, 190));
+                            $imagine->paste($pic_url, new Point(280, 402));
                         }
                         if(mb_strlen($val['name']) > 7){
                             $val['name'] = mb_substr($val['name'],0,5).'...';
                         }
-                        $imagine->draw()->text($val['name'], $text_font, new Point(140, 292));
-                        $imagine->draw()->text('￥', $text_font1, new Point(144, 315));
-                        $imagine->draw()->text($val['price'], $text_font1, new Point(156, 315));
+                        $imagine->draw()->text($val['name'], $text_font, new Point(280, 628));
+                        $imagine->draw()->text('￥', $text_font1, new Point(288,680));
+                        $imagine->draw()->text($val['price'], $text_font1, new Point(312, 680));
                     }
                     if($keys == 5){
                         $local_goods = self::getPicture($val['pic_urls'][0], $rand,'goods');
                         if($local_goods){
                             $pic_url = $image->open($local_goods);
-                            $pic_url->resize(new Box(95, 95));
-                            $imagine->paste($pic_url, new Point(256, 191));
+                            $pic_url->resize(new Box(190, 190));
+                            $imagine->paste($pic_url, new Point(512, 402));
                         }
                         if(mb_strlen($val['name']) > 7){
                             $val['name'] = mb_substr($val['name'],0,5).'...';
                         }
-                        $imagine->draw()->text($val['name'], $text_font, new Point(256, 292));
-                        $imagine->draw()->text('￥', $text_font1, new Point(260, 315));
-                        $imagine->draw()->text($val['price'], $text_font1, new Point(271, 315));
+                        $imagine->draw()->text($val['name'], $text_font, new Point(512, 628));
+                        $imagine->draw()->text('￥', $text_font1, new Point(520, 680));
+                        $imagine->draw()->text($val['price'], $text_font1, new Point(542, 680));
                     }
                     if($keys == 6){
                         $local_goods = self::getPicture($val['pic_urls'][0], $rand,'goods');
                         if($local_goods){
                             $pic_url = $image->open($local_goods);
-                            $pic_url->resize(new Box(95, 95));
-                            $imagine->paste($pic_url, new Point(24, 357));
+                            $pic_url->resize(new Box(190, 190));
+                            $imagine->paste($pic_url, new Point(48, 714));
                         }
                         $pic_url = $image->open($val['pic_urls'][0]);
-                        $pic_url->resize(new Box(95, 95));
-                        $imagine->paste($pic_url, new Point(24, 357));
+                        $pic_url->resize(new Box(190, 190));
+                        $imagine->paste($pic_url, new Point(48, 714));
                         if(mb_strlen($val['name']) > 7){
                             $val['name'] = mb_substr($val['name'],0,5).'...';
                         }
-                        $imagine->draw()->text($val['name'], $text_font, new Point(24, 458));
-                        $imagine->draw()->text('￥', $text_font1, new Point(28, 483));
-                        $imagine->draw()->text($val['price'], $text_font1, new Point(41, 483));
+                        $imagine->draw()->text($val['name'], $text_font, new Point(48, 916));
+                        $imagine->draw()->text('￥', $text_font1, new Point(56, 966));
+                        $imagine->draw()->text($val['price'], $text_font1, new Point(82, 966));
                     }
                     if($keys == 7){
                         $local_goods = self::getPicture($val['pic_urls'][0], $rand,'goods');
                         if($local_goods){
                             $pic_url = $image->open($local_goods);
-                            $pic_url->resize(new Box(95, 95));
-                            $imagine->paste($pic_url, new Point(140, 357));
+                            $pic_url->resize(new Box(190, 190));
+                            $imagine->paste($pic_url, new Point(280, 714));
                         }
                         if(mb_strlen($val['name']) > 7){
                             $val['name'] = mb_substr($val['name'],0,5).'...';
                         }
-                        $imagine->draw()->text($val['name'], $text_font, new Point(140, 458));
-                        $imagine->draw()->text('￥', $text_font1, new Point(144, 483));
-                        $imagine->draw()->text($val['price'], $text_font1, new Point(158, 483));
+                        $imagine->draw()->text($val['name'], $text_font, new Point(280, 916));
+                        $imagine->draw()->text('￥', $text_font1, new Point(286, 966));
+                        $imagine->draw()->text($val['price'], $text_font1, new Point(316, 966));
                     }
                     if($keys == 8){
                         $local_goods = self::getPicture($val['pic_urls'][0], $rand,'goods');
                         if($local_goods){
                             $pic_url = $image->open($local_goods);
-                            $pic_url->resize(new Box(95, 95));
-                            $imagine->paste($pic_url, new Point(256, 357));
+                            $pic_url->resize(new Box(190, 190));
+                            $imagine->paste($pic_url, new Point(512, 714));
                         }
                         if(mb_strlen($val['name']) > 7){
                             $val['name'] = mb_substr($val['name'],0,5).'...';
                         }
-                        $imagine->draw()->text($val['name'], $text_font, new Point(256, 458));
-                        $imagine->draw()->text('￥', $text_font1, new Point(260, 483));
-                        $imagine->draw()->text($val['price'], $text_font1, new Point(273, 483));
+                        $imagine->draw()->text($val['name'], $text_font, new Point(512, 916));
+                        $imagine->draw()->text('￥', $text_font1, new Point(520, 966));
+                        $imagine->draw()->text($val['price'], $text_font1, new Point(546, 966));
                     }
                 }
                 if($user_id){
@@ -239,29 +246,30 @@ class PosterController extends ShopController{
                     $leaderModel = new LeaderModel();
                     $leader = $leaderModel->do_one(['key' => $key, 'merchant_id' => $merchant_id, 'uid' => $user['data']['leader_uid']]);
                     if ($leader['status'] == 200 && $user['status'] == 200) {
+                        $imagine->draw()->text("团长:", $text_font3, new Point(50, 1040));
                         $local_avatar = self::getPicture($user['data']['avatar'], $rand,'goods');
                         if($local_avatar){
                             $local_avatar = $this->radiusImage($local_avatar);
                             $avatar = $image->open($local_avatar);
-                            $avatar->resize(new Box(30, 30));
-                            $imagine->paste($avatar, new Point(25, 550));
+                            $avatar->resize(new Box(60, 60));
+                            $imagine->paste($avatar, new Point(120, 1018));
                         }
-                        $imagine->draw()->text($user['data']['nickname'], $text_font2, new Point(62, 554));
-                        $text = '自提点:'.$leader['data']['area_name'].$leader['data']['addr'];
+                        $imagine->draw()->text($user['data']['nickname'], $text_font3, new Point(200, 1040));
+                        $text = '地址:'.$leader['data']['area_name'].$leader['data']['addr'];
                         $text_length = mb_strlen($text);
                         if($text_length <= 16){
-                            $imagine->draw()->text($text, $text_font3, new Point(25, 593));
+                            $imagine->draw()->text($text, $text_font3, new Point(50, 1080));
                         }elseif ($text_length > 16 && $text_length <= 32){
                             $text1 = mb_substr($text,0,16);
                             $text2 = mb_substr($text,16);
-                            $imagine->draw()->text($text1, $text_font3, new Point(25, 593));
-                            $imagine->draw()->text($text2, $text_font3, new Point(25, 610));
+                            $imagine->draw()->text($text1, $text_font3, new Point(50, 1100));
+                            $imagine->draw()->text($text2, $text_font3, new Point(50, 1150));
                         }
-                        $imagine->draw()->text('长按扫码识别', $text_font3, new Point(261, 635));
+                        $imagine->draw()->text('长按扫码识别', $text_font4, new Point(250, 1300));
                     }
                 }
                 $url_path = 'uploads/poster/'.$key.'/'.$merchant_id.'/';
-              	creat_mulu( 'uploads/poster/'.$key.'/'.$merchant_id);
+                creat_mulu( 'uploads/poster/'.$key.'/'.$merchant_id);
                 //保存的文件名
                 $save_name = 'poster_'.$key.'_'.$merchant_id.'.png';
                 //完整路径
@@ -271,7 +279,7 @@ class PosterController extends ShopController{
                     @mkdir($path, 0755, true);
                 }
                 $imagine->save(Yii::getAlias('@webroot') .'/'.$url_path."/".$save_name);
-                return result(200, "请求成功",'https://' . $_SERVER['SERVER_NAME'].'/api/web/' . $save_path);
+                return result(200, "请求成功",'https://' . $_SERVER['HTTP_HOST'].'/api/web/' . $save_path);
             }catch (\Exception $e){
                 return result(500, $e->getMessage());
             }
@@ -302,7 +310,7 @@ class PosterController extends ShopController{
                 }
                 $merchant_id = $keyInfo['data']['merchant_id'];
             }
-            $user_id = yii::$app->session['user_id'];
+            $user_id = $params['leader_uid'];
             if(isset($params['test'])){
                 $user_id = 109;
             }
@@ -316,7 +324,7 @@ class PosterController extends ShopController{
                 $params['scene'] = 'detail_image';
             }else{
                 $params['scene'] = str_replace(',','&',$params['scene']);
-               // $params['scene'] = json_encode(explode(',', $params['scene']));
+                // $params['scene'] = json_encode(explode(',', $params['scene']));
             }
             if(!isset($params['page']) || empty($params['page'])){
                 $options['page'] = 'pages/goodsItem/goodsItem/goodsItem';
@@ -333,7 +341,7 @@ class PosterController extends ShopController{
                 }
                 $imagine = $image->open($image_url);
                 $options['width'] = 110;
-                $options['auto_color'] = true;
+                $options['auto_color'] = false;
                 $options['is_hyaline'] = true;
                 $code_res = $this->createQrScene((string)$key,(int)$merchant_id,'detail',$params['scene'],$options);// 二维码相对路径
                 if($code_res['code'] != 200){
@@ -342,8 +350,8 @@ class PosterController extends ShopController{
                 $code_str = $code_res['url'];
                 //合成小程序二维码
                 $code = $image->open($code_str);
-                $code->resize(new Box(110, 110));
-                $imagine->paste($code, new Point(249, 423));
+                $code->resize(new Box(300, 300));
+                $imagine->paste($code, new Point(420, 750));
                 //合成商品信息
                 $model = new GoodsModel();
                 $where['`key`'] = $key;
@@ -353,79 +361,26 @@ class PosterController extends ShopController{
                 if($array['status'] != 200){
                     throw new \Exception('商品信息出错');
                 }
-                $total = $model->TotalSale($params['goods_id']);
-                $array['data']['totalSale'] = $total['data'];
-                $totals = $array['data']['totalSale']['total'] + $array['data']['sales_number'];
-                $avatar = $this->avatar($array['data']['id']);
-                if(!empty($avatar)){
-                    foreach ($avatar as $k=>$avatar_url){
-                        if($k == 0){
-                            $local_avatar = self::getPicture($avatar_url['avatar'], $rand,'detail_avatar');
-                            if($local_avatar){
-                                $local_avatar = $this->radiusImage($local_avatar);
-                                $pic_url = $image->open($local_avatar);
-                                $pic_url->resize(new Box(20, 20));
-                                $imagine->paste($pic_url, new Point(28, 430));
-                            }
-                        }
-                        if($k == 1){
-                            $local_avatar = self::getPicture($avatar_url['avatar'], $rand,'detail_avatar');
-                            if($local_avatar){
-                                $local_avatar = $this->radiusImage($local_avatar);
-                                $pic_url = $image->open($local_avatar);
-                                $pic_url->resize(new Box(20, 20));
-                                $imagine->paste($pic_url, new Point(49, 430));
-                            }
-                        }
-                        if($k == 2){
-                            $local_avatar = self::getPicture($avatar_url['avatar'], $rand,'detail_avatar');
-                            if($local_avatar){
-                                $local_avatar = $this->radiusImage($local_avatar);
-                                $pic_url = $image->open($local_avatar);
-                                $pic_url->resize(new Box(20, 20));
-                                $imagine->paste($pic_url, new Point(70, 430));
-                            }
-                        }
-                        if($k == 3){
-                            $local_avatar = self::getPicture($avatar_url['avatar'], $rand,'detail_avatar');
-                            if($local_avatar){
-                                $local_avatar = $this->radiusImage($local_avatar);
-                                $pic_url = $image->open($local_avatar);
-                                $pic_url->resize(new Box(20, 20));
-                                $imagine->paste($pic_url, new Point(91, 430));
-                            }
-                        }
-                        if($k == 4){
-                            $local_avatar = self::getPicture($avatar_url['avatar'], $rand,'detail_avatar');
-                            if($local_avatar){
-                                $local_avatar = $this->radiusImage($local_avatar);
-                                $pic_url = $image->open($local_avatar);
-                                $pic_url->resize(new Box(20, 20));
-                                $imagine->paste($pic_url, new Point(112, 430));
-                            }
-                        }
-                    }
-                }
                 $font_file = Yii::getAlias('@webroot').'/uploads/default_poster/Alibaba-PuHuiTi-Regular.ttf';
-                $text_font    = new Font($font_file, 18, $imagine->palette()->color('000'));
-                $text_font2    = new Font($font_file, 16, $imagine->palette()->color('000'));
-                $text_font3    = new Font($font_file, 12, $imagine->palette()->color('000'));
-                $text_font1    = new Font($font_file, 20, $imagine->palette()->color('FF0000'));
-                $imagine->draw()->text(' ', $text_font3, new Point(135, 431));
+                $text_font    = new Font($font_file, 28, $imagine->palette()->color('000'));
+                $text_font2    = new Font($font_file, 32, $imagine->palette()->color('000'));
+                $text_font3    = new Font($font_file, 24, $imagine->palette()->color('708090'));
+                $text_font1    = new Font($font_file, 36, $imagine->palette()->color('FF0000'));
+                //  $imagine->draw()->text('等已抢购'.$totals.'份', $text_font3, new Point(135, 431));
                 $pic_urls = explode(',',$array['data']['pic_urls']);
-                
+
                 $local_goods = self::getPicture($pic_urls[0], $rand,'goods');
                 if($local_goods){
                     $pic_url = $image->open($local_goods);
-                    $pic_url->resize(new Box(320, 320));
+                    $pic_url->resize(new Box(700, 700));
                     $imagine->paste($pic_url, new Point(28, 30));
                 }
                 if(mb_strlen($array['data']['name']) > 7){
                     $array['data']['name'] = mb_substr($array['data']['name'],0,13).'...';
                 }
-                $imagine->draw()->text($array['data']['name'], $text_font, new Point(36, 359));
-                $imagine->draw()->text('￥', $text_font1, new Point(46, 400));
-                $imagine->draw()->text($array['data']['price'], $text_font1, new Point(66, 400));
+                $imagine->draw()->text($array['data']['name'], $text_font, new Point(62, 750));
+                $imagine->draw()->text('￥', $text_font1, new Point(26, 800));
+                $imagine->draw()->text($params['price'], $text_font1, new Point(66, 800));
                 if($user_id){
                     $userModel = new \app\models\shop\UserModel();
                     $user = $userModel->find(['id' => $user_id]);
@@ -433,26 +388,28 @@ class PosterController extends ShopController{
                     $leader = $leaderModel->do_one(['key' => $key, 'merchant_id' => $merchant_id, 'uid' => $user['data']['leader_uid']]);
                     if ($leader['status'] == 200 && $user['status'] == 200) {
                         $local_avatar = self::getPicture($user['data']['avatar'], $rand,'goods');
+                        $imagine->draw()->text("团长:", $text_font2, new Point(25, 880));
                         if($local_avatar){
                             $local_avatar = $this->radiusImage($local_avatar);
                             $avatar = $image->open($local_avatar);
-                            $avatar->resize(new Box(30, 30));
-                            $imagine->paste($avatar, new Point(28, 470));
+                            $avatar->resize(new Box(60, 60));
+                            $imagine->paste($avatar, new Point(128, 870));
                         }
-                        $imagine->draw()->text($user['data']['nickname'], $text_font2, new Point(65, 475));
-                        $text = '自提点:'.$leader['data']['area_name'].$leader['data']['addr'];
+                        $imagine->draw()->text($user['data']['nickname'], $text_font2, new Point(185, 880));
+                        $text = '地址:'.$leader['data']['area_name'].$leader['data']['addr'];
                         $text_length = mb_strlen($text);
-                        if($text_length <= 16){
-                            $imagine->draw()->text($text, $text_font3, new Point(25, 593));
-                        }elseif ($text_length > 16 && $text_length <= 32){
-                            $text1 = mb_substr($text,0,16);
-                            $text2 = mb_substr($text,16);
-                            $imagine->draw()->text($text1, $text_font3, new Point(28, 510));
-                            $imagine->draw()->text($text2, $text_font3, new Point(28, 530));
+                        if($text_length <= 10){
+                            $imagine->draw()->text($text, $text_font3, new Point(25, 920));
+                        }elseif ($text_length > 10 && $text_length <= 32){
+                            $text1 = mb_substr($text,0,10);
+                            $text2 = mb_substr($text,10);
+                            $imagine->draw()->text($text1, $text_font3, new Point(28, 940));
+                            $imagine->draw()->text($text2, $text_font3, new Point(28, 980));
                         }
-                        $imagine->draw()->text('长按扫码识别', $text_font3, new Point(268, 534));
+
                     }
                 }
+                $imagine->draw()->text('-           长按或者扫码识别进入小程序           -', $text_font3, new Point(50, 1080));
                 $url_path = 'uploads/poster_detail/'.$key.'/'.$merchant_id.'/';
                 creat_mulu( 'uploads/poster_detail/'.$key.'/'.$merchant_id);
                 //保存的文件名
@@ -464,7 +421,7 @@ class PosterController extends ShopController{
                     @mkdir($path, 0755, true);
                 }
                 $imagine->save(Yii::getAlias('@webroot') .'/'.$url_path."/".$save_name);
-                return result(200, "请求成功",'https://' . $_SERVER['SERVER_NAME']."/api/web/" . $save_path);
+                return result(200, "请求成功",'https://' . $_SERVER['HTTP_HOST']."/api/web/" . $save_path);
             }catch (\Exception $e){
                 return result(500, $e->getMessage());
             }

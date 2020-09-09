@@ -2,6 +2,7 @@
 
 namespace app\controllers\tuan;
 
+use app\models\merchant\system\ShopSolitaireModel;
 use yii;
 use yii\web\ShopController;
 use yii\db\Exception;
@@ -16,7 +17,7 @@ class ConfigController extends ShopController {
             'token' => [
                 'class' => 'yii\filters\ShopFilter', //调用过滤器
 //                'only' => ['single'],//指定控制器应用到哪些动作
-            //    'except' => ['single'], //指定控制器不应用到哪些动作
+                'except' => ['single'], //指定控制器不应用到哪些动作
             ]
         ];
     }
@@ -39,11 +40,10 @@ class ConfigController extends ShopController {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
             $model = new ConfigModel();
-            $data['merchant_id'] = yii::$app->session['merchant_id'];
-            $data['key'] = yii::$app->session['key'];
+           // $data['merchant_id'] = yii::$app->session['merchant_id'];
+            $data['key'] = $params['key'];
 //            $data['merchant_id'] = 108;
 //           $data['key'] = 'jqXkVh';
-
             $array = $model->do_one($data);
             if ($array['status'] == 200) {
                 $time = date("Y-m-d", time());

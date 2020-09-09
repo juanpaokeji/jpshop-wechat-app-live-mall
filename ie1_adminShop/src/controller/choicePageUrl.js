@@ -48,6 +48,8 @@ layui.define(function (exports) {
                 getUrl('merchantGoods');
             } else if (tabId == '4') {
                 getUrl('customLinks');
+            }else if (tabId == '5') {
+                getUrl('supplier');
             }
         });
 
@@ -131,12 +133,19 @@ layui.define(function (exports) {
                             $('.choicePageUrl').append(getChoicePageUrlList(1, name, link_url, pic_url));
                         }
                     } else if (type == 'merchantGoods') {//商品
-                        for (i = 0; i < data.length; i++) {
+                        for (i = 0; i < data.length; i++) { 
                             name = data[i].name;
                             link_url = link_list.goods_link + '?id=' + data[i].id;
                             pic_url = data[i].pic_urls.split(',')[0];
                             var is_flash_sale = data[i].is_flash_sale;
                             $('.choicePageUrl').append(getChoicePageUrlListGoods(1, name, link_url, pic_url, is_flash_sale));
+                        }
+                    }else if(type == 'supplier'){//门店
+                        
+                        for(i= 0;i<data.length; i++){
+                         name=data[i].name;
+                         link_url='supplier/index/index'+ '?id='+data[i].id;
+                         $('.choicePageUrl').append(getChoicePageUrlList(0, name, link_url));
                         }
                     }
                 },

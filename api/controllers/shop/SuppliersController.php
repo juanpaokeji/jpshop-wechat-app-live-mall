@@ -32,7 +32,7 @@ class SuppliersController extends ShopController
             'token' => [
                 'class' => 'yii\filters\ShopFilter', //调用过滤器
 //                'only' => ['single'],//指定控制器应用到哪些动作
-                'except' => ['img'], //指定控制器不应用到哪些动作
+                'except' => ['img','list','info','goods','category'], //指定控制器不应用到哪些动作
             ]
         ];
     }
@@ -86,15 +86,16 @@ class SuppliersController extends ShopController
         }
     }
 
+
     public function actionList()
     {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
-            $params['key'] = yii::$app->session['key'];
+            // $params['key'] = yii::$app->session['key'];
             $suplier = new UserModel();
             $md['type'] = 1;
-            $md['`key`']= $params['key'];
+            $md['`key`']= 'ccvWPn';
             if(isset($params['limit'])){
                 $md['limit'] = $params['limit'];
             }
@@ -103,16 +104,32 @@ class SuppliersController extends ShopController
             }
             $md['status'] =1;
             $list = $suplier->more($md);
+            $app = new AppAccessModel();
+            $appInfo = $app->find(['`key`'=>'ccvWPn']);
+            $sort = $appInfo['data']['supplier_sort'];
+            //var_dump($sort);die();
             if ($list['status'] == 200) {
                 for ($y = 0; $y< count($list['data']); $y++) {
                     unset($list['data'][$y]['password']);
                     unset($list['data'][$y]['salt']);
                     $list['data'][$y]['leader'] = json_decode($list['data'][$y]['leader'], true);
+                    if($sort==1){
+                        $list['data'][$y]['sort'] = $this->xiaoliang($list['data'][$y]['id']);
+                    }else if($sort==2){
+                        if($params['latitude']!=0&&$params['longitude']!=0){
+                            $destination = $list['data'][$y]['leader']['longitude'].",".$list['data'][$y]['leader']['latitude'];
+                            $origin = $params['longitude'].",".$params['latitude'];
+
+                            $list['data'][$y]['juli'] = $this->juli($origin,$destination);
+                        }else{
+                            $list['data'][$y]['juli'] =  0;
+                        }
+                    }
                     $goods = new GoodsModel();
                     $array = $goods->finds(['supplier_id' => $list['data'][$y]['id'],'is_check'=>1 , 'limit' => 3]);
                     $goods_id = array();
                     $groupModel = new ShopAssembleModel();
-                    $where['key'] = $params['key'];
+                    //$where['key'] = $params['key'];
                     if($array['status']==200){
                         foreach ($array['data'] as $k => &$val) {
                             $goods_id[] = $val['id'];
@@ -162,10 +179,59 @@ class SuppliersController extends ShopController
                     $list['data'][$y]['goods'] = $array['data'];
                 }
             }
+            if($sort!=0){
+                if($sort==1){
+                    // 第一层可以理解为从数组中键为0开始循环到最后一个
+                    for ($i = 0; $i < count($list['data']); $i++) {
+                        // 第二层为从$i+1的地方循环到数组最后
+                        for ($j = $i + 1; $j < count($list['data']); $j++) {
+                            // 比较数组中两个相邻值的大小
+                            if ($list['data'][$i]['sort'] < $list['data'][$j]['sort']) {
+                                $tem = $list['data'][$i]; // 这里临时变量，存贮$i的值
+                                $list['data'][$i] = $list['data'][$j]; // 第一次更换位置
+                                $list['data'][$j] = $tem; // 完成位置互换
+                            }
+                        }
+                    }
+                }else if($sort==2){
+                    // 第一层可以理解为从数组中键为0开始循环到最后一个
+                    for ($i = 0; $i < count($list['data']); $i++) {
+                        // 第二层为从$i+1的地方循环到数组最后
+                        for ($j = $i + 1; $j < count($list['data']); $j++) {
+                            // 比较数组中两个相邻值的大小
+                            if ($list['data'][$i]['juli'] > $list['data'][$j]['juli']) {
+                                $tem = $list['data'][$i]; // 这里临时变量，存贮$i的值
+                                $list['data'][$i] = $list['data'][$j]; // 第一次更换位置
+                                $list['data'][$j] = $tem; // 完成位置互换
+                            }
+                        }
+                    }
+                }
+
+            }
+
             return $list;
         } else {
             return result(500, "请求方式错误");
         }
+    }
+
+    function juli($origin,$destination){
+        $url = "https://restapi.amap.com/v3/distance?key=bc55956766e813d3deb1f95e45e97d73&origins={$origin}&destination={$destination}&type=0";
+        $result = json_decode(curlGet($url), true);
+
+        if ($result['status'] == 1) {
+            $juli = $result['results'][0]['distance'] / 1000;
+        } else{
+            $juli = 0;
+        }
+        return  $juli;
+    }
+
+    function xiaoliang($id){
+        $sql = "select count(*) as num  from shop_order_group where supplier_id = {$id}";
+        $res = Yii::$app->db->createCommand($sql)->queryAll();
+        return $res[0]['num']==null?0:$res[0]['num'];
     }
 
     //秒杀商品属性
@@ -215,7 +281,7 @@ class SuppliersController extends ShopController
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
             $model = new GoodsModel();
-            $params['`key`'] = yii::$app->session['key'];
+            $params['`key`'] ='ccvWPn';
             unset($params['key']);
             $model->goodsOut($params); //查询商品数量是否为0  为0下架
             if (isset($params['type']) && $params['type'] == 1) {
@@ -331,7 +397,7 @@ class SuppliersController extends ShopController
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
             $model = new MerchantCategoryModel();
-            $params['`key`'] = yii::$app->session['key'];
+            $params['`key`'] = 'ccvWPn';
             unset($params['key']);
             unset($params['id']);
             $params['parent_id'] = 0;

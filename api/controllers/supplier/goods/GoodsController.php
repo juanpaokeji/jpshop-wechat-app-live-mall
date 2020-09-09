@@ -422,13 +422,17 @@ class GoodsController extends SupplierController
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
             $model = new GoodsModel();
-            $params['`key`'] = yii::$app->session['key'];
+            //$must = ['key'];
+//            $rs = $this->checkInput($must, $params);
+//            if ($rs != false) {
+//                return $rs;
+//            }
 
             $flashModel = new FlashSaleGroupModel();
             $goodsId[] = $id;
             $res = $flashModel->do_select(['in' => ['goods_ids', $goodsId], 'key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['uid']]);
             if ($res['status'] == 200) {
-                return result(500, "已有正在秒杀的商品，无法修改");
+                return result(500, "以有正在秒杀的商品，无法修改");
             }
             if ($res['status'] == 500) {
                 return $res;
@@ -437,20 +441,20 @@ class GoodsController extends SupplierController
             $bargainModel = new ShopBargainInfoModel();
             $bargain = $bargainModel->do_select(['goods_id' => $id, 'key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['uid']]);
             if ($bargain['status'] == 200) {
-                return result(500, "已有正在砍价的商品，无法修改");
+                return result(500, "以有正在砍价的商品，无法修改");
             }
             if ($bargain['status'] == 500) {
                 return $bargain;
             }
 
             $params['id'] = $id;
-            $params['supplier_id'] = yii::$app->session['sid'];
+            $params['merchant_id'] = yii::$app->session['uid'];
             if (!isset($params['id'])) {
                 return result(400, "缺少参数 id");
             } else {
                 $params['`key`'] = yii::$app->session['key'];
                 unset($params['key']);
-                $info = $model->find(['id'=>$params['id'],'merchant_id'=>yii::$app->session['uid'],'`key`'=>$params['`key`']]);
+                $info = $model->find(['id' => $params['id'], 'merchant_id' => yii::$app->session['uid'], '`key`' => $params['`key`']]);
                 if ($info['status'] != 200) {
                     return result(400, "数据错误");
                 }
@@ -461,6 +465,7 @@ class GoodsController extends SupplierController
                         $video_status = $info['data']['video_status'];
                     } elseif ($params['video_id'] && $info['data']['video_id'] && ($info['data']['video_id'] != $params['video_id'])) {
                         //删除腾讯云原先的video_id
+
                         $videoModel = new SystemVideoModel();
                         $video = $videoModel->do_one([]);
                         $credential = new Credential($video['secretId'], $video['secretKey']);
@@ -507,7 +512,16 @@ class GoodsController extends SupplierController
                 if (isset($params['tuan_type']) && !empty($params['tuan_type']) && isset($params['assemble_number']) && !empty($params['assemble_number'])) {
                     $group_number = max($params['assemble_number']);
                 }
-
+                //校验商户是否关闭合伙人设置
+                /* $app = new \app\models\merchant\app\AppAccessModel();
+                 $appInfo = $app->find(['key' => Yii::$app->session['key'], 'open_partner' => 1]);
+                 if($appInfo['status'] == 200){
+                     if(!isset($params['partner_id']) || empty($params['partner_id'])){
+                         return result(500, "缺少partner_id");
+                     }
+                 }else{
+                     $params['partner_id'] = 0;
+                 }*/
                 $goodsData = array(
                     'id' => $params['id'],
                     '`key`' => $params['`key`'],
@@ -518,11 +532,14 @@ class GoodsController extends SupplierController
                     'price' => $params['price'],
                     'line_price' => $params['line_price'],
                     'pic_urls' => $params['pic_urls'],
+                    'thum_pic' => isset($params['thum_pic']) ? $params['thum_pic'] : '',
                     'stocks' => $params['stocks'],
                     'category_id' => $params['category_id'],
                     'm_category_id' => $params['m_category_id'],
                     'city_group_id' => $params['city_group_id'],
                     'storehouse_id' => $params['storehouse_id'] ?? 0,
+                    'time_icon' => isset($params['time_icon']) ? $params['time_icon'] : '',
+                    'is_stock_open' => isset($params['is_stock_open']) ? $params['is_stock_open'] : 1,
                     'sort' => $params['sort'],
                     'type' => $params['type'],
                     'end_time' => $end_time,
@@ -544,15 +561,16 @@ class GoodsController extends SupplierController
                     'band_self_leader_id' => isset($params['band_self_leader_id']) ? $params['band_self_leader_id'] : 0,
                     'commission_leader_ratio' => isset($params['commission_leader_ratio']) ? $params['commission_leader_ratio'] : 0,
                     'commission_selfleader_ratio' => isset($params['commission_selfleader_ratio']) ? $params['commission_selfleader_ratio'] : 0,
-                    'distribution'=>isset($params['distribution']) ? $params['distribution'] : 0,
+                    'distribution' => isset($params['distribution']) ? $params['distribution'] : 0,
                     //  'is_top' => $params['is_top'],
                     'status' => $params['status'],
                     'video_url' => isset($params['video_url']) ? $params['video_url'] : '',
                     'video_pic_url' => isset($params['video_pic_url']) ? $params['video_pic_url'] : '',
                     'video_id' => isset($params['video_id']) ? $params['video_id'] : '',
                     'video_status' => $params['video_url'] != "" ? 1 : 0,
-                    'is_check' => 0,
+                    'is_check' => 1,
                     'is_limit' => $params['is_limit'],
+                    'is_parcel' => isset($params['is_parcel']) ? $params['is_parcel'] : 0,
                     'limit_number' => $params['limit_number'],
                     'regimental_only' => $params['regimental_only'] ?? 0,
                     'is_open_assemble' => $params['is_open_assemble'] ?? 0,
@@ -562,6 +580,7 @@ class GoodsController extends SupplierController
                     'bargain_start_time' => isset($params['bargain_start_time']) ? strtotime($params['bargain_start_time']) : 0,
                     'bargain_end_time' => isset($params['bargain_end_time']) ? strtotime($params['bargain_end_time']) : 0,
                     'is_buy_alone' => $params['is_buy_alone'] ?? 0,
+                    'is_cart' => isset($params['is_cart']) ? $params['is_cart'] : 0,
                     'fictitious_initiate_bargain' => $params['fictitious_initiate_bargain'] ?? 0,
                     'fictitious_help_bargain' => $params['fictitious_help_bargain'] ?? 0,
                     'bargain_price' => $params['bargain_price'] ?? 0,
@@ -573,9 +592,7 @@ class GoodsController extends SupplierController
                     'weight' => isset($params['weight']) ? $params['weight'] : 0,
                     'commission_is_open' => isset($params['commission_is_open']) ? $params['commission_is_open'] : 0,
                 );
-
                 $array = $model->update($goodsData);
-
                 if ($array['status'] == 200) {
                     //添加操作记录
                     $operationRecordModel = new OperationRecordModel();
@@ -589,15 +606,14 @@ class GoodsController extends SupplierController
 
                 $stockModel = new StockModel();
                 $delData['goods_id'] = $params['id'];
-                $stockModel->del($delData);
-                $str = creat_mulu("./uploads/goods/" . yii::$app->session['uid']);
-                $base = new Base64Model();
+                $stocks = $stockModel->findall(['goods_id' => $params['id']]);
+                //  $stockModel->del($delData);
+                //   $str = creat_mulu("./uploads/goods/" . $params['merchant_id']);
+                //   $base = new Base64Model();
                 $transaction = yii::$app->db->beginTransaction();
                 try {
-
                     $pic_url = explode(",", $params['pic_urls']);
                     if ($params['have_stock_type'] == 0) {
-
                         $data['`key`'] = $params['`key`'];
                         $data['merchant_id'] = yii::$app->session['uid'];
                         $data['goods_id'] = $params['id'];
@@ -611,42 +627,58 @@ class GoodsController extends SupplierController
                         $data['property2_name'] = "";
                         $data['pic_url'] = is_array($pic_url) ? $pic_url[0] : $params['pic_urls'];
                         $data['status'] = 1;
-                        $data['storehouse_id'] =  $params['storehouse_id'] ?? 0;
-                        $stockModel->add($data);
+                        $data['storehouse_id'] = $params['storehouse_id'] ?? 0;
+                        $stockModel->delete(['goods_id' => $params['id']]);
+                        $res = $stockModel->add($data);
                     } else {
-                        //	var_dump($params['stock']);die();
-                        $num = count($params['stock']['code']);
+                        $params['stock'] = json_decode($params['stock'],true);
+                        $num = count($params['stock']);
+                        for ($i = 0; $i < count($stocks['data']); $i++) {
+                            $bool = false;
+                            for ($k = 0; $k < $num; $k++) {
+                                if ($params['stock'][$k]['id'] == $stocks['data'][$i]['id']) {
+                                    $bool = true;
+                                }
+                            }
+                            if($bool==false){
+                                $stockModel->delete(['id' => $stocks['data'][$i]['id']]);
+                            }
+
+                        }
                         for ($i = 0; $i < $num; $i++) {
                             $data['`key`'] = $params['`key`'];
                             $data['merchant_id'] = yii::$app->session['uid'];
-                            //$data['id'] = $params['stock']['id'];
+                            $data['id'] = $params['stock'][$i]['id'];
                             $data['goods_id'] = $params['id'];
                             $data['name'] = $params['name'];
-                            $data['code'] = $params['stock']['code'][$i];
-                            $data['number'] = $params['stock']['number'][$i];
-                            $data['weight'] = isset($params['stock']['weight'][$i]) ? $params['stock']['weight'][$i] : 0;
-                            $data['price'] = $params['stock']['price'][$i];
-                            $data['cost_price'] = $params['stock']['cost_price'][$i];
-                            $data['assemble_price'] = $params['stock']['assemble_price'][$i];
-                            $data['property1_name'] = $params['stock']['property1_name'][$i];
-                            $data['property2_name'] = $params['stock']['property2_name'][$i];
-                            $data['storehouse_id'] =  $params['storehouse_id'] ?? 0;
-                            if (isset($params['stock']['pic_url'])) {
-                                if ($params['stock']['pic_url'][$i] != "") {
-                                    $data['pic_url'] = $params['stock']['pic_url'][$i];
-                                } else {
-                                    $data['pic_url'] = is_array($pic_url) ? $pic_url[0] : $params['pic_urls'];
-                                }
-                            } else {
+                            $data['code'] = $params['stock'][$i]['code'];
+                            $data['number'] = $params['stock'][$i]['number'];
+                            $data['weight'] = isset($params['stock'][$i]['weight']) ? $params['stock'][$i]['weight'] : 0;
+                            $data['price'] = $params['stock'][$i]['price'];
+                            $data['cost_price'] = $params['stock'][$i]['cost_price'];
+                            $data['assemble_price'] = $params['stock'][$i]['assemble_price'];
+                            $data['property1_name'] = $params['stock'][$i]['property1_name'];
+                            $data['property2_name'] = $params['stock'][$i]['property2_name'];
+                            $data['storehouse_id'] = $params['storehouse_id'] ?? 0;
+                            if ($params['stock'][$i]['pic_url'] =="") {
                                 $data['pic_url'] = is_array($pic_url) ? $pic_url[0] : $params['pic_urls'];
+                            }else{
+                                $data['pic_url'] = $params['stock'][$i]['pic_url'] ;
                             }
                             $data['status'] = 1;
-                            $stockModel->add($data);
+
+                            if ($params['stock'][$i]['id'] == 0) {
+                                unset($params['stock'][$i]['id']);
+                                $stockModel->add($data);
+
+                            } else {
+                                $stockModel->update($data);
+                            }
+
                         }
                     }
 
-
-                    //添加砍价活动开启记录
+//                    //添加砍价活动开启记录
                     if (isset($params['is_bargain']) && $params['is_bargain'] == '1') {
                         $bargainModel = new BargainModel();
                         $bargainData = array(

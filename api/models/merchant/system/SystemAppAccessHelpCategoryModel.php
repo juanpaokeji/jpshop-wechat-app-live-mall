@@ -48,7 +48,7 @@ class SystemAppAccessHelpCategoryModel extends CommonModel {
      */
     public function do_select($params) {
         //数据库操作      
-        $params['orderby'] = "id desc";
+        $params['orderby'] = "sort desc";
         $params['count'] = true;
         $res = $this->get_list($params);
         if (empty($res)) {

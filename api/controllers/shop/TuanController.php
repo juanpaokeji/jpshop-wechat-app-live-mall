@@ -2,6 +2,8 @@
 
 namespace app\controllers\shop;
 
+use app\models\admin\system\SystemSmsModel;
+use app\models\core\SMS\SMS;
 use app\models\core\TableModel;
 use app\models\merchant\app\AppAccessModel;
 use app\models\merchant\distribution\AgentModel;
@@ -16,7 +18,12 @@ use app\models\shop\TuanLeaderModel;
 use app\models\shop\UserModel;
 use app\models\system\SystemAreaModel;
 use app\models\system\SystemMerchantMiniAccessModel;
+use app\models\system\SystemMerchantMiniSubscribeTemplateAccessModel;
+use app\models\system\SystemMerchantMiniSubscribeTemplateModel;
+use app\models\system\SystemSmsTemplateAccessModel;
+use app\models\system\SystemSmsTemplateIdModel;
 use app\models\tuan\LeaderModel;
+use Qcloud\Sms\SmsSingleSender;
 use yii;
 use yii\web\ShopController;
 
@@ -37,7 +44,7 @@ class TuanController extends ShopController
             'token' => [
                 'class' => 'yii\filters\ShopFilter', //调用过滤器
 //                'only' => ['single'],//指定控制器应用到哪些动作
-                'except' => ['order'], //指定控制器不应用到哪些动作
+                //            'except' => ['order'], //指定控制器不应用到哪些动作
             ]
         ];
     }
@@ -104,7 +111,7 @@ class TuanController extends ShopController
             $params = $request->get(); //获取地址栏参数
             $model = new \app\models\shop\OrderModel();
             $model->timeOutOrder();
-            //  $id = yii::$app->session['user_id'];
+            //$id = yii::$app->session['user_id'];
             //  $id = 146;
             $must = ['type'];
             $rs = $this->checkInput($must, $params);
@@ -141,7 +148,14 @@ class TuanController extends ShopController
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
             $orderModel = new \app\models\shop\OrderModel();
-            $data['order_sn'] = $params['order_sn'];
+
+            if (!isset($params['order_sn']) && !isset($params['pick_up_code'])){
+                return result(500, "参数有误,订单号");
+            }
+
+            if (isset($params['order_sn'])){
+                $data['order_sn'] = $params['order_sn'];
+            }
             $data['`key`'] = yii::$app->session['key'];
             $data['merchant_id'] = yii::$app->session['merchant_id'];
             $data['leader_uid'] = yii::$app->session['user_id'];
@@ -154,11 +168,18 @@ class TuanController extends ShopController
 //            $data['merchant_id'] = 13;
 //            $data['leader_uid'] = "444";
             $data['status'] = 3;
-           // $data['tuan_status'] = 2;
-
+            // $data['tuan_status'] = 2;
+            if (isset($params['pick_up_code'])){
+                $data['pick_up_code'] = $params['pick_up_code'];
+            }
             $array = $orderModel->queryOrder($data);
             if ($array['status'] != 200) {
                 return $array;
+            }
+
+            if (!isset($params['order_sn'])){
+                $params['order_sn'] = $array['data']['order_sn'];
+                $data['order_sn'] = $array['data']['order_sn'];
             }
 
             $data['status'] = 6;
@@ -177,33 +198,11 @@ class TuanController extends ShopController
             $vip = 1;
             $appAccessModel = new AppAccessModel();
             $appInfo = $appAccessModel->find(['key' => yii::$app->session['key']]);
-            if ($appInfo['status'] == 200 && $appInfo['data']['user_vip'] != 0){
-                if ($appInfo['data']['user_vip'] == 2){
+            if ($appInfo['status'] == 200 && $appInfo['data']['user_vip'] != 0) {
+                if ($appInfo['data']['user_vip'] == 2) {
                     //积分会员等级
-                    $userModel = new UserModel;
-                    $userInfo = $userModel->find(['id' => yii::$app->session['user_id']]);
-                    $unpaidVipModel = new UnpaidVipModel();
-                    $unpaidVipWhere['key'] = yii::$app->session['key'];
-                    $unpaidVipWhere['merchant_id'] = yii::$app->session['merchant_id'];
-                    $unpaidVipWhere['limit'] = false;
-                    $unpaidVipInfo = $unpaidVipModel->do_select($unpaidVipWhere);
-                    if ($unpaidVipInfo['status'] == 200 && $userInfo['status'] == 200){
-                        $minLev = reset($unpaidVipInfo['data']);//最低等级
-                        $maxLev = end($unpaidVipInfo['data']);//最高等级
-                        //总积分大于等于最高等级
-                        if ($userInfo['data']['total_score'] >= $maxLev['min_score']){
-                            $vip = $maxLev['score_times'];
-                        }
-                        //总积分在最低和最高之间的
-                        if ($userInfo['data']['total_score'] >= $minLev['min_score'] && $userInfo['data']['total_score'] < $maxLev['min_score']){
-                            foreach ($unpaidVipInfo['data'] as $k=>$v){
-                                if ($userInfo['data']['total_score'] >= $v['min_score']){
-                                    $vip = $v['score_times'];
-                                }
-                            }
-                        }
-                    }
-                }else{
+                    $vip = 1;
+                } else {
                     if ($vipUser[0]['is_vip'] == 1 && $vipUser[0]['vip_validity_time'] > time()) {
                         $sql = "select score_times from shop_vip_config where merchant_id = " . yii::$app->session['merchant_id'] . " and `key` = '" . yii::$app->session['key'] . "'";
                         $vipConfig = $orderModel->querySql($sql);
@@ -230,7 +229,7 @@ class TuanController extends ShopController
             $user_id = yii::$app->session['user_id'];
             $userModel = new UserModel();
             $user = $userModel->find(['id' => $user_id]);
-            $userModel->update(['id' => $user_id, '`key`' => yii::$app->session['key'], 'total_score' => $user['data']['total_score'] + $score,'score' => $user['data']['score'] + $score]);
+            $userModel->update(['id' => $user_id, '`key`' => yii::$app->session['key'], 'total_score' => $user['data']['total_score'] + $score, 'score' => $user['data']['score'] + $score]);
 
 
             if ($array['status'] == 200) {
@@ -239,7 +238,7 @@ class TuanController extends ShopController
                 if ($config['status'] == 200 && $config['data']['status'] == 1) {
                     //团长佣金
                     $balanceModel = new \app\models\shop\BalanceModel();
-                    $balance = $balanceModel->do_one(['order_sn' => $params['order_sn'], 'uid' => yii::$app->session['user_id'], 'type' => 1, 'key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['merchant_id']]);
+                    $balance = $balanceModel->do_one(['order_sn' => $params['order_sn'], 'uid' => yii::$app->session['user_id'],'status'=>1, 'type' => 1, 'key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['merchant_id']]);
                     if ($balance['status'] == 200) {
                         $userModel = new UserModel();
                         $user = $userModel->find(['id' => $balance['data']['uid']]);
@@ -256,10 +255,10 @@ class TuanController extends ShopController
                     }
 
                     //门店佣金
-                    if($rs['data']['supplier_id']!=0){
+                    if ($rs['data']['supplier_id'] != 0) {
                         $sql = "select sum(money) as num from shop_user_balance where order_sn = '{$rs['order_sn']}' and type = 1";
-                        $tuanbalance =  Yii::$app->db->createCommand($sql)->queryOne();
-                        $balance = $rs['data']['payment_money'] - $tuanbalance['num']-$rs['data']['commission']+$rs['data']['commissions_pool'];
+                        $tuanbalance = Yii::$app->db->createCommand($sql)->queryOne();
+                        $balance = $rs['data']['payment_money'] - $tuanbalance['num'] - $rs['data']['commission'] + $rs['data']['commissions_pool'];
                         $sql = "update system_sub_admin set balance = balance+{$balance} where id = " . $rs['data']['supplier_id'] . " ;";
                         Yii::$app->db->createCommand($sql)->execute();
                     }
@@ -271,8 +270,8 @@ class TuanController extends ShopController
                 $orderRs = $orderModel->find(['order_sn' => $params['order_sn']]);
 
                 //确认收货后更新团长等级、经验
-                if ($orderRs['data']['leader_uid'] != 0){
-                    $this->level($orderRs['data']['leader_uid'],floor($orderRs['data']['payment_money']));
+                if ($orderRs['data']['leader_uid'] != 0) {
+                    $this->level($orderRs['data']['leader_uid'], floor($orderRs['data']['payment_money']));
                 }
 
                 //用户确认收货后，查询普通会员是否可以升级为超级会员
@@ -308,7 +307,11 @@ class TuanController extends ShopController
                                 $levelData['reg_time'] = time();
                                 $userModel->update($levelData);
                             }
+                        } else {
+                            file_put_contents(Yii::getAlias('@webroot/') . '/log.text', date('Y-m-d H:i:s') . "分销_普升超_未查询到会员订单信息或消费金额未达标" . PHP_EOL, FILE_APPEND);
                         }
+                    } else {
+                        file_put_contents(Yii::getAlias('@webroot/') . '/log.text', date('Y-m-d H:i:s') . "分销_普升超_未查询到超级会员设置信息" . PHP_EOL, FILE_APPEND);
                     }
                 }
                 //判断父级是否可以升级
@@ -328,7 +331,7 @@ class TuanController extends ShopController
                         $agentInfo = $agentModel->do_select($agentWhere);
                         if (isset($agentInfo['data'])) {
                             foreach ($agentInfo['data'] as $k => $v) {
-                                if ($v['fan_number_buy'] <= $total[0]['total'] && $v['fan_number'] <= $fanNum && $v['secondhand_fan_number'] <= $secondhandFanNum) {
+                                if ((int)$v['fan_number_buy'] <= $total[0]['total'] && $v['fan_number'] <= $fanNum && $v['secondhand_fan_number'] <= $secondhandFanNum) {
                                     $level = 2;
                                     $levelId = $v['id'];
                                 }
@@ -342,7 +345,7 @@ class TuanController extends ShopController
                         $operatorInfo = $operatorModel->do_select($operatorWhere);
                         if (isset($operatorInfo['data'])) {
                             foreach ($operatorInfo['data'] as $k => $v) {
-                                if ($v['fan_number_buy'] <= $total[0]['total'] && $v['fan_number'] <= $fanNum && $v['secondhand_fan_number'] <= $secondhandFanNum) {
+                                if ((int)$v['fan_number_buy'] <= $total[0]['total'] && $v['fan_number'] <= $fanNum && $v['secondhand_fan_number'] <= $secondhandFanNum) {
                                     $level = 3;
                                     $levelId = $v['id'];
                                 }
@@ -376,7 +379,7 @@ class TuanController extends ShopController
                 $accessWhere['key'] = yii::$app->session['key'];
                 $accessWhere['merchant_id'] = yii::$app->session['merchant_id'];
                 $accessWhere['order_sn'] = $params['order_sn'];
-                $accessWhere['type'] = 1; //订单提佣
+                $accessWhere['or'] = ['or', ['=', 'type', 1], ['=', 'type', 2], ['=', 'type', 3]]; //订单提佣
                 $accessWhere['limit'] = false;
                 $distributionAccess = $distributionAccessModel->do_select($accessWhere);
                 if ($distributionAccess['status'] == 200) {
@@ -385,6 +388,7 @@ class TuanController extends ShopController
                         if ($userInfo['status'] == 200) {
                             $userData['id'] = $v['uid'];
                             $userData['`key`'] = $v['key'];
+                            $userData['commission'] = $userInfo['data']['commission'] - $v['money'];
                             $userData['withdrawable_commission'] = $v['money'] + $userInfo['data']['withdrawable_commission'];
                             $userModel->update($userData);
                         }
@@ -416,10 +420,10 @@ class TuanController extends ShopController
             $sql = "select * from shop_leader_level  where min_exp < {$user[0]['leader_exp']} and `key`='ccvWPn'  order by min_exp desc limit 1";
             $res = $table->querySql($sql);
             if (count($res) > 0) {
-                $sql = "update shop_user set leader_level = {$res[0]['id']},leader_exp = {$user[0]['leader_exp']}";
+                $sql = "update shop_user set leader_level = {$res[0]['id']},leader_exp = {$user[0]['leader_exp']} where id ={$leader_uid}";
                 Yii::$app->db->createCommand($sql)->execute();
             }else{
-                $sql = "update shop_user set leader_exp = {$user[0]['leader_exp']}";
+                $sql = "update shop_user set leader_exp = {$user[0]['leader_exp']} where id ={$leader_uid}";
                 Yii::$app->db->createCommand($sql)->execute();
             }
         }
@@ -474,6 +478,85 @@ class TuanController extends ShopController
                     'status' => '-1',
                 );
                 $tempAccess->do_add($taData);
+
+                //订阅消息(取货通知)
+                $leaderModel = new LeaderModel();
+                $leaderInfo = $leaderModel->do_one(['uid'=>yii::$app->session['user_id']]);
+                $leaderName = '未知';
+                $leaderPhone = 0;
+                $address = '未知';
+                if ($leaderInfo['status'] == 200){
+                    $leaderName = $leaderInfo['data']['realname'];
+                    $leaderPhone = $leaderInfo['data']['phone'] == ''? 0 : $leaderInfo['data']['phone'];
+                    $address = $leaderInfo['data']['area_name'] . $leaderInfo['data']['addr'];
+                    if (mb_strlen($address, 'utf-8') > 20) {
+                        $address = mb_substr($address, 0, 17, 'utf-8') . '...'; //商品名超过20个汉字截断
+                    } else {
+                        $address = $address;
+                    }
+                }
+                $pickUpCode = 0;
+                if ($orderRs['data']['pick_up_code'] != null){
+                    $pickUpCode = $orderRs['data']['pick_up_code'];
+                }
+                $subscribeTempModel = new SystemMerchantMiniSubscribeTemplateModel();
+                $subscribeTempInfo = $subscribeTempModel->do_one(['template_purpose' => 'pick_up_notice']);
+                if ($subscribeTempInfo['status'] == 200){
+                    $accessParams = array(
+                        'character_string6' => ['value' => $params['order_sn']],  //订单号
+                        'name10' => ['value' => $leaderName],  //团长姓名
+                        'phone_number11' => ['value' => $leaderPhone],    //联系电话
+                        'number12' => ['value' => $pickUpCode],   //取货码
+                        'thing2' => ['value' => $address],   //取货地点
+                    );
+                    $subscribeTempAccessModel = new SystemMerchantMiniSubscribeTemplateAccessModel();
+                    $subscribeTempAccessData = array(
+                        'key' => $orderRs['data']['key'],
+                        'merchant_id' => $orderRs['data']['merchant_id'],
+                        'mini_open_id' => $shopUser['data']['mini_open_id'],
+                        'template_id' => $subscribeTempInfo['data']['template_id'],
+                        'number' => '0',
+                        'template_params' => json_encode($accessParams, JSON_UNESCAPED_UNICODE),
+                        'template_purpose' => 'pick_up_notice',
+                        'page' => "/pages/orderItem/orderItem/orderItem?order_sn={$params['order_sn']}",
+                        'status' => '-1',
+                    );
+                    $subscribeTempAccessModel->do_add($subscribeTempAccessData);
+                }else{
+                    file_put_contents(Yii::getAlias('@webroot/') . '/log.text', date('Y-m-d H:i:s') . "取货通知_未查询到该订阅消息模板" . PHP_EOL, FILE_APPEND);
+                }
+
+
+                //发送短信给买家
+                $smsModel = new SystemSmsModel();
+                $smsWhere['status'] = 1;
+                $smsInfo = $smsModel->do_one($smsWhere); //查询短信配置
+                $templateIdModel = new SystemSmsTemplateIdModel();
+                $templateIdInfo = $templateIdModel->do_one([]); //查询短信模板id
+                $buyerPhone = $orderRs['data']['phone']; //买家电话
+                if ($smsInfo['status'] == 200 && $templateIdInfo['status'] == 200 && isset($buyerPhone)) {
+                    $templateConfig = json_decode($templateIdInfo['data']['config'], true);
+                    if ($templateConfig[1]['status'] == 'true') {  //下标1为团长收货买家短信提醒
+                        $smsAccessModel = new SystemSmsTemplateAccessModel();
+                        $smsInfo['data']['config'] = json_decode($smsInfo['data']['config'], true);
+                        $sms = new SMS();
+                        $sendRes = $sms->sendSms($buyerPhone,$templateConfig[1]['templateId']);
+                        if ($sendRes['status'] == 200) {
+                            $smsAccessData['phone'] = $buyerPhone;
+                            $smsAccessData['template_id'] = $templateConfig[1]['templateId'];
+                            $smsAccessData['type'] = 2; //团长收货买家短信提醒
+                            $smsAccessModel->do_add($smsAccessData);
+                        } else {
+                            file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . json_encode($sendRes, JSON_UNESCAPED_UNICODE) . PHP_EOL, FILE_APPEND);
+                        }
+                    } else {
+                        file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . '团长收货买家短信提醒未开启' . PHP_EOL, FILE_APPEND);
+                    }
+                } else {
+                    file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . '未查询到买家电话或腾讯云、短信模板配置信息' . PHP_EOL, FILE_APPEND);
+                }
+
+
                 return result(200, "订单{$data['order_sn']}确认收货成功！");
             } else {
                 return $array;
@@ -539,8 +622,111 @@ class TuanController extends ShopController
             $where['shop_tuan_user.leader_uid'] = yii::$app->session['user_id'];
             $where['field'] = "avatar,nickname,money";
             $where['join'][] = ['inner join', 'shop_user', 'shop_user.id=shop_tuan_user.uid'];
+            $where['limit'] = false;
             $data = $tuanUserModel->do_select($where);
             return $data;
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
+
+    //一键收货
+    public function actionReceipt()
+    {
+        if (yii::$app->request->isPut) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->bodyParams; //获取body传参
+            $orderModel = new \app\models\shop\OrderModel();
+          //  $data['fields'] = " * ,shop_order.send_out_time ";
+
+            $data['shop_order_group.`key`'] = yii::$app->session['key'];
+            $data['shop_order_group.merchant_id'] = yii::$app->session['merchant_id'];
+            $data['leader_self_uid'] = yii::$app->session['user_id'];
+            $data['join']=" inner join shop_order on shop_order.order_group_sn=shop_order_group.order_sn ";
+            $data['shop_order_group.status']= 3;
+            $data['tuan_status']=1;
+            $data['express_type <> 0'] =null;
+            $time1 = strtotime($params['time']);
+            $time2 = $time1+(24*3600);
+            $data["send_out_time>{$time1} and send_out_time <{$time2}"]=null;
+            $params['shop_order_group.delete_time is null'] = null;
+            $array = $orderModel->queryOrder($data);
+            if ($array['status'] != 200) {
+                return result(500, "未找到订单号");
+            }
+
+            unset($data['leader_self_uid']);
+
+            if ($array['status'] == 200) {
+                for ($i = 0; $i < count($array['data']); $i++) {
+
+                    $res = $orderModel->update(['order_sn'=>$array['data'][$i]['order_sn'],'tuan_status'=>2]);
+                   // var_dump($res);die();
+                    $params['order_sn'] = $array['data'][$i]['order_sn'];
+
+                    $orderModel = new OrderModel();
+                    $orderRs = $orderModel->find(['order_sn' => $params['order_sn']]);
+
+                    $shopUserModel = new \app\models\shop\UserModel();
+                    $shopUser = $shopUserModel->find(['id' => $orderRs['data']['user_id']]);
+
+                    $tempModel = new \app\models\system\SystemMiniTemplateModel();
+                    $minitemp = $tempModel->do_one(['id' => 34]);
+                    //单号,金额,下单时间,物品名称,
+                    $tempParams = array(
+                        'keyword1' => $orderRs['data']['goodsname'],
+                        'keyword2' => $orderRs['data']['payment_money'],
+                    );
+
+                    $tempAccess = new SystemMerchantMiniAccessModel();
+                    $taData = array(
+                        'key' => $orderRs['data']['key'],
+                        'merchant_id' => $orderRs['data']['merchant_id'],
+                        'mini_open_id' => $shopUser['data']['mini_open_id'],
+                        'template_id' => 34,
+                        'number' => '0',
+                        'template_params' => json_encode($tempParams),
+                        'template_purpose' => 'order',
+                        'page' => "/pages/orderItem/orderItem/orderItem?order_sn={$params['order_sn']}",
+                        'status' => '-1',
+                    );
+                    $tempAccess->do_add($taData);
+                    //发送短信给买家
+                    $smsModel = new SystemSmsModel();
+                    $smsWhere['status'] = 1;
+                    $smsInfo = $smsModel->do_one($smsWhere); //查询短信配置
+                    $templateIdModel = new SystemSmsTemplateIdModel();
+                    $templateIdInfo = $templateIdModel->do_one([]); //查询短信模板id
+                    $buyerPhone = $orderRs['data']['phone']; //买家电话
+                    if ($smsInfo['status'] == 200 && $templateIdInfo['status'] == 200 && isset($buyerPhone)) {
+                        $templateConfig = json_decode($templateIdInfo['data']['config'], true);
+                        if ($templateConfig[1]['status'] == 'true') {  //下标1为团长收货买家短信提醒
+                            $smsAccessModel = new SystemSmsTemplateAccessModel();
+                            $smsInfo['data']['config'] = json_decode($smsInfo['data']['config'], true);
+                            $sms = new SMS();
+                            $sendRes = $sms->sendSms($buyerPhone,$templateConfig[1]['templateId']);
+                            if ($sendRes['status'] == 200) {
+                                $smsAccessData['phone'] = $buyerPhone;
+                                $smsAccessData['template_id'] = $templateConfig[1]['templateId'];
+                                $smsAccessData['type'] = 2; //团长收货买家短信提醒
+                                $smsAccessModel->do_add($smsAccessData);
+                            } else {
+                                file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . json_encode($sendRes, JSON_UNESCAPED_UNICODE) . PHP_EOL, FILE_APPEND);
+                            }
+                        } else {
+                            file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . '团长收货买家短信提醒未开启' . PHP_EOL, FILE_APPEND);
+                        }
+                    } else {
+                        file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . '未查询到买家电话或腾讯云、短信模板配置信息' . PHP_EOL, FILE_APPEND);
+                    }
+
+
+                }
+                $number = count($array['data']);
+                return result(200, "确认收货{$number}个订单");
+            } else {
+                return $array;
+            }
         } else {
             return result(500, "请求方式错误");
         }

@@ -23,7 +23,7 @@ class VoucherController extends ShopController
             'token' => [
                 'class' => 'yii\filters\ShopFilter', //调用过滤器
 //                'only' => ['single'],//指定控制器应用到哪些动作
-                'except' => ['vouchertype'], //指定控制器不应用到哪些动作
+                'except' => ['vouchertype','overdue'], //指定控制器不应用到哪些动作
             ]
         ];
     }
@@ -195,7 +195,7 @@ class VoucherController extends ShopController
             $vdata['category_id'] = $voutype['data']['category_id'];
             $vdata['status'] = 1;
             $vdata['start_time'] = time();
-            $vdata['end_time'] = ($voutype['data']['days'] * 24 * 60 * 60) + ($vdata['start_time']);
+            $vdata['end_time'] = $voutype['data']['to_date'];
             $vdata['is_exchange'] = 0;
             $vdata['merchant_id'] = $params['merchant_id'];
             try {
@@ -516,5 +516,13 @@ class VoucherController extends ShopController
         }
     }
 
+
+    //过期红包处理（计划任务）
+    public function actionOverdue(){
+        $model = new VoucherModel();
+        $time = time();
+        $sql = "UPDATE `shop_voucher` SET status = '0' WHERE end_time < {$time}";
+        $model->querySql($sql);
+    }
 
 }

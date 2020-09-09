@@ -19,6 +19,8 @@ class DistributionController extends ShopController{
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
 
+            $params['key'] = yii::$app->session['key'];
+
             $userModel = new UserModel();
             $userId = yii::$app->session['user_id'];
             $userInfo = $userModel->find(['id'=>$userId]);
@@ -31,13 +33,13 @@ class DistributionController extends ShopController{
 
             $agentModel = new AgentModel();
             $agentWhere['key'] = $params['key'];
-            $agentWhere['merchant_id'] = yii::$app->session['uid'];
+            $agentWhere['merchant_id'] = yii::$app->session['merchant_id'];
             $agentWhere['status'] = 1;
             $agentWhere['limit'] = false;
             $agentInfo = $agentModel->do_select($agentWhere);  //可用的代理商等级
             $operatorModel = new OperatorModel();
             $operatorWhere['key'] = $params['key'];
-            $operatorWhere['merchant_id'] = yii::$app->session['uid'];
+            $operatorWhere['merchant_id'] = yii::$app->session['merchant_id'];
             $operatorWhere['status'] = 1;
             $operatorWhere['limit'] = false;
             $operatorInfo = $operatorModel->do_select($operatorWhere);  //可用的运营商等级
@@ -115,7 +117,8 @@ class DistributionController extends ShopController{
             }
 
             //不包含当天,总收益情况
-            $where['<'] = ['shop_distribution_access.create_time',$today];
+            unset($where['>=']);
+            $where['<'] = ['shop_distribution_access.create_time',time()];
             $totalInfo = $model->do_select($where);
             if ($totalInfo['status'] == 200){
                 $data['total'] = $totalInfo['data'][0]['total'];
@@ -280,19 +283,20 @@ class DistributionController extends ShopController{
 
             //统计各会员的小等级名称
             $agentModel = new AgentModel();
-            $agentWhere['key'] = $params['key'];
-            $agentWhere['merchant_id'] = yii::$app->session['uid'];
+            $agentWhere['key'] = yii::$app->session['key'];
+            $agentWhere['merchant_id'] = yii::$app->session['merchant_id'];
             $agentWhere['status'] = 1;
             $agentWhere['limit'] = false;
             $agentInfo = $agentModel->do_select($agentWhere);  //可用的代理商等级
             $operatorModel = new OperatorModel();
-            $operatorWhere['key'] = $params['key'];
-            $operatorWhere['merchant_id'] = yii::$app->session['uid'];
+            $operatorWhere['key'] = yii::$app->session['key'];
+            $operatorWhere['merchant_id'] = yii::$app->session['merchant_id'];
             $operatorWhere['status'] = 1;
             $operatorWhere['limit'] = false;
             $operatorInfo = $operatorModel->do_select($operatorWhere);  //可用的运营商等级
 
             $count = 0;
+            $user = [];
             foreach ($userInfo['data'] as $k=>$v){
                 switch ($v['level']) {
                     //普通会员
@@ -338,7 +342,7 @@ class DistributionController extends ShopController{
                 }
             }
 
-            if (isset($user)){
+            if (isset($params['status']) && $params['status'] == 1){
                 $userInfo['data'] = $user;
                 $userInfo['count'] = $count;
             }

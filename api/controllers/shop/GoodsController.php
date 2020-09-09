@@ -5,6 +5,7 @@ namespace app\controllers\shop;
 use app\models\core\TableModel;
 use app\models\merchant\app\AppAccessModel;
 use app\models\merchant\system\ShopRecommendGoodsModel;
+use app\models\shop\GoodsAdvanceSaleModel;
 use app\models\shop\GoodsLabelModel;
 use app\models\shop\OrderModel;
 use app\models\shop\ShopAssembleAccessModel;
@@ -102,7 +103,7 @@ class GoodsController extends ShopController
                     $params['supplier_id'] = 0;
                 }
             }
-
+            $params['is_check'] = 1;
             $array = $model->finds($params);
 
             $goods_id = array();
@@ -149,7 +150,7 @@ class GoodsController extends ShopController
                         $val['is_flash_sale'] = '1';
                         $val['start_time'] = $res['data']['start_time'];
                         $val['end_time'] = $res['data']['end_time'];
-                        $val['send_time'] = $res['data']['send_time'];
+                        $val['take_goods_time'] = $res['data']['take_goods_time'];
                     }
                 }
                 $orderModel = new SubOrdersModel();
@@ -343,8 +344,9 @@ class GoodsController extends ShopController
                     return result(500, "查询失败");
                 }
 
-                $array['data']['monthSale'] = $month['data'];
-                $array['data']['totalSale'] = $total['data'];
+                $array['data']['monthSale'] = isset($month['data']) ? $month['data'] : 0;
+                $array['data']['monthSale'] = $array['data']['monthSale'] + $array['data']['sales_number'];
+                $array['data']['totalSale'] = isset($total['data']) ? $total['data'] : array('total' => 0);
                 $array['data']['totalSale']['total'] = $array['data']['totalSale']['total'] + $array['data']['sales_number'];
                 $model = new CommentModel();
                 $commentData['shop_user_comment.`key`'] = $params['`key`'];
@@ -410,8 +412,10 @@ class GoodsController extends ShopController
                 if ($total['status'] != 200) {
                     return result(500, "查询失败");
                 }
-                $array['data']['monthSale'] = $month['data'];
-                $array['data']['totalSale'] = $total['data'];
+
+                $array['data']['monthSale'] = isset($month['data']) ? $month['data'] : 0;
+                $array['data']['monthSale'] = $array['data']['monthSale'] + $array['data']['sales_number'];
+                $array['data']['totalSale'] = isset($total['data']) ? $total['data'] : array('total' => 0);
                 $array['data']['totalSale']['total'] = $array['data']['totalSale']['total'] + $array['data']['sales_number'];
                 $model = new CommentModel();
                 $commentData['shop_user_comment.`key`'] = $params['`key`'];
@@ -445,6 +449,7 @@ class GoodsController extends ShopController
                             for ($j = 0; $j < count($array['data']['stock']); $j++) {
                                 if ($a['stock_id'] == $array['data']['stock'][$j]['id']) {
                                     $array['data']['stock'][$j]['number'] = $a['stocks'];
+                                    $array['data']['stock'][$j]['price'] = $a['flash_price'];
                                     $array['data']['stock'][$j]['price'] = $a['flash_price'];
                                 }
                             }
@@ -504,6 +509,17 @@ class GoodsController extends ShopController
                     $array['data']['max_group_price'] = $groupInfo['data']['min_price'];
                 }
                 $array['data']['min_group_price'] = $groupInfo['data']['min_price'];
+                if ($array['data']['min_price'] > $array['data']['min_group_price']) {
+                    $array['data']['min_price'] = $array['data']['min_group_price'];
+                }
+            }
+            //判断是否预售商品
+            $advanceSaleModel = new GoodsAdvanceSaleModel();
+            $advanceGoods = $advanceSaleModel->do_one(['goods_id' => $id, '<=' => ['start_time', time() + 24 * 60 * 60], '>' => ['end_time', time()]]);
+            if ($advanceGoods['status'] == 200) {
+                $advanceGoods['data']['goods_info'] = json_decode($advanceGoods['data']['goods_info'], true);
+                $advanceGoods['data']['goods_info']['tail_money '] = $advanceGoods['data']['goods_info']['price'] - $advanceGoods['data']['deduction'];
+                $array['data']['advance_info'] = $advanceGoods['data'];
             }
             if ($array['status'] == 200) {
                 if ($array['data']['supplier_id'] == 0) {
@@ -1024,7 +1040,6 @@ class GoodsController extends ShopController
             $params = $request->get(); //获取地址栏参数
             $model = new ShopRecommendGoodsModel();
             $where['key'] = $params['key'];
-            $where['merchant_id'] = yii::$app->session['uid'];
             $where['supplier_id'] = 0;
             $info = $model->do_one($where);
             if ($info['status'] == 200) {
@@ -1033,6 +1048,9 @@ class GoodsController extends ShopController
                 $data['bottom_show'] = $config['bottom_show'];
                 $data['pay_finish_show'] = $config['pay_finish_show'];
                 $idStr = '';
+                if ($config['goods_ids'] == null) {
+                    return result(204, "查询失败");
+                }
                 for ($i = 0; $i < count($config['goods_ids']); $i++) {
                     if ($i == 0) {
                         $idStr .= $config['goods_ids'][$i];
@@ -1051,14 +1069,14 @@ class GoodsController extends ShopController
                         $pic = explode(',', $v['pic_urls']);
                         $temp['pic_urls'] = $pic[0];
                         $temp['price'] = $v['price'];
-                        $data[] = $temp;
+                        $data['goods_list'][] = $temp;
                     }
                     return result(200, "请求成功", $data);
                 } else {
-                    return result(500, "查询失败");
+                    return result(204, "查询失败");
                 }
             } else {
-                return result(500, "查询失败");
+                return result(204, "查询失败");
             }
         } else {
             return result(500, "请求方式错误");

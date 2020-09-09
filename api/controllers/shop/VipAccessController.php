@@ -4,6 +4,7 @@ namespace app\controllers\shop;
 
 use app\models\merchant\vip\UnpaidVipModel;
 use app\models\merchant\vip\VipModel;
+use app\models\shop\GroupOrderModel;
 use app\models\shop\VipAccessModel;
 use tools\pay\mini_pay\MiniPay;
 use tools\pay\Payx;
@@ -293,45 +294,49 @@ class VipAccessController extends ShopController {
     public function actionUnpaidVip() {
         if (yii::$app->request->isGet) {
             $model = new UnpaidVipModel();
-            $userModel = new UserModel();
-            $where['id'] = yii::$app->session['user_id'];
             $where['key'] = yii::$app->session['key'];
             $where['merchant_id'] = yii::$app->session['merchant_id'];
-
-            $userInfo = $userModel->find($where);
-            unset($where['id']);
             $where['limit'] = false;
             $res = $model->do_select($where);
-            if ($userInfo['status'] != 200){
-                return $userInfo;
+
+            $orderModel = new GroupOrderModel();
+            $orderWhere['user_id'] = yii::$app->session['user_id'];
+            $orderWhere['or'] = ['or',['=','status',6],['=','status',7],['=','status',3]];
+            $orderWhere['limit'] = false;
+            $orderWhere['field'] = 'sum(payment_money) as payment_money';
+            $orderInfo = $orderModel->do_select($orderWhere);
+            $pay_price = 0;
+            if ($orderInfo['status'] == 200){
+                $pay_price = $orderInfo['data'][0]['payment_money'] == null ? 0 : $orderInfo['data'][0]['payment_money'];
             }
 
             if ($res['status'] == 200){
                 $minLev = reset($res['data']);//最低等级
                 $maxLev = end($res['data']);//最高等级
                 //总积分小于最低等级时
-                if ($userInfo['data']['total_score'] < $minLev['min_score']){
-                    $array['info']['min_score'] = intval($userInfo['data']['total_score']);
+                $array = [];
+                if ($pay_price < $minLev['min_score']){
+                    $array['info']['min_score'] = intval($pay_price);
                     $array['info']['name'] = "无等级";
                     $array['info']['discount_ratio'] = 1;
                     $array['next']['min_score'] = $minLev['min_score'];
                     $array['next']['name'] = $minLev['name'];
                 }
                 //总积分大于等于最高等级
-                if ($userInfo['data']['total_score'] >= $maxLev['min_score']){
+                if ($pay_price >= $maxLev['min_score']){
                     $array['up']['min_score'] = $maxLev['min_score'];
                     $array['up']['name'] = $maxLev['name'];
-                    $array['info']['min_score'] = intval($userInfo['data']['total_score']);
+                    $array['info']['min_score'] = intval($pay_price);
                     $array['info']['name'] = $maxLev['name'];
                     $array['info']['discount_ratio'] = $maxLev['discount_ratio'];
                 }
                 //总积分在最低和最高之间的
-                if ($userInfo['data']['total_score'] >= $minLev['min_score'] && $userInfo['data']['total_score'] < $maxLev['min_score']){
+                if ($pay_price >= $minLev['min_score'] && $pay_price < $maxLev['min_score']){
                     foreach ($res['data'] as $k=>$v){
-                        if ($userInfo['data']['total_score'] >= $v['min_score']){
+                        if ($pay_price >= $v['min_score']){
                             $array['up']['min_score'] = $v['min_score'];
                             $array['up']['name'] = $v['name'];
-                            $array['info']['min_score'] = intval($userInfo['data']['total_score']);
+                            $array['info']['min_score'] = intval($pay_price);
                             $array['info']['name'] = $v['name'];
                             $array['info']['discount_ratio'] = $v['discount_ratio'];
                             $array['next']['min_score'] = $res['data'][$k+1]['min_score'];

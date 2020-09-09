@@ -44,7 +44,6 @@ class GoodsModel extends TableModel
             if (!isset($params['fields'])) {
                 $params['fields'] = " *,(select IFNULL(sum(number),0) from shop_order where  shop_order.goods_id = shop_goods.id) as sold ";
             }
-
             if ($params['delete_time'] == 1) {
                 $params['shop_goods.delete_time is null'] = null;
                 unset($params['delete_time']);
@@ -58,7 +57,7 @@ class GoodsModel extends TableModel
                 $params["(shop_goods.name like '%{$params['searchName']}%' or shop_goods.id = '{$params['searchName']}' or shop_goods.code = '{$params['searchName']}')"] = null;
                 unset($params['searchName']);
             }
-            $params['orderby'] = " sort desc";
+            $params['orderby'] = "sort desc,update_time desc ";
             $res = $table->tableList($params);
             $app = $res['app'];
         } catch (Exception $ex) {
@@ -69,6 +68,9 @@ class GoodsModel extends TableModel
             $app[$i]['create_time'] = date('Y-m-d H:i:s', $app[$i]['create_time']);
             if ($app[$i]['update_time'] != "") {
                 $app[$i]['update_time'] = date('Y-m-d H:i:s', $app[$i]['update_time']);
+            }
+            if(htmlspecialchars_decode($app[$i]['detail_info'])!=""){
+                $app[$i]['detail_info'] =htmlspecialchars_decode($app[$i]['detail_info']);
             }
 
             $stock = new StockModel();
@@ -104,7 +106,7 @@ class GoodsModel extends TableModel
             if (!isset($params['status'])) {
                 $params['status'] = 1;
             }
-            $params['orderby'] = " sort desc";
+            $params['orderby'] = " sort desc,update_time desc";
             $bool = true;
             if (!isset($params['fields'])) {
                 $params['fields'] = " *,(select IFNULL(sum(number),0) from shop_order where  shop_order.goods_id = shop_goods.id) as sold ";
@@ -159,6 +161,7 @@ class GoodsModel extends TableModel
             } else {
                 $app[$i]['format_take_goods_time'] = "";
             }
+            $app[$i]['detail_info'] = htmlspecialchars_decode($app[$i]['detail_info']);
             $app[$i]['pic_urls'] = array_filter(explode(",", $app[$i]['pic_urls']));
             if ($bool == true) {
                 $stockData['table'] = 'shop_stock';
@@ -170,11 +173,7 @@ class GoodsModel extends TableModel
 
 //            $sql = "select sum(shop_order.number) as  num from shop_order  where goods_id = {$app[$i]['id']} and confirm_time != 0 ";
 //            $sold = $table->querySql($sql);
-            if ($app[$i]['sales_number']!=0) {
-                $app[$i]['sold'] = $app[$i]['sold'] + intval($app[$i]['sales_number']);
-            }else{
-                $app[$i]['sold'] = $app[$i]['sold'];
-            }
+            $app[$i]['sold'] = $app[$i]['sold'] + intval($app[$i]['sales_number']);
         }
 
         if (empty($app)) {
@@ -231,6 +230,7 @@ class GoodsModel extends TableModel
             if ($app['take_goods_time'] != "") {
                 $app['format_take_goods_time'] = date('Y-m-d', $app['take_goods_time']);
             }
+            $app['detail_info'] = htmlspecialchars_decode($app['detail_info']);
             $stockData['table'] = 'shop_stock';
             $stockData['goods_id'] = $app['id'];
             $stockData['delete_time is null'] = null;
@@ -317,7 +317,7 @@ class GoodsModel extends TableModel
             if ($app['update_time'] != "") {
                 $app['update_time'] = date('Y-m-d H:i:s', $app['update_time']);
             }
-
+            $app['detail_info'] = htmlspecialchars_decode($app['detail_info']);
             $app['label'] = array_filter(explode(",", $app['label']));
             unset($app['detail_info']);
             $stockData['table'] = 'shop_stock';

@@ -9,13 +9,19 @@ use app\models\merchant\picture\PictureGroupModel;
 use app\models\merchant\picture\PictureModel;
 use app\models\merchant\system\BargainModel;
 use app\models\merchant\system\OperationRecordModel;
+use app\models\merchant\system\ShopSolitaireModel;
+use app\models\merchant\user\MerchantModel;
 use app\models\shop\AssembleRecordModel;
 use app\models\shop\SaleGoodsModel;
 use app\models\shop\SaleGoodsStockModel;
 use app\models\shop\ShopAssembleModel;
 use app\models\shop\ShopBargainInfoModel;
 use app\models\shop\ShopGoodsModel;
+use app\models\shop\ShopSubscribeMessageNumModel;
+use app\models\shop\UserModel;
 use app\models\spike\FlashSaleGroupModel;
+use app\models\system\SystemMerchantMiniSubscribeTemplateAccessModel;
+use app\models\system\SystemMerchantMiniSubscribeTemplateModel;
 use app\models\system\SystemPicServerModel;
 use app\models\tuan\LeaderModel;
 use TencentCloud\Common\Credential;
@@ -53,7 +59,7 @@ class GoodsController extends MerchantController
             'token' => [
                 'class' => 'yii\filters\MerchantFilter', //调用过滤器
 //                'only' => ['single'],//指定控制器应用到哪些动作
-                'except' => ['goods-bool', 'auto-obtained'], //指定控制器不应用到哪些动作
+                'except' => ['goods-bool', 'auto-obtained', 'goods-message', 'solitaire-goods'], //指定控制器不应用到哪些动作
             ]
         ];
     }
@@ -88,8 +94,8 @@ class GoodsController extends MerchantController
                 Yii::$app->db->createCommand($sql)->execute();
 
             }
-            $bargainModel = new ShopBargainInfoModel();
-            $bargain = $bargainModel->do_select(['goods_id' => $id, 'key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['uid']]);
+            $bargainModel = new BargainModel();
+            $bargain = $bargainModel->do_one(['goods_id' => $id]);
             if ($bargain['status'] == 200) {
                 return result(500, "已有正在砍价的商品，无法修改");
             } else if ($bargain['status'] == 500) {
@@ -254,7 +260,7 @@ class GoodsController extends MerchantController
             $model = new GoodsModel();
 
             //设置类目 参数
-            $must = ['name', 'key', 'price', 'pic_urls', 'detail_info', 'stocks'];
+            $must = ['name', 'key', 'price', 'pic_urls',  'stocks'];
             $rs = $this->checkInput($must, $params);
             if ($rs != false) {
                 return $rs;
@@ -323,11 +329,13 @@ class GoodsController extends MerchantController
                 'city_group_id' => isset($params['city_group_id']) ? $params['city_group_id'] : 0,
                 'unit' => isset($params['unit']) ? $params['unit'] : "",
                 'sort' => $params['sort'],
+                'time_icon' => isset($params['time_icon']) ? $params['time_icon'] : '',
+                'is_stock_open' => isset($params['is_stock_open']) ? $params['is_stock_open'] : 1,
                 'type' => $params['type'],
                 'start_time' => $start_time,
                 'end_time' => $end_time,
                 'take_goods_time' => $take_goods_time,
-                'detail_info' => $params['detail_info'],
+                'detail_info' => addslashes(htmlentities($params['detail_info'])),
                 'simple_info' => htmlentities($params['simple_info']),
                 'label' => htmlentities($params['label']),
                 'label_id' => isset($params['label_id']) ? $params['label_id'] : "",
@@ -349,7 +357,10 @@ class GoodsController extends MerchantController
                 'video_id' => isset($params['video_id']) ? $params['video_id'] : '',
                 'attribute' => isset($params['attribute']) ? json_encode($params['attribute'], JSON_UNESCAPED_UNICODE) : "",
                 'video_status' => $params['video_url'] != "" ? 1 : 0,
+                'shop_express_template_id' => isset($params['shop_express_template_id']) ? $params['shop_express_template_id'] : 0,
+                'is_vip' =>isset($params['is_vip']) ? $params['is_vip'] : 1,
                 'is_limit' => $params['is_limit'],
+                'is_check' => 1,
                 'limit_number' => $params['limit_number'],
                 'regimental_only' => $params['regimental_only'] ?? 0,
                 'is_open_assemble' => $params['is_open_assemble'] ?? 0,
@@ -411,7 +422,7 @@ class GoodsController extends MerchantController
                     $data['storehouse_id'] = $params['storehouse_id'] ?? 0;
                     $stockModel->add($data);
                 } else {
-                    $num = count($params['stock']['code']);
+                    $num = count($params['stock']);
                     for ($i = 0; $i < $num; $i++) {
                         $data['`key`'] = $params['`key`'];
                         $data['merchant_id'] = yii::$app->session['uid'];
@@ -425,17 +436,13 @@ class GoodsController extends MerchantController
                         $data['property1_name'] = $params['stock']['property1_name'][$i];
                         $data['property2_name'] = $params['stock']['property2_name'][$i];
                         $data['storehouse_id'] = $params['storehouse_id'] ?? 0;
-                        if (isset($params['stock']['pic_url'])) {
-                            if ($params['stock']['pic_url'][$i] != "") {
-                                $data['pic_url'] = $params['stock']['pic_url'][$i];
-                            } else {
-                                $data['pic_url'] = is_array($pic_url) ? $pic_url[0] : $params['pic_urls'];
-                            }
-                        } else {
+
+                        if ($params['stock']['pic_url'][$i] =="") {
                             $data['pic_url'] = is_array($pic_url) ? $pic_url[0] : $params['pic_urls'];
                         }
                         $data['status'] = 1;
-                        $stockModel->add($data);
+
+                       $stockModel->add($data);
                     }
                 }
                 //添加拼团配置
@@ -518,7 +525,19 @@ class GoodsController extends MerchantController
                 //添加操作记录
                 $operationRecordModel = new OperationRecordModel();
                 $operationRecordData['key'] = $params['`key`'];
-                $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                if (isset(yii::$app->session['sid'])) {
+                    $subModel = new \app\models\merchant\system\UserModel();
+                    $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                    if ($subInfo['status'] == 200){
+                        $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                    }
+                } else {
+                    $merchantModle = new MerchantModel();
+                    $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                    if ($merchantInfo['status'] == 200) {
+                        $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                    }
+                }
                 $operationRecordData['operation_type'] = '新增';
                 $operationRecordData['operation_id'] = $array['data'];
                 $operationRecordData['module_name'] = '商品列表';
@@ -555,7 +574,7 @@ class GoodsController extends MerchantController
 
             $flashModel = new FlashSaleGroupModel();
             $goodsId[] = $id;
-            $res = $flashModel->do_select(['in' => ['goods_ids', $goodsId], 'key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['uid']]);
+            $res = $flashModel->do_select(['in' => ['goods_ids', $goodsId], 'merchant_id' => yii::$app->session['uid']]);
             if ($res['status'] == 200) {
                 return result(500, "以有正在秒杀的商品，无法修改");
             }
@@ -563,8 +582,8 @@ class GoodsController extends MerchantController
                 return $res;
             }
 
-            $bargainModel = new ShopBargainInfoModel();
-            $bargain = $bargainModel->do_select(['goods_id' => $id, 'key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['uid']]);
+            $bargainModel = new BargainModel();
+            $bargain = $bargainModel->do_select(['goods_id' => $id, 'merchant_id' => yii::$app->session['uid']]);
             if ($bargain['status'] == 200) {
                 return result(500, "以有正在砍价的商品，无法修改");
             }
@@ -662,11 +681,13 @@ class GoodsController extends MerchantController
                     'm_category_id' => $params['m_category_id'],
                     'city_group_id' => $params['city_group_id'],
                     'storehouse_id' => $params['storehouse_id'] ?? 0,
+                    'time_icon' => isset($params['time_icon']) ? $params['time_icon'] : '',
+                    'is_stock_open' => isset($params['is_stock_open']) ? $params['is_stock_open'] : 1,
                     'sort' => $params['sort'],
                     'type' => $params['type'],
                     'end_time' => $end_time,
                     'start_time' => $start_time,
-                    'detail_info' => $params['detail_info'],
+                    'detail_info' => addslashes(htmlentities($params['detail_info'])),
                     'simple_info' => $params['simple_info'],
                     'sales_number' => $params['sales_number'],
                     'label' => $params['label'],
@@ -690,6 +711,9 @@ class GoodsController extends MerchantController
                     'video_pic_url' => isset($params['video_pic_url']) ? $params['video_pic_url'] : '',
                     'video_id' => isset($params['video_id']) ? $params['video_id'] : '',
                     'video_status' => $params['video_url'] != "" ? 1 : 0,
+                    'shop_express_template_id' => isset($params['shop_express_template_id']) ? $params['shop_express_template_id'] : 0,
+                    'is_vip' =>isset($params['is_vip']) ? $params['is_vip'] : 1,
+                    'is_check' => 1,
                     'is_limit' => $params['is_limit'],
                     'is_parcel' => isset($params['is_parcel']) ? $params['is_parcel'] : 0,
                     'limit_number' => $params['limit_number'],
@@ -713,14 +737,24 @@ class GoodsController extends MerchantController
                     'weight' => isset($params['weight']) ? $params['weight'] : 0,
                     'commission_is_open' => isset($params['commission_is_open']) ? $params['commission_is_open'] : 0,
                 );
-
                 $array = $model->update($goodsData);
-
                 if ($array['status'] == 200) {
                     //添加操作记录
                     $operationRecordModel = new OperationRecordModel();
                     $operationRecordData['key'] = $params['`key`'];
-                    $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                    if (isset(yii::$app->session['sid'])) {
+                        $subModel = new \app\models\merchant\system\UserModel();
+                        $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                        if ($subInfo['status'] == 200){
+                            $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                        }
+                    } else {
+                        $merchantModle = new MerchantModel();
+                        $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                        if ($merchantInfo['status'] == 200) {
+                            $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                        }
+                    }
                     $operationRecordData['operation_type'] = '更新';
                     $operationRecordData['operation_id'] = $id;
                     $operationRecordData['module_name'] = '商品列表';
@@ -729,32 +763,14 @@ class GoodsController extends MerchantController
 
                 $stockModel = new StockModel();
                 $delData['goods_id'] = $params['id'];
-                $stockModel->del($delData);
-                $str = creat_mulu("./uploads/goods/" . $params['merchant_id']);
-                $base = new Base64Model();
+                $stocks = $stockModel->findall(['goods_id' => $params['id']]);
+                //  $stockModel->del($delData);
+                //   $str = creat_mulu("./uploads/goods/" . $params['merchant_id']);
+                //   $base = new Base64Model();
                 $transaction = yii::$app->db->beginTransaction();
                 try {
-                    //拼团开关记录
-//                    if (isset($params['is_open_assemble'])) {
-//                        $assembleRecordModel = new AssembleRecordModel();
-//                        $assembleRecordWhere['key'] = $params['`key`'];
-//                        $assembleRecordWhere['merchant_id'] = yii::$app->session['uid'];
-//                        $assembleRecordWhere['goods_id'] = $id;
-//                        $assembleRecordWhere['orderby'] = "id desc";
-//                        $assembleRecordInfo = $assembleRecordModel->do_one($assembleRecordWhere);
-//                        if (($assembleRecordInfo['status'] != 200 && $params['is_open_assemble'] == 1) || (isset($assembleRecordInfo['data']) && $assembleRecordInfo['data']['status'] != $params['is_open_assemble'])) {
-//                            $assembleRecordData['key'] = $params['`key`'];
-//                            $assembleRecordData['merchant_id'] = yii::$app->session['uid'];
-//                            $assembleRecordData['goods_id'] = $id;
-//                            $assembleRecordData['name'] = $params['name'];
-//                            $assembleRecordData['status'] = $params['is_open_assemble'];
-//                            $assembleRecordData['time'] = time();
-//                            $assembleRecordModel->do_add($assembleRecordData);
-//                        }
-//                    }
                     $pic_url = explode(",", $params['pic_urls']);
                     if ($params['have_stock_type'] == 0) {
-
                         $data['`key`'] = $params['`key`'];
                         $data['merchant_id'] = yii::$app->session['uid'];
                         $data['goods_id'] = $params['id'];
@@ -769,40 +785,57 @@ class GoodsController extends MerchantController
                         $data['pic_url'] = is_array($pic_url) ? $pic_url[0] : $params['pic_urls'];
                         $data['status'] = 1;
                         $data['storehouse_id'] = $params['storehouse_id'] ?? 0;
-                        $stockModel->add($data);
+                        $stockModel->delete(['goods_id' => $params['id']]);
+                        $res = $stockModel->add($data);
                     } else {
-                        //	var_dump($params['stock']);die();
-                        $num = count($params['stock']['code']);
+                        $params['stock'] = json_decode($params['stock'],true);
+                        $num = count($params['stock']);
+                        for ($i = 0; $i < count($stocks['data']); $i++) {
+                            $bool = false;
+                            for ($k = 0; $k < $num; $k++) {
+                                if ($params['stock'][$k]['id'] == $stocks['data'][$i]['id']) {
+                                    $bool = true;
+                                }
+                            }
+                            if($bool==false){
+                                $stockModel->delete(['id' => $stocks['data'][$i]['id']]);
+                            }
+
+                        }
                         for ($i = 0; $i < $num; $i++) {
                             $data['`key`'] = $params['`key`'];
                             $data['merchant_id'] = yii::$app->session['uid'];
-                            //$data['id'] = $params['stock']['id'];
+                            $data['id'] = $params['stock'][$i]['id'];
                             $data['goods_id'] = $params['id'];
                             $data['name'] = $params['name'];
-                            $data['code'] = $params['stock']['code'][$i];
-                            $data['number'] = $params['stock']['number'][$i];
-                            $data['weight'] = isset($params['stock']['weight'][$i]) ? $params['stock']['weight'][$i] : 0;
-                            $data['price'] = $params['stock']['price'][$i];
-                            $data['cost_price'] = $params['stock']['cost_price'][$i];
-                            $data['assemble_price'] = $params['stock']['assemble_price'][$i];
-                            $data['property1_name'] = $params['stock']['property1_name'][$i];
-                            $data['property2_name'] = $params['stock']['property2_name'][$i];
+                            $data['code'] = $params['stock'][$i]['code'];
+                            $data['number'] = $params['stock'][$i]['number'];
+                            $data['weight'] = isset($params['stock'][$i]['weight']) ? $params['stock'][$i]['weight'] : 0;
+                            $data['price'] = $params['stock'][$i]['price'];
+                            $data['cost_price'] = $params['stock'][$i]['cost_price'];
+                            $data['assemble_price'] = $params['stock'][$i]['assemble_price'];
+                            $data['property1_name'] = $params['stock'][$i]['property1_name'];
+                            $data['property2_name'] = $params['stock'][$i]['property2_name'];
                             $data['storehouse_id'] = $params['storehouse_id'] ?? 0;
-                            if (isset($params['stock']['pic_url'])) {
-                                if ($params['stock']['pic_url'][$i] != "") {
-                                    $data['pic_url'] = $params['stock']['pic_url'][$i];
-                                } else {
-                                    $data['pic_url'] = is_array($pic_url) ? $pic_url[0] : $params['pic_urls'];
-                                }
-                            } else {
+                            if ($params['stock'][$i]['pic_url'] =="") {
                                 $data['pic_url'] = is_array($pic_url) ? $pic_url[0] : $params['pic_urls'];
+                            }else{
+                                $data['pic_url'] = $params['stock'][$i]['pic_url'] ;
                             }
                             $data['status'] = 1;
-                            $stockModel->add($data);
+
+                            if ($params['stock'][$i]['id'] == 0) {
+                                unset($params['stock'][$i]['id']);
+                                $stockModel->add($data);
+
+                            } else {
+                                $stockModel->update($data);
+                            }
+
                         }
                     }
 
-                    //添加砍价活动开启记录
+//                    //添加砍价活动开启记录
                     if (isset($params['is_bargain']) && $params['is_bargain'] == '1') {
                         $bargainModel = new BargainModel();
                         $bargainData = array(
@@ -870,7 +903,19 @@ class GoodsController extends MerchantController
                     //添加操作记录
                     $operationRecordModel = new OperationRecordModel();
                     $operationRecordData['key'] = $params['`key`'];
-                    $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                    if (isset(yii::$app->session['sid'])) {
+                        $subModel = new \app\models\merchant\system\UserModel();
+                        $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                        if ($subInfo['status'] == 200){
+                            $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                        }
+                    } else {
+                        $merchantModle = new MerchantModel();
+                        $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                        if ($merchantInfo['status'] == 200) {
+                            $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                        }
+                    }
                     $operationRecordData['operation_type'] = '更新';
                     $operationRecordData['operation_id'] = $id;
                     $operationRecordData['module_name'] = '商品列表';
@@ -958,7 +1003,19 @@ class GoodsController extends MerchantController
                 //添加操作记录
                 $operationRecordModel = new OperationRecordModel();
                 $operationRecordData['key'] = $params['`key`'];
-                $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                if (isset(yii::$app->session['sid'])) {
+                    $subModel = new \app\models\merchant\system\UserModel();
+                    $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                    if ($subInfo['status'] == 200){
+                        $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                    }
+                } else {
+                    $merchantModle = new MerchantModel();
+                    $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                    if ($merchantInfo['status'] == 200) {
+                        $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                    }
+                }
                 $operationRecordData['operation_type'] = '删除';
                 $operationRecordData['operation_id'] = $id;
                 $operationRecordData['module_name'] = '商品列表';
@@ -1186,7 +1243,19 @@ class GoodsController extends MerchantController
                     //添加操作记录
                     $operationRecordModel = new OperationRecordModel();
                     $operationRecordData['key'] = $data['`key`'];
-                    $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                    if (isset(yii::$app->session['sid'])) {
+                        $subModel = new \app\models\merchant\system\UserModel();
+                        $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                        if ($subInfo['status'] == 200){
+                            $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                        }
+                    } else {
+                        $merchantModle = new MerchantModel();
+                        $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                        if ($merchantInfo['status'] == 200) {
+                            $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                        }
+                    }
                     $operationRecordData['operation_type'] = '更新';
                     $operationRecordData['operation_id'] = $id;
                     $operationRecordData['module_name'] = '回收站';
@@ -1223,44 +1292,60 @@ class GoodsController extends MerchantController
         if (!$video_url) {
             return result(500, "上传视频错误");
         }
-        $videoModel = new SystemVideoModel();
-        $video = $videoModel->do_one([]);
+//        $videoModel = new SystemVideoModel();
+//        $video = $videoModel->do_one([]);
+        $cosModel = new SystemPicServerModel();
+        $where['status'] = 1; //服务器只会有一个开启，没有开启则使用本地
+        $video = $cosModel->do_one($where);
         if ($video['status'] == 200) {
-            try {
-                $client = new VodUploadClient($video['secretId'], $video['secretKey']);
-                $req = new VodUploadRequest();
-                if (!$video_url) {
-                    return result(500, "上传文件路径错误");
-                }
-                $req->MediaFilePath = $video_url;
-                $req->Procedure = "处理视频"; //指定任务流
-                $rsp = $client->upload("ap-guangzhou", $req);
-                if ($rsp->FileId) {
-                    $credential = new Credential($video['secretId'], $video['secretKey']);
-                    $vodClient = new VodClient($credential, "ap-guangzhou");
-                    $DescribeMediaInfosRequest = new DescribeMediaInfosRequest();
-                    $DescribeMediaInfosRequest->deserialize(['FileIds' => [$rsp->FileId], 'Filters' => ['basicInfo', 'metaData']]);
-                    $applyUploadResponse = $vodClient->DescribeMediaInfos($DescribeMediaInfosRequest);
-                    if ($applyUploadResponse) {
-                        $Duration = $applyUploadResponse->MediaInfoSet[0]->MetaData->Duration;
-                        if ($Duration > 30) { //太长了删除它
-                            $DeleteMediaRequest = new DeleteMediaRequest();
-                            $DeleteMediaRequest->deserialize(['FileId' => $rsp->FileId]);
-                            $vodClient->DeleteMedia($DeleteMediaRequest);
-                            return result(500, "视频太长了！");
-                        }
-                        $data['video_id'] = $rsp->FileId;
-                        $data['video_url'] = $rsp->MediaUrl;
-                        $data['video_pic_url'] = $rsp->CoverUrl;
-                        return result(200, "上传成功", $data);
-                    }
-                    return result(500, "出错了");
-                } else {
-                    return result(500, "上传失败");
-                }
-            } catch (\Exception $e) {
-                // 处理上传异常
-                return result(500, $e->getMessage());
+//            try {
+//                $client = new VodUploadClient($video['secretId'], $video['secretKey']);
+//                $req = new VodUploadRequest();
+//                if (!$video_url) {
+//                    return result(500, "上传文件路径错误");
+//                }
+//                $req->MediaFilePath = $video_url;
+//                $req->Procedure = "处理视频"; //指定任务流
+//                $rsp = $client->upload("ap-guangzhou", $req);
+//                if ($rsp->FileId) {
+//                    $credential = new Credential($video['secretId'], $video['secretKey']);
+//                    $vodClient = new VodClient($credential, "ap-guangzhou");
+//                    $DescribeMediaInfosRequest = new DescribeMediaInfosRequest();
+//                    $DescribeMediaInfosRequest->deserialize(['FileIds' => [$rsp->FileId], 'Filters' => ['basicInfo', 'metaData']]);
+//                    $applyUploadResponse = $vodClient->DescribeMediaInfos($DescribeMediaInfosRequest);
+//                    if ($applyUploadResponse) {
+//                        $Duration = $applyUploadResponse->MediaInfoSet[0]->MetaData->Duration;
+//                        if ($Duration > 30) { //太长了删除它
+//                            $DeleteMediaRequest = new DeleteMediaRequest();
+//                            $DeleteMediaRequest->deserialize(['FileId' => $rsp->FileId]);
+//                            $vodClient->DeleteMedia($DeleteMediaRequest);
+//                            return result(500, "视频太长了！");
+//                        }
+//                        $data['video_id'] = $rsp->FileId;
+//                        $data['video_url'] = $rsp->MediaUrl;
+//                        $data['video_pic_url'] = $rsp->CoverUrl;
+//                        return result(200, "上传成功", $data);
+//                    }
+//                    return result(500, "出错了");
+//                } else {
+//                    return result(500, "上传失败");
+//                }
+//            } catch (\Exception $e) {
+//                // 处理上传异常
+//                return result(500, $e->getMessage());
+//            }
+            $cos = new CosModel();
+            $cosRes = $cos->putObject($video_url);
+            if ($cosRes['status'] == '200') {
+                $url = $cosRes['data'];
+                unlink(Yii::getAlias('@webroot/') . $video_url);
+                $data['video_id'] = "";
+                $data['video_url'] = $url;
+                $data['video_pic_url'] = "";
+                return result(200, "上传成功", $data);
+            } else {
+                unlink(Yii::getAlias('@webroot/') . $video_url);
+                return json_encode($cosRes, JSON_UNESCAPED_UNICODE);
             }
         } else {
             $data['video_id'] = "";
@@ -1269,13 +1354,13 @@ class GoodsController extends MerchantController
             return result(200, "上传成功", $data);
         }
         // $credential = new Credential($video['secretId'],$video['secretKey']);
-        $client = new VodUploadClient($video['secretId'], $video['secretKey']);
-        $req = new VodUploadRequest();
-        if (!$video_url) {
-            return result(500, "上传文件路径错误");
-        }
-        $req->MediaFilePath = $video_url;
-        $req->Procedure = "处理视频"; //指定任务流
+//        $client = new VodUploadClient($video['secretId'], $video['secretKey']);
+//        $req = new VodUploadRequest();
+//        if (!$video_url) {
+//            return result(500, "上传文件路径错误");
+//        }
+//        $req->MediaFilePath = $video_url;
+//        $req->Procedure = "处理视频"; //指定任务流
 
     }
 
@@ -1414,7 +1499,7 @@ class GoodsController extends MerchantController
     public function actionAutoObtained()
     {
         //结束售卖时间大于当前时间全部下架
-        $sql = "UPDATE shop_goods set `status`= 0 where (end_time != 0 AND end_time < unix_timestamp(now())) AND `status` = 1";
+        $sql = "UPDATE shop_goods set `status`= 0 where (end_time != 0 AND end_time < unix_timestamp(now())) AND `status` = 1 and is_stock_open=0 ";
         $str = yii::$app->db->createCommand($sql)->execute();
         return $str;
     }
@@ -1446,5 +1531,280 @@ class GoodsController extends MerchantController
             return result(500, "请求方式错误");
         }
     }
+
+    //预约商品到货通知，将商品信息存入redis
+    public function actionRedisMessage()
+    {
+        if (yii::$app->request->isPost) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->bodyParams; //获取body传参
+
+            $must = ['key', 'goods_id', 'name', 'price'];
+            //设置类目 参数
+            $rs = $this->checkInput($must, $params);
+            if ($rs != false) {
+                return $rs;
+            }
+
+            $data['key'] = $params['key'];
+            $data['goods_id'] = $params['goods_id'];
+            $data['name'] = $params['name'];
+            $data['price'] = $params['price'];
+            lpushRedis('merchandise_arrival_subscribe_message', $data);
+
+            return result(200, "请求成功");
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
+
+    //预约商品到货通知，读取redis商品信息，发送给每一位会员
+    public function actionGoodsMessage()
+    {
+        $paramsLen = llenRedis('merchandise_arrival_subscribe_message');
+        if ($paramsLen > 0) {
+            for ($i = 0; $i < $paramsLen; $i++) {
+                $paramsList[] = rpopRedis('merchandise_arrival_subscribe_message');
+            }
+            foreach ($paramsList as $k => $v) {
+                $params = $v;
+                file_put_contents(Yii::getAlias('@webroot/') . '/log.text', date('Y-m-d H:i:s') . "预约商品到货通知_" . json_encode($params, JSON_UNESCAPED_UNICODE) . PHP_EOL, FILE_APPEND);
+                if ($params) {
+                    //获取小程序
+                    $config = $this->getSystemConfig($params['key'], "miniprogram");
+                    if ($config == false) {
+                        return result(500, "小程序信息错误");
+                    }
+                    try {
+                        $miniProgram = Factory::miniProgram($config);
+                        $token = $miniProgram->access_token->getToken(true);// 强制重新从微信服务器获取 token
+                    } catch (\EasyWeChat\Kernel\Exceptions\Exception $exception) {
+                        return result(500, "小程序信息错误");
+                    }
+                    if (!isset($token['access_token'])) {
+                        return result(500, "小程序信息错误");
+                    }
+                    $miniProgram['access_token']->setToken($token['access_token'], 3600);
+                    $url = "https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token={$token['access_token']}";
+                    //订阅消息
+                    $subscribeTempModel = new SystemMerchantMiniSubscribeTemplateModel();
+                    $subscribeTempInfo = $subscribeTempModel->do_one(['template_purpose' => 'merchandise_arrival']);
+                    if ($subscribeTempInfo['status'] != 200) {
+                        file_put_contents(Yii::getAlias('@webroot/') . '/log.text', date('Y-m-d H:i:s') . "预约商品到货通知_未查询到该订阅消息模板" . PHP_EOL, FILE_APPEND);
+                        return;
+                    }
+
+                    $subscribeMessageNumModel = new ShopSubscribeMessageNumModel();
+                    $subscribeMessageNumWhere['field'] = "shop_user.*,shop_subscribe_message_num.num as message_num";
+                    $subscribeMessageNumWhere['shop_subscribe_message_num.template_id'] = $subscribeTempInfo['data']['template_id'];
+                    $subscribeMessageNumWhere['join'][] = ['left join', 'shop_user', 'shop_user.id = shop_subscribe_message_num.user_id'];
+                    $userInfo = $subscribeMessageNumModel->do_select($subscribeMessageNumWhere);
+                    if ($userInfo['status'] != 200) {
+                        file_put_contents(Yii::getAlias('@webroot/') . '/log.text', date('Y-m-d H:i:s') . "预约商品到货通知_未查询到会员信息" . PHP_EOL, FILE_APPEND);
+                        return;
+                    }
+                    if (mb_strlen($params['name'], 'utf-8') > 20) {
+                        $goodsName = mb_substr($params['name'], 0, 17, 'utf-8') . '...'; //商品名超过20个汉字截断
+                    } else {
+                        $goodsName = $params['name'];
+                    }
+                    $accessParams = array(
+                        'thing1' => ['value' => $goodsName],  //商品名
+                        'thing3' => ['value' => '您预约的商品已到货'],  //温馨提示
+                        'amount4' => ['value' => $params['price']],    //商品价格
+                        'date5' => ['value' => date('Y-m-d h:i:s', time())],   //快递单号
+                    );
+                    foreach ($userInfo['data'] as $k => $v) {
+                        $data = array(
+                            'touser' => $v['mini_open_id'],   //openid
+                            'template_id' => $subscribeTempInfo['data']['template_id'],  //模板ID
+                            'page' => "pages/goodsItem/goodsItem/goodsItem?id={$params['goods_id']}", //跳转地址
+                            'data' => $accessParams, //消息内容
+                        );
+                        $res = json_decode(curlPostJson($url, json_encode($data)), true);
+                        if ($res['errcode'] == 0) {
+                            $subscribeMessageWhere['user_id'] = $v['id'];
+                            $subscribeMessageWhere['template_id'] = $subscribeTempInfo['data']['template_id'];
+                            $data['num'] = $v['message_num'] - 1;
+                            if ($data['num'] <= 0) {
+                                $subscribeMessageNumModel->do_del($subscribeMessageWhere);
+                            } else {
+                                $subscribeMessageNumModel->do_update($subscribeMessageWhere, $data);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    //接龙活动到期，将此活动的商品接龙ID修改为0
+    public function actionSolitaireGoods()
+    {
+        $model = new ShopSolitaireModel();
+        $where['limit'] = false;
+        $array = $model->do_select($where);
+        $time = time();
+        if ($array['status'] == 200) {
+            foreach ($array['data'] as $k => $v) {
+                if ($v['end_time'] < $time) {
+                    $sql = "UPDATE shop_goods set `solitaire_id`= 0 where `solitaire_id` = {$v['id']}";
+                    yii::$app->db->createCommand($sql)->execute();
+                }
+            }
+        }
+    }
+
+    //单个商品规格详情
+    public function actionGoodsStock($id){
+        if (yii::$app->request->isGet) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->get();
+
+            $must = ['key'];
+            //设置类目 参数
+            $rs = $this->checkInput($must, $params);
+            if ($rs != false) {
+                return $rs;
+            }
+
+            $model = new SaleGoodsStockModel();
+            $where['key'] = $params['key'];
+            $where['merchant_id'] = yii::$app->session['uid'];
+            $where['goods_id'] = $id;
+            $where['limit'] = false;
+            $array = $model->do_select($where);
+            return $array;
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
+
+    //追加商品库存
+    public function actionAdditional($id){
+        if (yii::$app->request->isPut) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->bodyParams; //获取body传参
+
+            $must = ['key', 'stock'];
+            //设置类目 参数
+            $rs = $this->checkInput($must, $params);
+            if ($rs != false) {
+                return $rs;
+            }
+
+            $params['stock'] = json_decode($params['stock'],true);
+            $stock = 0;
+            foreach ($params['stock'] as $k=>$v){
+                $stock = $stock + $v['add_stock'];
+            }
+
+            $model = new SaleGoodsStockModel();
+            $goodsModel = new ShopGoodsModel();
+            $goodsWhere['id'] = $id;
+            $goodsInfo = $goodsModel->do_one($goodsWhere);
+            if ($goodsInfo['status'] != 200){
+                return result(500, "未查询到该商品");
+            }
+            $goodsData['stocks'] = $stock + $goodsInfo['data']['stocks'];
+            $array = $goodsModel->do_update($goodsWhere,$goodsData);
+            if ($array['status'] == 200){
+                foreach ($params['stock'] as $k=>$v){
+                    $where['id'] = $v['id'];
+                    $info = $model->do_one($where);
+                    if ($info['status'] == 200){
+                        $data['number'] = $info['data']['number'] + $v['add_stock'];
+                        $model->do_update($where,$data);
+                    }
+                }
+                //添加操作记录
+                $operationRecordModel = new OperationRecordModel();
+                $operationRecordData['key'] = $params['key'];
+                if (isset(yii::$app->session['sid'])) {
+                    $subModel = new \app\models\merchant\system\UserModel();
+                    $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                    if ($subInfo['status'] == 200){
+                        $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                    }
+                } else {
+                    $merchantModle = new MerchantModel();
+                    $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                    if ($merchantInfo['status'] == 200) {
+                        $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                    }
+                }
+                $operationRecordData['operation_type'] = '更新';
+                $operationRecordData['operation_id'] = $id;
+                $operationRecordData['module_name'] = '商品列表';
+                $operationRecordModel->do_add($operationRecordData);
+            }
+            return $array;
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
+
+    //修改各规格商品价格
+    public function actionStockPrice($id){
+        if (yii::$app->request->isPut) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->bodyParams; //获取body传参
+
+            $must = ['key', 'stock'];
+            //设置类目 参数
+            $rs = $this->checkInput($must, $params);
+            if ($rs != false) {
+                return $rs;
+            }
+
+            $params['stock'] = json_decode($params['stock'],true);
+            $stock = 0;
+            foreach ($params['stock'] as $k=>$v){
+                $price[] = $v['price'];
+            }
+            $minPrice = min($price);
+
+            $model = new SaleGoodsStockModel();
+            $goodsModel = new ShopGoodsModel();
+            $goodsWhere['id'] = $id;
+            $goodsInfo = $goodsModel->do_one($goodsWhere);
+            if ($goodsInfo['status'] != 200){
+                return result(500, "未查询到该商品");
+            }
+            $goodsData['price'] = $minPrice;
+            $array = $goodsModel->do_update($goodsWhere,$goodsData);
+            if ($array['status'] == 200){
+                foreach ($params['stock'] as $k=>$v){
+                    $where['id'] = $v['id'];
+                    $data['price'] = $v['price'];
+                    $model->do_update($where,$data);
+                }
+                //添加操作记录
+                $operationRecordModel = new OperationRecordModel();
+                $operationRecordData['key'] = $params['key'];
+                if (isset(yii::$app->session['sid'])) {
+                    $subModel = new \app\models\merchant\system\UserModel();
+                    $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                    if ($subInfo['status'] == 200){
+                        $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                    }
+                } else {
+                    $merchantModle = new MerchantModel();
+                    $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                    if ($merchantInfo['status'] == 200) {
+                        $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                    }
+                }
+                $operationRecordData['operation_type'] = '更新';
+                $operationRecordData['operation_id'] = $id;
+                $operationRecordData['module_name'] = '商品列表';
+                $operationRecordModel->do_add($operationRecordData);
+            }
+            return $array;
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
+
 
 }

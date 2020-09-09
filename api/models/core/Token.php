@@ -13,7 +13,8 @@ class Token{
     protected $key;
 
     public function __construct($key){
-        $this->key = $key.$_SERVER['HTTP_HOST'];
+       $this->key = $key.$_SERVER['HTTP_HOST'];
+        //$this->key = $key.'ceshi.juanpao.cn';
     }
 
     /**

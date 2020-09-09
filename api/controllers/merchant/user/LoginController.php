@@ -2,7 +2,12 @@
 
 namespace app\controllers\merchant\user;
 
+use app\controllers\pay\VipAccessController;
+use app\models\merchant\app\AppAccessModel;
 use app\models\merchant\user\MerchantModel;
+use app\models\shop\ShopAdminMiniConfigModel;
+use app\models\shop\ShopAdminUserModel;
+use app\models\shop\UserModel;
 use app\models\system\SystemSmsAccessModel;
 use yii;
 use yii\web\Controller;
@@ -391,6 +396,209 @@ class LoginController extends Controller {
         }
     }
 
+    //后台小程序管理员登录
+    public function actionAdminLogin(){
+        if (yii::$app->request->isPost) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->bodyParams; //获取地址栏参数
+
+            //设置类目 参数
+            $must = ['key','code'];
+            $rs = $this->checkInput($must, $params);
+            if ($rs != false) {
+                return $rs;
+            }
+
+            $miniConfigModel = new ShopAdminMiniConfigModel();
+            $miniConfigWhere['key'] = $params['key'];
+            $configInfo = $miniConfigModel->do_one($miniConfigWhere);
+            if ($configInfo['status'] != 200){
+                return result(500, "未配置微信信息");
+            }
+
+            $config['app_id'] = $configInfo['data']['app_id'];
+            $config['secret'] = $configInfo['data']['secret'];
+
+            $miniProgram = Factory::miniProgram($config);
+            $user = $miniProgram->auth->session($params['code']);
+            if (isset($user['openid'])) {
+                $userModel = new ShopAdminUserModel();
+                $userInfo = $userModel->do_one(['mini_open_id' => $user['openid']]);
+                if ($userInfo['status'] == 200) {
+                    if ($userInfo['data']['is_admin'] != 1){
+                        return result(500, '无登录权限，请联系管理员');
+                    }
+                    //获取token
+                    $payload = [
+                        'iat' => $_SERVER['REQUEST_TIME'], //什么时候签发的
+                        'exp' => $_SERVER['REQUEST_TIME'] + 12 * 60 * 60, //过期时间
+                        'uid' => $userInfo['data']['merchant_id'],
+                        'sid' => 0,
+                        'key' => ""
+                    ];
+                    $tokenClass = new Token(yii::$app->params['JWT_KEY_MERCHANT']);
+                    try {
+                        $token = $tokenClass->encode($payload);
+                        //返回token
+                        if ($token) {
+                            $data['token'] = $token;
+                            $appModel = new AppAccessModel();
+                            $appWhere['key'] = $params['key'];
+                            $appInfo = $appModel->find($appWhere);
+                            if ($appInfo['status'] == 200){
+                                $data['name'] = $appInfo['data']['name'];
+                            }
+                            return result(200, "请求成功", $data);
+                        } else {
+                            return result(500, 'token生成失败,请再次登录');
+                        }
+                    } catch (\Exception $e) {
+                        return result(500, '内部错误');
+                    }
+                }
+            }
+            if (isset($user['errcode'])) {
+                return result(500, "请求失败", $user);
+            } else {
+                return result(200, "请求成功", $user);
+            }
+
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
+
+    //添加用户
+    public function actionAddUser(){
+        if (yii::$app->request->isPost) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->bodyParams; //获取地址栏参数
+
+            //设置类目 参数
+            $must = ['key','mini_open_id','nickname','avatar'];
+            $rs = $this->checkInput($must, $params);
+            if ($rs != false) {
+                return $rs;
+            }
+
+            $userModel = new ShopAdminUserModel();
+            $where['mini_open_id'] = $params['mini_open_id'];
+            $userInfo = $userModel->do_one($where);
+            if ($userInfo['status'] == 200){
+                $data['nickname'] = $params['nickname'];
+                $data['avatar'] = $params['avatar'];
+                $userModel->do_update(['id'=>$userInfo['data']['id']],$data);
+            }else{
+                $data['mini_open_id'] = $params['mini_open_id'];
+                $data['key'] = $params['key'];
+                $data['merchant_id'] = $this->getMerchant($params['key']);
+                if ($data['merchant_id'] == false){
+                    return result(500, "登陆失败,未找到商户信息");
+                }
+                $data['nickname'] = $params['nickname'];
+                $data['avatar'] = $params['avatar'];
+                $userModel->do_add($data);
+            }
+
+            return result(500, '无登录权限，请联系管理员');
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
+
+    //后台小程序门店登录
+    public function actionSupplierLogin(){
+        if (yii::$app->request->isPost) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->bodyParams; //获取地址栏参数
+
+            //设置类目 参数
+            $must = ['key','code'];
+            $rs = $this->checkInput($must, $params);
+            if ($rs != false) {
+                return $rs;
+            }
+
+            $miniConfigModel = new ShopAdminMiniConfigModel();
+            $miniConfigWhere['key'] = $params['key'];
+            $configInfo = $miniConfigModel->do_one($miniConfigWhere);
+            if ($configInfo['status'] != 200){
+                return result(500, "未配置微信信息");
+            }
+
+            $config['app_id'] = $configInfo['data']['app_id'];
+            $config['secret'] = $configInfo['data']['secret'];
+
+            $miniProgram = Factory::miniProgram($config);
+            $user = $miniProgram->auth->session($params['code']);
+            if (isset($user['openid'])) {
+                $userModel = new ShopAdminUserModel();
+                $userInfo = $userModel->do_one(['mini_open_id' => $user['openid']]);
+                if ($userInfo['status'] == 200) {
+                    if ($userInfo['data']['supplier_id'] == 0){
+                        return result(500, '无登录权限，请联系管理员');
+                    }
+                    //查询门店信息
+                    $table = new TableModel();
+                    //通过 username 获取该用户的 salt
+                    $where = [
+                        'id' => $userInfo['data']['supplier_id'],
+                        'type'=>1,
+                        'delete_time is null' => null
+                    ];
+                    $res = $table->tableSingle('system_sub_admin', $where);
+                    if (gettype($res) != 'array') {
+                        return result(500, '该账号不存在');
+                    }
+                    if (!$res['status']) {
+                        return result(500, '账号被禁用，禁止登录');
+                    }
+
+                    //获取token
+                    $payload = [
+                        'iat' => $_SERVER['REQUEST_TIME'], //什么时候签发的
+                        'exp' => $_SERVER['REQUEST_TIME'] + 12 * 60 * 60, //过期时间
+                        'uid' => $res['merchant_id'],
+                        'sid' => $res['id'],
+                        'key' => $res['key']
+                    ];
+
+                    $app = $table->tableSingle('system_app_access', ['`key`' => $res['key'], 'merchant_id' => $res['merchant_id']]);
+                    $tokenClass = new Token(yii::$app->params['JWT_KEY_SUPPLIER']);
+                    try {
+                        $token = $tokenClass->encode($payload);
+                        //返回token
+                        if ($token) {
+                            $array = [
+                                'status' => 200,
+                                'message' => '请求成功',
+                                'data' => $token,
+                                'sid'=> $res['id'],
+                                'name' => $res['username'],
+                                'key' => $res['key'],
+                                'rule' => $res['type'],
+                                'type' => $app['app_id'],
+                                'avatar' => $app['pic_url']
+                            ];
+                        } else {
+                            return result(500, 'token生成失败,请再次登录');
+                        }
+                    } catch (\Exception $e) {
+                        return result(500, '内部错误');
+                    }
+                    return $array;
+                }
+            }
+            if (isset($user['errcode'])) {
+                return result(500, "请求失败", $user);
+            } else {
+                return result(200, "请求成功", $user);
+            }
+
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
 
 
 

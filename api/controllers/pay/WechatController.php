@@ -9,10 +9,13 @@
 namespace app\controllers\pay;
 
 use app\models\admin\system\SystemSmsModel;
+use app\models\core\SMS\SMS;
 use app\models\merchant\distribution\AgentModel;
 use app\models\merchant\distribution\OperatorModel;
 use app\models\merchant\distribution\SuperModel;
+use app\models\shop\AdvanceOrderModel;
 use app\models\shop\ShopAssembleAccessModel;
+use app\models\shop\SubOrdersModel;
 use app\models\system\SystemSmsTemplateAccessModel;
 use app\models\system\SystemSmsTemplateIdModel;
 use Qcloud\Sms\SmsSingleSender;
@@ -40,19 +43,22 @@ use app\models\wolive\ServiceModel;
 use app\models\merchant\user\MerchantModel;
 use app\models\merchant\system\GroupModel;
 use app\models\system\SystemMerchantMiniAccessModel;
+use yii\redis;
 
 require_once yii::getAlias('@vendor/wxpay/Wechat.php');
 
-class WechatController extends Controller {
+class WechatController extends Controller
+{
 
     public $enableCsrfValidation = false; //禁用CSRF令牌验证，可以在基类中设置
 
-    public function behaviors() {
+    public function behaviors()
+    {
         return [
             'token' => [
                 'class' => 'yii\filters\TokenFilter', //调用过滤器
 //                'only' => ['single'],//指定控制器应用到哪些动作
-                'except' => ['index', 'qrcode', 'notify', 'notify1','query', 'notifyreturn', 'notify-sao-bei'], //指定控制器不应用到哪些动作
+                'except' => ['index', 'qrcode', 'notify', 'notify1', 'query', 'notifyreturn', 'notify-sao-bei','notify-advance'], //指定控制器不应用到哪些动作
             ]
         ];
     }
@@ -68,7 +74,8 @@ class WechatController extends Controller {
      * 扫码支付，获取二维码
      * @return array
      */
-    public function actionIndex($id) {
+    public function actionIndex($id)
+    {
         $request = yii::$app->request; //获取 request 对象
         $params = $request->post(); //获取地址栏参数
         $wx = new Wechat();
@@ -143,7 +150,8 @@ class WechatController extends Controller {
      * 订单查询
      * @throws \Exception
      */
-    public function actionQuery($id) {
+    public function actionQuery($id)
+    {
         $request = yii::$app->request; //获取 request 对象
         $params = $request->get(); //获取地址栏参数
         //判断必填
@@ -224,7 +232,8 @@ class WechatController extends Controller {
      * 退款
      * @return array
      */
-    public function actionRefund() {
+    public function actionRefund()
+    {
         $request = yii::$app->request; //获取 request 对象
         $params = $request->post(); //获取传递参数
         //判断必填
@@ -233,6 +242,7 @@ class WechatController extends Controller {
         if ($checkRes != false) {
             return json_encode($checkRes);
         }
+
         //获取商户微信配置
         $wxConfig = new WxConfigModel();
         $configRes = $wxConfig->getConfig($params['merchant_id']);
@@ -285,7 +295,8 @@ class WechatController extends Controller {
      * 退款查询
      * @return array
      */
-    public function actionRefundquery() {
+    public function actionRefundquery()
+    {
         $request = yii::$app->request; //获取 request 对象
         $params = $request->get(); //获取地址栏参数
         //判断必填
@@ -346,7 +357,8 @@ class WechatController extends Controller {
      * 关闭订单
      * @return array
      */
-    public function actionClose() {
+    public function actionClose()
+    {
         $request = yii::$app->request; //获取 request 对象
         $params = $request->post(); //获取地址栏参数
         //判断必填
@@ -396,595 +408,588 @@ class WechatController extends Controller {
         return $array;
     }
 
-    /**
-     * 支付回调 线上环境
-     * @throws \EasyWeChat\Kernel\Exceptions\HttpException
-     * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
-     * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
-     * @throws \EasyWeChat\Kernel\Exceptions\RuntimeException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     * @throws \WxPayException
-     * @throws yii\db\Exception
-     */
-    public function actionNotify() {
-        //获取商户微信配置
-        $xml = file_get_contents("php://input");
-        file_put_contents(Yii::getAlias('@webroot/') . '/test.text', date('Y-m-d H:i:s') . 'xxx' . PHP_EOL, FILE_APPEND);
-
-        $wxPatNotify = new \WxPayNotify();
-        $wxPatNotify->Handle(false);
-        $returnValues = $wxPatNotify->GetValues();
-        $result = $wxPatNotify->FromXml($xml);
-        $this->logger(json_encode($result));
-        file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . json_encode($result) . PHP_EOL, FILE_APPEND);
-//        $a = '{"appid":"wxe8bceb47d563824d","attach":"shop","bank_type":"CFT","cash_fee":"2","fee_type":"CNY","is_subscribe":"N","mch_id":"1496441282","nonce_str":"5d259694aaea1","openid":"oQiQX0V7OwdylihmiFRkwYqS8fJE","out_trade_no":"201907101541081467","result_code":"SUCCESS","return_code":"SUCCESS","sign":"805B07FAE298BF3A4E7B632CC775DF2D","time_end":"20190710154113","total_fee":"2","trade_type":"JSAPI","transaction_id":"4200000332201907103792432943"}';
-//        $result = json_decode($a, true);
-        if (!empty($result['result_code']) && $result['result_code'] == 'SUCCESS') {
-            //商户逻辑处理，如订单状态更新为已支付
-            $out_trade_no = $result['out_trade_no'];
-            $out_trade_no = explode("_", $out_trade_no);
-            //圈子
-            if ($result['attach'] == "app") {
-                if ($out_trade_no[0] == "forum") {
-                    $trade_no = $result['transaction_id'];
-                    $payModel = new PayModel();
-                    $params['id'] = $out_trade_no[1];
-                    $params['type'] = 2;
-                    $params['status'] = 1;
-                    $params['pay_time'] = time();
-                    $params['transaction_id'] = $trade_no;
-                    $payModel->update($params);
-
-                    $payinfo = $payModel->find(['id' => $out_trade_no[1]]);
-                    $appAccessModel = new AppAccessModel();
-                    $appAccess = $appAccessModel->find(['id' => $payinfo['data']['app_access_id']]);
-                    $comboModel = new ComboModel();
-                    $comboinfo = $comboModel->find(['id' => $appAccess['data']['combo_id']]);
-                    $data['expire_time'] = strtotime(date('Y-m-d', strtotime("+{$comboinfo['data']['expired_days']}day")));
-                    $data['id'] = $payinfo['data']['app_access_id'];
-                    $data['status'] = 1;
-                    $rs = $appAccessModel->update($data);
-
-                    unset($data['expire_time']);
-                    unset($data['status']);
-                    $apppAccess = $appAccessModel->find($data);
-                    $forumModel = new ForumModel();
-                    $config = array(
-                        'must_keyword' => 0,
-                        'must_examine' => 0,
-                        'allow_post_time' => 0,
-                        'allow_comment_level' => 0,
-                        'illegally' => "",
-                        'score' => false,
-                    );
-
-                    $array = array(
-                        '`key`' => $apppAccess['data']['key'],
-                        'name' => $apppAccess['data']['name'],
-                        'merchant_id' => $apppAccess['data']['merchant_id'],
-                        'pic_url' => $apppAccess['data']['pic_url'],
-                        'detail_info' => $apppAccess['data']['detail_info'],
-                        'config' => json_encode($config),
-                        'status' => 1,
-                    );
-                    $forumModel->add($array);
-
-                    $foromUserModel = new UserModel();
-                    $userdata = array(
-                        '`key`' => $apppAccess['data']['key'],
-                        'avatar' => $apppAccess['data']['pic_url'],
-                        'merchant_id' => $apppAccess['data']['merchant_id'],
-                        'nickname' => '管理员',
-                        'sex' => '1',
-                        'is_admin' => 9,
-                        'status' => 1
-                    );
-                    $foromUserModel->add($userdata);
-
-
-                    $systemConfigModel = new SystemWxConfigModel();
-                    $systemConfigdata['merchant_id'] = $appAccess['data']['merchant_id'];
-                    $systemConfigdata['`key`'] = $appAccess['data']['key'];
-                    $systemConfigdata['wechat'] = json_encode(array(
-                        "type" => 0,
-                        "wechat_id" => 0,
-                        "app_id" => "",
-                        "url" => "https://api.juanpao.com/wx?key={$appAccess['data']['key']}",
-                        "secret" => "",
-                        "token" => generateCode(32),
-                        "aes_key" => generateCode(43)
-                    ));
-                    $systemConfigdata['wechat_pay'] = json_encode(array(
-                        "type" => 0,
-                        "app_id" => "",
-                        "mch_id" => "",
-                        "cert_path" => "",
-                        "key_path" => "",
-                        'notify_url' => "http://api.juanpao.com/pay/wechat/notify",
-                    ));
-                    $systemConfigdata['miniprogram'] = "";
-                    $systemConfigModel->add($systemConfigdata);
-                }
-                //商城
-                if ($out_trade_no[0] == "shop") {
-                    $trade_no = $result['transaction_id'];
-                    $payModel = new PayModel();
-                    $params['id'] = $out_trade_no[1];
-                    $params['type'] = 2;
-                    $params['status'] = 1;
-                    $params['pay_time'] = time();
-                    $params['transaction_id'] = $trade_no;
-                    $payModel->update($params);
-
-                    $payinfo = $payModel->find(['id' => $out_trade_no[1]]);
-
-                    $appAccessModel = new AppAccessModel();
-                    $appAccess = $appAccessModel->find(['id' => $payinfo['data']['app_access_id']]);
-                    $comboModel = new ComboModel();
-                    $comboinfo = $comboModel->find(['id' => $appAccess['data']['combo_id']]);
-                    $data['expire_time'] = strtotime(date('Y-m-d', strtotime("+{$comboinfo['data']['expired_days']}day")));
-                    $data['id'] = $payinfo['data']['app_access_id'];
-                    $data['status'] = 1;
-                    $data['config'] = '{"is_large_scale":"1","number":"100000"}';
-                    $rs = $appAccessModel->update($data);
-
-                    $systemConfigModel = new SystemWxConfigModel();
-                    $systemConfigdata['merchant_id'] = $appAccess['data']['merchant_id'];
-                    $systemConfigdata['`key`'] = $appAccess['data']['key'];
-                    $systemConfigdata['wechat'] = json_encode(array(
-                        "type" => 0,
-                        "wechat_id" => 0,
-                        "app_id" => "",
-                        "url" => "https://api.juanpao.com/wx?key={$appAccess['data']['key']}",
-                        "secret" => "",
-                        "token" => generateCode(32),
-                        "aes_key" => generateCode(43)
-                    ));
-                    $systemConfigdata['wechat_pay'] = json_encode(array(
-                        "type" => 0,
-                        "app_id" => "",
-                        "mch_id" => "",
-                        "cert_path" => "",
-                        "key_path" => "",
-                        'notify_url' => "http://api.juanpao.com/pay/wechat/notify",
-                    ));
-                    $systemConfigdata['miniprogram'] = "";
-                    $systemConfigModel->add($systemConfigdata);
-
-                    $merchantModel = new MerchantModel();
-                    $merchant = $merchantModel->find(['id' => $appAccess['data']['merchant_id']]);
-
-                    $businessModel = new BusinessModel();
-                    $bdata = array(
-                        'business_id' => $appAccess['data']['key'],
-                        'video_state' => 'close',
-                        'voice_state' => 'open',
-                        'audio_state' => 'open',
-                        'distribution_rule' => 'auto',
-                        'voice_address' => '/upload/voice/default.mp3',
-                        'state' => 'open'
-                    );
-                    $businessModel->add($bdata);
-                    $serviceModel = new ServiceModel();
-                    $sdata = array(
-                        'user_name' => $appAccess['data']['key'],
-                        'nick_name' => $appAccess['data']['name'],
-                        'real_name' => $merchant['data']['real_name'],
-                        'password' => $merchant['data']['password'],
-                        'salt' => $merchant['data']['salt'],
-                        'groupid' => '0',
-                        'phone' => $merchant['data']['phone'],
-                        'email' => '',
-                        'business_id' => $appAccess['data']['key'],
-                        'avatar' => $merchant['data']['pic_url'],
-                        'level' => 'super_manager',
-                        'parent_id' => '0',
-                        'state' => 'offline',
-                    );
-                    $serviceModel->add($sdata);
-
-                    $groupModel = new GroupModel();
-                    $rdata = array(
-                        'key' => $appAccess['data']['key'],
-                        'merchant_id' => $appAccess['data']['merchant_id'],
-                        'title' => '客服',
-                        'status' => 1,
-                        'create_time' => time(),
-                        'is_kefu' => 1,
-                    );
-                    $groupModel->add($rdata);
-
-                    $merchatComboModel = new \app\models\merchant\system\MerchantComboModel();
-                    $combo = $merchatComboModel->do_one(['type' => 9]);
-
-                    $merchatComboAccessModel = new \app\models\merchant\system\MerchantComboAccessModel();
-                    $order = "combo_" . date("YmdHis", time()) . rand(1000, 9999);
-                    $comboData = array(
-                        'merchant_id' => $appAccess['data']['merchant_id'],
-                        'key' => $appAccess['data']['key'],
-                        'order_sn' => $order,
-                        'combo_id' => $params['id'],
-                        'sms_number' => $combo['data']['sms_number'],
-                        'order_number' => $combo['data']['order_number'],
-                        'sms_remain_number' => $combo['data']['sms_number'],
-                        'order_remain_number' => $combo['data']['order_number'],
-                        'validity_time' => $combo['data']['validity_time'],
-                        'type' => $combo['data']['type'],
-                        'remarks' => "购买应用赠送",
-                        'status' => 0,
-                    );
-
-                    $res = $merchatComboAccessModel->do_add($comboData);
-                }
-            }
-            if ($result['attach'] == "shop") {
-                //检测订单是否是拼团订单 是的话订单状态11
-                $groupAccModel = new ShopAssembleAccessModel();
-                $groupWhere['order_sn'] =  $result['out_trade_no'];
-                $groupInfo = $groupAccModel->one($groupWhere);
-                $orderModel = new OrderModel;
-                $orderRs = $orderModel->find(['order_sn' => $result['out_trade_no']]);
-
-
-                $status = 1;
-                if($groupInfo['status'] == 200){
-                    $status = 11;
-                }else{
-                    if($orderRs['data']['service_goods_status'] == 1){
-                        $status = 3;
-                    }
-                }
-                $orderData = array(
-                    'order_sn' => $result['out_trade_no'],
-                    'status' => $status,
-                );
-                $orderModel->update($orderData);
-
-                //将订单号放入redis队列，用计划任务计算分销分佣金额
-                $dtbData['order_sn'] = $result['out_trade_no'];
-                lpushRedis('distribution',$dtbData);
-
-                //微信公众号商家，新订单提醒
-                $messageData['key'] = $orderRs['data']['key'];
-                $messageData['pay_time'] = time();
-                lpushRedis('wechat_template_message',$messageData);
-
-                //易联云自动推送，将订单号、key放入redis队列
-                $ylyData['key'] = $orderRs['data']['key'];
-                $ylyData['supplier_id'] = $orderRs['data']['supplier_id'];
-                $ylyData['order_sn'] = $result['out_trade_no'];
-                if ($orderRs['data']['supplier_id'] == 0){
-                    //非门店订单
-                    lpushRedis('ylyprint',$ylyData);
-                    file_put_contents(Yii::getAlias('@webroot/') . '/ylyPrint.text', date('Y-m-d H:i:s') . "待打印_". json_encode($ylyData) . PHP_EOL, FILE_APPEND);
-                }else{
-                    //门店订单
-                    lpushRedis('supplier_ylyprint',$ylyData);
-                    file_put_contents(Yii::getAlias('@webroot/') . '/ylyPrint.text', date('Y-m-d H:i:s') . "待打印_". json_encode($ylyData) . PHP_EOL, FILE_APPEND);
-                }
-
-                //好物圈导入订单
-                //查询好物圈插件是否开启
-                $appAccessModel = new AppAccessModel();
-                $appAccessInfo = $appAccessModel->find(['`key`' => $orderRs['data']['key']]);
-
-                if (isset($appAccessInfo['status']) && $appAccessInfo['status'] == 200 && $appAccessInfo['data']['good_phenosphere'] == 1){
-                    $categoryModel = new MerchantCategoryModel();
-                    $sql = "SELECT so.*,sg.m_category_id FROM `shop_order_group` sog LEFT JOIN `shop_order` so ON so.order_group_sn = sog.order_sn LEFT JOIN `shop_goods` sg ON sg.id = so.goods_id WHERE sog.`key` = '".$orderRs['data']['key']."' AND sog.order_sn = '".$result['out_trade_no']."'";
-                    $goodsData = $orderModel->querySql($sql);
-                    //商品分类
-                    $sql = "SELECT * FROM `shop_marchant_category` WHERE `key` = '".$orderRs['data']['key']."' AND delete_time is NULL";
-                    $categoryData = $categoryModel->querySql($sql);
-                    if (count($goodsData)>0 || count($categoryData)>0) {
-                        $config = $this->getSystemConfig($orderRs['data']['key'], "miniprogram");
-                        if ($config == false) {
-                            file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . "未配置小程序信息" . PHP_EOL, FILE_APPEND);
-                        } else {
-                            $miniProgram = Factory::miniProgram($config);
-                            $token = $miniProgram->access_token->getToken(true);// 强制重新从微信服务器获取 token
-                            if (!isset($token['access_token'])){
-                                file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . "小程序access_token不存在" . PHP_EOL, FILE_APPEND);
-                            } else {
-                                $miniProgram['access_token']->setToken($token['access_token'], 3600);
-                                $access_token = $token['access_token'];
-                                $url = "https://api.weixin.qq.com/mall/importorder?action=add-order&is_history=0&access_token={$access_token}";
-                                $circleData[0]['order_id'] = $result['out_trade_no'];  //订单id，需要保证唯一性
-                                $circleData[0]['create_time'] = $orderRs['data']['create_time'];  //订单创建时间，unix时间戳
-                                $circleData[0]['pay_finish_time'] = time();  //支付完成时间，unix时间戳
-                                $circleData[0]['trans_id'] = $result['transaction_id'];  //微信支付订单id，对于使用微信支付的订单，该字段必填
-                                $circleData[0]['fee'] = $result['cash_fee'];  //订单金额，单位：分
-                                $circleData[0]['status'] = 3;//订单状态，3：支付完成 4：已发货 5：已退款 100: 已完成
-                                $circleData[0]['ext_info'] = [
-                                    'express_info'=>[
-                                        'price'=>$orderRs['data']['express_price']*100 //运费，单位：分
-                                    ],  //快递信息
-                                    'brand_info'=>[
-                                        'contact_detail_page'=>[
-                                            'kf_type'=>1   //在线客服类型 1 没有在线客服; 2 微信客服消息; 3 小程序自有客服; 4 公众号h5自有客服
-                                        ]  //联系商家页面
-                                    ],  //商家信息
-                                    'payment_method'=>1,  //订单支付方式，0：未知方式 1：微信支付 2：其他支付方式
-                                    'user_open_id'=>$result['openid'],  //用户的openid，参见openid说明
-                                    'order_detail_page'=>[
-                                        'path'=>'pages/orderItem/orderItem/orderItem?order_sn='.$result['out_trade_no']  //小程序订单详情页跳转链接
-                                    ],  //订单详情页（小程序页面）
-                                ];  //订单扩展信息
-                                foreach ($goodsData as $gk=>$gv){
-                                    if ($gv['order_group_sn'] == $result['out_trade_no']){
-                                        $categoryList = [];
-                                        foreach ($categoryData as $ck=>$cv){
-                                            if ($gv['m_category_id'] == $cv['id']){
-                                                $categoryList[] = $cv['name'];
-                                                foreach ($categoryData as $pk => $pv){
-                                                    if ($pv['id'] == $cv['parent_id']){
-                                                        $categoryList[] = $pv['name'];
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        $categoryList = array_reverse($categoryList);
-                                        $circleData[0]['ext_info']['product_info']['item_list'][] = [
-                                            'item_code'=>$gv['goods_id'],  //物品ID（SPU ID），要求appid下全局唯一
-                                            'sku_id'=>$gv['goods_id'],  //sku_id
-                                            'amount'=>$gv['number'],  //物品数量
-                                            'total_fee'=>$gv['total_price']*100,  //物品总价，单位：分
-                                            'thumb_url'=>$gv['pic_url'],  //物品图片，图片宽度必须大于750px，宽高比建议4:3 - 1:1之间
-                                            'title'=>$gv['name'],  //物品名称
-                                            'unit_price'=>$gv['price']*100,  //物品单价（实际售价），单位：分
-                                            'original_price'=>$gv['price']*100,  //物品原价，单位：分
-                                            'category_list'=>$categoryList,  //物品类目列表
-                                            'item_detail_page'=>['path'=>'pages/goodsItem/goodsItem/goodsItem?id='.$gv['goods_id']],  //小程序物品详情页跳转链接
-                                            'can_be_search'=>true
-                                        ];  //物品相关信息
-                                    }
-                                }
-                                $orderList['order_list'] = $circleData;
-                                $array = json_encode($orderList, JSON_UNESCAPED_UNICODE);
-                                $rs = curlPost($url, $array);
-                                file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . $rs . PHP_EOL, FILE_APPEND);
-                            }
-                        }
-                    } else {
-                        file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . "未查询到订单商品信息" . PHP_EOL, FILE_APPEND);
-                    }
-                }
-
-                //商家发货短信提醒
-                $smsModel = new SystemSmsModel();
-                $smsWhere['type'] = 1; //腾讯云
-                $smsWhere['status'] = 1;
-                $smsInfo = $smsModel->do_one($smsWhere); //查询腾讯云配置
-                $templateIdModel = new SystemSmsTemplateIdModel();
-                $templateIdInfo = $templateIdModel->do_one([]); //查询商家发货提醒短信模板id
-                if ($orderRs['data']['supplier_id'] == 0){ //查询商家电话
-                    $appModel = new AppAccessModel();
-                    $appInfo = $appModel->find(['key'=>$orderRs['data']['key']]);
-                    if ($appInfo['status'] == 200 && !empty($appInfo['data']['phone'])){
-                        $merchantPhone = $appInfo['data']['phone'];
-                    }
-                }else{
-                    $subUserModel = new \app\models\merchant\system\UserModel();
-                    $subUserInfo = $subUserModel->find(['id'=>$orderRs['data']['supplier_id']]);
-                    if ($subUserInfo['status'] == 200){
-                        $supplierInfo = json_decode($subUserInfo['data']['leader'],true);
-                        $merchantPhone = $supplierInfo['phone'];
-                    }
-                }
-                if ($smsInfo['status'] == 200 && $templateIdInfo['status'] == 200 && isset($merchantPhone)){
-                    $templateConfig = json_decode($templateIdInfo['data']['config'],true);
-                    if ($templateConfig[0]['status'] == 'true'){
-                        $smsAccessModel = new SystemSmsTemplateAccessModel();
-                        $smsAccessWhere['phone'] = $merchantPhone;
-                        $smsAccessWhere['type'] = 1; //商家发货提醒
-                        $smsAccessInfo = $smsAccessModel->do_one($smsAccessWhere);
-                        //离上次给商家发短信超过1小时才能再发
-                        if ($smsAccessInfo['status'] == 204 || (isset($smsAccessInfo['data']) && ($smsAccessInfo['data']['create_time'] + 3600) < time())){
-                            $smsInfo['data']['config'] = json_decode($smsInfo['data']['config'],true);
-                            try {
-                                $sender = new SmsSingleSender($smsInfo['data']['config']['appid'], $smsInfo['data']['config']['appkey']);
-                                $sendResult = $sender->sendWithParam("86",$merchantPhone,$templateConfig[0]['templateId']);
-                                $sendRes = json_decode($sendResult, true);
-                            } catch (\Exception $e) {
-
-                            }
-                            if (isset($sendRes['result']) && $sendRes['result'] == 0){
-                                $smsAccessData['phone'] = $merchantPhone;
-                                $smsAccessData['template_id'] = $templateConfig[0]['templateId'];
-                                $smsAccessData['type'] = 1; //商家发货提醒
-                                $smsAccessModel->do_add($smsAccessData);
-                            }else{
-                                $sms_error['result'] = $sendRes['result'];
-                                $sms_error['errmsg'] = unicodeDecode($sendRes['errmsg']);
-                                file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . json_encode($sms_error, JSON_UNESCAPED_UNICODE) . PHP_EOL, FILE_APPEND);
-                            }
-                        }else{
-                            file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . '一小时内只发给商家一次' . PHP_EOL, FILE_APPEND);
-                        }
-                    }else{
-                        file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . '商家发货短信提醒未开启' . PHP_EOL, FILE_APPEND);
-                    }
-                }else{
-                    file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . '未查询到商家电话或腾讯云、短信模板配置信息' . PHP_EOL, FILE_APPEND);
-                }
-
-                if ($orderRs['data']['order_type'] == 2) {
-                    $shopUserModel = new \app\models\shop\UserModel;
-                    $shopUser = $shopUserModel->find(['id' => $orderRs['data']['user_id']]);
-
-                    $tempModel = new \app\models\system\SystemMiniTemplateModel();
-                    $minitemp = $tempModel->do_one(['id' => 35]);
-                    //单号,金额,下单时间,物品名称,
-                    $tempParams = array(
-                        'keyword1' => $result['out_trade_no'],
-                        'keyword2' => $orderRs['data']['payment_money'],
-                        'keyword3' => $orderRs['data']['create_time'],
-                        'keyword4' => $orderRs['data']['goodsname'],
-                    );
-
-                    $tempAccess = new SystemMerchantMiniAccessModel();
-                    $taData = array(
-                        'key' => $orderRs['data']['key'],
-                        'merchant_id' => $orderRs['data']['merchant_id'],
-                        'mini_open_id' => $shopUser['data']['mini_open_id'],
-                        'template_id' => 35,
-                        'number' => '0',
-                        'template_params' => json_encode($tempParams),
-                        'template_purpose' => 'order',
-                        'page' => "/pages/orderItem/orderItem/orderItem?order_sn={$result['out_trade_no']}",
-                        'status' => '-1',
-                    );
-                    $tempAccess->do_add($taData);
-                }
-                //根据订单信息 减去总库存 和 各个商品库存
-                $subOrderModel = new SubOrderModel();
-                $subOrders = $subOrderModel->findall(['order_group_sn' => $result['out_trade_no']]);
-                $number = 0;
-
-                for ($i = 0; $i < count($subOrders['data']); $i++) {
-                    if ($subOrders['data'][$i]['is_flash_sale'] == 0) {
-                        $stockModel = new StockModel();
-                        $number = (int) $subOrders['data'][$i]['number'];
-                        $stockdata["number = number-{$number}"] = NULL;
-                        $stockdata['id'] = $subOrders['data'][$i]['stock_id'];
-                        $stockModel->update($stockdata);
-                        $goodModel = new GoodsModel();
-                        $gooddata["stocks= stocks-{$subOrders['data'][$i]['number']}"] = null;
-                        $gooddata['id'] = $subOrders['data'][$i]['goods_id'];
-                        $goodModel->update($gooddata);
-                    } else {
-                        $flashModel = new \app\models\spike\FlashSaleModel();
-                        $flashGoods = $flashModel->do_one(['goods_id' => $subOrders['data'][$i]['goods_id']]);
-                        $property = explode("-", $flashGoods['property']);
-                        $str = "";
-                        for ($j = 0; $i < count($property); $j++) {
-                            $a = json_decode($property[$j], true);
-                            if ($a['stock_id'] == $subOrders['data'][$i]['stock_id']) {
-                                $a['stock'] = $a['stock'] - $number;
-                            }
-                            if ($j == 0) {
-                                $str = json_encode($a, JSON_UNESCAPED_UNICODE);
-                            } else {
-                                $str = $str . "_" . json_encode($a, JSON_UNESCAPED_UNICODE);
-                            }
-                        }
-                        $flashModel->do_update(['goods_id' => $subOrders['data'][$i]['goods_id']], ['property' => $str]);
-                    }
-
-                    $goodsModel = new \app\models\shop\SaleGoodsModel();
-                    $goods = $goodsModel->do_one(['id' => $subOrders['data'][$i]['goods_id']]);
-                    if ($goods['data']['supplier_id'] != 0) {
-                        $systemSubUserBalanceModel = new \app\models\system\SystemSubAdminBalanceModel();
-                        $data = array(
-                            'key' => $goods['data']['key'],
-                            'merchant_id' => $goods['data']['merchant_id'],
-                            'sub_admin_id' => $goods['data']['supplier_id'],
-                            'order_sn' => $result['out_trade_no'],
-                            'money' => $goods['data']['supplier_money'],
-                            'content' => "供应商商品出售佣金",
-                            'status' => 1,
-                            'type' => 6,
-                        );
-                        $systemSubUserBalanceModel->do_add($data);
-                    }
-                }
-
-
-                $payModel = new PayModel;
-                $paydata = array(
-                    'transaction_id' => $result['transaction_id'],
-                    'order_id' => $result['out_trade_no'],
-                    'remain_price' => $result['total_fee'],
-                    'total_price' => $result['total_fee'],
-                    'pay_time' => time(),
-                    'status' => 1,
-                    'merchant_id' => $orderRs['data']['merchant_id'],
-                    'user_id' => $orderRs['data']['user_id'],
-                    'update_time' => time(),
-                );
-                $res = $payModel->update($paydata);
-                $wxModel = new WeixinModel();
-                $result['wx_appid'] = $result['appid'];
-                $result['wx_mchId'] = $result['mch_id'];
-
-                unset($result['appid']);
-                unset($result['wx_mchId']);
-
-                //佣金计算 根据比例计算
-                $configModel = new \app\models\tuan\ConfigModel();
-
-                $con = $configModel->do_one(['merchant_id' => $orderRs['data']['merchant_id'], 'key' => $orderRs['data']['key']]);
-                if ($con['status'] == 200 && $con['data']['status'] == 1) {
-                    $tuanUserModel = new \app\models\tuan\UserModel;
-                    $tuanUser = $tuanUserModel->do_one(['merchant_id' => $orderRs['data']['merchant_id'], 'uid' => $orderRs['data']['user_id']]);
-
-                    if ($tuanUser['status'] == 204) {
-                        $tuanData = array(
-                            'key' => $orderRs['data']['key'],
-                            'merchant_id' => $orderRs['data']['merchant_id'],
-                            'uid' => $orderRs['data']['user_id'],
-                            'leader_uid' => $orderRs['data']['leader_self_uid'],
-                            'status' => 1,
-                        );
-                        $tuanUserModel->do_add($tuanData);
-                        $tuanUser = $tuanUserModel->do_one(['merchant_id' => $orderRs['data']['merchant_id'], 'uid' => $orderRs['data']['user_id']]);
-                    }
-
-                    if ($orderRs['data']['express_type'] == 2) {
-                        $leaderModel = new \app\models\tuan\LeaderModel();
-                        $leader = $leaderModel->do_one(['uid' => $orderRs['data']['leader_self_uid']]);
-
-                        $balanceModel = new \app\models\shop\BalanceModel;
-                        $data['money'] = $leader['data']['tuan_express_fee'];
-                        $data['type'] = 6;
-                        $data['uid'] = $orderRs['data']['leader_self_uid'];
-                        $data['content'] = "配送费佣金";
-                        $array = $balanceModel->do_add($data);
-                    }
-
-                    $balanceModel = new \app\models\shop\BalanceModel;
-                    $balance = $this->balance($result['out_trade_no'], $con['data']['commission_leader_ratio'], $con['data']['commission_selfleader_ratio']);
-                    $data = array(
-                        'uid' => $tuanUser['data']['leader_uid'],
-                        'order_sn' => $result['out_trade_no'],
-                        'money' => $balance[0],
-                        'content' => "团员消费",
-                        'type' => 1,
-                        'status' => 0
-                    );
-                    $data['key'] = $orderRs['data']['key'];
-                    $data['merchant_id'] = $orderRs['data']['merchant_id'];
-                    $array = $balanceModel->do_add($data);
-                    $balanceModel = new \app\models\shop\BalanceModel;
-                    if ($orderRs['data']['leader_self_uid'] != 0) {
-                        $data['money'] = $balance[1];
-                        $data['type'] = 3;
-                        $data['uid'] = $orderRs['data']['leader_self_uid'];
-                        $data['content'] = "自提点佣金";
-                        $array = $balanceModel->do_add($data);
-                    }
-                }
-            }
-            $comboAccessModel = new \app\models\merchant\system\MerchantComboAccessModel();
-            $comboAccessData = $comboAccessModel->do_one(['<>' => ['order_remain_number', 0], '>' => ['validity_time', time()], 'merchant_id' => $orderRs['data']['merchant_id']]);
-
-            $comboAccessModel->do_update(['id' => $comboAccessData['data']['id']], ['order_remain_number' => $comboAccessData['data']['order_remain_number'] - 1]);
-            $systemPayWeixin = new WeixinModel();
-            $result['status'] = 1;
-            $result['create_time'] = time();
-
-            $rs = $systemPayWeixin->add($result);
-
-            if ($rs['status'] == 200) {
-                ob_clean();
-                echo "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
-                die();
-            } else {
-                ob_clean();
-                echo '<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[签名失败]]></return_msg></xml>';
-                die();
-            }
-        }
-    }
+//    /**
+//     * 支付回调 线上环境
+//     * @throws \EasyWeChat\Kernel\Exceptions\HttpException
+//     * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
+//     * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
+//     * @throws \EasyWeChat\Kernel\Exceptions\RuntimeException
+//     * @throws \Psr\SimpleCache\InvalidArgumentException
+//     * @throws \WxPayException
+//     * @throws yii\db\Exception
+//     */
+//    public function actionNotify()
+//    {
+//        //获取商户微信配置
+//        $xml = file_get_contents("php://input");
+//        file_put_contents(Yii::getAlias('@webroot/') . '/test.text', date('Y-m-d H:i:s') . 'xxx' . PHP_EOL, FILE_APPEND);
+//
+//        $wxPatNotify = new \WxPayNotify();
+//        $wxPatNotify->Handle(false);
+//        $returnValues = $wxPatNotify->GetValues();
+//        $result = $wxPatNotify->FromXml($xml);
+//        $this->logger(json_encode($result));
+//        file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . json_encode($result) . PHP_EOL, FILE_APPEND);
+////        $a = '{"appid":"wxe8bceb47d563824d","attach":"shop","bank_type":"CFT","cash_fee":"2","fee_type":"CNY","is_subscribe":"N","mch_id":"1496441282","nonce_str":"5d259694aaea1","openid":"oQiQX0V7OwdylihmiFRkwYqS8fJE","out_trade_no":"201907101541081467","result_code":"SUCCESS","return_code":"SUCCESS","sign":"805B07FAE298BF3A4E7B632CC775DF2D","time_end":"20190710154113","total_fee":"2","trade_type":"JSAPI","transaction_id":"4200000332201907103792432943"}';
+////        $result = json_decode($a, true);
+//        if (!empty($result['result_code']) && $result['result_code'] == 'SUCCESS') {
+//            //商户逻辑处理，如订单状态更新为已支付
+//            $out_trade_no = $result['out_trade_no'];
+//            $out_trade_no = explode("_", $out_trade_no);
+//            //圈子
+//            if ($result['attach'] == "app") {
+//                if ($out_trade_no[0] == "forum") {
+//                    $trade_no = $result['transaction_id'];
+//                    $payModel = new PayModel();
+//                    $params['id'] = $out_trade_no[1];
+//                    $params['type'] = 2;
+//                    $params['status'] = 1;
+//                    $params['pay_time'] = time();
+//                    $params['transaction_id'] = $trade_no;
+//                    $payModel->update($params);
+//
+//                    $payinfo = $payModel->find(['id' => $out_trade_no[1]]);
+//                    $appAccessModel = new AppAccessModel();
+//                    $appAccess = $appAccessModel->find(['id' => $payinfo['data']['app_access_id']]);
+//                    $comboModel = new ComboModel();
+//                    $comboinfo = $comboModel->find(['id' => $appAccess['data']['combo_id']]);
+//                    $data['expire_time'] = strtotime(date('Y-m-d', strtotime("+{$comboinfo['data']['expired_days']}day")));
+//                    $data['id'] = $payinfo['data']['app_access_id'];
+//                    $data['status'] = 1;
+//                    $rs = $appAccessModel->update($data);
+//
+//                    unset($data['expire_time']);
+//                    unset($data['status']);
+//                    $apppAccess = $appAccessModel->find($data);
+//                    $forumModel = new ForumModel();
+//                    $config = array(
+//                        'must_keyword' => 0,
+//                        'must_examine' => 0,
+//                        'allow_post_time' => 0,
+//                        'allow_comment_level' => 0,
+//                        'illegally' => "",
+//                        'score' => false,
+//                    );
+//
+//                    $array = array(
+//                        '`key`' => $apppAccess['data']['key'],
+//                        'name' => $apppAccess['data']['name'],
+//                        'merchant_id' => $apppAccess['data']['merchant_id'],
+//                        'pic_url' => $apppAccess['data']['pic_url'],
+//                        'detail_info' => $apppAccess['data']['detail_info'],
+//                        'config' => json_encode($config),
+//                        'status' => 1,
+//                    );
+//                    $forumModel->add($array);
+//
+//                    $foromUserModel = new UserModel();
+//                    $userdata = array(
+//                        '`key`' => $apppAccess['data']['key'],
+//                        'avatar' => $apppAccess['data']['pic_url'],
+//                        'merchant_id' => $apppAccess['data']['merchant_id'],
+//                        'nickname' => '管理员',
+//                        'sex' => '1',
+//                        'is_admin' => 9,
+//                        'status' => 1
+//                    );
+//                    $foromUserModel->add($userdata);
+//
+//
+//                    $systemConfigModel = new SystemWxConfigModel();
+//                    $systemConfigdata['merchant_id'] = $appAccess['data']['merchant_id'];
+//                    $systemConfigdata['`key`'] = $appAccess['data']['key'];
+//                    $systemConfigdata['wechat'] = json_encode(array(
+//                        "type" => 0,
+//                        "wechat_id" => 0,
+//                        "app_id" => "",
+//                        "url" => "https://api.juanpao.com/wx?key={$appAccess['data']['key']}",
+//                        "secret" => "",
+//                        "token" => generateCode(32),
+//                        "aes_key" => generateCode(43)
+//                    ));
+//                    $systemConfigdata['wechat_pay'] = json_encode(array(
+//                        "type" => 0,
+//                        "app_id" => "",
+//                        "mch_id" => "",
+//                        "cert_path" => "",
+//                        "key_path" => "",
+//                        'notify_url' => "http://api.juanpao.com/pay/wechat/notify",
+//                    ));
+//                    $systemConfigdata['miniprogram'] = "";
+//                    $systemConfigModel->add($systemConfigdata);
+//                }
+//                //商城
+//                if ($out_trade_no[0] == "shop") {
+//                    $trade_no = $result['transaction_id'];
+//                    $payModel = new PayModel();
+//                    $params['id'] = $out_trade_no[1];
+//                    $params['type'] = 2;
+//                    $params['status'] = 1;
+//                    $params['pay_time'] = time();
+//                    $params['transaction_id'] = $trade_no;
+//                    $payModel->update($params);
+//
+//                    $payinfo = $payModel->find(['id' => $out_trade_no[1]]);
+//
+//                    $appAccessModel = new AppAccessModel();
+//                    $appAccess = $appAccessModel->find(['id' => $payinfo['data']['app_access_id']]);
+//                    $comboModel = new ComboModel();
+//                    $comboinfo = $comboModel->find(['id' => $appAccess['data']['combo_id']]);
+//                    $data['expire_time'] = strtotime(date('Y-m-d', strtotime("+{$comboinfo['data']['expired_days']}day")));
+//                    $data['id'] = $payinfo['data']['app_access_id'];
+//                    $data['status'] = 1;
+//                    $data['config'] = '{"is_large_scale":"1","number":"100000"}';
+//                    $rs = $appAccessModel->update($data);
+//
+//                    $systemConfigModel = new SystemWxConfigModel();
+//                    $systemConfigdata['merchant_id'] = $appAccess['data']['merchant_id'];
+//                    $systemConfigdata['`key`'] = $appAccess['data']['key'];
+//                    $systemConfigdata['wechat'] = json_encode(array(
+//                        "type" => 0,
+//                        "wechat_id" => 0,
+//                        "app_id" => "",
+//                        "url" => "https://api.juanpao.com/wx?key={$appAccess['data']['key']}",
+//                        "secret" => "",
+//                        "token" => generateCode(32),
+//                        "aes_key" => generateCode(43)
+//                    ));
+//                    $systemConfigdata['wechat_pay'] = json_encode(array(
+//                        "type" => 0,
+//                        "app_id" => "",
+//                        "mch_id" => "",
+//                        "cert_path" => "",
+//                        "key_path" => "",
+//                        'notify_url' => "http://api.juanpao.com/pay/wechat/notify",
+//                    ));
+//                    $systemConfigdata['miniprogram'] = "";
+//                    $systemConfigModel->add($systemConfigdata);
+//
+//                    $merchantModel = new MerchantModel();
+//                    $merchant = $merchantModel->find(['id' => $appAccess['data']['merchant_id']]);
+//
+//                    $businessModel = new BusinessModel();
+//                    $bdata = array(
+//                        'business_id' => $appAccess['data']['key'],
+//                        'video_state' => 'close',
+//                        'voice_state' => 'open',
+//                        'audio_state' => 'open',
+//                        'distribution_rule' => 'auto',
+//                        'voice_address' => '/upload/voice/default.mp3',
+//                        'state' => 'open'
+//                    );
+//                    $businessModel->add($bdata);
+//                    $serviceModel = new ServiceModel();
+//                    $sdata = array(
+//                        'user_name' => $appAccess['data']['key'],
+//                        'nick_name' => $appAccess['data']['name'],
+//                        'real_name' => $merchant['data']['real_name'],
+//                        'password' => $merchant['data']['password'],
+//                        'salt' => $merchant['data']['salt'],
+//                        'groupid' => '0',
+//                        'phone' => $merchant['data']['phone'],
+//                        'email' => '',
+//                        'business_id' => $appAccess['data']['key'],
+//                        'avatar' => $merchant['data']['pic_url'],
+//                        'level' => 'super_manager',
+//                        'parent_id' => '0',
+//                        'state' => 'offline',
+//                    );
+//                    $serviceModel->add($sdata);
+//
+//                    $groupModel = new GroupModel();
+//                    $rdata = array(
+//                        'key' => $appAccess['data']['key'],
+//                        'merchant_id' => $appAccess['data']['merchant_id'],
+//                        'title' => '客服',
+//                        'status' => 1,
+//                        'create_time' => time(),
+//                        'is_kefu' => 1,
+//                    );
+//                    $groupModel->add($rdata);
+//
+//                    $merchatComboModel = new \app\models\merchant\system\MerchantComboModel();
+//                    $combo = $merchatComboModel->do_one(['type' => 9]);
+//
+//                    $merchatComboAccessModel = new \app\models\merchant\system\MerchantComboAccessModel();
+//                    $order = "combo_" . date("YmdHis", time()) . rand(1000, 9999);
+//                    $comboData = array(
+//                        'merchant_id' => $appAccess['data']['merchant_id'],
+//                        'key' => $appAccess['data']['key'],
+//                        'order_sn' => $order,
+//                        'combo_id' => $params['id'],
+//                        'sms_number' => $combo['data']['sms_number'],
+//                        'order_number' => $combo['data']['order_number'],
+//                        'sms_remain_number' => $combo['data']['sms_number'],
+//                        'order_remain_number' => $combo['data']['order_number'],
+//                        'validity_time' => $combo['data']['validity_time'],
+//                        'type' => $combo['data']['type'],
+//                        'remarks' => "购买应用赠送",
+//                        'status' => 0,
+//                    );
+//
+//                    $res = $merchatComboAccessModel->do_add($comboData);
+//                }
+//            }
+//            if ($result['attach'] == "shop") {
+//                //检测订单是否是拼团订单 是的话订单状态11
+//                $groupAccModel = new ShopAssembleAccessModel();
+//                $groupWhere['order_sn'] = $result['out_trade_no'];
+//                $groupInfo = $groupAccModel->one($groupWhere);
+//                $orderModel = new OrderModel;
+//                $orderRs = $orderModel->find(['order_sn' => $result['out_trade_no']]);
+//
+//
+//                $status = 1;
+//                if ($groupInfo['status'] == 200) {
+//                    $status = 11;
+//                } else {
+//                    if ($orderRs['data']['service_goods_status'] == 1) {
+//                        $status = 3;
+//                    }
+//                }
+//                $orderData = array(
+//                    'order_sn' => $result['out_trade_no'],
+//                    'status' => $status,
+//                );
+//                $orderModel->update($orderData);
+//
+//                //将订单号放入redis队列，用计划任务计算分销分佣金额
+//                $dtbData['order_sn'] = $result['out_trade_no'];
+//                lpushRedis('distribution', $dtbData);
+//
+//                //微信公众号商家，新订单提醒
+//                $messageData['key'] = $orderRs['data']['key'];
+//                $messageData['pay_time'] = time();
+//                lpushRedis('wechat_template_message', $messageData);
+//
+//                //易联云自动推送，将订单号、key放入redis队列
+//                $ylyData['key'] = $orderRs['data']['key'];
+//                $ylyData['supplier_id'] = $orderRs['data']['supplier_id'];
+//                $ylyData['order_sn'] = $result['out_trade_no'];
+//                if ($orderRs['data']['supplier_id'] == 0) {
+//                    //非门店订单
+//                    lpushRedis('ylyprint', $ylyData);
+//                    file_put_contents(Yii::getAlias('@webroot/') . '/ylyPrint.text', date('Y-m-d H:i:s') . "待打印_" . json_encode($ylyData) . PHP_EOL, FILE_APPEND);
+//                } else {
+//                    //门店订单
+//                    lpushRedis('supplier_ylyprint', $ylyData);
+//                    file_put_contents(Yii::getAlias('@webroot/') . '/ylyPrint.text', date('Y-m-d H:i:s') . "待打印_" . json_encode($ylyData) . PHP_EOL, FILE_APPEND);
+//                }
+//
+//                //好物圈导入订单
+//                //查询好物圈插件是否开启
+//                $appAccessModel = new AppAccessModel();
+//                $appAccessInfo = $appAccessModel->find(['`key`' => $orderRs['data']['key']]);
+//
+//                if (isset($appAccessInfo['status']) && $appAccessInfo['status'] == 200 && $appAccessInfo['data']['good_phenosphere'] == 1) {
+//                    $categoryModel = new MerchantCategoryModel();
+//                    $sql = "SELECT so.*,sg.m_category_id FROM `shop_order_group` sog LEFT JOIN `shop_order` so ON so.order_group_sn = sog.order_sn LEFT JOIN `shop_goods` sg ON sg.id = so.goods_id WHERE sog.`key` = '" . $orderRs['data']['key'] . "' AND sog.order_sn = '" . $result['out_trade_no'] . "'";
+//                    $goodsData = $orderModel->querySql($sql);
+//                    //商品分类
+//                    $sql = "SELECT * FROM `shop_marchant_category` WHERE `key` = '" . $orderRs['data']['key'] . "' AND delete_time is NULL";
+//                    $categoryData = $categoryModel->querySql($sql);
+//                    if (count($goodsData) > 0 || count($categoryData) > 0) {
+//                        $config = $this->getSystemConfig($orderRs['data']['key'], "miniprogram");
+//                        if ($config == false) {
+//                            file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . "未配置小程序信息" . PHP_EOL, FILE_APPEND);
+//                        } else {
+//                            $miniProgram = Factory::miniProgram($config);
+//                            $token = $miniProgram->access_token->getToken(true);// 强制重新从微信服务器获取 token
+//                            if (!isset($token['access_token'])) {
+//                                file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . "小程序access_token不存在" . PHP_EOL, FILE_APPEND);
+//                            } else {
+//                                $miniProgram['access_token']->setToken($token['access_token'], 3600);
+//                                $access_token = $token['access_token'];
+//                                $url = "https://api.weixin.qq.com/mall/importorder?action=add-order&is_history=0&access_token={$access_token}";
+//                                $circleData[0]['order_id'] = $result['out_trade_no'];  //订单id，需要保证唯一性
+//                                $circleData[0]['create_time'] = $orderRs['data']['create_time'];  //订单创建时间，unix时间戳
+//                                $circleData[0]['pay_finish_time'] = time();  //支付完成时间，unix时间戳
+//                                $circleData[0]['trans_id'] = $result['transaction_id'];  //微信支付订单id，对于使用微信支付的订单，该字段必填
+//                                $circleData[0]['fee'] = $result['cash_fee'];  //订单金额，单位：分
+//                                $circleData[0]['status'] = 3;//订单状态，3：支付完成 4：已发货 5：已退款 100: 已完成
+//                                $circleData[0]['ext_info'] = [
+//                                    'express_info' => [
+//                                        'price' => $orderRs['data']['express_price'] * 100 //运费，单位：分
+//                                    ],  //快递信息
+//                                    'brand_info' => [
+//                                        'contact_detail_page' => [
+//                                            'kf_type' => 1   //在线客服类型 1 没有在线客服; 2 微信客服消息; 3 小程序自有客服; 4 公众号h5自有客服
+//                                        ]  //联系商家页面
+//                                    ],  //商家信息
+//                                    'payment_method' => 1,  //订单支付方式，0：未知方式 1：微信支付 2：其他支付方式
+//                                    'user_open_id' => $result['openid'],  //用户的openid，参见openid说明
+//                                    'order_detail_page' => [
+//                                        'path' => 'pages/orderItem/orderItem/orderItem?order_sn=' . $result['out_trade_no']  //小程序订单详情页跳转链接
+//                                    ],  //订单详情页（小程序页面）
+//                                ];  //订单扩展信息
+//                                foreach ($goodsData as $gk => $gv) {
+//                                    if ($gv['order_group_sn'] == $result['out_trade_no']) {
+//                                        $categoryList = [];
+//                                        foreach ($categoryData as $ck => $cv) {
+//                                            if ($gv['m_category_id'] == $cv['id']) {
+//                                                $categoryList[] = $cv['name'];
+//                                                foreach ($categoryData as $pk => $pv) {
+//                                                    if ($pv['id'] == $cv['parent_id']) {
+//                                                        $categoryList[] = $pv['name'];
+//                                                    }
+//                                                }
+//                                            }
+//                                        }
+//                                        $categoryList = array_reverse($categoryList);
+//                                        $circleData[0]['ext_info']['product_info']['item_list'][] = [
+//                                            'item_code' => $gv['goods_id'],  //物品ID（SPU ID），要求appid下全局唯一
+//                                            'sku_id' => $gv['goods_id'],  //sku_id
+//                                            'amount' => $gv['number'],  //物品数量
+//                                            'total_fee' => $gv['total_price'] * 100,  //物品总价，单位：分
+//                                            'thumb_url' => $gv['pic_url'],  //物品图片，图片宽度必须大于750px，宽高比建议4:3 - 1:1之间
+//                                            'title' => $gv['name'],  //物品名称
+//                                            'unit_price' => $gv['price'] * 100,  //物品单价（实际售价），单位：分
+//                                            'original_price' => $gv['price'] * 100,  //物品原价，单位：分
+//                                            'category_list' => $categoryList,  //物品类目列表
+//                                            'item_detail_page' => ['path' => 'pages/goodsItem/goodsItem/goodsItem?id=' . $gv['goods_id']],  //小程序物品详情页跳转链接
+//                                            'can_be_search' => true
+//                                        ];  //物品相关信息
+//                                    }
+//                                }
+//                                $orderList['order_list'] = $circleData;
+//                                $array = json_encode($orderList, JSON_UNESCAPED_UNICODE);
+//                                $rs = curlPost($url, $array);
+//                                file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . $rs . PHP_EOL, FILE_APPEND);
+//                            }
+//                        }
+//                    } else {
+//                        file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . "未查询到订单商品信息" . PHP_EOL, FILE_APPEND);
+//                    }
+//                }
+//
+//                //商家发货短信提醒
+//                $smsModel = new SystemSmsModel();
+//                $smsWhere['status'] = 1;
+//                $smsInfo = $smsModel->do_one($smsWhere); //查询短信配置
+//                $templateIdModel = new SystemSmsTemplateIdModel();
+//                $templateIdInfo = $templateIdModel->do_one([]); //查询商家发货提醒短信模板id
+//                if ($orderRs['data']['supplier_id'] == 0) { //查询商家电话
+//                    $appModel = new AppAccessModel();
+//                    $appInfo = $appModel->find(['key' => $orderRs['data']['key']]);
+//                    if ($appInfo['status'] == 200 && !empty($appInfo['data']['phone'])) {
+//                        $merchantPhone = $appInfo['data']['phone'];
+//                    }
+//                } else {
+//                    $subUserModel = new \app\models\merchant\system\UserModel();
+//                    $subUserInfo = $subUserModel->find(['id' => $orderRs['data']['supplier_id']]);
+//                    if ($subUserInfo['status'] == 200) {
+//                        $supplierInfo = json_decode($subUserInfo['data']['leader'], true);
+//                        $merchantPhone = $supplierInfo['phone'];
+//                    }
+//                }
+//                if ($smsInfo['status'] == 200 && $templateIdInfo['status'] == 200 && isset($merchantPhone)) {
+//                    $templateConfig = json_decode($templateIdInfo['data']['config'], true);
+//                    if ($templateConfig[0]['status'] == 'true') {
+//                        $smsAccessModel = new SystemSmsTemplateAccessModel();
+//                        $smsAccessWhere['phone'] = $merchantPhone;
+//                        $smsAccessWhere['type'] = 1; //商家发货提醒
+//                        $smsAccessInfo = $smsAccessModel->do_one($smsAccessWhere);
+//                        //离上次给商家发短信超过1小时才能再发
+//                        if ($smsAccessInfo['status'] == 204 || (isset($smsAccessInfo['data']) && ($smsAccessInfo['data']['create_time'] + 3600) < time())) {
+//                            $smsInfo['data']['config'] = json_decode($smsInfo['data']['config'], true);
+//                            $sms = new SMS();
+//                            $sendRes = $sms->sendSms($merchantPhone, $templateConfig[0]['templateId']);
+//                            if ($sendRes['status'] == 200) {
+//                                $smsAccessData['phone'] = $merchantPhone;
+//                                $smsAccessData['template_id'] = $templateConfig[0]['templateId'];
+//                                $smsAccessData['type'] = 1; //商家发货提醒
+//                                $smsAccessModel->do_add($smsAccessData);
+//                            } else {
+//                                file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . json_encode($sendRes, JSON_UNESCAPED_UNICODE) . PHP_EOL, FILE_APPEND);
+//                            }
+//                        } else {
+//                            file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . '一小时内只发给商家一次' . PHP_EOL, FILE_APPEND);
+//                        }
+//                    } else {
+//                        file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . '商家发货短信提醒未开启' . PHP_EOL, FILE_APPEND);
+//                    }
+//                } else {
+//                    file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . '未查询到商家电话或腾讯云、短信模板配置信息' . PHP_EOL, FILE_APPEND);
+//                }
+//
+//                if ($orderRs['data']['order_type'] == 2) {
+//                    $shopUserModel = new \app\models\shop\UserModel;
+//                    $shopUser = $shopUserModel->find(['id' => $orderRs['data']['user_id']]);
+//
+//                    $tempModel = new \app\models\system\SystemMiniTemplateModel();
+//                    $minitemp = $tempModel->do_one(['id' => 35]);
+//                    //单号,金额,下单时间,物品名称,
+//                    $tempParams = array(
+//                        'keyword1' => $result['out_trade_no'],
+//                        'keyword2' => $orderRs['data']['payment_money'],
+//                        'keyword3' => $orderRs['data']['create_time'],
+//                        'keyword4' => $orderRs['data']['goodsname'],
+//                    );
+//
+//                    $tempAccess = new SystemMerchantMiniAccessModel();
+//                    $taData = array(
+//                        'key' => $orderRs['data']['key'],
+//                        'merchant_id' => $orderRs['data']['merchant_id'],
+//                        'mini_open_id' => $shopUser['data']['mini_open_id'],
+//                        'template_id' => 35,
+//                        'number' => '0',
+//                        'template_params' => json_encode($tempParams),
+//                        'template_purpose' => 'order',
+//                        'page' => "/pages/orderItem/orderItem/orderItem?order_sn={$result['out_trade_no']}",
+//                        'status' => '-1',
+//                    );
+//                    $tempAccess->do_add($taData);
+//                }
+//                //根据订单信息 减去总库存 和 各个商品库存
+//                $subOrderModel = new SubOrderModel();
+//                $subOrders = $subOrderModel->findall(['order_group_sn' => $result['out_trade_no']]);
+//                $number = 0;
+//
+//                for ($i = 0; $i < count($subOrders['data']); $i++) {
+//                    if ($subOrders['data'][$i]['is_flash_sale'] == 0) {
+//                        $stockModel = new StockModel();
+//                        $number = (int)$subOrders['data'][$i]['number'];
+//                        $stockdata["number = number-{$number}"] = NULL;
+//                        $stockdata['id'] = $subOrders['data'][$i]['stock_id'];
+//                        $stockModel->update($stockdata);
+//                        $goodModel = new GoodsModel();
+//                        $gooddata["stocks= stocks-{$subOrders['data'][$i]['number']}"] = null;
+//                        $gooddata['id'] = $subOrders['data'][$i]['goods_id'];
+//                        $goodModel->update($gooddata);
+//                    } else {
+//                        $flashModel = new \app\models\spike\FlashSaleModel();
+//                        $flashGoods = $flashModel->do_one(['goods_id' => $subOrders['data'][$i]['goods_id']]);
+//                        $property = explode("-", $flashGoods['property']);
+//                        $str = "";
+//                        for ($j = 0; $i < count($property); $j++) {
+//                            $a = json_decode($property[$j], true);
+//                            if ($a['stock_id'] == $subOrders['data'][$i]['stock_id']) {
+//                                $a['stock'] = $a['stock'] - $number;
+//                            }
+//                            if ($j == 0) {
+//                                $str = json_encode($a, JSON_UNESCAPED_UNICODE);
+//                            } else {
+//                                $str = $str . "_" . json_encode($a, JSON_UNESCAPED_UNICODE);
+//                            }
+//                        }
+//                        $flashModel->do_update(['goods_id' => $subOrders['data'][$i]['goods_id']], ['property' => $str]);
+//                    }
+//
+//                    $goodsModel = new \app\models\shop\SaleGoodsModel();
+//                    $goods = $goodsModel->do_one(['id' => $subOrders['data'][$i]['goods_id']]);
+//                    if ($goods['data']['supplier_id'] != 0) {
+//                        $systemSubUserBalanceModel = new \app\models\system\SystemSubAdminBalanceModel();
+//                        $data = array(
+//                            'key' => $goods['data']['key'],
+//                            'merchant_id' => $goods['data']['merchant_id'],
+//                            'sub_admin_id' => $goods['data']['supplier_id'],
+//                            'order_sn' => $result['out_trade_no'],
+//                            'money' => $goods['data']['supplier_money'],
+//                            'content' => "供应商商品出售佣金",
+//                            'status' => 1,
+//                            'type' => 6,
+//                        );
+//                        $systemSubUserBalanceModel->do_add($data);
+//                    }
+//                }
+//
+//
+//                $payModel = new PayModel;
+//                $paydata = array(
+//                    'transaction_id' => $result['transaction_id'],
+//                    'order_id' => $result['out_trade_no'],
+//                    'remain_price' => $result['total_fee'],
+//                    'total_price' => $result['total_fee'],
+//                    'pay_time' => time(),
+//                    'status' => 1,
+//                    'merchant_id' => $orderRs['data']['merchant_id'],
+//                    'user_id' => $orderRs['data']['user_id'],
+//                    'update_time' => time(),
+//                );
+//                $res = $payModel->update($paydata);
+//                $wxModel = new WeixinModel();
+//                $result['wx_appid'] = $result['appid'];
+//                $result['wx_mchId'] = $result['mch_id'];
+//
+//                unset($result['appid']);
+//                unset($result['wx_mchId']);
+//
+//                //佣金计算 根据比例计算
+//                $configModel = new \app\models\tuan\ConfigModel();
+//
+//                $con = $configModel->do_one(['merchant_id' => $orderRs['data']['merchant_id'], 'key' => $orderRs['data']['key']]);
+//                if ($con['status'] == 200 && $con['data']['status'] == 1) {
+//                    $tuanUserModel = new \app\models\tuan\UserModel;
+//                    $tuanUser = $tuanUserModel->do_one(['merchant_id' => $orderRs['data']['merchant_id'], 'uid' => $orderRs['data']['user_id']]);
+//
+//                    if ($tuanUser['status'] == 204) {
+//                        $tuanData = array(
+//                            'key' => $orderRs['data']['key'],
+//                            'merchant_id' => $orderRs['data']['merchant_id'],
+//                            'uid' => $orderRs['data']['user_id'],
+//                            'leader_uid' => $orderRs['data']['leader_self_uid'],
+//                            'status' => 1,
+//                        );
+//                        $tuanUserModel->do_add($tuanData);
+//                        $tuanUser = $tuanUserModel->do_one(['merchant_id' => $orderRs['data']['merchant_id'], 'uid' => $orderRs['data']['user_id']]);
+//                    }
+//
+//                    if ($orderRs['data']['express_type'] == 2) {
+//                        $leaderModel = new \app\models\tuan\LeaderModel();
+//                        $leader = $leaderModel->do_one(['uid' => $orderRs['data']['leader_self_uid']]);
+//
+//                        $balanceModel = new \app\models\shop\BalanceModel;
+//                        $data['money'] = $leader['data']['tuan_express_fee'];
+//                        $data['type'] = 6;
+//                        $data['uid'] = $orderRs['data']['leader_self_uid'];
+//                        $data['content'] = "配送费佣金";
+//                        $array = $balanceModel->do_add($data);
+//                    }
+//
+//                    $balanceModel = new \app\models\shop\BalanceModel;
+//                    $balance = $this->balance($result['out_trade_no'], $con['data']['commission_leader_ratio'], $con['data']['commission_selfleader_ratio']);
+//                    $data = array(
+//                        'uid' => $tuanUser['data']['leader_uid'],
+//                        'order_sn' => $result['out_trade_no'],
+//                        'money' => $balance[0],
+//                        'content' => "团员消费",
+//                        'type' => 1,
+//                        'status' => 0
+//                    );
+//                    $data['key'] = $orderRs['data']['key'];
+//                    $data['merchant_id'] = $orderRs['data']['merchant_id'];
+//                    $array = $balanceModel->do_add($data);
+//                    $balanceModel = new \app\models\shop\BalanceModel;
+//                    if ($orderRs['data']['leader_self_uid'] != 0) {
+//                        $data['money'] = $balance[1];
+//                        $data['type'] = 3;
+//                        $data['uid'] = $orderRs['data']['leader_self_uid'];
+//                        $data['content'] = "自提点佣金";
+//                        $array = $balanceModel->do_add($data);
+//                    }
+//                }
+//            }
+//            $comboAccessModel = new \app\models\merchant\system\MerchantComboAccessModel();
+//            $comboAccessData = $comboAccessModel->do_one(['<>' => ['order_remain_number', 0], '>' => ['validity_time', time()], 'merchant_id' => $orderRs['data']['merchant_id']]);
+//
+//            $comboAccessModel->do_update(['id' => $comboAccessData['data']['id']], ['order_remain_number' => $comboAccessData['data']['order_remain_number'] - 1]);
+//            $systemPayWeixin = new WeixinModel();
+//            $result['status'] = 1;
+//            $result['create_time'] = time();
+//
+//            $rs = $systemPayWeixin->add($result);
+//
+//            if ($rs['status'] == 200) {
+//                ob_clean();
+//                echo "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
+//                die();
+//            } else {
+//                ob_clean();
+//                echo '<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[签名失败]]></return_msg></xml>';
+//                die();
+//            }
+//        }
+//    }
 
     public function actionNotify1()
     {
@@ -996,7 +1001,7 @@ class WechatController extends Controller {
         $wxPatNotify->Handle(false);
         $returnValues = $wxPatNotify->GetValues();
         $result = $wxPatNotify->FromXml($xml);
-        // $this->logger(json_encode($result));
+        $this->logger(json_encode($result));
         //file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . json_encode($result) . PHP_EOL, FILE_APPEND);
 //         $a = '{"appid":"wx5efa471126f441c3","attach":"shop","bank_type":"COMM_DEBIT","cash_fee":"2190","fee_type":"CNY","is_subscribe":"N","mch_id":"1537270121","nonce_str":"5e7f0d2aeb6c5","openid":"onH725QknPbegejzrVKNVoQioGHk","out_trade_no":"t_202003281639062352","result_code":"SUCCESS","return_code":"SUCCESS","sign":"30C936E58CEB1C396BF321E6840EFFA8","time_end":"20200328163912","total_fee":"2190","trade_type":"JSAPI","transaction_id":"4200000559202003288521530202"}';
 //        $result = json_decode($a, true);
@@ -1012,11 +1017,11 @@ class WechatController extends Controller {
                 $groupInfo = $groupAccModel->one($groupWhere);
                 $orderModel = new OrderModel;
                 $orderRes = $orderModel->findList(['transaction_order_sn' => $result['out_trade_no']]);
-                $number = 1;
+                $num = 1;
                 if ($orderRes['status'] == 200) {
-                    $number = count($orderRes['data']);
+                    $num = count($orderRes['data']);
                 }
-                for ($l = 0; $l < $number; $l++) {
+                for ($l = 0; $l < $num; $l++) {
                     $status = 1;
                     if ($groupInfo['status'] == 200) {
                         $status = 11;
@@ -1035,34 +1040,41 @@ class WechatController extends Controller {
                     $result['out_trade_no'] = $orderRes['data'][$l]['order_sn'];
 
                     $appAccessModel = new AppAccessModel();
-                    $appInfo = $appAccessModel->find(['key'=>$orderRs['data']['key']]);
+                    $appInfo = $appAccessModel->find(['key' => $orderRs['data']['key']]);
 
-                    $orderData['commission'] = $this->fenxiao($orderRes['data'][$l]['order_sn'], $appInfo['data']['distribution']);
+                    // $orderData['commission'] = $this->fenxiao($orderRes['data'][$l]['order_sn'], $appInfo['data']['distribution']);
                     $orderModel->update($orderData);
+
+                    $subOrdersModel = new SubOrdersModel();
+                    $subOrdersModel->do_update(['order_group_sn'=>$result['out_trade_no']],['status'=>1]);
 
                     //  $orderRs['data'] = array();
 
                     //将订单号放入redis队列，用计划任务计算分销分佣金额
                     $dtbData['order_sn'] = $result['out_trade_no'];
-                    lpushRedis('distribution',$dtbData);
+                    lpushRedis('distribution', $dtbData);
 
                     //微信公众号商家，新订单提醒
                     $messageData['key'] = $orderRs['data']['key'];
                     $messageData['pay_time'] = time();
-                    lpushRedis('wechat_template_message',$messageData);
+                    lpushRedis('wechat_template_message', $messageData);
 
                     //易联云自动推送，将订单号、key放入redis队列
                     $ylyData['key'] = $orderRs['data']['key'];
                     $ylyData['supplier_id'] = $orderRs['data']['supplier_id'];
                     $ylyData['order_sn'] = $result['out_trade_no'];
-                    if ($orderRs['data']['supplier_id'] == 0){
+                    //团长佣金
+                    lpushRedis("leaderMoney", $result['out_trade_no']);
+
+                    file_put_contents(Yii::getAlias('@webroot/') . '/leaderMoney.text', date('Y-m-d H:i:s') . "待打印_" . json_encode($ylyData) . PHP_EOL, FILE_APPEND);
+                    if ($orderRs['data']['supplier_id'] == 0) {
                         //非门店订单
-                        lpushRedis('ylyprint',$ylyData);
-                        file_put_contents(Yii::getAlias('@webroot/') . '/ylyPrint.text', date('Y-m-d H:i:s') . "待打印_". json_encode($ylyData) . PHP_EOL, FILE_APPEND);
-                    }else{
+                        lpushRedis('ylyprint', $ylyData);
+                        file_put_contents(Yii::getAlias('@webroot/') . '/ylyPrint.text', date('Y-m-d H:i:s') . "待打印_" . json_encode($ylyData) . PHP_EOL, FILE_APPEND);
+                    } else {
                         //门店订单
-                        lpushRedis("supplier_ylyprint",$ylyData);
-                        file_put_contents(Yii::getAlias('@webroot/') . '/ylyPrint.text', date('Y-m-d H:i:s') . "待打印_". json_encode($ylyData) . PHP_EOL, FILE_APPEND);
+                        lpushRedis("supplier_ylyprint", $ylyData);
+                        file_put_contents(Yii::getAlias('@webroot/') . '/ylyPrint.text', date('Y-m-d H:i:s') . "待打印_" . json_encode($ylyData) . PHP_EOL, FILE_APPEND);
                     }
 
                     //好物圈导入订单
@@ -1070,21 +1082,21 @@ class WechatController extends Controller {
                     $appAccessModel = new AppAccessModel();
                     $appAccessInfo = $appAccessModel->find(['`key`' => $orderRs['data']['key']]);
 
-                    if (isset($appAccessInfo['status']) && $appAccessInfo['status'] == 200 && $appAccessInfo['data']['good_phenosphere'] == 1){
+                    if (isset($appAccessInfo['status']) && $appAccessInfo['status'] == 200 && $appAccessInfo['data']['good_phenosphere'] == 1) {
                         $categoryModel = new MerchantCategoryModel();
-                        $sql = "SELECT so.*,sg.m_category_id FROM `shop_order_group` sog LEFT JOIN `shop_order` so ON so.order_group_sn = sog.order_sn LEFT JOIN `shop_goods` sg ON sg.id = so.goods_id WHERE sog.`key` = '".$orderRs['data']['key']."' AND sog.order_sn = '".$result['out_trade_no']."'";
+                        $sql = "SELECT so.*,sg.m_category_id FROM `shop_order_group` sog LEFT JOIN `shop_order` so ON so.order_group_sn = sog.order_sn LEFT JOIN `shop_goods` sg ON sg.id = so.goods_id WHERE sog.`key` = '" . $orderRs['data']['key'] . "' AND sog.order_sn = '" . $result['out_trade_no'] . "'";
                         $goodsData = $orderModel->querySql($sql);
                         //商品分类
-                        $sql = "SELECT * FROM `shop_marchant_category` WHERE `key` = '".$orderRs['data']['key']."' AND delete_time is NULL";
+                        $sql = "SELECT * FROM `shop_marchant_category` WHERE `key` = '" . $orderRs['data']['key'] . "' AND delete_time is NULL";
                         $categoryData = $categoryModel->querySql($sql);
-                        if (count($goodsData)>0 || count($categoryData)>0) {
+                        if (count($goodsData) > 0 || count($categoryData) > 0) {
                             $config = $this->getSystemConfig($orderRs['data']['key'], "miniprogram");
                             if ($config == false) {
                                 file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . "未配置小程序信息" . PHP_EOL, FILE_APPEND);
                             } else {
                                 $miniProgram = Factory::miniProgram($config);
                                 $token = $miniProgram->access_token->getToken(true);// 强制重新从微信服务器获取 token
-                                if (!isset($token['access_token'])){
+                                if (!isset($token['access_token'])) {
                                     file_put_contents(Yii::getAlias('@webroot/') . '/circle.text', date('Y-m-d H:i:s') . "小程序access_token不存在" . PHP_EOL, FILE_APPEND);
                                 } else {
                                     $miniProgram['access_token']->setToken($token['access_token'], 3600);
@@ -1097,28 +1109,28 @@ class WechatController extends Controller {
                                     $circleData[0]['fee'] = $result['cash_fee'];  //订单金额，单位：分
                                     $circleData[0]['status'] = 3;//订单状态，3：支付完成 4：已发货 5：已退款 100: 已完成
                                     $circleData[0]['ext_info'] = [
-                                        'express_info'=>[
-                                            'price'=>$orderRs['data']['express_price']*100 //运费，单位：分
+                                        'express_info' => [
+                                            'price' => $orderRs['data']['express_price'] * 100 //运费，单位：分
                                         ],  //快递信息
-                                        'brand_info'=>[
-                                            'contact_detail_page'=>[
-                                                'kf_type'=>1   //在线客服类型 1 没有在线客服; 2 微信客服消息; 3 小程序自有客服; 4 公众号h5自有客服
+                                        'brand_info' => [
+                                            'contact_detail_page' => [
+                                                'kf_type' => 1   //在线客服类型 1 没有在线客服; 2 微信客服消息; 3 小程序自有客服; 4 公众号h5自有客服
                                             ]  //联系商家页面
                                         ],  //商家信息
-                                        'payment_method'=>1,  //订单支付方式，0：未知方式 1：微信支付 2：其他支付方式
-                                        'user_open_id'=>$result['openid'],  //用户的openid，参见openid说明
-                                        'order_detail_page'=>[
-                                            'path'=>'pages/orderItem/orderItem/orderItem?order_sn='.$result['out_trade_no']  //小程序订单详情页跳转链接
+                                        'payment_method' => 1,  //订单支付方式，0：未知方式 1：微信支付 2：其他支付方式
+                                        'user_open_id' => $result['openid'],  //用户的openid，参见openid说明
+                                        'order_detail_page' => [
+                                            'path' => 'pages/orderItem/orderItem/orderItem?order_sn=' . $result['out_trade_no']  //小程序订单详情页跳转链接
                                         ],  //订单详情页（小程序页面）
                                     ];  //订单扩展信息
-                                    foreach ($goodsData as $gk=>$gv){
-                                        if ($gv['order_group_sn'] == $result['out_trade_no']){
+                                    foreach ($goodsData as $gk => $gv) {
+                                        if ($gv['order_group_sn'] == $result['out_trade_no']) {
                                             $categoryList = [];
-                                            foreach ($categoryData as $ck=>$cv){
-                                                if ($gv['m_category_id'] == $cv['id']){
+                                            foreach ($categoryData as $ck => $cv) {
+                                                if ($gv['m_category_id'] == $cv['id']) {
                                                     $categoryList[] = $cv['name'];
-                                                    foreach ($categoryData as $pk => $pv){
-                                                        if ($pv['id'] == $cv['parent_id']){
+                                                    foreach ($categoryData as $pk => $pv) {
+                                                        if ($pv['id'] == $cv['parent_id']) {
                                                             $categoryList[] = $pv['name'];
                                                         }
                                                     }
@@ -1126,17 +1138,17 @@ class WechatController extends Controller {
                                             }
                                             $categoryList = array_reverse($categoryList);
                                             $circleData[0]['ext_info']['product_info']['item_list'][] = [
-                                                'item_code'=>$gv['goods_id'],  //物品ID（SPU ID），要求appid下全局唯一
-                                                'sku_id'=>$gv['goods_id'],  //sku_id
-                                                'amount'=>$gv['number'],  //物品数量
-                                                'total_fee'=>$gv['total_price']*100,  //物品总价，单位：分
-                                                'thumb_url'=>$gv['pic_url'],  //物品图片，图片宽度必须大于750px，宽高比建议4:3 - 1:1之间
-                                                'title'=>$gv['name'],  //物品名称
-                                                'unit_price'=>$gv['price']*100,  //物品单价（实际售价），单位：分
-                                                'original_price'=>$gv['price']*100,  //物品原价，单位：分
-                                                'category_list'=>$categoryList,  //物品类目列表
-                                                'item_detail_page'=>['path'=>'pages/goodsItem/goodsItem/goodsItem?id='.$gv['goods_id']],  //小程序物品详情页跳转链接
-                                                'can_be_search'=>true
+                                                'item_code' => $gv['goods_id'],  //物品ID（SPU ID），要求appid下全局唯一
+                                                'sku_id' => $gv['goods_id'],  //sku_id
+                                                'amount' => $gv['number'],  //物品数量
+                                                'total_fee' => $gv['total_price'] * 100,  //物品总价，单位：分
+                                                'thumb_url' => $gv['pic_url'],  //物品图片，图片宽度必须大于750px，宽高比建议4:3 - 1:1之间
+                                                'title' => $gv['name'],  //物品名称
+                                                'unit_price' => $gv['price'] * 100,  //物品单价（实际售价），单位：分
+                                                'original_price' => $gv['price'] * 100,  //物品原价，单位：分
+                                                'category_list' => $categoryList,  //物品类目列表
+                                                'item_detail_page' => ['path' => 'pages/goodsItem/goodsItem/goodsItem?id=' . $gv['goods_id']],  //小程序物品详情页跳转链接
+                                                'can_be_search' => true
                                             ];  //物品相关信息
                                         }
                                     }
@@ -1153,59 +1165,51 @@ class WechatController extends Controller {
 
                     //商家发货短信提醒
                     $smsModel = new SystemSmsModel();
-                    $smsWhere['type'] = 1; //腾讯云
                     $smsWhere['status'] = 1;
-                    $smsInfo = $smsModel->do_one($smsWhere); //查询腾讯云配置
+                    $smsInfo = $smsModel->do_one($smsWhere); //查询短信配置
                     $templateIdModel = new SystemSmsTemplateIdModel();
                     $templateIdInfo = $templateIdModel->do_one([]); //查询商家发货提醒短信模板id
-                    if ($orderRs['data']['supplier_id'] == 0){ //查询商家电话
+                    if ($orderRs['data']['supplier_id'] == 0) { //查询商家电话
                         $appModel = new AppAccessModel();
-                        $appInfo = $appModel->find(['key'=>$orderRs['data']['key']]);
-                        if ($appInfo['status'] == 200 && !empty($appInfo['data']['phone'])){
+                        $appInfo = $appModel->find(['key' => $orderRs['data']['key']]);
+                        if ($appInfo['status'] == 200 && !empty($appInfo['data']['phone'])) {
                             $merchantPhone = $appInfo['data']['phone'];
                         }
-                    }else{
+                    } else {
                         $subUserModel = new \app\models\merchant\system\UserModel();
-                        $subUserInfo = $subUserModel->find(['id'=>$orderRs['data']['supplier_id']]);
-                        if ($subUserInfo['status'] == 200){
-                            $supplierInfo = json_decode($subUserInfo['data']['leader'],true);
+                        $subUserInfo = $subUserModel->find(['id' => $orderRs['data']['supplier_id']]);
+                        if ($subUserInfo['status'] == 200) {
+                            $supplierInfo = json_decode($subUserInfo['data']['leader'], true);
                             $merchantPhone = $supplierInfo['phone'];
                         }
                     }
-                    if ($smsInfo['status'] == 200 && $templateIdInfo['status'] == 200 && isset($merchantPhone)){
-                        $templateConfig = json_decode($templateIdInfo['data']['config'],true);
-                        if ($templateConfig[0]['status'] == 'true'){
+                    if ($smsInfo['status'] == 200 && $templateIdInfo['status'] == 200 && isset($merchantPhone)) {
+                        $templateConfig = json_decode($templateIdInfo['data']['config'], true);
+                        if ($templateConfig[0]['status'] == 'true') {
                             $smsAccessModel = new SystemSmsTemplateAccessModel();
                             $smsAccessWhere['phone'] = $merchantPhone;
                             $smsAccessWhere['type'] = 1; //商家发货提醒
                             $smsAccessInfo = $smsAccessModel->do_one($smsAccessWhere);
                             //离上次给商家发短信超过1小时才能再发
-                            if ($smsAccessInfo['status'] == 204 || (isset($smsAccessInfo['data']) && ($smsAccessInfo['data']['create_time'] + 3600) < time())){
-                                $smsInfo['data']['config'] = json_decode($smsInfo['data']['config'],true);
-                                try {
-                                    $sender = new SmsSingleSender($smsInfo['data']['config']['appid'], $smsInfo['data']['config']['appkey']);
-                                    $sendResult = $sender->sendWithParam("86",$merchantPhone,$templateConfig[0]['templateId']);
-                                    $sendRes = json_decode($sendResult, true);
-                                } catch (\Exception $e) {
-
-                                }
-                                if (isset($sendRes['result']) && $sendRes['result'] == 0){
+                            if ($smsAccessInfo['status'] == 204 || (isset($smsAccessInfo['data']) && ($smsAccessInfo['data']['create_time'] + 3600) < time())) {
+                                $smsInfo['data']['config'] = json_decode($smsInfo['data']['config'], true);
+                                $sms = new SMS();
+                                $sendRes = $sms->sendSms($merchantPhone, $templateConfig[0]['templateId']);
+                                if ($sendRes['status'] == 200) {
                                     $smsAccessData['phone'] = $merchantPhone;
                                     $smsAccessData['template_id'] = $templateConfig[0]['templateId'];
                                     $smsAccessData['type'] = 1; //商家发货提醒
                                     $smsAccessModel->do_add($smsAccessData);
-                                }else{
-                                    $sms_error['result'] = $sendRes['result'];
-                                    $sms_error['errmsg'] = unicodeDecode($sendRes['errmsg']);
-                                    file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . json_encode($sms_error, JSON_UNESCAPED_UNICODE) . PHP_EOL, FILE_APPEND);
+                                } else {
+                                    file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . json_encode($sendRes, JSON_UNESCAPED_UNICODE) . PHP_EOL, FILE_APPEND);
                                 }
-                            }else{
+                            } else {
                                 file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . '一小时内只发给商家一次' . PHP_EOL, FILE_APPEND);
                             }
-                        }else{
+                        } else {
                             file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . '商家发货短信提醒未开启' . PHP_EOL, FILE_APPEND);
                         }
-                    }else{
+                    } else {
                         file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . '未查询到商家电话或腾讯云、短信模板配置信息' . PHP_EOL, FILE_APPEND);
                     }
 
@@ -1248,20 +1252,6 @@ class WechatController extends Controller {
 
                         $goodsModel = new \app\models\shop\SaleGoodsModel();
                         $goods = $goodsModel->do_one(['id' => $subOrders['data'][$i]['goods_id']]);
-                        if ($goods['data']['supplier_id'] != 0) {
-                            $systemSubUserBalanceModel = new \app\models\system\SystemSubAdminBalanceModel();
-                            $data = array(
-                                'key' => $goods['data']['key'],
-                                'merchant_id' => $goods['data']['merchant_id'],
-                                'sub_admin_id' => $goods['data']['supplier_id'],
-                                'order_sn' => $result['out_trade_no'],
-                                'money' => $goods['data']['supplier_money'],
-                                'content' => "供应商商品出售佣金",
-                                'status' => 1,
-                                'type' => 6,
-                            );
-                            $systemSubUserBalanceModel->do_add($data);
-                        }
                     }
 
 
@@ -1269,8 +1259,8 @@ class WechatController extends Controller {
                     $paydata = array(
                         'transaction_id' => $result['transaction_id'],
                         'order_id' => $out_trade_no,
-                        'remain_price' => $result['total_fee']/100,
-                        'total_price' => $result['total_fee']/100,
+                        'remain_price' => $result['total_fee'] / 100,
+                        'total_price' => $result['total_fee'] / 100,
                         'pay_time' => time(),
                         'status' => 1,
                         'merchant_id' => $orderRs['data']['merchant_id'],
@@ -1287,62 +1277,62 @@ class WechatController extends Controller {
                     unset($result['wx_mchId']);
 
                     //佣金计算 根据比例计算
-                    $configModel = new \app\models\tuan\ConfigModel();
-                    $con = $configModel->do_one(['merchant_id' => $orderRs['data']['merchant_id'], 'key' => $orderRs['data']['key']]);
-                    if ($con['status'] == 200 && $con['data']['status'] == 1) {
-
-                        if ($orderRs['data']['express_type'] == 2 && $orderRs['data']['express_price'] > 0&&$orderRs['data']['supplier_id']==0) {
-                            $balanceModel = new \app\models\shop\BalanceModel;
-                            $data['order_sn'] = $orderRs['data']['order_sn'];
-                            $data['key'] =$orderRs['data']['key'];
-                            $data['merchant_id'] = $orderRs['data']['merchant_id'];
-                            $data['money'] = $orderRs['data']['express_price'];
-                            $data['type'] = 6;
-                            $data['uid'] = $orderRs['data']['leader_uid'];
-                            $data['content'] = "配送费佣金";
-                            $balanceModel->do_add($data);
-                        }
-
-                        $balance = $this->balance($orderRs['data']['order_sn'], $con['data']['commission_leader_ratio'], 0);
-                        $data = array(
-                            'uid' => $orderRs['data']['leader_uid'],
-                            'order_sn' => $orderRs['data']['order_sn'],
-                            'money' => $balance[0],
-                            'content' => "团员消费",
-                            'type' => 1,
-                            'status' => 0
-                        );
-                        $data['key'] = $orderRs['data']['key'];
-                        $data['merchant_id'] = $orderRs['data']['merchant_id'];
-                        $balanceModel = new \app\models\shop\BalanceModel;
-
-                        $array = $balanceModel->do_add($data);
-                        $sql = "update shop_order_group set  leader_money = {$balance[0]} where order_sn = {$orderRs['data']['order_sn']}";
-                        Yii::$app->db->createCommand($sql)->execute();
-                    }
+//                    $configModel = new \app\models\tuan\ConfigModel();
+//                    $con = $configModel->do_one(['merchant_id' => $orderRs['data']['merchant_id'], 'key' => $orderRs['data']['key']]);
+//                    if ($con['status'] == 200 && $con['data']['status'] == 1) {
+//
+//                        if ($orderRs['data']['express_type'] == 2 && $orderRs['data']['express_price'] > 0 && $orderRs['data']['supplier_id'] == 0) {
+//                            $balanceModel = new \app\models\shop\BalanceModel;
+//                            $data['order_sn'] = $orderRs['data']['order_sn'];
+//                            $data['key'] = $orderRs['data']['key'];
+//                            $data['merchant_id'] = $orderRs['data']['merchant_id'];
+//                            $data['money'] = $orderRs['data']['express_price'];
+//                            $data['type'] = 6;
+//                            $data['uid'] = $orderRs['data']['leader_uid'];
+//                            $data['content'] = "配送费佣金";
+//                            $balanceModel->do_add($data);
+//                        }
+//                        $configModel = new \app\models\tuan\ConfigModel();
+//                        $con = $configModel->do_one(['merchant_id' => $orderRs['data']['merchant_id'], 'key' => $orderRs['data']['key']]);
+//                        $balance = $this->balance($orderRs['data']['order_sn'], $con['data']['commission_leader_ratio'], 0);
+//                        $data = array(
+//                            'uid' => $orderRs['data']['leader_uid'],
+//                            'order_sn' => $orderRs['data']['order_sn'],
+//                            'money' => $balance[0],
+//                            'content' => "团员消费",
+//                            'type' => 1,
+//                            'status' => 0
+//                        );
+//                        $data['key'] = $orderRs['data']['key'];
+//                        $data['merchant_id'] = $orderRs['data']['merchant_id'];
+//                        $balanceModel = new \app\models\shop\BalanceModel;
+//
+//                        $array = $balanceModel->do_add($data);
+//                        $sql = "update shop_order_group set  leader_money = {$balance[0]} where order_sn = {$orderRs['data']['order_sn']}";
+//                        Yii::$app->db->createCommand($sql)->execute();
+//                    }
                 }
-                $comboAccessModel = new \app\models\merchant\system\MerchantComboAccessModel();
-                $comboAccessData = $comboAccessModel->do_one(['<>' => ['order_remain_number', 0], '>' => ['validity_time', time()], 'merchant_id' => $orderRs['data']['merchant_id']]);
-
-                $comboAccessModel->do_update(['id' => $comboAccessData['data']['id']], ['order_remain_number' => $comboAccessData['data']['order_remain_number'] - 1]);
-
 
             }
-            $systemPayWeixin = new WeixinModel();
-            $result['status'] = 1;
-            $result['create_time'] = time();
+//            $systemPayWeixin = new WeixinModel();
+//            $result['status'] = 1;
+//            $result['create_time'] = time();
+//
+//            $rs = $systemPayWeixin->add($result);
 
-            $rs = $systemPayWeixin->add($result);
-
-            if ($rs['status'] == 200) {
-                ob_clean();
-                echo "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
-                die();
-            } else {
-                ob_clean();
-                echo '<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[签名失败]]></return_msg></xml>';
-                die();
-            }
+//            if ($rs['status'] == 200) {
+//                $this->logger(json_encode($rs));
+//                $this->logger('true');
+            ob_clean();
+            echo "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
+            die();
+//            } else {
+//                $this->logger(json_encode($rs));
+//                $this->logger('false');
+//                ob_clean();
+//                echo '<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[签名失败]]></return_msg></xml>';
+//                die();
+//            }
         }
     }
 
@@ -1350,7 +1340,8 @@ class WechatController extends Controller {
     /**
      * 退款接口回调
      */
-    public function actionNotifyreturn() {
+    public function actionNotifyreturn()
+    {
         //获取商户微信配置
         $xml = file_get_contents("php://input");
 
@@ -1400,7 +1391,8 @@ class WechatController extends Controller {
     /**
      * @param $log_content
      */
-    private function logger($log_content) {
+    private function logger($log_content)
+    {
         if (isset($_SERVER['HTTP_APPNAME'])) {   //SAE
             sae_set_display_errors(false);
             sae_debug($log_content);
@@ -1408,14 +1400,15 @@ class WechatController extends Controller {
         } else if ($_SERVER['REMOTE_ADDR'] != "127.0.0.1") { //LOCAL
             $max_size = 1000000;
             $log_filename = "log.xml";
-            if (file_exists($log_filename) and ( abs(filesize($log_filename)) > $max_size)) {
+            if (file_exists($log_filename) and (abs(filesize($log_filename)) > $max_size)) {
                 unlink($log_filename);
             }
             file_put_contents($log_filename, date('Y-m-d H:i:s') . " " . $log_content . "\r\n", FILE_APPEND);
         }
     }
 
-    public function actionQrcode() {
+    public function actionQrcode()
+    {
         error_reporting(E_ERROR);
         require_once yii::getAlias('@vendor/wxpay/example/qrcode.php');
         $url = urldecode($_GET['data']);
@@ -1426,7 +1419,8 @@ class WechatController extends Controller {
         }
     }
 
-    public function balance($order_sn, $commission_leader_ratio, $commission_selfleader_ratio) {
+    public function balance($order_sn, $commission_leader_ratio, $commission_selfleader_ratio)
+    {
         $money[0] = 0;
         $money[1] = 0;
         //根据订单查询子订单
@@ -1457,7 +1451,8 @@ class WechatController extends Controller {
      * 支付回调 小程序扫呗支付专用回调
      * @return array
      */
-    public function actionNotifySaoBei() {
+    public function actionNotifySaoBei()
+    {
         //获取商户微信配置
         $request_body = file_get_contents('php://input');
         $data = json_decode($request_body, true);
@@ -1475,7 +1470,7 @@ class WechatController extends Controller {
                 $groupWhere['order_sn'] = $data['terminal_trace'];
                 $groupInfo = $groupAccModel->one($groupWhere);
                 $orderModel = new OrderModel;
-               // $orderRs = $orderModel->find(['order_sn' => $data['terminal_trace']]);
+                // $orderRs = $orderModel->find(['order_sn' => $data['terminal_trace']]);
                 $orderRes = $orderModel->findList(['transaction_order_sn' => $data['terminal_trace']]);
                 $number = 1;
                 if ($orderRes['status'] == 200) {
@@ -1508,25 +1503,25 @@ class WechatController extends Controller {
 
                     //将订单号放入redis队列，用计划任务计算分销分佣金额
                     $dtbData['order_sn'] = $data['terminal_trace'];
-                    lpushRedis('distribution',$dtbData);
+                    lpushRedis('distribution', $dtbData);
 
                     //微信公众号商家，新订单提醒
                     $messageData['key'] = $orderRs['data']['key'];
                     $messageData['pay_time'] = time();
-                    lpushRedis('wechat_template_message',$messageData);
+                    lpushRedis('wechat_template_message', $messageData);
 
                     //易联云自动推送，将订单号、key放入redis队列
                     $ylyData['key'] = $orderRs['data']['key'];
                     $ylyData['supplier_id'] = $orderRs['data']['supplier_id'];
                     $ylyData['order_sn'] = $result['out_trade_no'];
-                    if ($orderRs['data']['supplier_id'] == 0){
+                    if ($orderRs['data']['supplier_id'] == 0) {
                         //非门店订单
-                        lpushRedis('ylyprint',$ylyData);
-                        file_put_contents(Yii::getAlias('@webroot/') . '/ylyPrint.text', date('Y-m-d H:i:s') . "待打印_". json_encode($ylyData) . PHP_EOL, FILE_APPEND);
-                    }else{
+                        lpushRedis('ylyprint', $ylyData);
+                        file_put_contents(Yii::getAlias('@webroot/') . '/ylyPrint.text', date('Y-m-d H:i:s') . "待打印_" . json_encode($ylyData) . PHP_EOL, FILE_APPEND);
+                    } else {
                         //门店订单
-                        lpushRedis("supplier_ylyprint",$ylyData);
-                        file_put_contents(Yii::getAlias('@webroot/') . '/ylyPrint.text', date('Y-m-d H:i:s') . "待打印_". json_encode($ylyData) . PHP_EOL, FILE_APPEND);
+                        lpushRedis("supplier_ylyprint", $ylyData);
+                        file_put_contents(Yii::getAlias('@webroot/') . '/ylyPrint.text', date('Y-m-d H:i:s') . "待打印_" . json_encode($ylyData) . PHP_EOL, FILE_APPEND);
                     }
 
                     //好物圈导入订单
@@ -1617,59 +1612,51 @@ class WechatController extends Controller {
 
                     //商家发货短信提醒
                     $smsModel = new SystemSmsModel();
-                    $smsWhere['type'] = 1; //腾讯云
                     $smsWhere['status'] = 1;
-                    $smsInfo = $smsModel->do_one($smsWhere); //查询腾讯云配置
+                    $smsInfo = $smsModel->do_one($smsWhere); //查询短信配置
                     $templateIdModel = new SystemSmsTemplateIdModel();
                     $templateIdInfo = $templateIdModel->do_one([]); //查询商家发货提醒短信模板id
-                    if ($orderRs['data']['supplier_id'] == 0){ //查询商家电话
+                    if ($orderRs['data']['supplier_id'] == 0) { //查询商家电话
                         $appModel = new AppAccessModel();
-                        $appInfo = $appModel->find(['key'=>$orderRs['data']['key']]);
-                        if ($appInfo['status'] == 200 && !empty($appInfo['data']['phone'])){
+                        $appInfo = $appModel->find(['key' => $orderRs['data']['key']]);
+                        if ($appInfo['status'] == 200 && !empty($appInfo['data']['phone'])) {
                             $merchantPhone = $appInfo['data']['phone'];
                         }
-                    }else{
+                    } else {
                         $subUserModel = new \app\models\merchant\system\UserModel();
-                        $subUserInfo = $subUserModel->find(['id'=>$orderRs['data']['supplier_id']]);
-                        if ($subUserInfo['status'] == 200){
-                            $supplierInfo = json_decode($subUserInfo['data']['leader'],true);
+                        $subUserInfo = $subUserModel->find(['id' => $orderRs['data']['supplier_id']]);
+                        if ($subUserInfo['status'] == 200) {
+                            $supplierInfo = json_decode($subUserInfo['data']['leader'], true);
                             $merchantPhone = $supplierInfo['phone'];
                         }
                     }
-                    if ($smsInfo['status'] == 200 && $templateIdInfo['status'] == 200 && isset($merchantPhone)){
-                        $templateConfig = json_decode($templateIdInfo['data']['config'],true);
-                        if ($templateConfig[0]['status'] == 'true'){
+                    if ($smsInfo['status'] == 200 && $templateIdInfo['status'] == 200 && isset($merchantPhone)) {
+                        $templateConfig = json_decode($templateIdInfo['data']['config'], true);
+                        if ($templateConfig[0]['status'] == 'true') {
                             $smsAccessModel = new SystemSmsTemplateAccessModel();
                             $smsAccessWhere['phone'] = $merchantPhone;
                             $smsAccessWhere['type'] = 1; //商家发货提醒
                             $smsAccessInfo = $smsAccessModel->do_one($smsAccessWhere);
                             //离上次给商家发短信超过1小时才能再发
-                            if ($smsAccessInfo['status'] == 204 || (isset($smsAccessInfo['data']) && ($smsAccessInfo['data']['create_time'] + 3600) < time())){
-                                $smsInfo['data']['config'] = json_decode($smsInfo['data']['config'],true);
-                                try {
-                                    $sender = new SmsSingleSender($smsInfo['data']['config']['appid'], $smsInfo['data']['config']['appkey']);
-                                    $sendResult = $sender->sendWithParam("86",$merchantPhone,$templateConfig[0]['templateId']);
-                                    $sendRes = json_decode($sendResult, true);
-                                } catch (\Exception $e) {
-
-                                }
-                                if (isset($sendRes['result']) && $sendRes['result'] == 0){
+                            if ($smsAccessInfo['status'] == 204 || (isset($smsAccessInfo['data']) && ($smsAccessInfo['data']['create_time'] + 3600) < time())) {
+                                $smsInfo['data']['config'] = json_decode($smsInfo['data']['config'], true);
+                                $sms = new SMS();
+                                $sendRes = $sms->sendSms($merchantPhone, $templateConfig[0]['templateId']);
+                                if ($sendRes['status'] == 200) {
                                     $smsAccessData['phone'] = $merchantPhone;
                                     $smsAccessData['template_id'] = $templateConfig[0]['templateId'];
                                     $smsAccessData['type'] = 1; //商家发货提醒
                                     $smsAccessModel->do_add($smsAccessData);
-                                }else{
-                                    $sms_error['result'] = $sendRes['result'];
-                                    $sms_error['errmsg'] = unicodeDecode($sendRes['errmsg']);
-                                    file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . json_encode($sms_error, JSON_UNESCAPED_UNICODE) . PHP_EOL, FILE_APPEND);
+                                } else {
+                                    file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . json_encode($sendRes, JSON_UNESCAPED_UNICODE) . PHP_EOL, FILE_APPEND);
                                 }
-                            }else{
+                            } else {
                                 file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . '一小时内只发给商家一次' . PHP_EOL, FILE_APPEND);
                             }
-                        }else{
+                        } else {
                             file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . '商家发货短信提醒未开启' . PHP_EOL, FILE_APPEND);
                         }
-                    }else{
+                    } else {
                         file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . '未查询到商家电话或腾讯云、短信模板配置信息' . PHP_EOL, FILE_APPEND);
                     }
 
@@ -1788,13 +1775,14 @@ class WechatController extends Controller {
     }
 
 
-    public  function fenxiao($order_sn,$distribution){
+    public function fenxiao($order_sn, $distribution)
+    {
         $orderSubModel = new SubOrderModel();
         $order = $orderSubModel->findall(['order_group_sn' => $order_sn]);
-        if($distribution==""||$distribution==null){
+        if ($distribution == "" || $distribution == null) {
             $distribution = 0;
-        }else{
-            $a = json_decode($distribution,true);
+        } else {
+            $a = json_decode($distribution, true);
             $distribution = $a['total'];
         }
         //循环订单
@@ -1805,11 +1793,138 @@ class WechatController extends Controller {
             $good = $goodsModel->find(['id' => $order['data'][$i]['goods_id']]);
             // 判断商品是否单独设置佣金
             if ((int)$good['data']['distribution'] != 0) {
-                $money = $money + (($order['data'][$i]['payment_money']-$order['data'][$i]['express_price']) * $good['data']['distribution'] / 100);
+                $money = $money + (($order['data'][$i]['payment_money'] - $order['data'][$i]['express_price']) * $good['data']['distribution'] / 100);
             } else {
-                $money= $money + ($order['data'][$i]['payment_money'] * $distribution / 100);
+                $money = $money + ($order['data'][$i]['payment_money'] * $distribution / 100);
             }
         }
         return $money;
     }
+    public function actionNotifyAdvance()
+    {
+        //获取商户微信配置
+        $xml = file_get_contents("php://input");
+        $wxPatNotify = new \WxPayNotify();
+        $wxPatNotify->Handle(false);
+        $returnValues = $wxPatNotify->GetValues();
+        $result = $wxPatNotify->FromXml($xml);
+        if (!empty($result['result_code']) && $result['result_code'] == 'SUCCESS') {
+            $advanceOrder = new AdvanceOrderModel();
+            $advance = $advanceOrder->do_one(['sale_order_sn' => $result['out_trade_no']]);
+            if ($advance['status'] == 200) {
+                $res = $advanceOrder->do_update(['sale_order_sn' => $result['out_trade_no']], ['status' => 1, 'transaction_id' => $result['transaction_id']]);
+                if ($res['status'] == 200) {
+                    ob_clean();
+                    echo "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
+                    die();
+                } else {
+                    ob_clean();
+                    echo '<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[签名失败]]></return_msg></xml>';
+                    die();
+                }
+            } else {
+                ob_clean();
+                echo '<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[签名失败]]></return_msg></xml>';
+                die();
+            }
+        } else {
+            echo '<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[签名失败]]></return_msg></xml>';
+            die();
+        }
+
+    }
+
+    /**
+     * 退款接口回调
+     */
+    public function actionNotifyReturnAdvance()
+    {
+        //获取商户微信配置
+        $xml = file_get_contents("php://input");
+
+        $wxPatNotify = new \WxPayNotify();
+        $wxPatNotify->Handle(false);
+        $returnValues = $wxPatNotify->GetValues();
+        $result = $wxPatNotify->FromXml($xml);
+
+        if (!empty($result['return_code']) && $result['return_code'] == 'SUCCESS') {
+            $wxmodel = new SystemWxConfigModel();
+            $res = $wxmodel->find(['miniprogram_id' => $result['appid']]);
+            if ($res['status'] != 200) {
+                return false;
+            }
+            $app = Factory::payment(json_decode($res['data']['miniprogram_pay'], true));
+            $response = $app->handleRefundedNotify(function ($message, $reqInfo, $fail) {
+                // 其中 $message['req_info'] 获取到的是加密信息
+                // $reqInfo 为 message['req_info'] 解密后的信息
+                if ($reqInfo['refund_status'] == 'SUCCESS') {
+                    $advanceOrder = new AdvanceOrderModel();
+                    $res = $advanceOrder->do_update(['sale_order_sn' => $reqInfo['out_trade_no']], ['status' => 2]);
+                    if ($res['status'] == 200) { // 如果订单不存在 或者 订单已经退过款了
+                        return true; // 告诉微信，我已经处理完了，订单没找到，别再通知我了
+                    }
+                } else {
+                    return true;
+                }
+                return true; // 返回 true 告诉微信“我已处理完成”                // 或返回错误原因 $fail('参数格式校验错误');
+            });
+        }
+    }
+
+    public function actionNotify2()
+    {
+        //获取商户微信配置
+        $xml = file_get_contents("php://input");
+        $wxPatNotify = new \WxPayNotify();
+        $wxPatNotify->Handle(false);
+        $returnValues = $wxPatNotify->GetValues();
+        $result = $wxPatNotify->FromXml($xml);
+        if (!empty($result['result_code']) && $result['result_code'] == 'SUCCESS') {
+            //商户逻辑处理，如订单状态更新为已支付
+            $out_trade_no = $result['out_trade_no'];
+            //检测订单是否是拼团订单 是的话订单状态11
+            $groupAccModel = new ShopAssembleAccessModel();
+            $groupWhere['order_sn'] = $result['out_trade_no'];
+            $groupInfo = $groupAccModel->one($groupWhere);
+            $orderModel = new OrderModel;
+            $orderRes = $orderModel->findList(['transaction_order_sn' => $result['out_trade_no']]);
+            $num = 1;
+            if ($orderRes['status'] == 200) {
+                $num = count($orderRes['data']);
+            }
+            for ($l = 0; $l < $num; $l++) {
+                $status = 1;
+                if ($groupInfo['status'] == 200) {
+                    $status = 11;
+                } else {
+                    if ($orderRes['data'][$l]['service_goods_status'] == 1) {
+                        $status = 3;
+                    }
+                }
+                $orderData = array(
+                    'transaction_order_sn' => $result['out_trade_no'],
+                    'status' => $status,
+                );
+
+                $orderRs['status'] = 200;
+                $orderRs['data'] = $orderRes['data'][$l];
+                $result['out_trade_no'] = $orderRes['data'][$l]['order_sn'];
+                $orderModel->update($orderData);
+            }
+
+            //分销redis 队列
+            //商品库存 redis 队列
+            //团长佣金 队列
+
+            ob_clean();
+            echo "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
+            die();
+        } else {
+            echo '<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[签名失败]]></return_msg></xml>';
+            die();
+        }
+
+    }
+
+
 }

@@ -3,6 +3,7 @@
 namespace app\controllers\shop;
 
 use app\models\merchant\app\AppAccessModel;
+use app\models\shop\ShopGoodsModel;
 use app\models\tuan\LeaderModel;
 use yii;
 use yii\db\Exception;
@@ -79,7 +80,7 @@ class ContactController extends ShopController
             $params = $request->bodyParams; //获取body传参
             $model = new ContactModel();
             //设置类目 参数
-            $must = ['name', 'phone', 'address', 'longitude', 'latitude', 'loction_address'];
+            $must = ['name', 'phone', 'province', 'city', 'area', 'address'];
             $rs = $this->checkInput($must, $params);
             if ($rs != false) {
                 return $rs;
@@ -88,19 +89,34 @@ class ContactController extends ShopController
             if (isset($params['is_default'])) {
                 $params['is_default'] == false ? 0 : 1;
             }
+            $appAccess = new AppAccessModel();
+            $app = $appAccess->find(['`key`' => 'ccvWPn']);
+            if ($app['status'] == 200) {
+                if ($app['data']['is_location'] == 1 && ($params['longitude'] == 0 && $params['latitude'] == 0)) {
+                    return result(500, '请定位坐标地址！');
+                }
+            }
             $params['merchant_id'] = yii::$app->session['merchant_id'];
             $params['user_id'] = yii::$app->session['user_id'];
+//            if ($params['longitude']!=0 &&$params['latitude']!=0) {
+//                $url = "https://restapi.amap.com/v3/geocode/regeo?output=json&location={$params['longitude']},{$params['latitude']}&key=bc55956766e813d3deb1f95e45e97d73&poitype=&radius=1000&extensions=all&batch=true&roadlevel=0";
+//                $address = json_decode(curlGet($url), true);
+//                if ($address['status'] == 0) {
+//                    return result(500, $address['info']);
+//                }
+//                $params['province'] = $address['regeocodes'][0]['addressComponent']['province'];
+//                $params['city'] = is_array($address['regeocodes'][0]['addressComponent']['city']) ? $address['regeocodes'][0]['addressComponent']['province'] : $address['regeocodes'][0]['addressComponent']['city'];
+//                $params['area'] = is_array($address['regeocodes'][0]['addressComponent']['district']) ? $address['regeocodes'][0]['addressComponent']['city'] : $address['regeocodes'][0]['addressComponent']['district'];
+//            }
 
-            $url = "https://restapi.amap.com/v3/geocode/regeo?output=json&location={$params['longitude']},{$params['latitude']}&key=bc55956766e813d3deb1f95e45e97d73&poitype=&radius=1000&extensions=all&batch=true&roadlevel=0";
-
-            $address = json_decode(curlGet($url), true);
-
-            if ($address['status'] == 0) {
-                return result(500, $address['info']);
+            if ($params['city'] == "") {
+                $params['city'] = $params['province'];
             }
-            $params['province'] = $address['regeocodes'][0]['addressComponent']['province'];
-            $params['city'] = is_array($address['regeocodes'][0]['addressComponent']['city']) ? "" : $address['regeocodes'][0]['addressComponent']['city'];
-            $params['area'] = is_array($address['regeocodes'][0]['addressComponent']['district']) ? "" : $address['regeocodes'][0]['addressComponent']['district'];
+
+            if ($params['area'] == "") {
+                $params['area'] = $params['city'];
+            }
+
 
             $array = $model->add($params);
             return $array;
@@ -131,17 +147,25 @@ class ContactController extends ShopController
                 if (isset($params['is_default'])) {
                     $params['is_default'] == false ? 0 : 1;
                 }
-                $url = "https://restapi.amap.com/v3/geocode/regeo?output=json&location={$params['longitude']},{$params['latitude']}&key=bc55956766e813d3deb1f95e45e97d73&poitype=&radius=1000&extensions=all&batch=true&roadlevel=0";
-
-                $address = json_decode(curlGet($url), true);
-
-                if ($address['status'] == 0) {
-                    return result(500, $address['info']);
+                $appAccess = new AppAccessModel();
+                $app = $appAccess->find(['`key`' => 'ccvWPn']);
+                if ($app['status'] == 200) {
+                    if ($app['data']['is_location'] == 1 && ($params['longitude'] == 0 && $params['latitude'] == 0)) {
+                        return result(500, '请定位坐标地址！');
+                    }
                 }
-                $params['province'] = $address['regeocodes'][0]['addressComponent']['province'];
-                $params['city'] = is_array($address['regeocodes'][0]['addressComponent']['city']) ? "" : $address['regeocodes'][0]['addressComponent']['city'];
-                $params['area'] = is_array($address['regeocodes'][0]['addressComponent']['district']) ? "" : $address['regeocodes'][0]['addressComponent']['district'];
+                if ($params['longitude'] != 0 && $params['latitude'] != 0) {
+                    $url = "https://restapi.amap.com/v3/geocode/regeo?output=json&location={$params['longitude']},{$params['latitude']}&key=bc55956766e813d3deb1f95e45e97d73&poitype=&radius=1000&extensions=all&batch=true&roadlevel=0";
 
+                    $address = json_decode(curlGet($url), true);
+
+                    if ($address['status'] == 0) {
+                        return result(500, $address['info']);
+                    }
+                    $params['province'] = $address['regeocodes'][0]['addressComponent']['province'];
+                    $params['city'] = is_array($address['regeocodes'][0]['addressComponent']['city']) ? "" : $address['regeocodes'][0]['addressComponent']['city'];
+                    $params['area'] = is_array($address['regeocodes'][0]['addressComponent']['district']) ? "" : $address['regeocodes'][0]['addressComponent']['district'];
+                }
                 if ($params['is_default'] == 1) {
                     $data['is_default'] = 0;
                     $data['`key`'] = yii::$app->session['key'];
@@ -264,7 +288,16 @@ class ContactController extends ShopController
             if ($temp['status'] != 200) {
                 return $temp;
             }
-
+            $ids = json_decode($params['ids'], true);
+            if (count($ids) == 1) {
+                $goodsModel = new ShopGoodsModel();
+                $goods = $goodsModel->do_one(['id' => $ids[0]]);
+                if ($goods['status'] == 200) {
+                    if ($goods['data']['is_parcel'] == 1) {
+                        return result(200, "请求成功", '0');
+                    }
+                }
+            }
             $type = $temp['data']['type'];
             $templateModel = new ShopExpressTemplateDetailsModel();
             //寄件 寄重
@@ -347,6 +380,7 @@ class ContactController extends ShopController
                     $data['searchName'] = "全国统一运费";
                     $kdf = $kdmb->find($data);
                 }
+
                 if ($weight <= $kdf['data']['first_num']) {
                     $price = $kdf['data']['first_price'];
                 } else {
@@ -414,6 +448,17 @@ class ContactController extends ShopController
             $temp = $model->find(['status' => 1, 'supplier_id' => $supplierId, 'merchant_id' => yii::$app->session['merchant_id'], '`key`' => yii::$app->session['key']]);
             if ($temp['status'] != 200) {
                 return $temp;
+            }
+
+            $ids = json_decode($params['ids'], true);
+            if (count($ids) == 1) {
+                $goodsModel = new ShopGoodsModel();
+                $goods = $goodsModel->do_one(['id' => $ids[0]]);
+                if ($goods['status'] == 200) {
+                    if ($goods['data']['is_parcel'] == 1) {
+                        return result(200, "请求成功", '0');
+                    }
+                }
             }
 
             $type = $temp['data']['type'];

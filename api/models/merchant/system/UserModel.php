@@ -63,7 +63,7 @@ class UserModel extends TableModel
                 $params["username like '%{$params['searchName']}%'"] = null;
                 unset($params['searchName']);
             }
-          //  $params['orderby'] = "  system_sub_admin.id desc";
+            //  $params['orderby'] = "  system_sub_admin.id desc";
             $params['table'] = $this->tableName;
             $res = $table->tableList($params);
             $app = $res['app'];
@@ -295,17 +295,21 @@ class UserModel extends TableModel
             if (isset($params['password'])) {
                 if ($params['password'] != "") {
                     $data['password'] = md5($params['password'] . $params['salt']);
-                    $sql = "update wolive_service set password = '{$data['password']}' where user_name = '{$data['username']}'";
-                    Yii::$app->db->createCommand($sql)->execute();
+                    //     $sql = "update wolive_service set password = {$data['password']} where user_name = {$data['username']}";
+                    //     Yii::$app->db->createCommand($sql)->execute();
                 }
             }
 
             //开始事务
-            $transaction = Yii::$app->db->beginTransaction();
 
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                if(isset($params['group_id'])){
+                    $res = $table->tableUpdate('shop_auth_group_access', ['group_ids' => $params['group_id']], ['uid' => $params['id']]);
+                }
                 $table->tableUpdate($this->tableName, $data, $where);
                 $transaction->commit(); //只有执行了commit(),对于上面数据库的操作才会真正执行
-            try {   } catch (\Exception $e) {
+            } catch (\Exception $e) {
                 $transaction->rollBack(); //回滚
                 return result(500, '更新失败');
             }
@@ -352,14 +356,14 @@ class UserModel extends TableModel
      * @param array|null $params
      * @throws Exception if the model cannot be found
      * @return array
-     * 修改门店小票自动打印开关
+     * 修改门店易联云配置信息
      */
     public function ylyupdate($params)
     {
         $where = ['id' => $params['id']];
         $table = new TableModel();
         $data = [
-            'yly_print' => $params['yly_print'],
+            'yly_config' => isset($params['yly_config']) ? $params['yly_config'] : '',
             'update_time' => time()
         ];
         $table->tableUpdate($this->tableName, $data, $where);

@@ -78,6 +78,7 @@ class LoginController extends Controller {
                     'status' => 200,
                     'message' => '请求成功',
                     'data' => $token,
+                    'sid'=>$res['id'],
                     'name' => $res['username'],
                     'key' => $res['key'],
                     'rule' => $res['type'],

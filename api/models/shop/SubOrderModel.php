@@ -52,8 +52,10 @@ class SubOrderModel extends TableModel {
         }
         //返回数据 时间格式重置
         for ($i = 0; $i < count($app); $i++) {
-            $app[$i]['create_time'] = date('Y-m-d H:i:s', $app[$i]['create_time']);
-            if ($app[$i]['update_time'] != "") {
+            if (isset($app[$i]['create_time']) && $app[$i]['create_time'] != "") {
+                $app[$i]['create_time'] = date('Y-m-d H:i:s', $app[$i]['create_time']);
+            }
+            if (isset($app[$i]['update_time']) && $app[$i]['update_time'] != "") {
                 $app[$i]['update_time'] = date('Y-m-d H:i:s', $app[$i]['update_time']);
             }
         }

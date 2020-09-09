@@ -4,9 +4,12 @@ namespace app\controllers\merchant\shop;
 
 use app\models\core\Base64Model;
 use app\models\shop\GoodsModel;
+use app\models\shop\GroupOrderModel;
 use app\models\shop\ShopAssembleModel;
 use app\models\shop\ShopGoodsModel;
 use app\models\shop\StockModel;
+use app\models\system\SystemMerchantMiniSubscribeTemplateAccessModel;
+use app\models\system\SystemMerchantMiniSubscribeTemplateModel;
 use Yii;
 use app\models\shop\AssembleRecordModel;
 use app\models\shop\ShopAssembleAccessModel;
@@ -261,6 +264,13 @@ class AssembleController extends MaterialController{
             //修改商品表拼团状态
             $goodsModel = new GoodsModel();
             $goodsData['id'] = $params['id'];
+            $goodsInfo = $goodsModel->findOne($goodsData);
+            if ($goodsInfo['status'] != 200){
+                return result(204, "未查询到商品信息");
+            }
+            if ($goodsInfo['data']['is_flash_sale'] == '1' || $goodsInfo['data']['is_bargain'] == '1' || $goodsInfo['data']['is_advance_sale'] == '1'){
+                return result(500, "商品已开启其他活动");
+            }
             $goodsData['is_open_assemble'] = $params['is_open_assemble'];
             $array = $goodsModel->update($goodsData);
 
@@ -379,6 +389,94 @@ class AssembleController extends MaterialController{
             $assembleWhere['id'] = $id;
             $array = $assembleModel->do_delete($assembleWhere);
             return $array;
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
+
+    public function actionGroupOrder($id){
+        if (yii::$app->request->isPut) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->bodyParams; //获取body传参
+            $must = ['key'];
+            $rs = $this->checkInput($must, $params);
+            if ($rs != false) {
+                return json_encode($rs, JSON_UNESCAPED_UNICODE);
+            }
+
+            $model = new ShopAssembleAccessModel();
+            $where['shop_assemble_access.key'] = $params['key'];
+            $where['shop_assemble_access.merchant_id'] = yii::$app->session['uid'];
+            $where['or'] = ['or',['=', 'shop_assemble_access.id', $id],['=', 'shop_assemble_access.leader_id', $id]];
+            $groupOrders= $model->do_select($where);
+
+            if($groupOrders['status']==200){
+                $bool = true;
+                for($i=0;$i<count($groupOrders['data']);$i++){
+                    $orderModel = new GroupOrderModel();
+                    $res =$orderModel->do_update(['order_sn'=>$groupOrders['data'][$i]['order_sn'],'status'=>11],['status'=>1]);
+                    if($res['status']!=200){
+                        $bool = false;
+                        break;
+                    }
+                }
+
+                //拼团成功生成订阅消息记录
+                $assembleOrderModel = new GroupOrderModel();
+                $assembleOrderWhere['field'] = "shop_order_group.order_sn,shop_assemble_access.id as assemble_id,shop_assemble_access.price,shop_assemble_access.number,shop_assemble_access.expire_time,shop_user.mini_open_id";
+                $assembleOrderWhere['join'] = [];
+                $assembleOrderWhere['join'][] = ['left join', 'shop_assemble_access', 'shop_assemble_access.order_sn = shop_order_group.order_sn'];
+                $assembleOrderWhere['join'][] = ['left join', 'shop_user', 'shop_user.id = shop_order_group.user_id'];
+                $assembleOrderWhere['or'][] = 'or';
+                foreach ($groupOrders['data'] as $tak => $tav) {
+                    $assembleOrderWhere['or'][] = ['=', 'shop_order_group.order_sn', $tav['order_sn']];
+                }
+                $subscribeTempModel = new SystemMerchantMiniSubscribeTemplateModel();
+                $subscribeTempInfo = $subscribeTempModel->do_one(['template_purpose' => 'assemble']);
+                $assembleOrder = $assembleOrderModel->do_select($assembleOrderWhere);
+                if ($assembleOrder['status'] == 200) {
+                    foreach ($assembleOrder['data'] as $aok => $aov) {
+                        if ($subscribeTempInfo['status'] == 200) {
+                            $accessParams = array(
+                                'amount2' => ['value' => $aov['price']],  //支付金额
+                                'number3' => ['value' => $aov['number']],    //成团人数
+                                'time4' => ['value' => date('Y-m-d h:i:s', $aov['expire_time'])],   //结束时间
+                            );
+                            if ($bool==false){
+                                $accessParams['thing5'] = ['value' => '拼团失败'];   //拼团进度
+                            }else{
+                                $accessParams['thing5'] = ['value' => '拼团成功'];   //拼团进度
+                            }
+                            $subscribeTempAccessModel = new SystemMerchantMiniSubscribeTemplateAccessModel();
+                            $subscribeTempAccessData = array(
+                                'key' => $params['key'],
+                                'merchant_id' => yii::$app->session['uid'],
+                                'mini_open_id' => $aov['mini_open_id'],
+                                'template_id' => $subscribeTempInfo['data']['template_id'],
+                                'number' => '0',
+                                'template_params' => json_encode($accessParams, JSON_UNESCAPED_UNICODE),
+                                'template_purpose' => 'assemble',
+                                'page' => "/pages/spellGroup/okGroup/okGroup?order_sn={$aov['order_sn']}&id={$aov['assemble_id']}",
+                                'status' => '-1',
+                            );
+                            if ($bool==false){
+                                $subscribeTempAccessData['page'] = "/pages/spellGroup/errGroup/errGroup?order_sn={$aov['order_sn']}&id={$aov['assemble_id']}";
+                            }else{
+                                $subscribeTempAccessData['page'] = "/pages/spellGroup/okGroup/okGroup?order_sn={$aov['order_sn']}&id={$aov['assemble_id']}";
+                            }
+                            $subscribeTempAccessModel->do_add($subscribeTempAccessData);
+                        }
+                    }
+                }
+
+                if($bool==false){
+                    return result(500,'成团失败');
+                }else{
+                    return result(200,'成团成功');
+                }
+            }else{
+                return result(500,'成团失败');
+            }
         } else {
             return result(500, "请求方式错误");
         }

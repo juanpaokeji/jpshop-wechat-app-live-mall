@@ -178,7 +178,7 @@ class BalanceAccessController extends ShopController {
                     'attach' => 'balance',
                     'out_trade_no' => $id,
                     'total_fee' => $accessInfo['data']['money'] * 100,
-                    'notify_url' => "https://".$_SERVER['SERVER_NAME']."/api/web/index.php/pay/balance-access/notify",
+                    'notify_url' => "https://".$_SERVER['HTTP_HOST']."/api/web/index.php/pay/balance-access/notify",
                     'trade_type' => 'JSAPI',
                 );
                 if ($params['pay_type'] == 1) {
@@ -205,7 +205,7 @@ class BalanceAccessController extends ShopController {
                 $mini_pay->setTerminal_time(date("YmdHis"));
                 $mini_pay->setTotal_fee($accessInfo['data']['money'] * 100);
                 $mini_pay->setOpen_id($userData['data']['mini_open_id']);
-                $mini_pay->setNotify_url("https://".$_SERVER['SERVER_NAME']."/api/web/index.php/pay/balance-access/notify-sao-bei");
+                $mini_pay->setNotify_url("https://".$_SERVER['HTTP_HOST']."/api/web/index.php/pay/balance-access/notify-sao-bei");
                 $pay_pre = Payx::miniPayRe($mini_pay, $config['saobei_access_token']);
                 if ($pay_pre->return_code == "01" && $pay_pre->result_code == "01") {
                     $saobei_payinfo = [

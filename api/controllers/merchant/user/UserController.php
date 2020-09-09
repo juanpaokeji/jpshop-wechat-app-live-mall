@@ -2,6 +2,8 @@
 
 namespace app\controllers\merchant\user;
 
+use app\models\merchant\distribution\DistributionAccessModel;
+use app\models\shop\BalanceModel;
 use yii;
 use yii\web\MerchantController;
 use yii\db\Exception;
@@ -307,9 +309,40 @@ class UserController extends MerchantController
             }
             $array = $userModel->findall($params);
             if ($array['status'] == 200) {
+                //总佣金
+                $model = new DistributionAccessModel();
+                $where['field'] = 'shop_distribution_access.uid,sum(shop_distribution_access.money) as total_money';
+                $where['shop_distribution_access.key'] = $params['`key`'];
+                $where['join'][] = ['inner join', 'shop_user', 'shop_user.id = shop_distribution_access.uid'];
+                $where['groupBy'] = 'uid';
+                $totalInfo = $model->do_select($where);
+                //已提现佣金
+                $balanceModel = new BalanceModel();
+                $balanceWhere['field'] = 'shop_user_balance.uid,sum(shop_user_balance.money) as cash_out';
+                $balanceWhere['shop_user_balance.type'] = 0;
+                $balanceWhere['shop_user_balance.order_sn'] = 0;
+                $balanceWhere['shop_user_balance.content'] = '分销佣金提现';
+                $balanceWhere['join'][] = ['inner join', 'shop_user', 'shop_user.id = shop_user_balance.uid'];
+                $cashOutInfo = $balanceModel->do_select($balanceWhere);
                 for ($i = 0; $i < count($array['data']); $i++) {
                     $array['data'][$i]['reg_time'] = $array['data'][$i]['reg_time'] == 0 ? "" : date('Y-m-d H:i:s', $array['data'][$i]['reg_time']);
                     $array['data'][$i]['check_time'] = $array['data'][$i]['check_time'] == 0 ? "" : date('Y-m-d H:i:s', $array['data'][$i]['check_time']);
+                    $array['data'][$i]['total_money'] = 0;
+                    $array['data'][$i]['cash_out'] = 0;
+                    if ($totalInfo['status'] == 200){
+                        foreach ($totalInfo['data'] as $k=>$v){
+                            if ($v['uid'] == $array['data'][$i]['id']){
+                                $array['data'][$i]['total_money'] = $v['total_money'];
+                            }
+                        }
+                    }
+                    if ($cashOutInfo['status'] == 200){
+                        foreach ($cashOutInfo['data'] as $k=>$v){
+                            if ($v['uid'] == $array['data'][$i]['id']){
+                                $array['data'][$i]['cash_out'] = $v['cash_out'];
+                            }
+                        }
+                    }
                 }
             }
             return $array;
@@ -317,4 +350,32 @@ class UserController extends MerchantController
             return result(500, "请求方式错误");
         }
     }
+
+    public function actionSubordinate($id){
+        if (yii::$app->request->isGet) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->get(); //获取地址栏参数
+
+            $must = ['key'];
+            //设置类目 参数
+            $rs = $this->checkInput($must, $params);
+            if ($rs != false) {
+                return $rs;
+            }
+
+            $userModel = new \app\models\shop\UserModel();
+            if (isset($params['key'])) {
+                $params['`key`'] = $params['key'];
+                unset($params['key']);
+            }
+            $params['parent_id'] = $id;
+            unset($params['id']);
+            $array = $userModel->findall($params);
+
+            return $array;
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
+
 }

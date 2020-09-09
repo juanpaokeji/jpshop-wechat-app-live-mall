@@ -3,7 +3,10 @@
 namespace app\controllers\shop;
 
 use app\models\merchant\app\SystemAppAccessModel;
+use app\models\merchant\user\LevelModel;
+use app\models\merchant\vip\UnpaidVipModel;
 use app\models\shop\GroupOrderModel;
+use app\models\tuan\LeaderModel;
 use yii;
 use yii\web\ShopController;
 use yii\db\Exception;
@@ -297,6 +300,14 @@ class UserController extends ShopController
                     $userinfo['data']['is_leader'] = false;
                 } else {
                     $userinfo['data']['is_leader'] = true;
+                    $levelModel = new LevelModel();
+                    $level=$levelModel->do_one(['id'=>$userinfo['data']['leader_level']]);
+                    if($level['status']==200){
+                        $userinfo['data']['level_name'] = $level['data']['name'];
+                    }else{
+                        $userinfo['data']['level_name'] = "团长";
+                    }
+
                     $leaderModel = new \app\models\tuan\LeaderModel();
                     $leader = $leaderModel->do_one(['uid' => yii::$app->session['user_id']]);
                     if ($leader['status'] == 200) {
@@ -310,31 +321,80 @@ class UserController extends ShopController
                     $userinfo['data']['name'] = $res['data']['name'];
                     $userinfo['data']['phone'] = $res['data']['phone'];
                 }
-                $vipModel = new \app\models\merchant\vip\VipConfigModel();
-                $vip = $vipModel->one(['key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['merchant_id']]);
-                if ($vip['status'] == 200) {
-                    $userinfo['data']['is_vip_config'] = true;
-                    $userinfo['data']['discount_ratio'] = $vip['data']['discount_ratio'];
-                    $vipAccessModel = new \app\models\shop\VipAccessModel();
-                    $vipAccess = $vipAccessModel->one(['key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['merchant_id']]);
 
-                    if ($vipAccess['status'] == 200) {
-                        $vipM = new \app\models\merchant\vip\VipModel();
-                        $vipd = $vipM->one(['key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['merchant_id'], 'id' => $vipAccess['data']['vip_id']]);
-                        if ($vipd['status'] == 200) {
-                            $userinfo['data']['vip_name'] = $vipd['data']['name'];
+                $appModel = new \app\models\admin\app\AppAccessModel();
+                $appWhere['`key`'] = yii::$app->session['key'];
+                $appInfo = $appModel->find($appWhere);
+                if ($appInfo['status'] != 200){
+                    return result(500, "未查询到应用信息");
+                }
+                if ($appInfo['data']['user_vip'] == 1){
+                    $vipModel = new \app\models\merchant\vip\VipConfigModel();
+                    $vip = $vipModel->one(['key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['merchant_id']]);
+                    if ($vip['status'] == 200) {
+                        $userinfo['data']['is_vip_config'] = true;
+                        $userinfo['data']['discount_ratio'] = $vip['data']['discount_ratio'];
+                        $vipAccessModel = new \app\models\shop\VipAccessModel();
+                        $vipAccess = $vipAccessModel->one(['key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['merchant_id']]);
+
+                        if ($vipAccess['status'] == 200) {
+                            $vipM = new \app\models\merchant\vip\VipModel();
+                            $vipd = $vipM->one(['key' => yii::$app->session['key'], 'merchant_id' => yii::$app->session['merchant_id'], 'id' => $vipAccess['data']['vip_id']]);
+                            if ($vipd['status'] == 200) {
+                                $userinfo['data']['vip_name'] = $vipd['data']['name'];
+                            }
+                        }
+                    } else {
+                        $userinfo['data']['is_vip_config'] = false;
+                    }
+                    if ($userinfo['data']['is_vip'] == 1 && $userinfo['data']['vip_validity_time'] <= time()) {
+                        $where['id'] = yii::$app->session['user_id'];
+                        $where['`key`'] = yii::$app->session['key'];
+                        $where['is_vip'] = 0;
+                        $user->update($where);
+                        $userinfo['data']['is_vip'] = 0;
+                    }
+                }elseif ($appInfo['data']['user_vip'] == 2){
+                    $vipModel = new UnpaidVipModel();
+                    $vipWhere['key'] = yii::$app->session['key'];
+                    $vipWhere['merchant_id'] = yii::$app->session['merchant_id'];
+                    $vipWhere['limit'] = false;
+                    $vipInfo = $vipModel->do_select($vipWhere);
+
+                    $orderWhere['user_id'] = yii::$app->session['user_id'];
+                    $orderWhere['or'] = ['or',['=','status',6],['=','status',7],['=','status',3]];
+                    $orderWhere['limit'] = false;
+                    $orderWhere['field'] = 'sum(payment_money) as payment_money';
+                    $orderInfo = $orderModel->do_select($orderWhere);
+                    $pay_price = 0;
+                    $userinfo['data']['discount_ratio'] = 1;
+                    $userinfo['data']['vip_name'] = '会员';
+                    if ($orderInfo['status'] == 200){
+                        $pay_price = $orderInfo['data'][0]['payment_money'] == null ? 0 : $orderInfo['data'][0]['payment_money'];
+                    }
+                    if ($vipInfo['status'] == 200){
+                        $minLev = reset($vipInfo['data']);//最低等级
+                        $maxLev = end($vipInfo['data']);//最高等级
+                        //总积分大于等于最高等级
+                        if ($pay_price >= $maxLev['min_score']){
+                            $userinfo['data']['discount_ratio'] = $maxLev['discount_ratio'];
+                            $userinfo['data']['vip_name'] = $maxLev['name'];
+                        }
+                        //总积分在最低和最高之间的
+                        if ($pay_price >= $minLev['min_score'] && $pay_price < $maxLev['min_score']){
+                            foreach ($vipInfo['data'] as $key=>$val){
+                                if ($pay_price >= $val['min_score']){
+                                    $userinfo['data']['discount_ratio'] = $val['discount_ratio'];
+                                    $userinfo['data']['vip_name'] = $val['name'];
+                                }
+                            }
                         }
                     }
-                } else {
+                }else{
+                    $userinfo['data']['is_vip'] = 0;
                     $userinfo['data']['is_vip_config'] = false;
                 }
-                if ($userinfo['data']['is_vip'] == 1 && $userinfo['data']['vip_validity_time'] <= time()) {
-                    $where['id'] = yii::$app->session['user_id'];
-                    $where['`key`'] = yii::$app->session['key'];
-                    $where['is_vip'] = 0;
-                    $user->update($where);
-                    $userinfo['data']['is_vip'] = 0;
-                }
+
             }
             return $userinfo;
         } else {
@@ -430,6 +490,19 @@ class UserController extends ShopController
                 'type' => $user['type'],
                 'create_time' => time(),
             );
+            $appModel = new AppAccessModel();
+            $appInfo = $appModel->find(['key'=>$key]);
+            if ($appInfo['status'] == 200){
+                $distribution = json_decode($appInfo['data']['distribution'], true);
+                if (isset($distribution['user_level_is_open']) && $distribution['user_level_is_open'] == 1){
+                    $data['level'] = $distribution['level'];
+                    $data['up_level'] = $distribution['level'];
+                    if (isset($distribution['level_id'])){
+                        $data['level_id'] = $distribution['level_id'];
+                        $data['up_level_id'] = $distribution['level_id'];
+                    }
+                }
+            }
             if ($user['type'] == 1) {
                 $data['wx_open_id'] = $user['openid'];
             }

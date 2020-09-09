@@ -2,6 +2,7 @@
 
 namespace app\controllers\merchant\system;
 
+
 use yii;
 use yii\web\MerchantController;
 use yii\base\Exception;
@@ -332,5 +333,7 @@ class VipController extends MerchantController {
         $array = result(200, '请求成功', $arr);
         return $array;
     }
+
+
 
 }

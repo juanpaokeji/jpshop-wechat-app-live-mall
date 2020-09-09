@@ -85,6 +85,10 @@ layui.define(function (exports) {
 			coupons: [],//优惠券数组
 			search: '',//查询条件存储
 			bg_color:'#f2f2f2',
+			index_padding: '200px',
+			index_padding_color: '#000000',
+			index_padding_radius: '50%',
+			index_margin_bottom: '150px',
 			ue: '',
 			ues: 0,
 			ids: [],
@@ -723,11 +727,13 @@ layui.define(function (exports) {
 			if (res.status == 200) {
 				$("input[name=name]").val(res.data.name);
 				$(".temSelect").val(res.data.appid);
-				data.pageParam = res.data.info;
+				data.pageParam = res.data.info.map(e => {return{...e, eidt: false}});
 				data.bg_color = res.data.bg_color
-				data.pageParam && data.pageParam.forEach(function (e) {
-					e.edit = false;
-				})
+				data.index_padding = res.data.hasOwnProperty('index_padding') ? res.data.index_padding || '0px' : '0px'
+				data.index_padding_color = res.data.hasOwnProperty('index_padding_color') ? res.data.index_padding_color || '#000000' : '#000000'
+				data.index_padding_radius = res.data.hasOwnProperty('index_padding_radius') ? res.data.index_padding_radius || '0%' : '0%'
+				data.index_margin_bottom = res.data.hasOwnProperty('index_margin_bottom') ? res.data.index_margin_bottom || '0px' : '0px'
+				console.log(data)
 				// if(res.data.is_wx_default == 1 && res.data.is_mini_default == 1){
 				// 	$(".radios input[value=0]").prop("checked","checked")
 				// }else if(res.data.is_wx_default == 1 && res.data.is_mini_default == 0){
@@ -782,6 +788,10 @@ layui.define(function (exports) {
 						is_edit: isEdit,
 						status: '1',
 						bg_color:data.bg_color,
+						index_padding: data.index_padding,
+						index_padding_color: data.index_padding_color,
+						index_padding_radius: data.index_padding_radius,
+						index_margin_bottom: data.index_margin_bottom,
 						key: saa_key,
 						pic_url: canvas2.toDataURL('image/png')
 					};

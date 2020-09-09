@@ -18,6 +18,16 @@ class DiyController extends ShopController {
 
     public $enableCsrfValidation = false; //禁用CSRF令牌验证，可以在基类中设置
 
+    public function behaviors() {
+        return [
+            'token' => [
+                'class' => 'yii\filters\ShopFilter', //调用过滤器
+//                'only' => ['single'],//指定控制器应用到哪些动作
+                'except' => ['single'],//指定控制器不应用到哪些动作
+            ]
+        ];
+    }
+
     /**
      * 地址:/admin/group/index 默认访问
      * @throws Exception if the model cannot be found
@@ -38,7 +48,7 @@ class DiyController extends ShopController {
             $array = $model->do_one($params);
             if ($array['status'] == 200) {
                 $merchantModel = new MerchantDiyConfigModel();
-                $res = $merchantModel->do_one(['system_diy_config_id' => $array['data']['id'], 'merchant_id' => yii::$app->session['merchant_id'], 'key' => yii::$app->session['key']]);
+                $res = $merchantModel->do_one(['system_diy_config_id' => $array['data']['id']]);
                 if ($res['status'] == 200) {
                     return result(200, '请求成功', $res['data']['value']);
                 } else {

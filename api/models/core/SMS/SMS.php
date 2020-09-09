@@ -7,9 +7,12 @@
 
 namespace app\models\core\SMS;
 
+use app\models\admin\system\SystemSmsModel;
+use app\models\core\aliyun\AliSms;
 use app\models\core\TableModel;
 use Qcloud\Sms\SmsSingleSender;
 use Qcloud\Sms\SmsVoiceVerifyCodeSender;
+use Yii;
 use yii\db\Exception;
 use app\models\core\SMS\SendStatusPuller; //自定义查看数据统计类
 
@@ -221,6 +224,46 @@ class SMS {
             }
         } catch (\Exception $e) {
             return result(500, "内部错误");
+        }
+    }
+
+    /**
+     * 指定模板单发（判断短信渠道）
+     *
+     * @param string $phone       手机号
+     * @param int    $templId     模板 id
+     * @param array  $data        模板参数
+     * @param string $sign        签名
+     * @return string 应答json字符串
+     */
+    public function sendSms($phone,$templId,$data = []){
+        $smsModel = new SystemSmsModel();
+        $smsWhere['status'] = 1;
+        $smsInfo = $smsModel->do_one($smsWhere); //查询配置
+        if ($smsInfo['status'] != 200){
+            return result(500, "未查询到配置");
+        }
+        $smsInfo['data']['config'] = json_decode($smsInfo['data']['config'], true);
+
+        //判断短信渠道
+        if ($smsInfo['data']['type'] == 1){ //腾讯云
+            $sender = new SmsSingleSender($smsInfo['data']['config']['appid'], $smsInfo['data']['config']['appkey']);
+            $sendResult = $sender->sendWithParam("86", $phone, $templId, $data, $smsInfo['data']['config']['sign']);
+            $sendRes = json_decode($sendResult, true);
+            if (isset($sendRes['result']) && $sendRes['result'] == 0) {
+                return result(200, "发送成功");
+            } else {
+                $sms_error['result'] = $sendRes['result'];
+                $sms_error['errmsg'] = unicodeDecode($sendRes['errmsg']);
+                file_put_contents(Yii::getAlias('@webroot/') . '/sms_error.text', date('Y-m-d H:i:s') . json_encode($sms_error, JSON_UNESCAPED_UNICODE) . PHP_EOL, FILE_APPEND);
+                return result(500, "发送失败");
+            }
+        }elseif ($smsInfo['data']['type'] == 2){ //阿里云
+            $sender = new AliSms();
+            $sendRes = $sender->sendSms($phone,$smsInfo['data']['config']['sign'],$templId,$data);
+            return $sendRes;
+        }else{
+            return result(500, "短信配置有误");
         }
     }
 

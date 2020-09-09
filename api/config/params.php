@@ -231,6 +231,32 @@ return [
                 "introduce" => "",
                 "proposal" => ''
             ],
+            [
+                "name" => "充值",
+                "url" => "/pages/home/topup/topup",
+                "introduce" => "",
+                "proposal" => ''
+            ],[
+                "name" => "拼团",
+                "url" => "/assemble/list/list",
+                "introduce" => "",
+                "proposal" => ''
+            ],[
+                "name" => "新人专享",
+                "url" => "/newUser/list/list",
+                "introduce" => "",
+                "proposal" => ''
+            ],[
+                "name" => "订单列表",
+                "url" => "/pages/order/order/order",
+                "introduce" => "",
+                "proposal" => ''
+            ],[
+                "name" => "门店首页",
+                "url" => "/supplier/index/index",
+                "introduce" => "",
+                "proposal" => ''
+            ],
 
         ],
         'type_link' => "/pages/goodsClassify/goodsClassify/goodsClassify",

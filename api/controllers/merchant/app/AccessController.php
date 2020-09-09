@@ -4,6 +4,7 @@ namespace app\controllers\merchant\app;
 
 use app\models\merchant\system\OperationRecordModel;
 use app\models\merchant\system\UnitModel;
+use app\models\merchant\user\MerchantModel;
 use app\models\system\PluginModel;
 use yii;
 use yii\web\MerchantController;
@@ -154,12 +155,12 @@ class AccessController extends MerchantController
                 $transaction = Yii::$app->db->beginTransaction();
                 try {
                     $array = $model->update($params);
-                    $serveiceModel = new ServiceModel();
-                    if (!isset($params['pic_url'])) {
-                        $serveiceModel->update(['business_id' => $params['`key`'], 'nick_name' => $params['name']]);
-                    } else {
-                        $serveiceModel->update(['business_id' => $params['`key`'], 'nick_name' => $params['name'], 'avatar' => $params['pic_url']]);
-                    }
+               //     $serveiceModel = new ServiceModel();
+//                    if (!isset($params['pic_url'])) {
+//                        $serveiceModel->update(['business_id' => $params['`key`'], 'nick_name' => $params['name']]);
+//                    } else {
+//                        $serveiceModel->update(['business_id' => $params['`key`'], 'nick_name' => $params['name'], 'avatar' => $params['pic_url']]);
+//                    }
                     $transaction->commit(); //提交
                 } catch (\yii\base\Exception $e) {
                     $transaction->rollBack(); //回滚
@@ -172,7 +173,19 @@ class AccessController extends MerchantController
                     //添加操作记录
                     $operationRecordModel = new OperationRecordModel();
                     $operationRecordData['key'] = $params['`key`'];
-                    $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                    if (isset(yii::$app->session['sid'])) {
+                        $subModel = new \app\models\merchant\system\UserModel();
+                        $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                        if ($subInfo['status'] == 200){
+                            $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                        }
+                    } else {
+                        $merchantModle = new MerchantModel();
+                        $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                        if ($merchantInfo['status'] == 200) {
+                            $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                        }
+                    }
                     $operationRecordData['operation_type'] = '更新';
                     $operationRecordData['operation_id'] = $id;
                     $operationRecordData['module_name'] = '基础设置';
@@ -213,7 +226,19 @@ class AccessController extends MerchantController
                     //添加操作记录
                     $operationRecordModel = new OperationRecordModel();
                     $operationRecordData['key'] = $params['`key`'];
-                    $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                    if (isset(yii::$app->session['sid'])) {
+                        $subModel = new \app\models\merchant\system\UserModel();
+                        $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                        if ($subInfo['status'] == 200){
+                            $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                        }
+                    } else {
+                        $merchantModle = new MerchantModel();
+                        $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                        if ($merchantInfo['status'] == 200) {
+                            $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                        }
+                    }
                     if (isset($params['reduction_info'])) {
                         $operationRecordData['module_name'] = '满减';
                     } elseif (isset($params['is_recruits']) || isset($params['is_recruits_show'])) {
@@ -248,6 +273,7 @@ class AccessController extends MerchantController
             $data['`key`'] = $params['key'];
             $data['supplier_pic_url'] = isset($params['supplier_pic_url']) ? $params['supplier_pic_url'] : "http://".$_SERVER['HTTP_HOST'].'/api/web/uploads/mdhb.png';
             $data['is_show_supplier_goods'] = $params['is_show_supplier_goods'];
+            $data['supplier_sort'] = $params['supplier_sort'];
             $array = $model->update($data);
             return $array;
         } else {
@@ -297,6 +323,7 @@ class AccessController extends MerchantController
                 return json_encode($rs, JSON_UNESCAPED_UNICODE);
             }
             if (isset($params['distribution'])) {
+                $params['distribution_is_open'] = $params['distribution']['distribution_is_open'];
                 $params['distribution'] = json_encode($params['distribution'], JSON_UNESCAPED_UNICODE);
             }
             if (isset($params['key'])) {
@@ -359,6 +386,29 @@ class AccessController extends MerchantController
             return $copyright;
         } else {
             return result(500, "请求方式错误");
+        }
+    }
+
+    public function actionApp(){
+        isset($_SESSION) or session_start();
+        if (!isset($_SESSION['authcode']) || $_SESSION['authcode'] != '25b7fbcf28') {
+            $hosts = $_SERVER['HTTP_HOST'] . '|' . $_SERVER['SERVER_NAME'];
+            $ckret = file_get_contents('http://mf.juanpao.com/check.php?a=index&appsign=2_200813175144427_112f7126_a1c888aa1b2164cf647f289939cf2051&h=' . urlencode($hosts) . '&t=' . $_SERVER['REQUEST_TIME'] . '&token=' . md5($_SERVER['REQUEST_TIME'] . '|' . $hosts . '|xzphp|25b7fbcf28'), false, stream_context_create(array('http' => array('method' => 'GET', 'timeout' => 3))));
+            if ($ckret) {
+                $ckret = json_decode($ckret, true);
+                if ($ckret['status'] != 1) {
+                    //exit($ckret['msg']);
+                    return result(500,'授权检测失败，请联系授权提供商。');
+                } else {
+                    $_SESSION['authcode'] = '25b7fbcf28';
+                    unset($hosts, $ckret);
+                }
+                return result(200,'请求成功');
+            } else {
+                return result(500,'授权检测失败，请联系授权提供商。');
+            }
+        }else{
+            return result(500,'授权检测失败，请联系授权提供商。');
         }
     }
 

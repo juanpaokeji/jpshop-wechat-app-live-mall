@@ -39,12 +39,13 @@ class OrderModel extends TableModel
     {
         //数据库操作
         try {
-            $table = new TableModel();
-            $params['delete_time is null'] = null;
-            $params['table'] = 'shop_order_group';
+        $table = new TableModel();
+        $params['shop_order_group.delete_time is null'] = null;
+        $params['table'] = 'shop_order_group';
 
-            $res = $table->tableList($params);
-            $app = $res['app'];
+        $res = $table->tableList($params);
+        $app = $res['app'];
+
         } catch (Exception $ex) {
             return result(500, '数据库操作失败');
         }
@@ -413,7 +414,6 @@ class OrderModel extends TableModel
 
         try {
             $res = $table->tableList($params);
-
             $app = $res['app'];
         } catch (Exception $ex) {
             return result(500, '数据库操作失败');
@@ -452,14 +452,14 @@ class OrderModel extends TableModel
     public function findSuborder($params)
     {
         //数据库操作
-
+        try {
             $table = new TableModel();
             $params['shop_order.delete_time is null'] = null;
             $params['fields'] = " shop_order.* ";
             $params['table'] = 'shop_order';
             $res = $table->tableList($params);
             $app = $res['app'];
-        try {} catch (Exception $ex) {
+        } catch (Exception $ex) {
             return result(500, '数据库操作失败');
         }
         //返回数据 时间格式重置
@@ -604,7 +604,7 @@ class OrderModel extends TableModel
             return result(500, '数据库操作失败');
         }
         //返回数据 时间格式重置
-        if($app==false){
+        if ($app == false) {
             return result(204, '查询失败');
         }
         $app['create_time'] = date('Y-m-d H:i:s', $app['create_time']);
@@ -684,6 +684,30 @@ class OrderModel extends TableModel
         }
     }
 
+    public function find1($params)
+    {
+
+        $table = new TableModel();
+        //数据库操作
+
+        $params['delete_time is null'] = null;
+
+        try {
+            $app = $table->tableSingle($this->table, $params);
+        } catch (Exception $ex) {
+            return result(500, '数据库操作失败');
+        }
+        if (gettype($app) != 'array') {
+            return result(204, '查询失败');
+        } else {
+            $app['create_time'] = date('Y-m-d H:i:s', $app['create_time']);
+            if ($app['update_time'] != "") {
+                $app['update_time'] = date('Y-m-d H:i:s', $app['update_time']);
+            }
+            return result(200, '请求成功', $app);
+        }
+    }
+
     public function select($where)
     {
 
@@ -739,10 +763,11 @@ class OrderModel extends TableModel
             $orderParams['table'] = 'shop_order';
             $orderParams['order_group_sn'] = $app['order_sn'];
             $orders = $table->tableList($orderParams);
-           // $express = $table->tableSingle('shop_express', ['id' => $orders['app'][0]['express_id']]);
+            // $express = $table->tableSingle('shop_express', ['id' => $orders['app'][0]['express_id']]);
             $company = $table->tableSingle('system_express', ['id' => $orders['app'][0]['express_id']]);
 
             $shopExpress = logistics($orders['app'][0]['express_number'], $company['simple_name']);
+            var_dump($shopExpress);die();
             $shopExpress['mailNo'] = $orders['app'][0]['express_number'];
             $shopExpress['expTextName'] = $company['name'];
             return result(200, '请求成功', $shopExpress);
@@ -827,11 +852,15 @@ class OrderModel extends TableModel
         }
         if (isset($params['transaction_order_sn'])) {
             $where['transaction_order_sn'] = $params['transaction_order_sn'];
-            unset($params['order_sn']);
+            unset($params['transaction_order_sn']);
+        }
+        if (!isset($params['update_time'])) {
+            $params['update_time'] = time();
+
         }
         $where['delete_time is null'] = null;
         //params 参数值设置
-        $params['update_time'] = time();
+        // $params['update_time'] = time();
         //数据库操作
 
         try {
@@ -981,19 +1010,25 @@ class OrderModel extends TableModel
         $params['update_time'] = time();
         //数据库操作
         //1.将主订单状态改为已发货 2.通过主订单id循环将快递信息保存到对应的子订单中
-        $transaction = Yii::$app->db->beginTransaction();
         try {
+            $transaction = Yii::$app->db->beginTransaction();
+
             $express_id = $params['express_id'];
             $express_number = $params['express_number'];
             unset($params['express_id']);
             unset($params['express_number']);
             $params['status'] = 3; //主订单需要修改的状态，改完后删除
+
             if ($type == 2) {
                 $params['tuan_status'] = 1; //若是团购订单还得修改团购状态
+            }
+            if ($express_id == 0) {
+                $params['pick_up_code'] = getPickUpCode();
             }
             $params['after_sale'] = -1; //主订单需要修改的退款状态，改完后删除
             $table = new TableModel();
             $table->tableUpdate($this->table, $params, $where);
+            unset($params['pick_up_code']);
             unset($params['send_express_type']);
             unset($params['supplier_id']);
             unset($params['status']);
@@ -1197,10 +1232,10 @@ class OrderModel extends TableModel
         $order_sn = "";
         for ($i = 0; $i < count($number['app']); $i++) {
             $userNumber[] = $number['app'][$i]['user_id'];
-            if($i==1){
+            if ($i == 1) {
                 $order_sn = $number['app'][$i]['order_sn'];
-            }else{
-                $order_sn = $order_sn.",".$number['app'][$i]['order_sn'];
+            } else {
+                $order_sn = $order_sn . "," . $number['app'][$i]['order_sn'];
             }
         }
         $userNumber = array_unique($userNumber);
@@ -1208,18 +1243,19 @@ class OrderModel extends TableModel
         $params['limit'] = $limit;
         try {
             $orders = $data['app'];
-            $params['fields'] = " shop_order_group.*,shop_goods.property1 as goods_property1,shop_goods.property2 as goods_property2,system_pay.pay_time ,so.name as goodsname,so.goods_id,so.pic_url as goods_url,so.goods_id,so.property1_name,so.property2_name,so.stock_id,so.number,so.total_price as order_total_price,so.price,so.confirm_time,so.send_out_time,so.payment_money as order_payment_money,so.express_id,so.express_number,so.admin_remark ,su.nickname,shop_voucher.price as voucher_price ";
+            $params['fields'] = " shop_order_group.*,shop_goods.property1 as goods_property1,shop_goods.property2 as goods_property2,system_pay.pay_time ,so.name as goodsname,so.goods_id,so.pic_url as goods_url,so.goods_id,so.property1_name,so.property2_name,so.stock_id,so.number,so.total_price as order_total_price,so.price,so.confirm_time,so.send_out_time,so.payment_money as order_payment_money,so.express_id,so.express_number,su.nickname,shop_voucher.price as voucher_price,stl.realname as leader_name,stl.phone as leader_phone,stl.area_name as leader_area,stl.addr as leader_addr ";
             $params['join'] = " inner join shop_order as so ON so.order_group_sn = shop_order_group.order_sn " .
                 " left join shop_user as su ON su.id = shop_order_group.user_id " .
                 " left join shop_voucher on shop_voucher.id=shop_order_group.voucher_id " .
                 " left join system_pay on system_pay.order_id=shop_order_group.order_sn " .
+                " left join shop_tuan_leader as stl on stl.uid=shop_order_group.leader_uid " .
                 " left join shop_goods on shop_goods.id=so.goods_id ";
             unset($params['limit']);
             unset($params['page']);
             unset($params['groupby']);
             $res = $table->tableList($params);
             $app = $res['app'];
-            
+
             $res = array();
 
             for ($j = 0; $j < count($orders); $j++) {
@@ -1243,8 +1279,8 @@ class OrderModel extends TableModel
                         $res[$j]['is_tuan'] = $app[$i]['is_tuan'];
                         $res[$j]['order_sn'] = $app[$i]['order_sn'];
                         $res[$j]['user_id'] = $app[$i]['user_id'];
-                        $res[$j]['express_type'] =$app[$i]['express_type'];
-                        $res[$j]['is_tuan'] =$app[$i]['is_tuan'];
+                        $res[$j]['express_type'] = $app[$i]['express_type'];
+                        $res[$j]['is_tuan'] = $app[$i]['is_tuan'];
                         $res[$j]['user_contact_id'] = $app[$i]['user_contact_id'];
                         $res[$j]['total_price'] = $app[$i]['total_price'];
                         $res[$j]['express_price'] = $app[$i]['express_price'];
@@ -1271,6 +1307,12 @@ class OrderModel extends TableModel
                         $res[$j]['create_time'] = $app[$i]['create_time'] == 0 ? "" : date('Y-m-d H:i:s', $app[$i]['create_time']);
                         $res[$j]['voucher_price'] = $app[$i]['voucher_price'] == null ? 0 : $app[$i]['voucher_price'];
                         $res[$j]['admin_remark'] = $app[$i]['admin_remark'] == null ? "" : $app[$i]['admin_remark'];
+                        $res[$j]['leader_money'] = $app[$i]['leader_money'];
+                        $res[$j]['leader_name'] = $app[$i]['leader_name'];
+                        $res[$j]['leader_phone'] = $app[$i]['leader_phone'];
+                        $res[$j]['leader_area'] = $app[$i]['leader_area'];
+                        $res[$j]['leader_addr'] = $app[$i]['leader_addr'];
+                        $res[$j]['estimated_service_time'] = $app[$i]['estimated_service_time'];
                         $order['name'] = $app[$i]['goodsname'];
                         $order['goods_id'] = $app[$i]['goods_id'];
                         $order['pic_url'] = $app[$i]['goods_url'];

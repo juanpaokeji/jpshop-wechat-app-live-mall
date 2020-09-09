@@ -300,6 +300,11 @@ class VipController extends MerchantController {
             $model = new UnpaidVipModel();
             $params['merchant_id'] = yii::$app->session['uid'];
             $array = $model->do_select($params);
+            if ($array['status'] == 200){
+                foreach ($array['data'] as $k=>$v){
+                    $array['data'][$k]['discount_ratio'] = intval($v['discount_ratio'] * 100);
+                }
+            }
             return $array;
         } else {
             return result(500, "请求方式错误");
@@ -325,6 +330,9 @@ class VipController extends MerchantController {
             $model = new UnpaidVipModel();
             $params['merchant_id'] = yii::$app->session['uid'];
             $array = $model->do_one($params);
+            if ($array['status'] == 200){
+                $array['data']['discount_ratio'] = intval($array['data']['discount_ratio'] * 100);
+            }
             return $array;
         } else {
             return result(500, "请求方式错误");
@@ -341,7 +349,7 @@ class VipController extends MerchantController {
             $params = $request->bodyParams; //获取body传参
             $model = new UnpaidVipModel();
             //设置类目 参数
-            $must = ['key', 'name', 'min_score', 'discount_ratio', 'voucher_count', 'voucher_type_id', 'score_times'];
+            $must = ['key', 'name', 'min_score', 'discount_ratio'];
             $rs = $this->checkInput($must, $params);
             if ($rs != false) {
                 return $rs;
@@ -353,6 +361,9 @@ class VipController extends MerchantController {
             $info = $model->do_one($where);
             if ($info['status'] == 200){
                 return result(500, "该会员等级已存在");
+            }
+            if(isset($params['discount_ratio'])){
+                $params['discount_ratio'] = $params['discount_ratio']/100;
             }
             $array = $model->do_add($params);
             if ($array['status'] == 200){
@@ -393,7 +404,9 @@ class VipController extends MerchantController {
             unset($params['key']);
             $where['merchant_id'] = yii::$app->session['uid'];
             $where['id'] = $id;
-
+            if(isset($params['discount_ratio'])){
+                $params['discount_ratio'] = $params['discount_ratio']/100;
+            }
             $transaction = yii::$app->db->beginTransaction();
             try {
                 $array = $model->do_update($where,$params);
@@ -538,6 +551,22 @@ class VipController extends MerchantController {
             }
 
             return $res;
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
+
+    public function actionVip(){
+        if (yii::$app->request->isGet) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->get(); //获取地址栏参数
+            $model = new VipAccessModel();
+            $params['field'] = ' shop_vip_access.*,shop_user.nickname,shop_user.avatar,shop_vip.name as vip_name';
+            $params['join'][] = ['inner join ','shop_user','shop_user.id=user_id'];
+            $params['join'][] = ['left join ','shop_vip','shop_vip.id=vip_id'];
+            $params['shop_vip_access.status'] = 1;
+            $array = $model->do_select($params);
+            return $array;
         } else {
             return result(500, "请求方式错误");
         }

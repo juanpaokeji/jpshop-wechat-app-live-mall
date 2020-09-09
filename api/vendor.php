@@ -27,7 +27,6 @@ function vendorBool(){
         echo(json_encode(array('status'=>500,'message'=>'请求成功')));
         die();
     }else{
-
         echo(json_encode(array('status'=>200,'message'=>'请求成功')));
         die();
     }

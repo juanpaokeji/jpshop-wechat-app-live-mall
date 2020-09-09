@@ -48,7 +48,9 @@ class ShopGoodsModel extends CommonModel {
      */
     public function do_select($params) {
         //数据库操作
-        $params['orderby'] = "id desc";
+        if (!isset($params['orderby'])){
+            $params['orderby'] = "id desc";
+        }
         $params['count'] = true;
         $res = $this->get_list($params);
         if (empty($res)) {

@@ -2,6 +2,7 @@
 
 namespace app\controllers\tuan;
 
+use app\models\core\TableModel;
 use app\models\merchant\app\AppAccessModel;
 use app\models\merchant\distribution\AgentModel;
 use app\models\merchant\distribution\OperatorModel;
@@ -81,6 +82,7 @@ class UserController extends ShopController
             $data['state'] = 0;
             $data['limit'] = false;
             $leader = $leaderModel->do_select($data);
+
             $str = "";
             for ($i = 0; $i < count($leader['data']); $i++) {
                 //https://restapi.amap.com/v3/distance?origins=116.481028,39.989643|114.481028,39.989643|115.481028,39.989643&destination=114.465302,40.004717&output=xml&key=<用户的key>
@@ -90,20 +92,27 @@ class UserController extends ShopController
                     $str = $str . "|" . $leader['data'][$i]['longitude'] . "," . $leader['data'][$i]['latitude'];
                 }
             }
+
             $str = str_replace(";","|",bd_amap($str)); //将百度坐标转为高德坐标
             $url = "https://restapi.amap.com/v3/distance?origins=" . $str . "&destination=" . $params['longitude'] . "," . $params['latitude'] . "&type=0&output=json&key=bc55956766e813d3deb1f95e45e97d73";
             $map = json_decode(curlGet($url), true);
+
             if ($map['status'] != 1) {
                 return result(500, '距离计算错误');
             }
-            for ($i = 0; $i < count($leader['data']); $i++) {
+            $count = count($leader['data']);
+
+            for ($i = 0; $i < $count; $i++) {
                 $leader['data'][$i]['avatar'] = ShopUserModel::instance()->get_value2(['id' => $leader['data'][$i]['uid']], 'avatar') ?? '';
                 $leader['data'][$i]['juli'] = $map['results'][$i]['distance']/1000;
+
                 if($leader['data'][$i]['juli']>$res['data']['leader_range']){
+
                     unset($leader['data'][$i]);
                 }
 
             }
+
             $leader['data'] = array_values($leader['data']);
             // 定义一个随机的数组
 
@@ -719,11 +728,11 @@ class UserController extends ShopController
                 $leader['data']['avatar'] = $data['data']['avatar'];
             }
 
-            $sql = "select count(id) as num  from shop_order_group where leader_uid = {$data['data']['leader_uid']} group by user_id ";
+            $sql = "select count(id) as num  from shop_order_group where leader_uid = {$leader['data']['uid']} group by user_id ";
             $res = $userModel->querySql($sql);
             $leader['data']['fans'] =$res[0]['num'];
 
-            $sql = "select sum(payment_money) as num  from shop_order_group where leader_uid = {$data['data']['leader_uid']}";
+            $sql = "select sum(payment_money) as num  from shop_order_group where leader_uid = {$leader['data']['uid']}";
             $res = $userModel->querySql($sql);
             $leader['data']['leader_money'] =floor($res[0]['num']*10);
 
@@ -908,7 +917,7 @@ class UserController extends ShopController
         $operatorInfo = $operatorModel->do_select($operatorWhere);
         if (isset($operatorInfo['data'])) {
             foreach ($operatorInfo['data'] as $k => $v) {
-                if ($v['fan_number_buy'] <= $total[0]['total'] && $v['fan_number'] <= $data['fan_number'] && $v['secondhand_fan_number'] <= $data['secondhand_fan_number']) {
+                if ((int)$v['fan_number_buy'] <= $total[0]['total'] && $v['fan_number'] <= $data['fan_number'] && $v['secondhand_fan_number'] <= $data['secondhand_fan_number']) {
                     $data['level'] = $userInfo['data']['level'];
                     $data['level_id'] = $userInfo['data']['level_id'];
                     $data['up_level'] = 3;
@@ -926,7 +935,7 @@ class UserController extends ShopController
         $agentInfo = $agentModel->do_select($agentWhere);
         if (isset($agentInfo['data'])) {
             foreach ($agentInfo['data'] as $k => $v) {
-                if ($v['fan_number_buy'] <= $total[0]['total'] && $v['fan_number'] <= $data['fan_number'] && $v['secondhand_fan_number'] <= $data['secondhand_fan_number']) {
+                if ((int)$v['fan_number_buy'] <= $total[0]['total'] && $v['fan_number'] <= $data['fan_number'] && $v['secondhand_fan_number'] <= $data['secondhand_fan_number']) {
                     $data['level'] = $userInfo['data']['level'];
                     $data['level_id'] = $userInfo['data']['level_id'];
                     $data['up_level'] = 2;
@@ -955,6 +964,50 @@ class UserController extends ShopController
             $data['leader_uid'] = $id;
             $array = $model->update($data);
             return $array;
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
+
+    public function actionTuanCenter(){
+        if (yii::$app->request->isGet) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->get(); //获取地址栏参数
+            $model = new LeaderModel();
+            $tableModel = new TableModel();
+            $user_id = yii::$app->session['user_id'];
+            $startTime = strtotime(date('Y-m-d'),time());
+            $endTime = time();// 0=待付款 1=待发货 2=已取消(24小时未支付) 3=已发货 4=已退款 5=退款中 6=待评价 7=已完成(评价后)  8=已删除  9一键退款  11=拼团中
+            //今日销售额、订单、收入
+            $sql = "select sum(payment_money)as money ,count(id) as number,sum(leader_money) as leader_money from shop_order_group where leader_uid = {$user_id} and  create_time >{$startTime} and create_time <{$endTime} and status in  (1,3,6,7)";
+            $a = $tableModel->querySql($sql);
+            $array['data']['today_money'] = $a[0]['money'] == null ? 0 : $a[0]['money'];
+            $array['data']['today_number'] = $a[0]['number'] == null ? 0 : $a[0]['number'];
+            $array['data']['today_leader_money'] = $a[0]['leader_money'] == null ? 0 : $a[0]['leader_money'];
+            //总销售额、订单、收入
+            $sql = "select sum(payment_money)as money ,count(id) as number,sum(leader_money) as leader_money from shop_order_group where leader_uid = {$user_id}  and status in  (1,3,6,7)";
+            $b = $tableModel->querySql($sql);
+            $array['data']['total_money'] = $b[0]['money'] == null ? 0 : $b[0]['money'];
+            $array['data']['total_number'] = $b[0]['number'] == null ? 0 : $b[0]['number'];
+            $array['data']['total_leader_money'] = $b[0]['leader_money'] == null ? 0 : $b[0]['leader_money'];
+            //待结算
+            $sql = "select sum(money)as money from shop_user_balance where uid = {$user_id}  and status =0 and  type = 1";
+            $c = $tableModel->querySql($sql);
+            $array['data']['stay_settlement'] = $c[0]['money'] == null ? 0 : $c[0]['money'];
+            //待发货
+            $sql = "select count(id) as number from shop_order_group where leader_uid = {$user_id}  and status =1";
+            $d = $tableModel->querySql($sql);
+            $array['data']['stay_delivery_goods'] = $d[0]['number'] == null ? 0 : $d[0]['number'];
+            //待收货
+            $sql = "select count(id) as number from shop_order_group where leader_uid = {$user_id}  and status =3 and  tuan_status = 1 and  is_tuan = 1";
+            $e = $tableModel->querySql($sql);
+            $array['data']['stay_receipt'] = $e[0]['number'] == null ? 0 : $e[0]['number'];
+            //代取货
+            $sql = "select count(id) as number from shop_order_group where leader_uid = {$user_id}  and status =3 and  tuan_status = 1 and  is_tuan = 2";
+            $f = $tableModel->querySql($sql);
+            $array['data']['stay_take_delivery'] = $f[0]['number'] == null ? 0 : $f[0]['number'];
+
+            return  result(200, "请求成功",$array['data']);
         } else {
             return result(500, "请求方式错误");
         }

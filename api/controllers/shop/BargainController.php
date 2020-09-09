@@ -12,6 +12,9 @@ use app\models\shop\OrderModel;
 use app\models\shop\SaleGoodsModel;
 use app\models\shop\ShopBargainInfoModel;
 use app\models\shop\StockModel;
+use app\models\shop\UserModel;
+use app\models\system\SystemMerchantMiniSubscribeTemplateAccessModel;
+use app\models\system\SystemMerchantMiniSubscribeTemplateModel;
 use yii;
 use yii\db\Exception;
 use yii\web\ShopController;
@@ -28,7 +31,8 @@ class BargainController extends ShopController
 
     public $enableCsrfValidation = false; //禁用CSRF令牌验证，可以在基类中设置
 
-    public function behaviors() {
+    public function behaviors()
+    {
         return [
             'token' => [
                 'class' => 'yii\filters\ShopFilter', //调用过滤器
@@ -61,7 +65,7 @@ class BargainController extends ShopController
                     $one = $model->do_one(['orderby' => 'id desc', 'promoter_user_id' => $array['data'][$i]['promoter_user_id'], 'promoter_sn' => $array['data'][$i]['promoter_sn']]);
 
                     $array['data'][$i]['goods_price'] = sprintf("%.2f", $one['data']['goods_price']);
-                    if (time() > $array['data'][$i]['end_time']) {
+                    if (time() < $array['data'][$i]['end_time']) {
                         $array['data'][$i]['time'] = date('H:i:s', $array['data'][$i]['end_time'] - time());
                     } else {
                         $array['data'][$i]['time'] = "";
@@ -81,38 +85,42 @@ class BargainController extends ShopController
             $request = yii::$app->request; //获取 request 对象
             $params = $request->get(); //获取地址栏参数
 
-            $goodsModel= new SaleGoodsModel();
-            $params['is_bargain'] =1;
+            $goodsModel = new SaleGoodsModel();
+            $params['is_bargain'] = 1;
+            $params['status'] = 1;
             $goods = $goodsModel->do_select($params);
+            if($goods['status']!=200){
+                return $goods;
+            }
             $tableModel = new TableModel();
-            for($i=0;$i<count($goods['data']);$i++){
-                $goods['data'][$i]['pic_urls'] =  explode(",",substr($goods['data'][$i]['pic_urls'],0,strlen($goods['data'][$i]['pic_urls'])-1));
-                $goods['data'][$i]['format_bargain_start_time'] =date('Y-m-d H:i:s', $goods['data'][$i]['bargain_start_time']);
-                $goods['data'][$i]['format_bargain_end_time'] =date('Y-m-d H:i:s', $goods['data'][$i]['bargain_end_time']);
+            for ($i = 0; $i < count($goods['data']); $i++) {
+                $goods['data'][$i]['pic_urls'] = explode(",",$goods['data'][$i]['pic_urls']);
+                $goods['data'][$i]['format_bargain_start_time'] = date('Y-m-d H:i:s', $goods['data'][$i]['bargain_start_time']);
+                $goods['data'][$i]['format_bargain_end_time'] = date('Y-m-d H:i:s', $goods['data'][$i]['bargain_end_time']);
                 $sql = "select avatar  from shop_order inner join  shop_order_group on  shop_order_group.order_sn = shop_order.order_group_sn inner join shop_user on shop_order_group.user_id = shop_user.id where goods_id = {$goods['data'][$i]['id']} and is_bargain = 1";
                 $res = $tableModel->querySql($sql);
 
-                if(count($res)==0){
+                if (count($res) == 0) {
                     $sql1 = "select avatar  from shop_user order by rand()  limit 0,3";
                     $res1 = $tableModel->querySql($sql1);
-                    $goods['data'][$i]['avatar'][] =$res1[0]['avatar'];
-                    $goods['data'][$i]['avatar'][] =$res1[1]['avatar'];
-                    $goods['data'][$i]['avatar'][] =$res1[2]['avatar'];
-                }else{
-                    $goods['data'][$i]['avatar'][] =$res[0]['avatar'];
-                    $goods['data'][$i]['avatar'][] =isset($res[1])?$res[1]['avatar']:"";
-                    $goods['data'][$i]['avatar'][] =isset($res[2])?$res[1]['avatar']:"";
+                    $goods['data'][$i]['avatar'][] = $res1[0]['avatar'];
+                    $goods['data'][$i]['avatar'][] = $res1[1]['avatar'];
+                    $goods['data'][$i]['avatar'][] = $res1[2]['avatar'];
+                } else {
+                    $goods['data'][$i]['avatar'][] = $res[0]['avatar'];
+                    $goods['data'][$i]['avatar'][] = isset($res[1]) ? $res[1]['avatar'] : "";
+                    $goods['data'][$i]['avatar'][] = isset($res[2]) ? $res[1]['avatar'] : "";
                 }
             }
 
             $appModel = new AppAccessModel();
             $app = $appModel->find(['`key`' => $params['key']]);//bargain_rotation
 
-            if($goods['status']==200){
-                $array['status']=200;
-                $array['message']="请求成功";
+            if ($goods['status'] == 200) {
+                $array['status'] = 200;
+                $array['message'] = "请求成功";
                 $array['data']['goods'] = $goods['data'];
-                $array['data']['pic_url'] = explode(",",substr($app['data']['bargain_rotation'],0,strlen($app['data']['bargain_rotation'])-1));
+                $array['data']['pic_url'] = explode(",", substr($app['data']['bargain_rotation'], 0, strlen($app['data']['bargain_rotation']) - 1));
             }
             return $array;
         } else {
@@ -132,7 +140,7 @@ class BargainController extends ShopController
             $params['is_promoter'] = 1;
             $params['id'] = $id;
 //            $array = $model->do_one($params);//非发起人查询不到数据
-            $array = $model->do_one(['id'=>$id]);
+            $array = $model->do_one(['id' => $id]);
 
             $appModel = new AppAccessModel();
             $app = $appModel->find(['`key`' => $params['`key`']]);
@@ -169,10 +177,10 @@ class BargainController extends ShopController
             $res['avatar'] = $avatar[0]['avatar'];
             $res['bargain_poster'] = $app['data']['bargain_poster'];
             $res['goods_name'] = $goods['data']['name'];
-            $res['format_bargain_start_time'] =date('Y-m-d H:i:s', $goods['data']['bargain_start_time']);
-            $res['format_bargain_end_time'] =date('Y-m-d H:i:s', $goods['data']['bargain_end_time']);
+            $res['format_bargain_start_time'] = date('Y-m-d H:i:s', $goods['data']['bargain_start_time']);
+            $res['format_bargain_end_time'] = date('Y-m-d H:i:s', $goods['data']['bargain_end_time']);
             $res['pic_url'] = $stock['data']['pic_url'];
-            $res['number'] =(int)$goods['data']['fictitious_initiate_bargain'] +(int)$num[0]['num'];
+            $res['number'] = (int)$goods['data']['fictitious_initiate_bargain'] + (int)$num[0]['num'];
             $res['stock_id'] = $stock['data']['id'];
             $res['property1_name'] = $stock['data']['property1_name'];
             $res['property2_name'] = $stock['data']['property2_name'];
@@ -231,10 +239,10 @@ class BargainController extends ShopController
             $goodsModel = new SaleGoodsModel();
             $goods = $goodsModel->do_one(['id' => $data['goods_id']]);
 
-            if($goods['data']['bargain_start_time']>time()){
+            if ($goods['data']['bargain_start_time'] > time()) {
                 return result(500, '砍价活动未开始');
             }
-            if($goods['data']['bargain_end_time']<time()){
+            if ($goods['data']['bargain_end_time'] < time()) {
                 return result(500, '砍价活动已结束');
             }
 
@@ -324,21 +332,28 @@ class BargainController extends ShopController
                 }
 
                 for ($i = 0; $i < count($json['bargain_price']); $i++) {
-
                     if ($json['bargain_price'][$i] <= $one['data']['goods_price']) {
                         $num = sprintf("%.2f", rand($json['bargain_min'][$i], $json['bargain_max'][$i]));
                         if ($num != $json['bargain_max'][$i]) {
                             $num = sprintf("%.2f", $num + lcg_value());
                         }
-                        if($goods['data']['bargain_price']>=$one['data']['goods_price']-$num){
-                            $num = $goods['data']['bargain_price'];
+                        if ($goods['data']['bargain_price'] >= ($one['data']['goods_price'] - $num)) {
+                            $num = $one['data']['goods_price']-$goods['data']['bargain_price'];
+
                         }
-                        if($info['data']['bargain_price']<=$one['data']['goods_price']-$num){
-                            $num = $one['data']['goods_price']-$num;
-                        }
+
                     }
                 }
+                if($num==0){
+                    $num = sprintf("%.2f", rand($json['bargain_min'][0], $json['bargain_max'][0]));
+                    if ($num != $json['bargain_max'][0]) {
+                        $num = sprintf("%.2f", $num + lcg_value());
+                    }
+                    if ($goods['data']['bargain_price'] >= ($one['data']['goods_price'] - $num)) {
+                        $num = $one['data']['goods_price']-$goods['data']['bargain_price'];
 
+                    }
+                }
                 $data['price'] = $num;
                 $data['promoter_sn'] = $info['data']['promoter_sn'];
                 $data['promoter_user_id'] = $info['data']['promoter_user_id'];
@@ -347,6 +362,37 @@ class BargainController extends ShopController
 
                 $array = $model->do_add($data);
                 if ($array['status'] == 200) {
+                    //当前帮砍到最低价时，订阅消息通知分享人
+                    if ($goods['data']['bargain_price'] >= $data['goods_price']) {
+                        $userModel = new UserModel();
+                        $userInfo = $userModel->find(['id' => $info['data']['promoter_user_id']]);
+                        if (mb_strlen($goods['data']['name'], 'utf-8') > 20) {
+                            $goodsName = mb_substr($goods['data']['name'], 0, 17, 'utf-8') . '...'; //商品名超过20个汉字截断
+                        } else {
+                            $goodsName = $goods['data']['name'];
+                        }
+                        $subscribeTempModel = new SystemMerchantMiniSubscribeTemplateModel();
+                        $subscribeTempInfo = $subscribeTempModel->do_one(['template_purpose' => 'bargain']);
+                        $accessParams = array(
+                            'thing1' => ['value' => '已砍至最低价'],  //砍价结果
+                            'thing2' => ['value' => '商品砍价'],    //活动名称
+                            'thing5' => ['value' => '点击支付底价完成订单'],   //温馨提示
+                            'thing6' => ['value' => $goodsName],   //商品名称
+                        );
+                        $subscribeTempAccessModel = new SystemMerchantMiniSubscribeTemplateAccessModel();
+                        $subscribeTempAccessData = array(
+                            'key' => yii::$app->session['key'],
+                            'merchant_id' => yii::$app->session['merchant_id'],
+                            'mini_open_id' => $userInfo['data']['mini_open_id'],
+                            'template_id' => $subscribeTempInfo['data']['template_id'],
+                            'number' => '0',
+                            'template_params' => json_encode($accessParams, JSON_UNESCAPED_UNICODE),
+                            'template_purpose' => 'bargain',
+                            'page' => "/bargaining/pages/buyDetail/buyDetail?id={$id}",
+                            'status' => '-1',
+                        );
+                        $subscribeTempAccessModel->do_add($subscribeTempAccessData);
+                    }
                     return result(200, "请求成功", $data['price']);
                 }
                 return $array;

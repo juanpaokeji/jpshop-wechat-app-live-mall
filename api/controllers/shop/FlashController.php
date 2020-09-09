@@ -26,6 +26,11 @@ class FlashController extends ShopController {
      * 秒杀活动组
      */
 
+
+    public function actionTest(){
+        $mpdf=new \PDFlib();
+        $mpdf->useAdobeCJK = true;
+    }
     public function actionGroup() {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
@@ -87,7 +92,7 @@ class FlashController extends ShopController {
             yii::$app->session['merchant_id'] =13;
             yii::$app->session['key']= 'ccvWPn';
             $model = new FlashSaleModel();
-            $array = $model->do_select(['flash_sale_group_id' => $group['data']['id']]);
+            $array = $model->do_select(['flash_sale_group_id' => $group['data']['id'],'limit'=>false]);
 //                if ($array['status'] == 200) {
 //                    $group['data'][$i]['sale'] = $array['data'];
 //                } else {
@@ -130,21 +135,22 @@ class FlashController extends ShopController {
                 $group['data']['goods'][$j]['name'] = $goods['data']['name'];
                 $group['data']['goods'][$j]['flash_number'] = $goods['data']['stocks'];
                 $group['data']['goods'][$j]['is_top'] = $goods['data']['is_top'];
-                $group['data']['goods'][$j]['line_price'] = $goods['data']['line_price'];
+                $group['data']['goods'][$j]['line_price'] = $ptgoods['data']['line_price'];
                 $group['data']['goods'][$j]['property'] = $array['data'][$j]['property'];
                 $group['data']['goods'][$j]['short_name'] = $ptgoods['data']['short_name'];
-                $sql = "select sum(number)as number  from shop_order where goods_id = " . $array['data'][$j]['goods_id'] . " and  create_time >= {$start_time} and  create_time <= {$end_time} ";
+                $sql = "select sum(number)as number  from shop_order  LEFT JOIN shop_order_group ON shop_order_group.order_sn = order_group_sn where goods_id = " . $array['data'][$j]['goods_id'] . " and  (shop_order.create_time >= {$start_time} and  shop_order.create_time <= {$end_time}) and shop_order_group.status in (1,3,6,7) ";
                 $number = yii::$app->db->createCommand($sql)->queryAll();
 
                 $group['data']['goods'][$j]['sold'] = $number[0]['number'] == null ? 0 : $number[0]['number'];
                 if ($group['data']['goods'][$j]['sold'] == 0) {
-                    $group['data']['goods'][$j]['percentage'] = 100;
+                    $group['data']['goods'][$j]['percentage'] = 0;
                 } else {
 
                     if ($array['data'][$j]['stocks'] - $goods['data'][$j]['sold'] == 0) {
-                        $group['data']['goods'][$j]['percentage'] = 0;
+                        $group['data']['goods'][$j]['percentage'] = 100;
                     } else {
-                        $group['data']['goods'][$j]['percentage'] = floor((($array['data'][$j]['stocks'] - $group['data']['goods'][$j]['sold']) / $array['data'][$j]['stocks']) * 100);
+                        //$group['data']['goods'][$j]['percentage'] = $array['data'][$j]['stocks'];
+                        $group['data']['goods'][$j]['percentage'] = floor(($group['data']['goods'][$j]['sold'] / $array['data'][$j]['stocks']) * 100);
                     }
                 }
             }

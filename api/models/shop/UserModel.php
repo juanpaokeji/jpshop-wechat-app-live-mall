@@ -39,10 +39,10 @@ class UserModel extends TableModel {
         try {
             $params['shop_user.delete_time is null'] = null;
             $params['table'] = $this->table;
-            $params['orderby'] = " id desc ";
+            $params['orderby'] = " shop_user.id desc ";
             if (isset($params['searchName'])) {
                 $params['searchName'] = trim($params['searchName']);
-                $params["name like '%{$params['searchName']}%'"] = null;
+                $params["nickname like '%{$params['searchName']}%'"] = null;
                 unset($params['searchName']);
             }
             $res = $table->tableList($params);
@@ -96,6 +96,9 @@ class UserModel extends TableModel {
         }
         if (isset($params['nickname'])) {
             $where['nickname'] = $params['nickname'];
+        }
+        if (isset($params['parent_id'])) {
+            $where['parent_id'] = $params['parent_id'];
         }
         $where['delete_time is null'] = null;
         try {

@@ -38,7 +38,9 @@ class CategoryController extends SupplierController {
                 unset($params['key']);
             }
             $params['supplier_id'] = yii::$app->session['sid'];
+            $params['parent_id'] = 0;
             $array = $model->findall($params);
+
             if ($array['status'] != 200) {
                 return $array;
             }
@@ -48,7 +50,8 @@ class CategoryController extends SupplierController {
                     $data[] = $array['data'][$i];
                 }
             }
-
+            unset($params['parent_id']);
+            $array = $model->findall($params);
             for ($i = 0; $i < count($data); $i++) {
                 $data[$i]['data'] = array();
                 for ($j = 0; $j < count($array['data']); $j++) {
@@ -57,7 +60,7 @@ class CategoryController extends SupplierController {
                     }
                 }
             }
-            
+
 
             return ['status' => 200, 'message' => '请求成功', 'data' => $data, 'count' => count($data)];
         } else {

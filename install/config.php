@@ -8,7 +8,7 @@ return array(
 		//系统powered
 		'powered'=>'Powered by juanpao.com',
 		//系统脚部信息
-		'footerInfo'=> 'Copyright © 2012-2013 juanpao.com Corporation',
+		'footerInfo'=> 'Copyright © 2016-2020 juanpao.com Corporation',
 
 		/* ------站点------ */
 		//数据库文件

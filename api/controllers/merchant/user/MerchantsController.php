@@ -15,11 +15,13 @@ use app\models\admin\user\SystemAccessModel;
  * @throws Exception if the model cannot be found
  * @return array
  */
-class MerchantsController extends MerchantController {
+class MerchantsController extends MerchantController
+{
 
     public $enableCsrfValidation = false; //禁用CSRF令牌验证，可以在基类中设置
 
-    public function actionList() {
+    public function actionList()
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request;
             $params = $request->get(); //获取地址栏参数
@@ -31,7 +33,8 @@ class MerchantsController extends MerchantController {
         }
     }
 
-    public function actionSingle() {
+    public function actionSingle()
+    {
 
         if (yii::$app->request->isGet) {
             $request = yii::$app->request; //获取 request 对象
@@ -45,7 +48,8 @@ class MerchantsController extends MerchantController {
         }
     }
 
-    public function actionAdd() {
+    public function actionAdd()
+    {
         $request = yii::$app->request; //获取 request 对象
         $params = $request->bodyParams; //获取body传参
         $merchant = new MerchantModel();
@@ -120,7 +124,8 @@ class MerchantsController extends MerchantController {
         }
     }
 
-    public function actionWx($id) {
+    public function actionWx($id)
+    {
         if (yii::$app->request->isGet) {
             $request = yii::$app->request;
             $params = $request->get(); //获取地址栏参数
@@ -131,7 +136,8 @@ class MerchantsController extends MerchantController {
         }
     }
 
-    public function actionAli($id) {
+    public function actionAli($id)
+    {
         $request = yii::$app->request; //获取 request 对象
         $params = $request->get(); //获取地址栏参数
         $merchant = new MerchantModel();
@@ -140,7 +146,8 @@ class MerchantsController extends MerchantController {
         return $array;
     }
 
-    public function actionUpdate() {
+    public function actionUpdate()
+    {
         $request = yii::$app->request; //获取 request 对象
         $params = $request->bodyParams; //获取body传参
         $merchant = new MerchantModel();
@@ -152,21 +159,24 @@ class MerchantsController extends MerchantController {
                 if ($params['password'] == "") {
                     unset($params['password']);
                 } else {
-                    $res = $merchant->find($params);
-                    if($res['status']!=200){
+                    $res = $merchant->find(['id'=>yii::$app->session['uid']]);
+                    if ($res['status'] != 200) {
                         return $res;
                     }
-                    if($res['data']['password']!=md5($params['old'].$res['data']['salt'])){
-                        return result(500,'原密码不正确');
+                    if ($res['data']['password'] != md5($params['old'] . $res['data']['salt'])) {
+                        return result(500, '原密码不正确');
                     }
-                    $salt = $this->get_randomstr(32);
-                    $params['password'] = md5($params['password'] . $salt);
-                    $params['salt'] = $salt;
-                    unset($params['old']);
-                    unset($params['confirm_new']);
+                    if (isset($params['confirm_new']) && isset($params['old'])) {
+                        $salt = $this->get_randomstr(32);
+                        $params['password'] = md5($params['password'] . $salt);
+                        $params['salt'] = $salt;
+                        unset($params['old']);
+                        unset($params['confirm_new']);
+                    }
+
                     $array = $merchant->update($params);
                 }
-            }else if (isset($params['group_id'])) {
+            } else if (isset($params['group_id'])) {
                 $access = new SystemAccessModel();
                 $transaction = yii::$app->db->beginTransaction();
                 try {
@@ -192,7 +202,8 @@ class MerchantsController extends MerchantController {
         return $array;
     }
 
-    public function actionUpdatewx($id) {
+    public function actionUpdatewx($id)
+    {
         $request = yii::$app->request; //获取 request 对象
         $params = $request->bodyParams; //获取地址栏参数
         $merchant = new MerchantModel();
@@ -238,7 +249,8 @@ class MerchantsController extends MerchantController {
         return $array;
     }
 
-    public function actionUpdateali($id) {
+    public function actionUpdateali($id)
+    {
         $request = yii::$app->request; //获取 request 对象
         $params = $request->bodyParams; //获取地址栏参数
         $merchant = new MerchantModel();
@@ -270,7 +282,8 @@ class MerchantsController extends MerchantController {
         return $array;
     }
 
-    public function actionDelete($id) {
+    public function actionDelete($id)
+    {
 
         $request = yii::$app->request; //获取 request 对象
         $params = $request->get(); //获取地址栏参数
@@ -283,7 +296,8 @@ class MerchantsController extends MerchantController {
         }
     }
 
-    public function actionSecret($id) {
+    public function actionSecret($id)
+    {
         if (yii::$app->request->isPut) {
             $merchant = new MerchantModel();
             $params['id'] = $id;

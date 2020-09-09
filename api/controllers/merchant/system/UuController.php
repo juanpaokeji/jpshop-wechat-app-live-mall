@@ -2,6 +2,7 @@
 
 namespace app\controllers\merchant\system;
 
+use app\models\merchant\user\MerchantModel;
 use yii;
 use yii\web\MerchantController;
 use app\models\merchant\system\UuAccountModel;
@@ -80,7 +81,19 @@ class UuController extends MerchantController {
                     //添加操作记录
                     $operationRecordModel = new OperationRecordModel();
                     $operationRecordData['key'] = $params['key'];
-                    $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                    if (isset(yii::$app->session['sid'])) {
+                        $subModel = new \app\models\merchant\system\UserModel();
+                        $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                        if ($subInfo['status'] == 200){
+                            $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                        }
+                    } else {
+                        $merchantModle = new MerchantModel();
+                        $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                        if ($merchantInfo['status'] == 200) {
+                            $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                        }
+                    }
                     $operationRecordData['operation_type'] = '更新';
                     $operationRecordData['operation_id'] = $res['data']['id'];
                     $operationRecordData['module_name'] = 'UU跑腿';
@@ -92,7 +105,19 @@ class UuController extends MerchantController {
                     //添加操作记录
                     $operationRecordModel = new OperationRecordModel();
                     $operationRecordData['key'] = $params['key'];
-                    $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                    if (isset(yii::$app->session['sid'])) {
+                        $subModel = new \app\models\merchant\system\UserModel();
+                        $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                        if ($subInfo['status'] == 200){
+                            $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                        }
+                    } else {
+                        $merchantModle = new MerchantModel();
+                        $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                        if ($merchantInfo['status'] == 200) {
+                            $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                        }
+                    }
                     $operationRecordData['operation_type'] = '新增';
                     $operationRecordData['operation_id'] = $array['data'];
                     $operationRecordData['module_name'] = 'UU跑腿';
@@ -331,7 +356,19 @@ class UuController extends MerchantController {
                 //添加操作记录
                 $operationRecordModel = new OperationRecordModel();
                 $operationRecordData['key'] = $params['key'];
-                $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                if (isset(yii::$app->session['sid'])) {
+                    $subModel = new \app\models\merchant\system\UserModel();
+                    $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                    if ($subInfo['status'] == 200){
+                        $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                    }
+                } else {
+                    $merchantModle = new MerchantModel();
+                    $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                    if ($merchantInfo['status'] == 200) {
+                        $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                    }
+                }
                 $operationRecordData['operation_type'] = '更新';
                 $operationRecordData['operation_id'] = $params['order_sn'];
                 $operationRecordData['module_name'] = '订单管理';
@@ -396,7 +433,19 @@ class UuController extends MerchantController {
                     //添加操作记录
                     $operationRecordModel = new OperationRecordModel();
                     $operationRecordData['key'] = $params['key'];
-                    $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                    if (isset(yii::$app->session['sid'])) {
+                        $subModel = new \app\models\merchant\system\UserModel();
+                        $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                        if ($subInfo['status'] == 200){
+                            $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                        }
+                    } else {
+                        $merchantModle = new MerchantModel();
+                        $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                        if ($merchantInfo['status'] == 200) {
+                            $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                        }
+                    }
                     $operationRecordData['operation_type'] = '更新';
                     $operationRecordData['operation_id'] = $params['order_sn'];
                     $operationRecordData['module_name'] = 'UU订单管理';

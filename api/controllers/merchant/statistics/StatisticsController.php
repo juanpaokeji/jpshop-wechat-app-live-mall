@@ -56,7 +56,7 @@ class StatisticsController extends MerchantController
                     $type = '%m';
                     $days = 12;
                 } else { //按月
-                    $days = cal_days_in_month(CAL_GREGORIAN, $params['month'], $params['year']);
+                    $days = date("t", strtotime($params['year'] . "-" . $params['month']));
                     $date = $this->getMonthFirstAndLast($params['year'], $params['month']);
                     $begin_time = $date['firstDay'];
                     $end_time = $date['lastDay'];
@@ -121,7 +121,7 @@ class StatisticsController extends MerchantController
                     $type = '%m';
                     $days = 12;
                 } else { //按月
-                    $days = cal_days_in_month(CAL_GREGORIAN, $params['month'], $params['year']);
+                    $days = date("t", strtotime($params['year'] . "-" . $params['month']));
                     $date = $this->getMonthFirstAndLast($params['year'], $params['month']);
                     $begin_time = $date['firstDay'];
                     $end_time = $date['lastDay'];
@@ -221,7 +221,7 @@ class StatisticsController extends MerchantController
             $result = $this->getGoodsSales($where, $params['key']);
             $res['status'] = 200;
             $res['message'] = "请求成功";
-            $res['data']=$result;
+            $res['data'] = $result;
             $res['count'] = count($result);
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             return $res;
@@ -332,7 +332,7 @@ class StatisticsController extends MerchantController
             $result = $this->getLeaderSales($where, $params['key']);
             $res['status'] = 200;
             $res['message'] = "请求成功";
-            $res['data']=$result;
+            $res['data'] = $result;
             $res['count'] = count($result);
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             return $res;
@@ -449,7 +449,7 @@ class StatisticsController extends MerchantController
             $result = $this->getUserSales($where, $params['key'], $order_by);
             $res['status'] = 200;
             $res['message'] = "请求成功";
-            $res['data']=$result;
+            $res['data'] = $result;
             $res['count'] = count($result);
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             return $res;
@@ -563,7 +563,7 @@ class StatisticsController extends MerchantController
                 SOG.create_time > {$begin_time} 
                 AND SOG.create_time < {$end_time} 
                 AND SOG.status in(1,3,5,6,7,11)
-                AND SOG.`key` = '$key'
+                AND SOG.`key` = '{$key}'
             GROUP BY
                 time";
         $orderModel = new OrderModel();
@@ -576,9 +576,9 @@ class StatisticsController extends MerchantController
         $result = [];
         foreach ($monthOrDays as $val) {
             if (!array_key_exists($val, $new_data)) {
-                $result[' '.$val] = ['time' => $val, 'money' => '0.00', 'total' => '0', 'cost' => '0.00', 'express_price' => '0.00'];
+                $result[' ' . $val] = ['time' => $val, 'money' => '0.00', 'total' => '0', 'cost' => '0.00', 'express_price' => '0.00'];
             } else {
-                $result[' '.$val] = $new_data[$val];
+                $result[' ' . $val] = $new_data[$val];
             }
         }
         return $result;
@@ -604,7 +604,7 @@ class StatisticsController extends MerchantController
                 SOG.create_time > {$begin_time} 
                 AND SOG.create_time < {$end_time} 
                 AND SOG.status = 4
-                AND SOG.`key` = '$key'
+                AND SOG.`key` = '{$key}'
             GROUP BY
                 time";
         $orderModel = new OrderModel();
@@ -635,19 +635,19 @@ class StatisticsController extends MerchantController
         $where = '';
         if (isset($params['code']) && !empty($params['code'])) {
             $code = $params['code'];
-            $where = " AND SS.code = '$code'";
+            $where .= " AND SS.code = '$code'";
         }
         if (isset($params['name']) && !empty($params['name'])) {
             $name = $params['name'];
-            $where = " AND SS.`name` = '$name'";
+            $where .= " AND SS.`name` like '%$name%'";
         }
         $sql = "SELECT
                     SO.goods_id,
                     SS.`name` goods_name,
                     SS.`pic_url` pic_url,
                     sum( SO.number ) sale_total,
-                    sum( SS.cost_price * SO.number ) cost_price,
-                    sum( SS.price * SO.number ) price_total
+                    sum( SS.cost_price * SO.number ) cost_price, 
+                    sum( SS.price * SO.number ) price_total  
                 FROM
                     shop_order_group AS SOG
                     right JOIN shop_order AS SO ON SO.order_group_sn = SOG.order_sn
@@ -656,9 +656,10 @@ class StatisticsController extends MerchantController
                     SOG.create_time > {$params['begin_time']} 
                     AND SOG.create_time < {$params['end_time']} 
                     AND SOG.`status` IN ( 1, 3, 5, 6, 7, 11 ) 
-                    AND SOG.`key` = '$key' $where
+                    AND SOG.`key` = '{$key}' {$where}
                 GROUP BY
-                    goods_id";
+                    goods_id 
+                ORDER BY price_total DESC";
         $orderModel = new OrderModel();
         $data = $orderModel->querySql($sql);
         return $data;
@@ -684,7 +685,6 @@ class StatisticsController extends MerchantController
                     `shop_tuan_leader`.`realname`,
                     `shop_order_group`.`leader_uid`,
                     `shop_order_group`.`leader_self_uid`,
-                    sum( `shop_order_group`.express_price ) express_price,
                     `shop_tuan_leader`.`area_name` 
                 FROM
                     `shop_order_group`
@@ -716,8 +716,22 @@ class StatisticsController extends MerchantController
                 if ($val['leader_uid']) {
                     $refunds = $this->leaderRefunds($params['begin_time'], $params['end_time'], $val['leader_uid']);
                     $val['refund_money'] = $refunds[0]['refund_money'] ? $refunds[0]['refund_money'] : 0.00;
-                    $refunds = $this->leaderBalance($params['begin_time'], $params['end_time'], $val['leader_self_uid']);
-                    $val['remain_money'] = $refunds[0]['remain_money'] ? $refunds[0]['remain_money'] : 0.00;
+                    $leaderBalance = $this->leaderBalance($params['begin_time'], $params['end_time'], $val['leader_uid']);
+                    $val['remain_money'] =$leaderBalance[0]['remain_money'] ? $leaderBalance[0]['remain_money'] : 0.00;
+                    $expressPrice = $this->leaderExpressPrice($params['begin_time'], $params['end_time'], $val['leader_uid']);
+                    $val['express_price'] = $expressPrice[0]['express_price'] ? $expressPrice[0]['express_price'] : 0.00;
+                }
+            }
+            // 第一层可以理解为从数组中键为0开始循环到最后一个
+            for ($i = 0; $i < count($data); $i++) {
+                // 第二层为从$i+1的地方循环到数组最后
+                for ($j = $i + 1; $j < count($data); $j++) {
+                    // 比较数组中两个相邻值的大小
+                    if ($data[$i]['total_money'] < $data[$j]['total_money']) {
+                        $tem = $data[$i]; // 这里临时变量，存贮$i的值
+                        $data[$i] = $data[$j]; // 第一次更换位置
+                        $data[$j] = $tem; // 完成位置互换
+                    }
                 }
             }
         }
@@ -742,7 +756,7 @@ class StatisticsController extends MerchantController
                 SOG.create_time > {$begin_time} 
                 AND SOG.create_time < {$end_time} 
                 AND SOG.status = 4
-                AND SOG.`leader_uid` = $leader_uid";
+                AND SOG.`leader_uid` = {$leader_uid}";
         $orderModel = new OrderModel();
         return $orderModel->querySql($sql);
     }
@@ -763,8 +777,29 @@ class StatisticsController extends MerchantController
             WHERE
                 SOG.create_time > {$begin_time} 
                 AND SOG.create_time < {$end_time} 
-                AND SOG.type = 3
-                AND SOG.`uid` = $leader_self_uid";
+                AND SOG.type = 1
+                AND SOG.`uid` = {$leader_self_uid}";
+        $orderModel = new OrderModel();
+        return $orderModel->querySql($sql);
+    }
+    /**
+     * 团长运费
+     * @param $begin_time
+     * @param $end_time
+     * @param $leader_self_uid
+     * @return array
+     */
+    function leaderExpressPrice($begin_time, $end_time, $leader_self_uid)
+    {
+        $sql = "SELECT
+                sum( SOG.money ) express_price
+            FROM
+                shop_user_balance AS SOG
+            WHERE
+                SOG.create_time > {$begin_time} 
+                AND SOG.create_time < {$end_time} 
+                AND SOG.type = 6
+                AND SOG.`uid` = {$leader_self_uid}";
         $orderModel = new OrderModel();
         return $orderModel->querySql($sql);
     }
@@ -810,12 +845,11 @@ class StatisticsController extends MerchantController
                     `shop_user`.`phone`,
                 IF
                     ( `shop_user`.`is_vip` = 1, 'VIP会员', '普通会员' ) AS user_level,
-                    SUM( `shop_order`.`number` ) goods_number,
+                    ( select sum(number) from shop_order where shop_order.user_id = shop_order_group.user_id ) goods_number,
                     `shop_user`.`avatar` 
                 FROM
                     `shop_order_group`
                     LEFT JOIN `shop_user` ON shop_user.id = shop_order_group.user_id
-                    LEFT JOIN `shop_order` ON shop_order.order_group_sn = shop_order_group.order_sn 
                 WHERE
                     ( `shop_order_group`.`delete_time` IS NULL ) 
                     AND ( `shop_order_group`.`key` = '$key' ) 

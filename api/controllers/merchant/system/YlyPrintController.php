@@ -7,6 +7,7 @@ use app\models\merchant\app\SystemAppAccessModel;
 use app\models\merchant\system\OperationRecordModel;
 use app\models\merchant\system\YlyPrintModel;
 use app\models\merchant\system\YlyPrintTemplateModel;
+use app\models\merchant\user\MerchantModel;
 use app\models\shop\OrderModel;
 use app\models\tuan\LeaderModel;
 use yii;
@@ -149,14 +150,14 @@ class YlyPrintController extends MerchantController {
                 $content .= str_repeat('*', 14) . "商品" . str_repeat("*", 14);
                 if ($template['goods'] == '1'){
                     $content .= "<table>";
-                    $content .= "<tr><td>商品名称</td><td>数量</td><td>单价</td></tr>";
+                    $content .= "<tr><td>商品名称</td><td>规格</td><td>数量</td><td>单价</td></tr>";
                     foreach ($order['order'] as $k=>$v){
-                        if (strlen($v['name'])>36) {
-                            $goodsname = substr($v['name'],0,36) . '...';
+                        if (strlen($v['name'])>15) {
+                            $goodsname = substr($v['name'],0,15) . '...';
                         } else {
                             $goodsname = $v['name'];
                         }
-                        $content .= "<tr><td>". $goodsname ."</td><td>x". $v['number'] ."</td><td>". $v['price'] ."</td></tr>";
+                        $content .= "<tr><td>". $goodsname ."</td><td>". $v['property1_name'] . ";" . $v['property2_name'] ."</td><td>x". $v['number'] ."</td><td>". $v['price'] ."</td></tr>";
                     }
                     $content .= "</table>";
                 }
@@ -195,11 +196,12 @@ class YlyPrintController extends MerchantController {
                 if ($template['leader_area'] == '1'){
                     $content .= "团长小区:". $order['leader_area'] ."\n";
                 }
+                $content .= str_repeat('*', 32);
                 if ($template['buyer_remark'] == '1'){
-                    $content .= "买家备注:". $order['remark'] ."\n";
+                    $content .= "<FS2>买家:". $order['remark'] ."</FS2>\n";
                 }
                 if ($template['merchant_remark'] == '1'){
-                    $content .= "商家备注:". $order['admin_remark'] ."\n";
+                    $content .= "<FS2>商家:". $order['admin_remark'] ."</FS2>\n";
                 }
                 $param = array(
                     "partner"=>$partner,
@@ -215,7 +217,19 @@ class YlyPrintController extends MerchantController {
                     //添加操作记录
                     $operationRecordModel = new OperationRecordModel();
                     $operationRecordData['key'] = $params['key'];
-                    $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                    if (isset(yii::$app->session['sid'])) {
+                        $subModel = new \app\models\merchant\system\UserModel();
+                        $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                        if ($subInfo['status'] == 200){
+                            $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                        }
+                    } else {
+                        $merchantModle = new MerchantModel();
+                        $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                        if ($merchantInfo['status'] == 200) {
+                            $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                        }
+                    }
                     $operationRecordData['operation_type'] = '更新';
                     $operationRecordData['operation_id'] = $params['order_sn'];
                     $operationRecordData['module_name'] = '订单管理';
@@ -238,7 +252,7 @@ class YlyPrintController extends MerchantController {
                 }
                 if ($template['goods'] == '1'){
                     $content .= str_repeat('*', 14) . "商品" . str_repeat("*", 14);
-                    $content .= '商品名称　　　　数量　　单价　<BR>';
+                    $content .= '商品名称　　　规格　数量　单价<BR>';
                     foreach ($order['order'] as $k=>$v){
                         //排版商品长度
                         if (strlen($v['name'])>15) {
@@ -246,33 +260,34 @@ class YlyPrintController extends MerchantController {
                         } else {
                             $goodsname = $v['name'];
                         }
-                        if(strlen($goodsname) < 21){
-                            $k1 = 21 - strlen($goodsname);
+                        if(strlen($goodsname) < 17){
+                            $k1 = 17 - strlen($goodsname);
                             $kw1 = '';
                             for($q=0;$q<$k1;$q++){
                                 $kw1 .= ' ';
                             }
                             $goodsname = $goodsname.$kw1;
                         }
+                        //排版规格长度
+                        $specs = $v['property1_name'] . ";" . $v['property2_name'];
+                        if (strlen($specs) < 9){
+                            $k2 = 9 - strlen($specs);
+                            $kw2 = '';
+                            for($q=0;$q<$k2;$q++){
+                                $kw2 .= ' ';
+                            }
+                            $specs = $specs.$kw2;
+                        }
                         //排版数量长度
-                        if(strlen($v['number']) < 5){
-                            $k2 = 5 - strlen($v['number']);
+                        if(strlen($v['number']) < 4){
+                            $k2 = 4 - strlen($v['number']);
                             $kw2 = '';
                             for($q=0;$q<$k2;$q++){
                                 $kw2 .= ' ';
                             }
                             $v['number'] = $v['number'].$kw2;
                         }
-                        //排版价格长度
-                        if(strlen($v['price']) < 9){
-                            $k2 = 3 - strlen($v['price']);
-                            $kw3 = '';
-                            for($q=0;$q<$k2;$q++){
-                                $kw3 .= ' ';
-                            }
-                            $v['price'] = $v['price'].$kw3;
-                        }
-                        $content .= $goodsname.$v['number'].$v['price']."<BR>";
+                        $content .= $goodsname.$specs.$v['number'].$v['price']."<BR>";
                     }
                 }
                 $content .= str_repeat('.', 32);
@@ -310,11 +325,12 @@ class YlyPrintController extends MerchantController {
                 if ($template['leader_area'] == '1'){
                     $content .= "团长小区:". $order['leader_area'] ."<BR>";
                 }
+                $content .= str_repeat('*', 32);
                 if ($template['buyer_remark'] == '1'){
-                    $content .= "买家备注:". $order['remark'] ."<BR>";
+                    $content .= "<B>买家:". $order['remark'] ."</B><BR>";
                 }
                 if ($template['merchant_remark'] == '1'){
-                    $content .= "商家备注:". $order['admin_remark'] ."<BR>";
+                    $content .= "<B>商家:". $order['admin_remark'] ."</B><BR>";
                 }
                 $time = time();
                 $user = $array['data']['partner'];
@@ -335,7 +351,19 @@ class YlyPrintController extends MerchantController {
                     //添加操作记录
                     $operationRecordModel = new OperationRecordModel();
                     $operationRecordData['key'] = $params['key'];
-                    $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                    if (isset(yii::$app->session['sid'])) {
+                        $subModel = new \app\models\merchant\system\UserModel();
+                        $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                        if ($subInfo['status'] == 200){
+                            $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                        }
+                    } else {
+                        $merchantModle = new MerchantModel();
+                        $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                        if ($merchantInfo['status'] == 200) {
+                            $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                        }
+                    }
                     $operationRecordData['operation_type'] = '更新';
                     $operationRecordData['operation_id'] = $params['order_sn'];
                     $operationRecordData['module_name'] = '订单管理';
@@ -449,14 +477,14 @@ class YlyPrintController extends MerchantController {
                         $content .= str_repeat('*', 14) . "商品" . str_repeat("*", 14);
                         if ($template['goods'] == '1'){
                             $content .= "<table>";
-                            $content .= "<tr><td>商品名称</td><td>数量</td><td>单价</td></tr>";
+                            $content .= "<tr><td>商品名称</td><td>规格</td><td>数量</td><td>单价</td></tr>";
                             foreach ($order['order'] as $k=>$v){
-                                if (strlen($v['name'])>36) {
-                                    $goodsname = substr($v['name'],0,36) . '...';
+                                if (strlen($v['name'])>15) {
+                                    $goodsname = substr($v['name'],0,15) . '...';
                                 } else {
                                     $goodsname = $v['name'];
                                 }
-                                $content .= "<tr><td>". $goodsname ."</td><td>x". $v['number'] ."</td><td>". $v['price'] ."</td></tr>";
+                                $content .= "<tr><td>". $goodsname ."</td><td>". $v['property1_name'] . ";" . $v['property2_name'] ."</td><td>x". $v['number'] ."</td><td>". $v['price'] ."</td></tr>";
                             }
                             $content .= "</table>";
                         }
@@ -495,11 +523,12 @@ class YlyPrintController extends MerchantController {
                         if ($template['leader_area'] == '1'){
                             $content .= "团长小区:". $order['leader_area'] ."\n";
                         }
+                        $content .= str_repeat('*', 32);
                         if ($template['buyer_remark'] == '1'){
-                            $content .= "买家备注:". $order['remark'] ."\n";
+                            $content .= "<FS2>买家:". $order['remark'] ."</FS2>\n";
                         }
                         if ($template['merchant_remark'] == '1'){
-                            $content .= "商家备注:". $order['admin_remark'] ."\n";
+                            $content .= "<FS2>商家:". $order['admin_remark'] ."</FS2>\n";
                         }
                         $param = array(
                             "partner"=>$partner,
@@ -529,7 +558,7 @@ class YlyPrintController extends MerchantController {
                         }
                         if ($template['goods'] == '1'){
                             $content .= str_repeat('*', 14) . "商品" . str_repeat("*", 14);
-                            $content .= '商品名称　　　　数量　　单价　<BR>';
+                            $content .= '商品名称　　　规格　数量　单价<BR>';
                             foreach ($order['order'] as $k=>$v){
                                 //排版商品长度
                                 if (strlen($v['name'])>15) {
@@ -537,33 +566,34 @@ class YlyPrintController extends MerchantController {
                                 } else {
                                     $goodsname = $v['name'];
                                 }
-                                if(strlen($goodsname) < 21){
-                                    $k1 = 21 - strlen($goodsname);
+                                if(strlen($goodsname) < 17){
+                                    $k1 = 17 - strlen($goodsname);
                                     $kw1 = '';
                                     for($q=0;$q<$k1;$q++){
                                         $kw1 .= ' ';
                                     }
                                     $goodsname = $goodsname.$kw1;
                                 }
+                                //排版规格长度
+                                $specs = $v['property1_name'] . ";" . $v['property2_name'];
+                                if (strlen($specs) < 9){
+                                    $k2 = 9 - strlen($specs);
+                                    $kw2 = '';
+                                    for($q=0;$q<$k2;$q++){
+                                        $kw2 .= ' ';
+                                    }
+                                    $specs = $specs.$kw2;
+                                }
                                 //排版数量长度
-                                if(strlen($v['number']) < 5){
-                                    $k2 = 5 - strlen($v['number']);
+                                if(strlen($v['number']) < 4){
+                                    $k2 = 4 - strlen($v['number']);
                                     $kw2 = '';
                                     for($q=0;$q<$k2;$q++){
                                         $kw2 .= ' ';
                                     }
                                     $v['number'] = $v['number'].$kw2;
                                 }
-                                //排版价格长度
-                                if(strlen($v['price']) < 9){
-                                    $k2 = 3 - strlen($v['price']);
-                                    $kw3 = '';
-                                    for($q=0;$q<$k2;$q++){
-                                        $kw3 .= ' ';
-                                    }
-                                    $v['price'] = $v['price'].$kw3;
-                                }
-                                $content .= $goodsname.$v['number'].$v['price']."<BR>";
+                                $content .= $goodsname.$specs.$v['number'].$v['price']."<BR>";
                             }
                         }
                         $content .= str_repeat('.', 32);
@@ -601,11 +631,12 @@ class YlyPrintController extends MerchantController {
                         if ($template['leader_area'] == '1'){
                             $content .= "团长小区:". $order['leader_area'] ."<BR>";
                         }
+                        $content .= str_repeat('*', 32);
                         if ($template['buyer_remark'] == '1'){
-                            $content .= "买家备注:". $order['remark'] ."<BR>";
+                            $content .= "<B>买家:". $order['remark'] ."</B><BR>";
                         }
                         if ($template['merchant_remark'] == '1'){
-                            $content .= "商家备注:". $order['admin_remark'] ."<BR>";
+                            $content .= "<B>商家:". $order['admin_remark'] ."</B><BR>";
                         }
                         $time = time();
                         $user = $array['data']['partner'];
@@ -701,7 +732,19 @@ class YlyPrintController extends MerchantController {
                 //添加操作记录
                 $operationRecordModel = new OperationRecordModel();
                 $operationRecordData['key'] = $params['key'];
-                $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                if (isset(yii::$app->session['sid'])) {
+                    $subModel = new \app\models\merchant\system\UserModel();
+                    $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                    if ($subInfo['status'] == 200){
+                        $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                    }
+                } else {
+                    $merchantModle = new MerchantModel();
+                    $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                    if ($merchantInfo['status'] == 200) {
+                        $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                    }
+                }
                 $operationRecordData['operation_type'] = '新增';
                 $operationRecordData['operation_id'] = $array['data'];
                 $operationRecordData['module_name'] = '易联云';
@@ -734,7 +777,19 @@ class YlyPrintController extends MerchantController {
                 //添加操作记录
                 $operationRecordModel = new OperationRecordModel();
                 $operationRecordData['key'] = $params['key'];
-                $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                if (isset(yii::$app->session['sid'])) {
+                    $subModel = new \app\models\merchant\system\UserModel();
+                    $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                    if ($subInfo['status'] == 200){
+                        $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                    }
+                } else {
+                    $merchantModle = new MerchantModel();
+                    $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                    if ($merchantInfo['status'] == 200) {
+                        $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                    }
+                }
                 $operationRecordData['operation_type'] = '更新';
                 $operationRecordData['operation_id'] = $id;
                 $operationRecordData['module_name'] = '易联云';
@@ -759,7 +814,19 @@ class YlyPrintController extends MerchantController {
                 //添加操作记录
                 $operationRecordModel = new OperationRecordModel();
                 $operationRecordData['key'] = $params['key'];
-                $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                if (isset(yii::$app->session['sid'])) {
+                    $subModel = new \app\models\merchant\system\UserModel();
+                    $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                    if ($subInfo['status'] == 200){
+                        $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                    }
+                } else {
+                    $merchantModle = new MerchantModel();
+                    $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                    if ($merchantInfo['status'] == 200) {
+                        $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                    }
+                }
                 $operationRecordData['operation_type'] = '删除';
                 $operationRecordData['operation_id'] = $id;
                 $operationRecordData['module_name'] = '易联云';
@@ -792,7 +859,19 @@ class YlyPrintController extends MerchantController {
                 //添加操作记录
                 $operationRecordModel = new OperationRecordModel();
                 $operationRecordData['key'] = $params['key'];
-                $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                if (isset(yii::$app->session['sid'])) {
+                    $subModel = new \app\models\merchant\system\UserModel();
+                    $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                    if ($subInfo['status'] == 200){
+                        $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                    }
+                } else {
+                    $merchantModle = new MerchantModel();
+                    $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                    if ($merchantInfo['status'] == 200) {
+                        $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                    }
+                }
                 $operationRecordData['operation_type'] = '更新';
                 $operationRecordData['operation_id'] = $id;
                 $operationRecordData['module_name'] = '易联云';

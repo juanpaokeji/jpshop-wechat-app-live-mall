@@ -79,13 +79,6 @@ class CommentModel extends TableModel {
             return result(500, '数据库操作失败');
         }
         //返回数据 时间格式重置
-        $num = count($app);
-        for ($i = 0; $i < $num; $i++) {
-            if ($app[$i]['pics_url'] == "") {
-                unset($app[$i]);
-            }
-        }
-        $app = array_values($app);
         for ($i = 0; $i < count($app); $i++) {
             $app[$i]['create_time'] = date('Y-m-d H:i:s', $app[$i]['create_time']);
             if ($app[$i]['update_time'] != "") {

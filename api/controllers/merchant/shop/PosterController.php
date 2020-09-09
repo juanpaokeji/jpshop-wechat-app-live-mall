@@ -4,6 +4,7 @@ namespace app\controllers\merchant\shop;
 
 use app\models\core\UploadsModel;
 use app\models\merchant\system\OperationRecordModel;
+use app\models\merchant\user\MerchantModel;
 use app\models\shop\ShopPosterModel;
 use Yii;
 use yii\web\MerchantController;
@@ -52,11 +53,11 @@ class PosterController extends MerchantController
                 return result(500, "缺少上传文件信息");
             }
             $image_arr = getimagesize($_FILES["file"]['tmp_name']);
-            if($params['type'] == 0 && ($image_arr[0] != 375 || $image_arr[1] != 670)){
-                return result(500, "首页图片尺寸必须是375*670");
+            if($params['type'] == 0 && ($image_arr[0] !=750 || $image_arr[1] !=1340)){
+                return result(500, "首页图片尺寸必须是750*1340");
             }
-            if($params['type'] == 1 && ($image_arr[0] != 375 || $image_arr[1] != 563)){
-                return result(500, "详情页图片尺寸必须是375*563");
+            if($params['type'] == 1 && ($image_arr[0] !=750 || $image_arr[1] !=1126)){
+                return result(500, "详情页图片尺寸必须是750*1126");
             }
             $upload = new UploadsModel('file', "./uploads/poster");
             $uploads = $upload->upload();
@@ -65,7 +66,7 @@ class PosterController extends MerchantController
             }
             $path = $uploads;
             $uploads = ltrim($uploads, '.');
-            $pic_url = 'https://'.$_SERVER['SERVER_NAME'] .'/api/web/' . $uploads;
+            $pic_url = 'https://'.$_SERVER['HTTP_HOST'] .'/api/web/' . $uploads;
             $posterModel = new ShopPosterModel();
             $info = $posterModel->one(['key'=>$params['key'],'type'=>$params['type']]);
             if($info['status'] == 200){
@@ -85,7 +86,19 @@ class PosterController extends MerchantController
                 //添加操作记录
                 $operationRecordModel = new OperationRecordModel();
                 $operationRecordData['key'] = $params['key'];
-                $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                if (isset(yii::$app->session['sid'])) {
+                    $subModel = new \app\models\merchant\system\UserModel();
+                    $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                    if ($subInfo['status'] == 200){
+                        $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                    }
+                } else {
+                    $merchantModle = new MerchantModel();
+                    $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                    if ($merchantInfo['status'] == 200) {
+                        $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                    }
+                }
                 $operationRecordData['operation_type'] = '更新';
                 $operationRecordData['operation_id'] = $res['data'];
                 $operationRecordData['module_name'] = '分享海报';

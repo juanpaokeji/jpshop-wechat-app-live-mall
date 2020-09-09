@@ -66,13 +66,22 @@ class CategoryController extends ShopController {
             $model = new ScoreGoodsCategoryModel();
             $params['merchant_id'] = yii::$app->session['merchant_id'];
             $params['key'] = yii::$app->session['key'];
+            $params['parent_id'] = 0;
+            $array = $model->do_select($params);
 
+            if($array['status']!=200){
+                return $array;
+            }
+            for($i=0;$i<count($array['data']);$i++){
+                $ids[] = $array['data'][$i]['id'];
+            }
             if (isset($params['parent_id'])) {
                 if ($params['parent_id'] == -1) {
                     $params['<>'] = ['parent_id', 0];
                     unset($params['parent_id']);
                 }
             }
+            $params['parent_id'] = $ids;
             $array = $model->do_select($params);
             return $array;
         } else {

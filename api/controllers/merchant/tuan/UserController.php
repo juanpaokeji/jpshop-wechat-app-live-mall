@@ -5,6 +5,7 @@ namespace app\controllers\merchant\tuan;
 use app\models\merchant\app\AppAccessModel;
 use app\models\merchant\partnerUser\PartnerUserModel;
 use app\models\merchant\system\OperationRecordModel;
+use app\models\shop\ShopUserModel;
 use app\models\system\SystemMerchantMiniAccessModel;
 use app\models\system\SystemMerchantMiniSubscribeTemplateAccessModel;
 use app\models\system\SystemMerchantMiniSubscribeTemplateModel;
@@ -66,8 +67,9 @@ class UserController extends MerchantController
             }
             $sql = "(select count(id) from shop_order_group where shop_order_group.leader_self_uid = shop_tuan_leader.uid and (shop_order_group.status=6 or shop_order_group.status =7) ) as self_number,"
                 . "(select count(id) from shop_order_group where shop_order_group.leader_uid = shop_tuan_leader.uid and (shop_order_group.status=6 or shop_order_group.status =7)) as number, "
-                . "(select sum(money) from shop_user_balance where shop_user_balance.uid = shop_tuan_leader.uid and (shop_user_balance.type = 6 and shop_user_balance.type =1) ) as sum_money, "
-                . "(select sum(money) from shop_user_balance where shop_user_balance.uid = shop_tuan_leader.uid and status =0) as on_money,";
+                . "(select sum(money) from shop_user_balance where shop_user_balance.uid = shop_tuan_leader.uid and (shop_user_balance.type = 6 or shop_user_balance.type =1) ) as sum_money, "
+                . "(select sum(money) from shop_user_balance where shop_user_balance.uid = shop_tuan_leader.uid and (shop_user_balance.type = 6 or shop_user_balance.type =1) and status =0) as on_money,"
+            . "(select sum(money) from shop_user_balance where shop_user_balance.uid = shop_tuan_leader.uid and shop_user_balance.type = 0 and  status =1) as txje,";
 
             $query = $query->select("shop_tuan_leader.*,shop_user.nickname,shop_user.balance as user_balance,shop_leader_level.name as level_name," . $sql)->leftJoin('shop_user', 'shop_tuan_leader.uid = shop_user.id')->leftJoin('shop_leader_level', 'shop_user.leader_level = shop_leader_level.id')->orderBy('shop_tuan_leader.id desc');
 
@@ -179,8 +181,8 @@ class UserController extends MerchantController
                     $city = $areaModel->do_column(['field' => 'name', 'code' => $array['data'][$i]['city_code']]);
                     $area = $areaModel->do_column(['field' => 'name', 'code' => $array['data'][$i]['area_code']]);
                     $array['data'][$i]['province'] = $province['data'][0];
-                    $array['data'][$i]['city'] = $city['data'][0];
-                    $array['data'][$i]['area'] = $area['data'][0];
+                    $array['data'][$i]['city'] = isset($city['data']) ? $city['data'][0] : '';
+                    $array['data'][$i]['area'] = isset($area['data']) ? $area['data'][0] : '';
 
                     $sql = "select sum(payment_money)as num  from shop_order_group where (status = 6 or status = 7) and user_id = {$array['data'][$i]['uid']}  and delete_time is null";
                     $res = $userModel->querySql($sql);
@@ -484,6 +486,67 @@ class UserController extends MerchantController
             }
             $tr->rollBack();
             return result(500, "更新失败");
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
+
+    public function actionDeleteAccess($id){
+        if (yii::$app->request->isDelete) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->bodyParams; //获取body传参
+
+            $must = ['key'];
+            $rs = $this->checkInput($must, $params);
+            if ($rs != false) {
+                return $rs;
+            }
+
+            $model = new LeaderModel();
+            $where['id'] = $id;
+            $info = $model->do_one($where);
+            $array = $model->do_delete($where);
+            if ($array['status'] == 200){
+                //订阅消息
+                $appModle = new AppAccessModel();
+                $appInfo = $appModle->find(['`key`'=>$params['key']]);
+                $userModel = new ShopUserModel();
+                $userInfo = $userModel->do_one(['id'=>$info['data']['uid']]);
+                $subscribeTempModel = new SystemMerchantMiniSubscribeTemplateModel();
+                $subscribeTempInfo = $subscribeTempModel->do_one(['template_purpose'=>'check']);
+                if ($subscribeTempInfo['status'] == 200){
+                    $accessParams = array(
+                        'thing1' => ['value'=>$appInfo['data']['name']],  //商户名称
+                        'thing2' => ['value'=>'申请成为团长'],  //申请事项
+                        'phrase3' => ['value'=>'已拒绝'],  //审核状态
+                        'date8' => ['value'=>date('Y-m-d h:i:s',time())],    //操作时间
+                        'thing5' => ['value'=>'拒绝'],   //备注(目前审核团长没有备注给个默认值)
+                    );
+                    $subscribeTempAccessModel = new SystemMerchantMiniSubscribeTemplateAccessModel();
+                    $subscribeTempAccessData = array(
+                        'key' => $params['key'],
+                        'merchant_id' => yii::$app->session['uid'],
+                        'mini_open_id' => $userInfo['data']['mini_open_id'],
+                        'template_id' => $subscribeTempInfo['data']['template_id'],
+                        'number' => '0',
+                        'template_params' => json_encode($accessParams, JSON_UNESCAPED_UNICODE),
+                        'template_purpose' => 'check',
+                        'page' => "/pages/home/my/my",
+                        'status' => '-1',
+                    );
+                    $subscribeTempAccessModel->do_add($subscribeTempAccessData);
+                }
+                //添加操作记录
+                $operationRecordModel = new OperationRecordModel();
+                $operationRecordData['key'] = $params['key'];
+                $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                $operationRecordData['operation_type'] = '删除';
+                $operationRecordData['operation_id'] = $id;
+                $operationRecordData['module_name'] = '团长审核';
+                $operationRecordModel->do_add($operationRecordData);
+            }
+            return $array;
+
         } else {
             return result(500, "请求方式错误");
         }

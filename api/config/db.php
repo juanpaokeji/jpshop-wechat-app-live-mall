@@ -14,13 +14,12 @@
 //];
 
 //测试服务器
-//请将用户名/数据库名称/密码分别替换成 BT_DB_USERNAME/BT_DB_NAME/BT_DB_PASSWORD
 return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=127.0.0.1;port=3306;dbname=BT_DB_NAME',
-    'username' => 'BT_DB_USERNAME',
-    'password' => 'BT_DB_PASSWORD',
-    'charset' => 'utf8',
+    'dsn' => 'mysql:host=111.222.75.227;port=3306;dbname=test',
+    'username' => '2222',
+    'password' => '2222',
+    'charset' => 'utf8mb4',
     // Schema cache options (for production environment)
     //'enableSchemaCache' => true,
     //'schemaCacheDuration' => 60,

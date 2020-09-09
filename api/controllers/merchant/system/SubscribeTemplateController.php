@@ -4,6 +4,7 @@ namespace app\controllers\merchant\system;
 
 use app\models\merchant\system\OperationRecordModel;
 use app\models\shop\OrderModel;
+use app\models\shop\ShopSubscribeMessageNumModel;
 use app\models\shop\UserModel;
 use app\models\system\SystemMerchantMiniSubscribeTemplateModel;
 use yii;
@@ -76,63 +77,126 @@ class SubscribeTemplateController extends MerchantController
             $subscribeWhere['merchant_id'] = yii::$app->session['uid'];
             $subscribeWhere['limit'] = false;
             $subscribeInfo = $subscribeModel->do_select($subscribeWhere);
-            $url = "https://api.weixin.qq.com/wxaapi/newtmpl/deltemplate?access_token={$token['access_token']}";
+
             if ($subscribeInfo['status'] == 200){
                 foreach ($subscribeInfo['data'] as $k=>$v){
-                    $delData['priTmplId'] = $v['template_id'];
-                    curlPostJson($url,json_encode($delData));
-                    $subscribeModel->do_del(['merchant_id' => yii::$app->session['uid'], 'key' => $params['key']]);
+                    $templatePurpose[] = $v['template_purpose'];
                 }
             }
+
             //添加小程序模板（模板需要变动，修改data参数）
             $url = "https://api.weixin.qq.com/wxaapi/newtmpl/addtemplate?access_token={$token['access_token']}";
-            $data = json_encode(['tid'=>'6220','kidList'=>[1,2,8,9],'sceneDesc'=>'您的订单已发货,请注意查收']);
-            $res = json_decode(curlPostJson($url,$data),true);  //订单发货模板
-            if ($res['errcode'] == 0){
-                $subscribeModel = new SystemMerchantMiniSubscribeTemplateModel();
-                $subscribeData = array(
-                    'key'=>$params['key'],
-                    'merchant_id'=>yii::$app->session['uid'],
-                    'template_id'=>$res['priTmplId'],
-                    'template_purpose'=>'send_goods',
-                );
-                $subscribeModel->do_add($subscribeData);
+            if ($subscribeInfo['status'] == 204 || !in_array('send_goods',$templatePurpose)){
+                $data = json_encode(['tid'=>'6220','kidList'=>[1,2,8,9],'sceneDesc'=>'您的订单已发货,请注意查收']);
+                $res = json_decode(curlPostJson($url,$data),true);  //订单发货模板
+                if ($res['errcode'] == 0){
+                    $subscribeModel = new SystemMerchantMiniSubscribeTemplateModel();
+                    $subscribeData = array(
+                        'key'=>$params['key'],
+                        'merchant_id'=>yii::$app->session['uid'],
+                        'template_id'=>$res['priTmplId'],
+                        'template_purpose'=>'send_goods',
+                    );
+                    $subscribeModel->do_add($subscribeData);
+                }
             }
-            $data = json_encode(['tid'=>'1482','kidList'=>[1,2,3,8,5],'sceneDesc'=>'已审核']);
-            $res = json_decode(curlPostJson($url,$data),true);  //申请审核模板
-            if ($res['errcode'] == 0){
-                $subscribeModel = new SystemMerchantMiniSubscribeTemplateModel();
-                $subscribeData = array(
-                    'key'=>$params['key'],
-                    'merchant_id'=>yii::$app->session['uid'],
-                    'template_id'=>$res['priTmplId'],
-                    'template_purpose'=>'check',
-                );
-                $subscribeModel->do_add($subscribeData);
+            if ($subscribeInfo['status'] == 204 || !in_array('check',$templatePurpose)){
+                $data = json_encode(['tid'=>'1482','kidList'=>[1,2,3,8,5],'sceneDesc'=>'已审核']);
+                $res = json_decode(curlPostJson($url,$data),true);  //申请审核模板
+                if ($res['errcode'] == 0){
+                    $subscribeModel = new SystemMerchantMiniSubscribeTemplateModel();
+                    $subscribeData = array(
+                        'key'=>$params['key'],
+                        'merchant_id'=>yii::$app->session['uid'],
+                        'template_id'=>$res['priTmplId'],
+                        'template_purpose'=>'check',
+                    );
+                    $subscribeModel->do_add($subscribeData);
+                }
             }
-            $data = json_encode(['tid'=>'2117','kidList'=>[1,4,5,7],'sceneDesc'=>'拼团成功']);
-            $res = json_decode(curlPostJson($url,$data),true);  //拼团成功模板
-            if ($res['errcode'] == 0){
-                $subscribeModel = new SystemMerchantMiniSubscribeTemplateModel();
-                $subscribeData = array(
-                    'key'=>$params['key'],
-                    'merchant_id'=>yii::$app->session['uid'],
-                    'template_id'=>$res['priTmplId'],
-                    'template_purpose'=>'assemble',
-                );
-                $subscribeModel->do_add($subscribeData);
+            if ($subscribeInfo['status'] == 204 || !in_array('assemble',$templatePurpose)){
+                $data = json_encode(['tid'=>'4213','kidList'=>[2,3,4,5],'sceneDesc'=>'拼团进度通知']);
+                $res = json_decode(curlPostJson($url,$data),true);  //拼团进度通知模板
+                if ($res['errcode'] == 0){
+                    $subscribeModel = new SystemMerchantMiniSubscribeTemplateModel();
+                    $subscribeData = array(
+                        'key'=>$params['key'],
+                        'merchant_id'=>yii::$app->session['uid'],
+                        'template_id'=>$res['priTmplId'],
+                        'template_purpose'=>'assemble',
+                    );
+                    $subscribeModel->do_add($subscribeData);
+                }
             }
-            $data = json_encode(['tid'=>'2269','kidList'=>[1,2],'sceneDesc'=>'预约商品到货通知']);
-            $res = json_decode(curlPostJson($url,$data),true);  //预约商品到货通知模板
-            if ($res['errcode'] == 0){
-                $subscribeModel = new SystemMerchantMiniSubscribeTemplateModel();
-                $subscribeData = array(
-                    'key'=>$params['key'],
-                    'merchant_id'=>yii::$app->session['uid'],
-                    'template_id'=>$res['priTmplId'],
-                    'template_purpose'=>'merchandise_arrival',
-                );
-                $subscribeModel->do_add($subscribeData);
+            if ($subscribeInfo['status'] == 204 || !in_array('merchandise_arrival',$templatePurpose)){
+                $data = json_encode(['tid'=>'279','kidList'=>[1,3,4,5],'sceneDesc'=>'预约到货通知']);
+                $res = json_decode(curlPostJson($url,$data),true);  //预约到货通知模板
+                if ($res['errcode'] == 0){
+                    $subscribeModel = new SystemMerchantMiniSubscribeTemplateModel();
+                    $subscribeData = array(
+                        'key'=>$params['key'],
+                        'merchant_id'=>yii::$app->session['uid'],
+                        'template_id'=>$res['priTmplId'],
+                        'template_purpose'=>'merchandise_arrival',
+                    );
+                    $subscribeModel->do_add($subscribeData);
+                }
+            }
+            if ($subscribeInfo['status'] == 204 || !in_array('presale',$templatePurpose)){
+                $data = json_encode(['tid'=>'4487','kidList'=>[1,2,3,4],'sceneDesc'=>'预售尾款支付提醒']);
+                $res = json_decode(curlPostJson($url,$data),true);  //预售尾款支付提醒模板
+                if ($res['errcode'] == 0){
+                    $subscribeModel = new SystemMerchantMiniSubscribeTemplateModel();
+                    $subscribeData = array(
+                        'key'=>$params['key'],
+                        'merchant_id'=>yii::$app->session['uid'],
+                        'template_id'=>$res['priTmplId'],
+                        'template_purpose'=>'presale',
+                    );
+                    $subscribeModel->do_add($subscribeData);
+                }
+            }
+            if ($subscribeInfo['status'] == 204 || !in_array('bargain',$templatePurpose)){
+                $data = json_encode(['tid'=>'2920','kidList'=>[1,2,5,6],'sceneDesc'=>'砍价结果通知']);
+                $res = json_decode(curlPostJson($url,$data),true);  //砍价结果通知
+                if ($res['errcode'] == 0){
+                    $subscribeModel = new SystemMerchantMiniSubscribeTemplateModel();
+                    $subscribeData = array(
+                        'key'=>$params['key'],
+                        'merchant_id'=>yii::$app->session['uid'],
+                        'template_id'=>$res['priTmplId'],
+                        'template_purpose'=>'bargain',
+                    );
+                    $subscribeModel->do_add($subscribeData);
+                }
+            }
+            if ($subscribeInfo['status'] == 204 || !in_array('pick_up_notice',$templatePurpose)){
+                $data = json_encode(['tid'=>'1193','kidList'=>[6,10,11,12,2],'sceneDesc'=>'取货通知']);
+                $res = json_decode(curlPostJson($url,$data),true);  //取货通知
+                if ($res['errcode'] == 0){
+                    $subscribeModel = new SystemMerchantMiniSubscribeTemplateModel();
+                    $subscribeData = array(
+                        'key'=>$params['key'],
+                        'merchant_id'=>yii::$app->session['uid'],
+                        'template_id'=>$res['priTmplId'],
+                        'template_purpose'=>'pick_up_notice',
+                    );
+                    $subscribeModel->do_add($subscribeData);
+                }
+            }
+            if ($subscribeInfo['status'] == 204 || !in_array('refund',$templatePurpose)){
+                $data = json_encode(['tid'=>'642','kidList'=>[1,2,3,7,15],'sceneDesc'=>'退款提醒']);
+                $res = json_decode(curlPostJson($url,$data),true);  //退款提醒
+                if ($res['errcode'] == 0){
+                    $subscribeModel = new SystemMerchantMiniSubscribeTemplateModel();
+                    $subscribeData = array(
+                        'key'=>$params['key'],
+                        'merchant_id'=>yii::$app->session['uid'],
+                        'template_id'=>$res['priTmplId'],
+                        'template_purpose'=>'refund',
+                    );
+                    $subscribeModel->do_add($subscribeData);
+                }
             }
 
             //获取小程序模板添加到数据库
@@ -157,6 +221,7 @@ class SubscribeTemplateController extends MerchantController
                         }
                     }
                 }
+
                 return result(200, "请求成功");
             }else{
                 return result(500, "请求失败");
@@ -167,4 +232,25 @@ class SubscribeTemplateController extends MerchantController
         }
     }
 
+    public function actionUpdate($id){
+        if (yii::$app->request->isPut) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->bodyParams; //获取body传参
+
+            $must = ['template_id'];
+            //设置类目 参数
+            $rs = $this->checkInput($must, $params);
+            if ($rs != false) {
+                return $rs;
+            }
+
+            $model = new SystemMerchantMiniSubscribeTemplateModel();
+            $where['id'] = $id;
+            $data['template_id'] = $params['template_id'];
+            $array = $model->do_update($where,$data);
+            return $array;
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
 }

@@ -4,6 +4,7 @@ namespace app\controllers\merchant\shop;
 
 use app\models\merchant\system\OperationRecordModel;
 use app\models\merchant\system\ShopRecommendGoodsModel;
+use app\models\merchant\user\MerchantModel;
 use app\models\shop\ShopGoodsModel;
 use yii;
 use yii\db\Exception;
@@ -71,8 +72,14 @@ class RecommendGoodsController extends MerchantController
                 $data['pay_finish_show'] = $config['pay_finish_show'];
                 $goodsModel = new ShopGoodsModel();
                 $gWhere['field'] = "id,name,pic_urls,price,is_open_assemble,is_advance_sale,is_bargain,is_flash_sale";
-                $gWhere['in'] = ['id',$config['goods_ids']];
-                $goodsInfo = $goodsModel->do_select($gWhere);
+                if($config['goods_ids']==null){
+                    $goodsInfo['status']=204;
+                    $goodsInfo['message']="查询失败";
+                }else{
+                    $gWhere['in'] = ['id',$config['goods_ids']];
+                    $goodsInfo = $goodsModel->do_select($gWhere);
+                }
+
 
                 if ($goodsInfo['status'] == 200){
                     foreach ($goodsInfo['data'] as $k=>$v){
@@ -115,7 +122,7 @@ class RecommendGoodsController extends MerchantController
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
 
-            $must = ['key','goods_ids','centre_show','bottom_show','pay_finish_show'];
+            $must = ['key','centre_show','bottom_show','pay_finish_show'];
             $rs = $this->checkInput($must, $params);
             if ($rs != false) {
                 return $rs;
@@ -140,7 +147,19 @@ class RecommendGoodsController extends MerchantController
             //添加操作记录
             $operationRecordModel = new OperationRecordModel();
             $operationRecordData['key'] = $params['key'];
-            $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+            if (isset(yii::$app->session['sid'])) {
+                $subModel = new \app\models\merchant\system\UserModel();
+                $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                if ($subInfo['status'] == 200){
+                    $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                }
+            } else {
+                $merchantModle = new MerchantModel();
+                $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                if ($merchantInfo['status'] == 200) {
+                    $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                }
+            }
             $operationRecordData['operation_type'] = '更新';
             $operationRecordData['operation_id'] = 1;
             $operationRecordData['module_name'] = '推荐商品';

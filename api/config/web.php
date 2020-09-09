@@ -374,6 +374,7 @@ $config = [
 //
 //商城统计
                 'GET merchantShopTotal' => 'merchant/shop/total/total', //权限列表
+                'GET merchantShopTopGoods' => 'merchant/shop/total/top-goods', //30天内销量前十商品列表
 //签到活动设置
                 //'PUT merchantSignInStatus' => 'merchant/shop/signin/status', //用不打 签到插件状态更新
                 'GET merchantSignUserAll/<id>' => 'merchant/shop/signin/users', //签到全部用户列表记录
@@ -445,7 +446,12 @@ $config = [
                 'PUT merchantGoodAudit/<id>' => 'merchant/shop/goods/audit', //供应商商品审核，填写售价
                 'GET merchantStock' => 'merchant/shop/goods/stock', //供应商商品审核，填写售价
                 'GET merchantGoodsName' => 'merchant/shop/goods/goods-name', //商品列表
-
+                'POST merchantRedisMessage' => 'merchant/shop/goods/redis-message', //预约商品到货通知(存入redis)
+                'GET merchantGoodsMessage' => 'merchant/shop/goods/goods-message', //预约商品到货通知(计划任务)
+                'GET SolitaireGoods' => 'merchant/shop/goods/solitaire-goods', //接龙结束清除商品接龙ID(计划任务)
+                'GET merchantStock/<id>' => 'merchant/shop/goods/goods-stock', //单个商品规格详情
+                'PUT merchantStock/<id>' => 'merchant/shop/goods/additional', //商品追加库存
+                'PUT merchantStockPrice/<id>' => 'merchant/shop/goods/stock-price', //修改各规格商品价格
                 //商品标签
                 'GET merchantGoodsLabel' => 'merchant/shop/goods-label/list', //商品标签列表
                 'GET merchantGoodsLabel/<id>' => 'merchant/shop/goods-label/single', //商品标签单条
@@ -536,6 +542,10 @@ $config = [
                 'GET merchantShopUsers' => 'merchant/shop/user/list', //会员列表
                 'PUT merchantShopUsers/<id>' => 'merchant/shop/user/update', //会员更新
                 'DELETE merchantShopUsers/<id>' => 'merchant/shop/user/delete', //会员更新
+                'PUT merchantShopUsersSuperior/<id>' => 'merchant/shop/user/update-superior', //修改会员上级
+                'GET merchantDistributor' => 'merchant/shop/user/distributor',//分销商会员列表
+                'DELETE merchantShopUser/<id>' => 'merchant/shop/user/delete-user', //会员更新
+                'GET merchantShopUsersAddress/<id>' => 'merchant/shop/user/address', //会员列表
 //售后信息
                 'GET merchantAfterInfo' => 'merchant/shop/afterinfo/list', //售后列表
                 'GET merchantAfterInfo/<id>' => 'merchant/shop/afterinfo/single', //售后单条
@@ -620,8 +630,10 @@ $config = [
                 'GET shopOrder' => 'shop/order/list', //订单
                 'GET shopRandomOrder' => 'shop/order/random', //随机 10 订单
                 'GET shopOrder/<id>' => 'shop/order/single', //订单详情
+                'GET shopOrderInfo/<id>' => 'shop/order/order-info', //订单详情
                 'DELETE shopOrder/<id>' => 'shop/order/delete', //订单详情
                 'GET shopOrderExpress/<id>' => 'shop/order/express', //订单详情
+                'POST shopPayOrderInfo' => 'shop/order/order-infos', //提交详情信息
 
 //退款/退款 维权
                 'GET shopOrderAfterList' => 'shop/order/afterlist',
@@ -740,6 +752,7 @@ $config = [
                 'GET merchantTuanUser' => 'merchant/tuan/user/list', //团长列表
                 'GET merchantTuanUser/<id>' => 'merchant/tuan/user/single', //团长列表
                 'PUT merchantTuanUser/<id>' => 'merchant/tuan/user/audit', //审核团长
+                'DELETE merchantTuanUser/<id>' => 'merchant/tuan/user/delete-access', //删除申请记录
                 'DELETE merchantTuanUserUntying/<id>' => 'merchant/tuan/user/delete', //审核团长
                 //vip会员 信息
                 'GET merchantTuanVip' => 'merchant/system/vip/list', //vip等级 信息详情
@@ -780,9 +793,12 @@ $config = [
                 'GET merchantPrintsOrders' => 'prints/order/list', //打印面单 列表
                 'POST merchantPrintsOrders' => 'prints/order/prints', //打印面单
                 'PUT merchantPrintsOrdersSend' => 'prints/order/send', //打印面单 发货
+                'POST merchantPrintsOrderExcel' => 'prints/order/order-excel', //订单excel导出
+                'POST merchantPrintsPdf' => 'prints/order/pdf', //pdf导出
                 //通用方法
                 //前台文件上传
                 'POST upload' => 'common/uploads/index',
+                'POST uploads' => 'common/uploads/upload',
                 'GET express' => 'common/base/express',
                 'POST base64' => 'common/uploads/base',
                 'GET address' => 'common/base/address',
@@ -808,9 +824,11 @@ $config = [
                 'GET shopBalances' => 'shop/balance/list', //团长体现
                 'GET shopBalancesAll' => 'shop/balance/all', //佣金流水
                 'POST shopBalances' => 'shop/balance/add', //团长体现
+
                 //商户后台
                 'GET merchantShopBalance' => 'merchant/shop/balance/list', //团长体现 //佣金流水 佣金提现申请
                 'PUT merchantShopBalance/<id>' => 'merchant/shop/balance/audit', //团长体现审核
+                'POST merchantShopBalance' => 'merchant/shop/balance/balance', //团长体现 //佣金流水 佣金提现申请
                 //后台商户短信，订单套餐
                 'GET adminMerchantCombo' => 'admin/system/combo/list',
                 'GET adminMerchantCombo/<id>' => 'admin/system/combo/single',
@@ -962,8 +980,10 @@ $config = [
                 'GET tuanLeader' => 'shop/tuan/leader',
                 'GET tuanOrder/<id>' => 'shop/tuan/order', //团长订单
                 'PUT tuanConfirm' => 'shop/tuan/confirm', //团长核销
-                'PUT tuanReceiving' => 'shop/tuan/tuan-order-receiving', //团长确认收货
+                'PUT tuanReceiving' => 'shop/tuan/tuan-order-receiving', //
+                'PUT shopTuanReceipt' => 'shop/tuan/receipt', //团长确认收货
                 'PUT updateTuanLeader' => 'shop/tuan/update-leader', //团长信息更新
+                'GET tuanCenter' => 'tuan/user/tuan-center',//团长中心
                 //团长等级
                 'GET merchantLeaderLevel' => 'merchant/user/level/list',
                 'GET merchantLeaderLevel/<id>' => 'merchant/user/level/single',
@@ -1038,7 +1058,9 @@ $config = [
                 'POST vipConfig' => 'merchant/vip/config/add', //新增vip配置
                 'PUT vipConfig/<id>' => 'merchant/vip/config/update', //更新vip配置
                 'DELETE vipConfig/<id>' => 'merchant/vip/config/delete', //删除vip配置
+
                 // vip 会员卡
+                'GET merchantVip' => 'merchant/vip/vip/vip', //会员卡列表
                 'GET vips' => 'merchant/vip/vip/list', //会员卡列表
                 'GET vips/<id>' => 'merchant/vip/vip/one', //会员卡单条信息
                 'POST vips' => 'merchant/vip/vip/add', //新增会员卡
@@ -1103,6 +1125,7 @@ $config = [
                 'GET merchantScoreOrder/<id>' => 'merchant/score/order/single', //积分订单单个
                 'PUT merchantScoreOrder/<id>' => 'merchant/score/order/update', //积分订单更新
                 'DELETE merchantScoreOrder/<id>' => 'merchant/score/order/delete', //积分订单删除
+                'GET merchantScoreOrderExpress' => 'merchant/score/order/express', //积分订单列表
                 //前台积分商城
                 'GET shopScoreBanner' => 'score/banner/list', //积分商品分组列表
                 'GET shopScoreCategory' => 'score/category/list', //积分商品分组列表
@@ -1119,7 +1142,15 @@ $config = [
                 'GET shopLive' => 'shop/live/list', //直播列表
                 //后台获取直播列表
                 'GET merchantLive' => 'merchant/live/live/list', //直播列表
-                'PUT merchantLive/<id>' => 'merchant/live/live/update', //直播列表
+                'PUT merchantLive/<id>' => 'merchant/live/live/update', //直播间更新
+                'POST merchantLive' => 'merchant/live/live/add', //创建直播间
+                'POST merchantLiveUpload' => 'merchant/live/live/upload', //上传图片
+                'POST merchantLiveImport' => 'merchant/live/live/import', //直播间商品导入
+                'GET merchantLiveGoods' => 'merchant/live/live/goods-list', //商品列表
+                'GET merchantLiveChoose' => 'merchant/live/live/choose', //选择商品列表
+                'POST merchantLiveGoods' => 'merchant/live/live/goods-add', //商品添加并提审
+                'PUT merchantLiveGoods/<id>' => 'merchant/live/live/goods-update', //更新商品库商品
+                'DELETE merchantLiveGoods/<id>' => 'merchant/live/live/goods-delete', //删除商品库商品
                 //商户后台路线
                 'GET merchantWarehouse' => 'merchant/tuan/warehouse/list', //路线列表
                 'GET merchantWarehouse/<id>' => 'merchant/tuan/warehouse/one', //路线单条
@@ -1206,6 +1237,7 @@ $config = [
                 'GET merchantAssembleAssemble/<id>' => 'merchant/shop/assemble/assembleone',//拼团管理已参团信息
                 'GET merchantAssemble' => 'merchant/shop/assemble/list',//拼团商品列表
                 'PUT merchantAssemble/<id>' => 'merchant/shop/assemble/update',//商品拼团信息添加、更新
+                'PUT merchantAssembleGroupOrder/<id>' => 'merchant/shop/assemble/group-order',//一键成团
                 'DELETE merchantAssemble/<id>' => 'merchant/shop/assemble/delete',//商品拼团删除
                 //介入腾讯云商品
                 'POST instance' => 'tencents/instance/instance', //校验token
@@ -1240,6 +1272,15 @@ $config = [
                 'GET merchantBargain' => 'merchant/shop/bargain/list',//活动列表
                 'PUT merchantBargain/<id>' => 'merchant/shop/bargain/update',//活动更新
                 'GET merchantBargainInfo' => 'merchant/shop/bargains/list',//砍价详情
+
+                //自定义海报
+                'GET merchantPosters' => 'merchant/shop/posters/list',//展示
+                'GET merchantPosters/<id>' => 'merchant/shop/posters/single',//展示
+                'POST merchantPosters' => 'merchant/shop/posters/add',
+                'PUT merchantPosters/<id>' => 'merchant/shop/posters/renovate',
+                'DELETE merchantPosters/<id>' => 'merchant/shop/posters/delete',
+               // 'GET merchantPosters' => 'shop/poster/home-images',//生成首页海报
+              //  'GET merchantPosters' => 'shop/poster/detail-images',//生成详情页海报
                 //海报设置
                 'GET posters' => 'merchant/shop/poster/list',//展示
                 'POST posters' => 'merchant/shop/poster/update',//更新或者删除
@@ -1357,6 +1398,7 @@ $config = [
 
                 //多级分销
                 'GET merchantDistributionUser' => 'merchant/user/user/distribution-user',//分销用户
+                'GET merchantSubordinate/<id>' => 'merchant/user/user/subordinate',//直推会员
                 'GET merchantDistribution' => 'merchant/app/access/distributions',//分销佣金比例设置
                 'PUT merchantDistribution/<id>' => 'merchant/app/access/distribution',//分销佣金比例设置
                 'POST uploadsImages' => 'merchant/distribution/super/uploads',//上传图片
@@ -1378,6 +1420,9 @@ $config = [
                 'GET distributionAccess' => 'merchant/distribution/distribution/list',//查询佣金记录
                 'GET upUser' => 'merchant/distribution/distribution/upuser',//查询待审核会员
                 'PUT upUser/<id>' => 'merchant/distribution/distribution/update',//审核会员等级
+                'POST RecalculateDistribution' => 'merchant/distribution/distribution/recalculate',//重新计算分销佣金
+                'GET merchantDistributorLevel' => 'merchant/distribution/distribution/distributor',//分销商等级
+                'GET RecalculationDistribution' => 'merchant/distribution/distribution/recalculation',//分销商等级
                 //多级分销前台接口
                 'GET distributionCenter' => 'shop/distribution/index',//分销中心首页
                 'GET distributionOrder' => 'shop/distribution/order',//当前用户有关的订单信息
@@ -1389,8 +1434,10 @@ $config = [
                 //订阅消息
                 'GET SubscribeTemplate' => 'merchant/system/subscribe-template/list',//查询
                 'POST SubscribeTemplate' => 'merchant/system/subscribe-template/add',//同步订阅模板
+                'PUT SubscribeTemplate/<id>' => 'merchant/system/subscribe-template/update',//修改订阅模板
                 'GET SubscribeMessage' => 'message/subscribe-message/index',//推送订阅消息
                 'GET SubscribeTemplateId' => 'shop/subscribe-template/list',//前台获取订阅模板ID
+                'POST SubscribeMessage' => 'shop/subscribe-template/add',//订阅消息授权后记录增加次数
                 //门店海报
                 'POST merchantSupplierConfig' => 'merchant/app/access/supplier-config', //更新海报
                 //图片库
@@ -1426,17 +1473,83 @@ $config = [
                 'GET supplierGrouping' => 'supplier/goods/goods/grouping',//查询
                 'GET shopGrouping' => 'shop/grouping/list',//前台查询集团分组列表
                 'GET shopGroupingGoods' => 'shop/grouping/goods',//前台查询集团分组商品
+                //接龙
+                'GET merchantSolitaire' => 'merchant/system/solitaire/list',//查询
+                'GET merchantSolitaire/<id>' => 'merchant/system/solitaire/one',//单条查询
+                'POST merchantSolitaire' => 'merchant/system/solitaire/add',//增加
+                'PUT merchantSolitaire/<id>' => 'merchant/system/solitaire/update',//修改
+                'DELETE merchantSolitaire/<id>' => 'merchant/system/solitaire/delete',//删除
+                'GET merchantSolitaireGoods' => 'merchant/system/solitaire/goods',//查询商品
+                'DELETE merchantSolitaireGoods/<id>' => 'merchant/system/solitaire/delete-goods',//删除接龙商品
+                'GET merchantSolitaireComment/<id>' => 'merchant/system/solitaire/comment',//接龙评论查询
+                'PUT merchantSolitaireComment/<id>' => 'merchant/system/solitaire/check',//评论审核
+                'GET shopSolitaire/<id>' => 'shop/solitaire/one',//前台接龙活动查询
+                'GET shopSolitaireOrder/<id>' => 'shop/solitaire/list',//前台接龙活动其他订单列表查询
+                'GET shopSolitaireComment' => 'shop/solitaire-comment/list',//前台接龙活动评论查询
+                'POST shopSolitaireComment' => 'shop/solitaire-comment/add',//前台评论接龙活动
+                'GET shopSolitaire' => 'shop/solitaire/order-share',//前台接龙转发
+                'GET shopSolitaireShare' => 'shop/solitaire/solitaire-share',//前台接龙分享
+                //蜂鸟配送
+                'GET merchantBirdConfig' => 'merchant/system/bird/one',//蜂鸟配置查询
+                'POST merchantBirdConfig' => 'merchant/system/bird/add',//蜂鸟配置添加、修改
+                'POST merchantBird' => 'merchant/system/bird/order',//蜂鸟下单
+                //后台管理小程序
+                'GET merchantAdminConfig' => 'merchant/system/shop-admin/config',//小程序配置查询
+                'POST merchantAdminConfig' => 'merchant/system/shop-admin/config-add',//小程序配置添加、修改
+                'GET merchantAdminUser' => 'merchant/system/shop-admin/list',//管理员查询
+                'PUT merchantAdminUser/<id>' => 'merchant/system/shop-admin/update',//管理员修改
+                'POST merchantAdminLogin' => 'merchant/user/login/admin-login',//小程序后台管理员登录
+                'POST merchantSupplierLogin' => 'merchant/user/login/supplier-login',//小程序后台门店登录
+                'POST merchantAdminUser' => 'merchant/user/login/add-user',//管理员添加
+                //后台省市区管理
+                'GET merchantArea' => 'merchant/system/system-area/list',//查询省
+                'GET merchantAreaSubset' => 'merchant/system/system-area/find',//查询下级
+                'GET merchantArea/<id>' => 'merchant/system/system-area/one',//单条查询
+                'POST merchantArea' => 'merchant/system/system-area/add',//增加
+                'PUT merchantArea/<id>' => 'merchant/system/system-area/update',//修改
+                'PUT merchantAreaStatus/<id>' => 'merchant/system/system-area/update-status',//修改状态
+                'DELETE merchantArea/<id>' => 'merchant/system/system-area/delete',//删除
+                //前台省市区管理
+                'GET shopArea' => 'shop/system-area/list',//查询省
+                'GET shopAreaSubset' => 'shop/system-area/find',//查询下级
+                //后台充值
+                'GET merchantRechargeUser' => 'merchant/shop/recharge/list',//查询会员列表
+                'GET merchantRechargeUser/<id>' => 'merchant/shop/recharge/one',//查询会员
+                'PUT merchantRecharge/<id>' => 'merchant/shop/recharge/update',//充值
+                //个人中心
+                'GET merchantPersonalCenter' => 'merchant/system/personal-center/list', //查所有
+                'GET merchantPersonalCenter/<id>' => 'merchant/system/personal-center/one', //查单条
+                'POST merchantPersonalCenter' => 'merchant/system/personal-center/add', //新增
+                'DELETE merchantPersonalCenter/<id>' => 'merchant/system/personal-center/delete', //删除
+                'PUT merchantPersonalCenter/<id>' => 'merchant/system/personal-center/update', //修改
+                'PUT merchantPersonalCenterOther/<id>' => 'merchant/system/personal-center/other-update', //修改
+                'GET merchantPersonalCenterOther' => 'merchant/system/personal-center/other', //查询
+                'GET shopPersonalCenter' => 'shop/personal-center/list', //前台查询功能入口、轮播图
+                'GET shopPersonalCenterOther' => 'shop/personal-center/other', //前台其他设置
+                //分类分组
+                'GET merchantCategoryGroup' => 'merchant/shop/category-group/list', //查所有
+                'GET merchantCategoryGroup/<id>' => 'merchant/shop/category-group/one', //查单条
+                'POST merchantCategoryGroup' => 'merchant/shop/category-group/add', //新增
+                'DELETE merchantCategoryGroup/<id>' => 'merchant/shop/category-group/delete', //删除
+                'PUT merchantCategoryGroup/<id>' => 'merchant/shop/category-group/update', //修改
+                'GET merchantTopCategory' => 'merchant/shop/category-group/category', //查一级分类
+                'GET shopCategoryGroup' => 'shop/category-group/list', //前台查所有
+                'GET shopTopCategory/<id>' => 'shop/category-group/category', //前台一级分类
 
 
                 'GET miniConfig' => 'merchant/config/config/minione', //查单条
                 'PUT miniConfig' => 'merchant/config/config/mini', //查单条
+
+                //帮助中心
+                'GET shopHelp' => 'shop/help/list',
+                'GET shopHelp/<id>' => 'shop/help/single',
+                'GET shopHelpCategory' => 'shop/help/category',
 
             ],
         ],
         'redis' => [
             'class' => 'yii\redis\Connection',
             'hostname' => '127.0.0.1',
-			'password' => '',//redis password
             'port' => 6379,
             'database' => 0,
         ],

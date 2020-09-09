@@ -23,7 +23,9 @@
         "yiisoft/yii2-redis": "~2.0.0",
         "overtrue/wechat": "~4.1",
         "qcloud/vod-sdk-v5": "v2.2.0",
-        "yiisoft/yii2-imagine": "~2.1.0"
+        "yiisoft/yii2-imagine": "~2.1.0",
+        "symfony/event-dispatcher": "~4.3",
+        "mpdf/mpdf": "^8.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

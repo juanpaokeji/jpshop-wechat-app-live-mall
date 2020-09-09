@@ -218,7 +218,7 @@ input[type=file] { cursor: pointer; }
 
 .section-setting .edit-box .item.item-table table { width: 100%; }
 
-.section-setting .edit-box .item.item-table th, .section-setting .edit-box .item.item-table td { padding: 0 5px;border: $bc 1px solid;line-height: 1em;max-width: 15em;min-width: 3em;}
+.section-setting .edit-box .item.item-table th, .section-setting .edit-box .item.item-table td {border: $bc 1px solid;line-height: 1em;max-width: 15em;min-width: 3em;padding: 2px!important;}
 
 .section-setting .edit-box .item.item-table th { background-color: #f6f6f6; }
 

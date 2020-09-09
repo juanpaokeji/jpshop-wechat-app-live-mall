@@ -201,7 +201,7 @@ a, img, input[type=text], input[type=submit], input[type=password], textarea, se
 
 #uicut-app .g-centerBox .content-box > div { position: relative; overflow: hidden; }
 
-#uicut-app .view-banner img { display: block; width: 100%; }
+#uicut-app .view-banner img { display: block; width: 100%; border-radius: 5px;}
 
 #uicut-app .view-banner .dot-box { position: absolute; bottom: 0; left: 0; width: 100%; padding: 10px; text-align: center; }
 
@@ -480,7 +480,7 @@ a, img, input[type=text], input[type=submit], input[type=password], textarea, se
 #uicut-app .textarea-box .btm .textarea { width: 100%; background-color: #ebf3fa; height: 72px; padding: 0px 10px; }
 
 
-.view-banner2{padding: 10px; box-sizing: border-box;}
+.view-banner2{padding: 10px; box-sizing: border-box; border-radius: 5px;}
 
 
 

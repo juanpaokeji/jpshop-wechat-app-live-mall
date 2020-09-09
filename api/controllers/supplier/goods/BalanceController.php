@@ -96,7 +96,7 @@ class BalanceController extends SupplierController
                 return result(500, "提现金额大于余额");
             }
 
-            $leader = json_decode($userData['data']['leader']);
+            $leader = json_decode($userData['data']['leader'],true);
             if (isset($leader['points'])) {
                 $params['remain_money'] = $params['money'] - ($params['money'] * $leader['points'] / 100);
             } else {

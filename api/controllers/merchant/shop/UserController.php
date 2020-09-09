@@ -6,7 +6,10 @@ use app\models\core\TableModel;
 use app\models\merchant\distribution\AgentModel;
 use app\models\merchant\distribution\OperatorModel;
 use app\models\merchant\system\OperationRecordModel;
+use app\models\merchant\user\MerchantModel;
 use app\models\merchant\vip\UnpaidVipModel;
+use app\models\shop\GroupOrderModel;
+use app\models\shop\ShopUserModel;
 use app\models\shop\StorePaymentModel;
 use app\models\tuan\LeaderModel;
 use yii;
@@ -234,28 +237,10 @@ class UserController extends MerchantController
         $vipInfo = $vipModel->do_select($vipWhere);
 
         foreach ($res as $k => $v) {
-            $res[$k]['level_name'] = '会员';
-            if ($vipInfo['status'] == 200){
-                $minLev = reset($vipInfo['data']);//最低等级
-                $maxLev = end($vipInfo['data']);//最高等级
-                //总积分大于等于最高等级
-                if ($v['total_score'] >= $maxLev['min_score']){
-                    $res[$k]['level_name'] = $maxLev['name'];
-                }
-                //总积分在最低和最高之间的
-                if ($v['total_score'] >= $minLev['min_score'] && $v['total_score'] < $maxLev['min_score']){
-                    foreach ($vipInfo['data'] as $key=>$val){
-                        if ($v['total_score'] >= $val['min_score']){
-                            $res[$k]['level_name'] = $val['name'];
-                        }
-                    }
-                }
-            }
-
-
             $res[$k]['pay_num'] = 0;
             $res[$k]['cart_num'] = 0;
             $res[$k]['pay_price'] = 0;
+            $res[$k]['level_name'] = '会员';
             $orderModel = new OrderModel();
             $data['user_id'] = $v['id'];
             $data['(status=6 or status = 7 or status= 3)'] =null ;
@@ -264,10 +249,27 @@ class UserController extends MerchantController
                 $res[$k]['pay_num'] = count($orderData['data']);
                 $pay_price = 0;
                 foreach ($orderData['data'] as $ko => $vo) {
-                    $pay_price += $vo['total_price'];
+                    $pay_price += $vo['payment_money'];
+                }
+                if ($vipInfo['status'] == 200){
+                    $minLev = reset($vipInfo['data']);//最低等级
+                    $maxLev = end($vipInfo['data']);//最高等级
+                    //总积分大于等于最高等级
+                    if ($pay_price >= $maxLev['min_score']){
+                        $res[$k]['level_name'] = $maxLev['name'];
+                    }
+                    //总积分在最低和最高之间的
+                    if ($pay_price >= $minLev['min_score'] && $pay_price < $maxLev['min_score']){
+                        foreach ($vipInfo['data'] as $key=>$val){
+                            if ($pay_price >= $val['min_score']){
+                                $res[$k]['level_name'] = $val['name'];
+                            }
+                        }
+                    }
                 }
                 $res[$k]['pay_price'] = number_format($pay_price, 2);
             }
+
             $cartModel = new CartModel();
             $cartData = $cartModel->findall(['user_id'=>$v['id']]);
             if ($cartData['status'] == 200) {
@@ -297,7 +299,19 @@ class UserController extends MerchantController
                     //添加操作记录
                     $operationRecordModel = new OperationRecordModel();
                     $operationRecordData['key'] = $params['`key`'];
-                    $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                    if (isset(yii::$app->session['sid'])) {
+                        $subModel = new \app\models\merchant\system\UserModel();
+                        $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                        if ($subInfo['status'] == 200){
+                            $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                        }
+                    } else {
+                        $merchantModle = new MerchantModel();
+                        $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                        if ($merchantInfo['status'] == 200) {
+                            $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                        }
+                    }
                     $operationRecordData['operation_type'] = '更新';
                     $operationRecordData['operation_id'] = $id;
                     $operationRecordData['module_name'] = '会员列表';
@@ -423,7 +437,106 @@ class UserController extends MerchantController
         }
     }
     
-    
-     
+    public function actionUpdateSuperior($id){
+        if (yii::$app->request->isPut) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->bodyParams; //获取body传参
+
+            $must = ['key','parent_id'];
+            //设置类目 参数
+            $rs = $this->checkInput($must, $params);
+            if ($rs != false) {
+                return $rs;
+            }
+
+            $model = new UserModel();
+            //查询用户是否有下级
+            $subordinateWhere['parent_id'] = $id;
+            $subordinateInfo = $model->find($subordinateWhere);
+            if ($subordinateInfo['status'] == 200){
+                return result(500, "该用户已有下属团队，不能修改上级");
+            }
+            //查询所选上级信息
+            $parentWhere['id'] = $params['parent_id'];
+            $parentInfo = $model->find($parentWhere);
+            if ($parentInfo['status'] != 200){
+                return result(204, "未查询到所选上级会员信息");
+            }
+            //上三级父节点url
+            $data['parent_url'] = '/' . $params['parent_id'] . '/';
+            if (!empty($parentInfo['data']['parent_url'])) {
+                $parentUrl = explode('/', trim($parentInfo['data']['parent_url'], '/'));
+                $data['parent_url'] .= $parentUrl[0] . '/';
+                if (isset($parentUrl[1])) {
+                    $data['parent_url'] .= $parentUrl[1] . '/';
+                }
+                if (isset($parentUrl[2])) {
+                    $data['parent_url'] .= $parentUrl[2] . '/';
+                }
+            }
+            $data['id'] = $id;
+            $data['parent_id'] = $params['parent_id'];
+            $array = $model->update($data);
+
+            return $array;
+
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
+
+    public function actionDistributor(){
+        if (yii::$app->request->isGet) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->get(); //获取地址栏参数
+
+            $must = ['key'];
+            //设置类目 参数
+            $rs = $this->checkInput($must, $params);
+            if ($rs != false) {
+                return $rs;
+            }
+
+            $userModel = new UserModel();
+            $params['level >= 1'] = null;
+            if (isset($params['key'])) {
+                $params['`key`'] = $params['key'];
+                unset($params['key']);
+            }
+            $array = $userModel->findall($params);
+            return $array;
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
+
+    //删除会员
+    public function actionDeleteUser($id){
+        if (yii::$app->request->isDelete) {
+            $request = yii::$app->request; //获取 request 对象
+            $params = $request->bodyParams; //获取body传参
+
+            $orderModel = new GroupOrderModel();
+            $orderWhere['user_id'] = $id;
+            $order = $orderModel->one($orderWhere);
+            if ($order['status'] == 200){
+                return result(500, "会员已产生订单，无法删除");
+            }
+
+            $model = new ShopUserModel();
+            $where['id'] = $id;
+            $info = $model->do_one($where);
+            if ($info['status'] != 200){
+                return result(500, "未查询到会员信息");
+            }
+            if ($info['data']['score'] != 0 || $info['data']['recharge_balance'] != 0 || $info['data']['balance'] != 0){
+                return result(500, "会员还有积分或余额，无法删除");
+            }
+            $array = $model->do_delete($where);
+            return $array;
+        } else {
+            return result(500, "请求方式错误");
+        }
+    }
 
 }

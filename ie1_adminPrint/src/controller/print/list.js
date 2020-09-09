@@ -16,13 +16,13 @@ layui.define(function (exports) {
      * form 不必须 表单操作，一般用于页面有新增和编辑
      * laydate 不必须 日期选择器
      */
-    layui.use(['jquery', 'setter', 'admin', 'laydate', 'laypage', 'element','table'], function () {
+    layui.use(['jquery', 'setter', 'admin', 'laydate', 'laypage', 'element', 'table'], function () {
         var $ = layui.$;
         var setter = layui.setter;//配置
         var layDate = layui.laydate;
         var laypage = layui.laypage;
-		var element = layui.element
-		var table = layui.table
+        var element = layui.element
+        var table = layui.table
         //以上定义的变量使用小驼峰命名法，与自定义变量区分，主要为 1、layui自带，2、config定义
 
         //以下为页面使用自定义变量，遵循下划线方式命名变量
@@ -37,15 +37,15 @@ layui.define(function (exports) {
         var tabPage = 1;//获取当前分页的页数
         var user_id = 0;//买家ID
         var all_orders = [];//查询到的所有信息，方便通过订单编号查找订单信息
-		var open_index,arr= {}
+        var open_index, arr = {}
         // var LODOP=getLodop();
         /*diy设置开始*/
         if (layui.router().search.key && layui.router().search.key !== '') {
             sessionStorage.setItem('saa_key', layui.router().search.key);//将key存入session
         } else {
-            layer.msg('错误请求', {icon: 1, time: 2000}, function () {
+            layer.msg('错误请求', { icon: 1, time: 2000 }, function () {
                 window.close();
-                layer.msg('请关闭当前页面', {icon: 1, time: 2000});
+                layer.msg('请关闭当前页面', { icon: 1, time: 2000 });
             });
         }
 
@@ -55,17 +55,17 @@ layui.define(function (exports) {
         function needCLodop() {
             try {
                 var ua = navigator.userAgent;
-                if (ua.match(/Windows\sPhone/i)){
+                if (ua.match(/Windows\sPhone/i)) {
                     return true;
                 }
 
-                if (ua.match(/iPhone|iPod|iPad/i)){
+                if (ua.match(/iPhone|iPod|iPad/i)) {
                     return true;
                 }
-                if (ua.match(/Android/i)){
+                if (ua.match(/Android/i)) {
                     return true;
                 }
-                if (ua.match(/Edge\D?\d+/i)){
+                if (ua.match(/Edge\D?\d+/i)) {
                     return true;
                 }
                 var verTrident = ua.match(/Trident\D?\d+/i);
@@ -73,23 +73,23 @@ layui.define(function (exports) {
                 var verOPR = ua.match(/OPR\D?\d+/i);
                 var verFF = ua.match(/Firefox\D?\d+/i);
                 var x64 = ua.match(/x64/i);
-                if ((!verTrident) && (!verIE) && (x64)){
+                if ((!verTrident) && (!verIE) && (x64)) {
                     return true;
-                }else if (verFF) {
+                } else if (verFF) {
                     verFF = verFF[0].match(/\d+/);
-                    if ((verFF[0] >= 41) || (x64)){
+                    if ((verFF[0] >= 41) || (x64)) {
                         return true;
                     }
                 } else if (verOPR) {
                     verOPR = verOPR[0].match(/\d+/);
-                    if (verOPR[0] >= 32){
+                    if (verOPR[0] >= 32) {
                         return true;
                     }
                 } else if ((!verTrident) && (!verIE)) {
                     var verChrome = ua.match(/Chrome\D?\d+/i);
                     if (verChrome) {
                         verChrome = verChrome[0].match(/\d+/);
-                        if (verChrome[0] >= 41){
+                        if (verChrome[0] >= 41) {
                             return true;
                         }
                     }
@@ -118,7 +118,7 @@ layui.define(function (exports) {
         //获取当前系统位数
         var agent = navigator.userAgent.toLowerCase();
         var systemBit
-        if(agent.indexOf("win64")>=0||agent.indexOf("wow64")>=0) {
+        if (agent.indexOf("win64") >= 0 || agent.indexOf("wow64") >= 0) {
             systemBit = 64;
         } else {
             systemBit = 32;
@@ -130,14 +130,14 @@ layui.define(function (exports) {
             try {
                 try {
                     LODOP = getCLodop();
-                } catch (err) {}
+                } catch (err) { }
                 if (!LODOP && document.readyState !== "complete") {
                     alert("网页还没下载完毕，请稍等一下再操作.");
                     return;
                 }
                 if (!LODOP) {
                     layer.open({
-                        title:'下载打印控件',
+                        title: '下载打印控件',
                         content: '未安装LODOP控件，请下载安装后刷新页面',
                         btn: ['确认', '取消'],
                         yes: function (index) {
@@ -158,264 +158,190 @@ layui.define(function (exports) {
                     })
                 }
                 // LODOP.SET_LICENSES("","13528A153BAEE3A0254B9507DCDE2839","","");
-                LODOP.SET_LICENSES("","7664EF00752AB8C6FF9E1F6906FB9256","C94CEE276DB2187AE6B65D56B3FC2848","");
+                LODOP.SET_LICENSES("", "7664EF00752AB8C6FF9E1F6906FB9256", "C94CEE276DB2187AE6B65D56B3FC2848", "");
                 return LODOP;
-            } catch (err) {}
+            } catch (err) { }
         }
 
 
-		var myTemps = getAjaxReturnKey({method:'merchantPrintingtemp',type:'get'})
-		var sysTemps = getAjaxReturn({method:'adminPrinttemp',type:'get'})
-		var allArray = []
-		if(sysTemps.status === 200){
-			myTemps.data && myTemps.data.forEach(function(e){
-				sysTemps.data && sysTemps.data.forEach(function(a,index){
-					e.english_name === a.english_name && sysTemps.data.splice(index,1)
-				})
-			})
-			if(myTemps.status != 200){
-				allArray = sysTemps.data
-			}else{
-				sysTemps.data.forEach(function(e){
-					myTemps.data.push(e)
-				})
-				allArray = myTemps.data
-			}
-			allArray && allArray.forEach(function(e){
-                tempId = e.system_express_template_id?e.system_express_template_id:e.id
+        var myTemps = getAjaxReturnKey({ method: 'merchantPrintingtemp', type: 'get' })
+        var sysTemps = getAjaxReturn({ method: 'adminPrinttemp', type: 'get' })
+        var allArray = []
+        if (sysTemps.status === 200) {
+            myTemps.data && myTemps.data.forEach(function (e) {
+                sysTemps.data && sysTemps.data.forEach(function (a, index) {
+                    e.english_name === a.english_name && sysTemps.data.splice(index, 1)
+                })
+            })
+            if (myTemps.status != 200) {
+                allArray = sysTemps.data
+            } else {
+                sysTemps.data.forEach(function (e) {
+                    myTemps.data.push(e)
+                })
+                allArray = myTemps.data
+            }
+            allArray && allArray.forEach(function (e) {
+                tempId = e.system_express_template_id ? e.system_express_template_id : e.id
                 switch (e.english_name) {
                     case 'leader_order':
-                        $('.footer_div').find("[data-engshilname='leader_order']").attr('data-tempId',tempId).attr('data-width',e.width).attr('data-height',e.height)
+                        $('.footer_div').find("[data-engshilname='leader_order']").attr('data-tempId', tempId).attr('data-width', e.width).attr('data-height', e.height)
                         break
                     case 'Invoice':
-                        $('.footer_div').find("[data-engshilname='Invoice']").attr('data-tempId',tempId).attr('data-width',e.width).attr('data-height',e.height)
+                        $('.footer_div').find("[data-engshilname='Invoice']").attr('data-tempId', tempId).attr('data-width', e.width).attr('data-height', e.height)
                         break
                     case 'purchasing_order':
-                        $('.footer_div').find("[data-engshilname='purchasing_order']").attr('data-tempId',tempId).attr('data-width',e.width).attr('data-height',e.height)
+                        $('.footer_div').find("[data-engshilname='purchasing_order']").attr('data-tempId', tempId).attr('data-width', e.width).attr('data-height', e.height)
                         break
                     case 'distribution_bill':
-                        $('.footer_div').find("[data-engshilname='distribution_bill']").attr('data-tempId',tempId).attr('data-width',e.width).attr('data-height',e.height)
+                        $('.footer_div').find("[data-engshilname='distribution_bill']").attr('data-tempId', tempId).attr('data-width', e.width).attr('data-height', e.height)
                         break
-                    case 'route_sheet':
-                        $('.footer_div').find("[data-engshilname='route_sheet']").attr('data-tempId',tempId).attr('data-width',e.width).attr('data-height',e.height)
+                    case 'leader_route':
+                        $('.footer_div').find("[data-engshilname='leader_route']").attr('data-tempId', tempId).attr('data-width', e.width).attr('data-height', e.height)
+                        break
+                    case 'warehouse_route':
+                        $('.footer_div').find("[data-engshilname='warehouse_route']").attr('data-tempId', tempId).attr('data-width', e.width).attr('data-height', e.height)
                         break
                     default:
 
                 }
-			})
-		}
+            })
+        }
 
-		$(document).off('click','input[type=checkbox]').on('click','input[type=checkbox]',function(){
-			if($(this).is(':checked')){
-				$('.btns').each(function(){
-					$(this).removeClass('layui-btn-disabled')
-				})
-			}
-		})
+        $(document).off('click', 'input[type=checkbox]').on('click', 'input[type=checkbox]', function () {
+            if ($(this).is(':checked')) {
+                $('.btns').each(function () {
+                    $(this).removeClass('layui-btn-disabled')
+                })
+            }
+        })
         //订单列表导出
-        $('.exportcsv').on('click',function () {
+        $('.exportcsv').on('click', function () {
             if (order_sn_list.length <= 0) {
-                layer.msg('未选择订单', {icon: 1, time: 2000});
+                layer.msg('未选择订单', { icon: 1, time: 2000 });
                 return;
             }
-            arr = {
-                method: 'merchantPrintsOrders',
-                type: 'get',
+            console.log(setter)
+            $.ajax({
+                url: setter.baseUrl + '/merchantPrintsOrderExcel',
+                method: 'post',
                 data: {
-                    page:tabPage,
-                    limit:pageLimit,
-                    status:$('#status').val(),
+                    order_sn_list: order_sn_list,
+                    page: tabPage,
+                    limit: pageLimit,
+                    status: $('#status').val(),
+                    key: 'ccvWPn'
+                },
+                success: res => {
+                    let btn = document.createElement('a')
+                    btn.href = res.data
+                    btn.download = '订单导出.xls'
+                    btn.click()
                 }
-            };
-            var res = getAjaxReturnKey(arr);
-            var orderlist = []
+            })
+            //console.log(res)
+            return false
+            var url = document.location.protocol + "//"
+            url += window.location.hostname + '/api/web/index.php/merchantPrintsOrderExcel?';
+            url += "page=" + tabPage + "&limit=" + pageLimit + "&status=" + $('#status').val() + "&key=" + layui.router().search.key
+            for (var i = 0; i < order_sn_list.length; i++) {
+                url += "&order_sn_list[]=" + order_sn_list[i]
+            }
+            window.open(url, "_blank")
+        })
 
-            if (res.status != 200) {
-                layer.msg(res.message, {icon: 2, time: 2000});
-                return;
-            } else {
-                if ($('#status').val() == 1){
-                    for (var i = 0; i < res.count; i++) {
-                        for (var k = 0; k < res.data[i].length; k++) {
-                            for (var j = 0; j < order_sn_list.length; j++) {
-                                if (res.data[i][k]['order_sn'] == order_sn_list[j]){
-                                    orderlist[j] = res.data[i][k];
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    for (var i = 0; i < res.count; i++) {
-                        for (var j = 0; j < order_sn_list.length; j++) {
-                            if (res.data[i]['order_sn'] == order_sn_list[j]){
-                                orderlist[j] = res.data[i];
-                            }
-                        }
-                    }
+        //配置模板开始
+        $('.configeTemp').on('click', function () {
+            open_index = layer.open({
+                type: 1,
+                title: '配制模板',
+                content: $('.tempModel'),
+                shade: 0,
+                offset: '100px',
+                area: ['1000px', '500px'],
+                cancel: function () {
+                    $('.tempModel').hide()
                 }
-                toLargerCSV(orderlist);
+            })
+            myTemp()
+        })
+
+        function myTemp() {
+            var saa_key = sessionStorage.getItem('saa_key');
+            var cols = [
+                { field: 'id', title: 'ID' },
+                { field: 'name', title: '模板名称' },
+                { field: 'english_name', title: '英文名称' },
+                { field: 'format_create_time', title: '创建时间' },
+                { field: 'operations', title: '操作', toolbar: '#Operations' }
+            ]
+            arr = {
+                name: 'render',//可操作的 render 对象名称
+                elem: '#myPageTable',//需要加载的 table 表格对应的 id
+                method: 'merchantPrintingtemp?key=' + saa_key,//请求的 api 接口方法
+                cols: [cols],//加载的表格字段
+            }
+            var render = getTableRender(arr)
+        }
+
+        //监听tab切换
+        element.on('tab(tab)', function (e) {
+            var index = e.index;
+            if (index === 0) {
+                //我的模板
+                myTemp()
+            } else if (index === 1) {
+                //系统模板
+                sysTemp()
             }
         })
 
-        function toLargerCSV(data) {
-            //CSV格式可以自己设定，适用MySQL导入或者excel打开。
-            //由于Excel单元格对于数字只支持15位，且首位为0会舍弃 建议用 =“数值”
-
-            var str = '行号,用户编码,姓名,手机号,收件地址,订单状态,快递单号,订单图片,订单规格,宝贝数量,留言备注\n';
-
-            for (var i = 0; i < data.length; i++) {
-                var status = '类型错误';
-                if (data[i].status === '0') {
-                    status = '待付款';
-                } else if (data[i].status === '1') {
-                    status = '待发货';
-                } else if (data[i].status === '2') {
-                    status = '已取消';
-                } else if (data[i].status === '3') {
-                    status = '已发货';
-                } else if (data[i].status === '4') {
-                    status = '已退款';
-                } else if (data[i].status === '5') {
-                    status = '退款中';
-                } else if (data[i].status === '6') {
-                    status = '待评价';
-                } else if (data[i].status === '7') {
-                    status = '已完成';
-                } else if (data[i].status === '8') {
-                    status = '已删除';
-                } else if (data[i].status === '9') {
-                    status = '一键退款';
-                } else {
-                    status = '类型错误';
-                }
-
-                var order_pic_url = '';
-                var order_number = '';
-                var order_property1_name = '';
-                for (var j = 0; j < data[i].order.length; j++) {
-                    order_pic_url += data[i].order[j].pic_url + ';'
-                    order_number += data[i].order[j].number
-                    order_property1_name += data[i].order[j].property1_name + ';'
-                }
-
-                var data_arr = [
-                    data[i].user_id,
-                    data[i].name,
-                    data[i].phone,
-                    data[i].address,
-                    status,
-                    data[i].order[0].express_number,
-                    order_pic_url,
-                    order_property1_name,
-                    order_number,
-                    data[i].remark
-                ];
-
-                str += (i + 1).toString() + ',' + data_arr.join(',') + ',\n'
+        function sysTemp() {
+            var cols = [
+                { field: 'id', title: 'ID' },
+                { field: 'name', title: '模板名称' },
+                { field: 'english_name', title: '英文名称' },
+                { field: 'format_create_time', title: '创建时间' },
+                { field: 'operations', title: '操作', toolbar: '#operations' }
+            ]
+            arr = {
+                name: 'render',//可操作的 render 对象名称
+                elem: '#sysPageTable',//需要加载的 table 表格对应的 id
+                method: 'adminPrinttemp',//请求的 api 接口方法
+                cols: [cols],//加载的表格字段
             }
-            var blob = new Blob([str], {type: "text/plain;charset=utf-8"});
-            //解决中文乱码问题
-            blob = new Blob([String.fromCharCode(0xFEFF), blob], {type: blob.type});
-            var object_url = window.URL.createObjectURL(blob);
-            var link = document.createElement("a");
-            link.href = object_url;
-            link.download = "导出.csv";
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            var render = getTableRender(arr)
         }
-		//配置模板开始
-		$('.configeTemp').on('click',function(){
-			open_index = layer.open({
-			    type: 1,
-			    title: '配制模板',
-			    content: $('.tempModel'),
-			    shade: 0,
-			    offset: '100px',
-			    area: ['1000px', '500px'],
-			    cancel: function () {
-			        $('.tempModel').hide()
-			    }
-			})
-			myTemp()
-		})
+        //选用
+        table.on('tool(sysPageTable)', function (obj) {
+            var id = obj.data.id
+            var layEvent = obj.event
+            layer.confirm('确定要选用这个模板么?', function (index) {
+                layer.close(index)
+                if (getAjaxReturnKey({ method: 'merchantPrintingtemp', type: 'post', data: { id: id } })) {
+                    layer.msg('选用成功')
+                }
+            })
+        })
 
-		function myTemp(){
-            var saa_key = sessionStorage.getItem('saa_key');
-			var cols = [
-			    {field: 'id', title: 'ID'},
-			    {field: 'name', title: '模板名称'},
-			    {field: 'english_name', title: '英文名称'},
-			    {field: 'format_create_time', title: '创建时间'},
-			    {field: 'operations', title: '操作', toolbar: '#Operations'}
-			]
-			arr = {
-			    name: 'render',//可操作的 render 对象名称
-			    elem: '#myPageTable',//需要加载的 table 表格对应的 id
-			    method: 'merchantPrintingtemp?key='+saa_key,//请求的 api 接口方法
-			    cols: [cols],//加载的表格字段
-			}
-			var render = getTableRender(arr)
-		}
+        //我的模板
+        table.on('tool(myPageTable)', function (obj) {
+            var id = obj.data.id
+            var layEvent = obj.event
+            if (layEvent === 'edit') {
+                sessionStorage.setItem('printTempId', id)
+            } else if (layEvent === 'del') {
+                layer.confirm('确定要删除这条数据么?', function (index) {
+                    layer.close(index)
+                    if (getAjaxReturn({ method: 'merchantPrintingtemp/' + id, type: 'delete' })) {
+                        layer.msg('删除成功')
+                        obj.del()
+                    }
+                })
+            }
+        })
 
-		//监听tab切换
-		element.on('tab(tab)', function (e) {
-		    var index = e.index;
-		    if (index === 0) {
-		        //我的模板
-				myTemp()
-		    } else if (index === 1) {
-		        //系统模板
-				sysTemp()
-		    }
-		})
-		
-		function sysTemp(){
-			var cols = [
-			    {field: 'id', title: 'ID'},
-			    {field: 'name', title: '模板名称'},
-			    {field: 'english_name', title: '英文名称'},
-			    {field: 'format_create_time', title: '创建时间'},
-			    {field: 'operations', title: '操作', toolbar: '#operations'}
-			]
-			arr = {
-			    name: 'render',//可操作的 render 对象名称
-			    elem: '#sysPageTable',//需要加载的 table 表格对应的 id
-			    method: 'adminPrinttemp',//请求的 api 接口方法
-			    cols: [cols],//加载的表格字段
-			}
-			var render = getTableRender(arr)
-		}
-		//选用
-		table.on('tool(sysPageTable)',function(obj){
-			var id = obj.data.id
-			var layEvent = obj.event
-			layer.confirm('确定要选用这个模板么?', function (index) {
-			    layer.close(index)
-			    if (getAjaxReturnKey({ method: 'merchantPrintingtemp', type: 'post',data:{id:id}})) {
-			        layer.msg('选用成功')
-			    }
-			})
-		})
-		
-		//我的模板
-		table.on('tool(myPageTable)',function(obj){
-			var id = obj.data.id
-			var layEvent = obj.event
-			if (layEvent === 'edit'){
-				sessionStorage.setItem('printTempId',id)
-			}else if (layEvent === 'del') {
-			    layer.confirm('确定要删除这条数据么?', function (index) {
-			        layer.close(index)
-			        if (getAjaxReturn({ method: 'merchantPrintingtemp/' + id, type: 'delete'})) {
-			            layer.msg('删除成功')
-			            obj.del()
-			        }
-			    })
-			}
-		})
-		
-		//配制模板结束
+        //配制模板结束
 
         //选择日期
         layDate.render({
@@ -459,19 +385,19 @@ layui.define(function (exports) {
             var time_type = $('#time_type').val();
             var time_type_value = $('input[name=time_type_value]').val()
             if (time_type === '' && time_type_value !== '') {
-                layer.msg('未选择搜索时间类型', {icon: 1, time: 2000});
+                layer.msg('未选择搜索时间类型', { icon: 1, time: 2000 });
                 return;
             }
             var type = $('#type').val();
             var type_value = $('input[name=type_value]').val();
             if (type === '' && type_value !== '') {
-                layer.msg('未选择查询条件', {icon: 1, time: 2000});
+                layer.msg('未选择查询条件', { icon: 1, time: 2000 });
                 return;
             }
             var print_type = $('#print_type').val();
             var is_print = $('#is_print').val();
             if (print_type === '' && is_print !== '') {
-                layer.msg('未选择打印类型', {icon: 1, time: 2000});
+                layer.msg('未选择打印类型', { icon: 1, time: 2000 });
                 return;
             }
             total_count = 0;
@@ -500,16 +426,17 @@ layui.define(function (exports) {
                 total_count = res.count;
                 for (var i = 0; i < order_list_len; i++) {
                     //查询待发货状态时，同用户订单合并在一起,另做处理
-                    if ($('#status').val() == 1){
-                        $('.order_list').append(getStayOrderDiv(order_list[i]));
+                    if ($('#status').val() == 1) {
+                        $('.order_list').append(getStayOrderDiv(order_list[i], i));
                     } else {
-                        $('.order_list').append(getOrderDiv(order_list[i]));
+                        $('.order_list').append(getOrderDiv(order_list[i], i));
                     }
-                    if(i%2==0){
-                        $('.order_list').children('li')[i].style.background='#e4e5e8';
+                    if (i % 2 == 0) {
+                        $('.order_list').children('li')[i].style.background = '#e4e5e8';
                     }
                 }
             }
+            console.log(res.count)
             $('.user_num').html(res.user ? res.user : 0);
             $('.order_num').html(res.count);
         }
@@ -538,58 +465,82 @@ layui.define(function (exports) {
         //打印模板单按钮点击事件
         $(document).off('click', '.print_temp').on('click', '.print_temp', function () {
             if (order_sn_list.length <= 0) {
-                layer.msg('未选择订单', {icon: 1, time: 2000});
+                layer.msg('未选择订单', { icon: 1, time: 2000 });
                 return;
             }
-            var id = $(this).attr('data-tempId'),str = ''
-            // var tempType = $(this).html().substring($(this).html().length-3) //订单类型
-            var height = Math.ceil($(this).attr('data-height')) + 2  //此处+2是设置模板宽高时，边框会增加2px，不+2，会导致超出高度，多一页空白
-            var width = Math.ceil($(this).attr('data-height')) + 2
-            // var height = Math.ceil($(this).attr('data-height')/37.8)  //px转为cm
-            // var width = Math.ceil($(this).attr('data-width')/37.8)  //px转为cm
-            order_sn_list.forEach(function(e){
-                str += e + ','
-            })
-            var res = getAjaxReturnKey({method:'merchantTuanordertemp',type:'get',data:{id:id,order_ids:str.substring(0,str.length-1)}})
-            if(res.status === 200){
-                getLodop()
-                // LODOP.SET_LICENSES("","7664EF00752AB8C6FF9E1F6906FB9256","C94CEE276DB2187AE6B65D56B3FC2848","");
-                // LODOP.SET_PRINT_PAGESIZE(1,width+'cm',height+'cm',"") //设置纸张大小
-                LODOP.SELECT_PRINTER();
-                LODOP.On_Return=function(TaskID,Value){
-                    if(Value>=0) {
-                        LODOP.SET_PRINTER_INDEX(Value)
-                        for (var i = 0; i < res.data.length; i++) {
-                            // LODOP.ADD_PRINT_TEXT(10, "40%", "100%", "100%", tempType) //设置抬头订单类型
-                            // LODOP.SET_PRINT_STYLEA(1,"FontSize",21);  //抬头字体
-                            LODOP.ADD_PRINT_HTM(0, 0, width, height, res.data[i]);
-                            // LODOP.PREVIEW();//打印预览
-                            LODOP.PRINT();//直接打印
+            let height = Math.ceil($(this).attr('data-height')) + 2  //此处+2是设置模板宽高时，边框会增加2px，不+2，会导致超出高度，多一页空白
+            let width = Math.ceil($(this).attr('data-height')) + 2
+            let id = $(this).attr('data-tempId'), str = ''
+            if(id != 1){
+                // var tempType = $(this).html().substring($(this).html().length-3) //订单类型
+                
+                // var height = Math.ceil($(this).attr('data-height')/37.8)  //px转为cm
+                // var width = Math.ceil($(this).attr('data-width')/37.8)  //px转为cm
+                layer.confirm('确定要打印么?', function (index) {
+                    layer.close(index);
+                    order_sn_list.forEach(function (e) {
+                        str += e + ','
+                    })
+                    let res = getAjaxReturnKey({ method: 'merchantTuanordertemp', type: 'get', data: { id: id, order_ids: str.substring(0, str.length - 1) } })
+                    if (res.status === 200) {
+                        getLodop()
+                        // LODOP.SET_LICENSES("","7664EF00752AB8C6FF9E1F6906FB9256","C94CEE276DB2187AE6B65D56B3FC2848","");
+                        // LODOP.SET_PRINT_PAGESIZE(1,width+'cm',height+'cm',"") //设置纸张大小
+                        LODOP.SELECT_PRINTER();
+                        LODOP.On_Return = function (TaskID, Value) {
+                            if (Value >= 0) {
+                                LODOP.SET_PRINTER_INDEX(Value)
+                                for (var i = 0; i < res.data.length; i++) {
+                                    // LODOP.ADD_PRINT_TEXT(10, "40%", "100%", "100%", tempType) //设置抬头订单类型
+                                    // LODOP.SET_PRINT_STYLEA(1,"FontSize",21);  //抬头字体
+                                    LODOP.ADD_PRINT_HTM(0, 0, width, height, res.data[i]);
+                                    // LODOP.PREVIEW();//打印预览
+                                    LODOP.PRINT();//直接打印
+                                }
+                            }
                         }
                     }
+                })
+            }else{
+                console.log(order_sn_list)
+                let res = getAjaxReturnKey({ method: 'merchantPrintsPdf', type: 'post', data: {order_sn_list} })
+                if (res.status === 200) {
+                    let htmlnode = ''
+                    for(let i of res.data){
+                        htmlnode += tonodestr(i)
+                    }
+                    newWindow=window.open("打印窗口","_blank")
+                    newWindow.document.write(htmlnode)
+                    newWindow.document.close()
+                    newWindow.print()
+                    //newWindow.close()
+                    
                 }
             }
+            
         });
 
         //打印快递单按钮点击事件
         $(document).off('click', '.print_express_order').on('click', '.print_express_order', function () {
             if ($('input[name=express]:checked').length === 0) {
-                layer.msg('未选择快递模板', {icon: 1, time: 2000});
+                layer.msg('未选择快递模板', { icon: 1, time: 2000 });
                 return;
             }
             if (order_sn_list.length <= 0) {
-                layer.msg('未选择订单', {icon: 1, time: 2000});
+                layer.msg('未选择订单', { icon: 1, time: 2000 });
                 return;
             }
             var express_id = $($('input[name=express]:checked')[0]).attr('id').split('_')[1];
 
-            if ($('#status').val() == 1){
+            if ($('#status').val() == 1) { //订单状态等于待发货
+                console.log(1)
                 var stayorder_arr = []
                 var express_type_arr = []
-                for(let i in stayorder_list){
+                console.log(stayorder_list)
+                for (let i in stayorder_list) {
                     stayorder_arr.push(stayorder_list[i])
                 }
-                for(let i in express_type){
+                for (let i in express_type) {
                     express_type_arr.push(express_type[i])
                 }
                 var subData = {
@@ -598,19 +549,20 @@ layui.define(function (exports) {
                     type: express_type_arr
                 };
             } else {
+                console.log(0)
                 var stayorder_arr = []
                 var express_type_arr = []
                 var k = 0
-                for(let i in stayorder_list){
-                    for (var j = 0; j < stayorder_list[i].length; j++){
+                for (let i in stayorder_list) {
+                    for (var j = 0; j < stayorder_list[i].length; j++) {
                         stayorder_arr[k] = []
                         stayorder_arr[k].push(stayorder_list[i][j])
                         k++
                     }
                 }
                 k = 0
-                for(let i in express_type){
-                    for (var j = 0; j < express_type[i].length; j++){
+                for (let i in express_type) {
+                    for (var j = 0; j < express_type[i].length; j++) {
                         express_type_arr[k] = []
                         express_type_arr[k].push(express_type[i][j])
                         k++
@@ -622,64 +574,68 @@ layui.define(function (exports) {
                     type: express_type_arr
                 };
             }
-            arr = {
-                method: 'merchantPrintsOrders',
-                type: 'post',
-                data: subData,
-            };
-            var res = getAjaxReturnKey(arr);
-            if (res && res.data) {
-                var order_list = res.data;
-                var order_list_len = order_list.length;
-                var str = '';
-                for (var i = 0; i < order_list_len; i++) {
-                    str += order_list[i].PrintTemplate;
-                    $($('#' + order_list[i].order_sn).parent().parent().find('.express_number')[0]).val(order_list[i].express_number);
+            layer.confirm('确定要打印么?', function (index) {
+                layer.close(index);
+                arr = {
+                    method: 'merchantPrintsOrders',
+                    type: 'post',
+                    data: subData,
+                };
+                var res = getAjaxReturnKey(arr);
+                if (res && res.data) {
+                    var order_list = res.data;
+                    var order_list_len = order_list.length;
+                    var str = '';
+                    for (var i = 0; i < order_list_len; i++) {
+                        str += order_list[i].PrintTemplate;
+                        // $($('#' + order_list[i].order_sn).parent().parent().find('.express_number')[0]).val(order_list[i].express_number);
+                        $($('#' + order_list[i].order_sn).closest('.top_parent_class').find('.express_number')[0]).val(order_list[i].express_number);
+                    }
+                    if (str !== '') {
+                        getLodop()
+                        // LODOP.SET_LICENSES("","7664EF00752AB8C6FF9E1F6906FB9256","C94CEE276DB2187AE6B65D56B3FC2848","");
+                        LODOP.ADD_PRINT_HTM(0, 0, "100%", "100%", str);
+                        // LODOP.PREVIEW();//打印预览
+                        LODOP.PRINT();//直接打印
+                    }
                 }
-                if (str !== '') {
-                    getLodop()
-                    // LODOP.SET_LICENSES("","7664EF00752AB8C6FF9E1F6906FB9256","C94CEE276DB2187AE6B65D56B3FC2848","");
-                    LODOP.ADD_PRINT_HTM(0, 0, "100%", "100%", str);
-                    // LODOP.PREVIEW();//打印预览
-                    LODOP.PRINT();//直接打印
-                }
-            }
+            })
         });
 
         //发货按钮点击事件
         $(document).off('click', '.deliver_goods').on('click', '.deliver_goods', function () {
             if ($('input[name=express]:checked').length === 0) {
-                layer.msg('未选择快递模板', {icon: 1, time: 2000});
+                layer.msg('未选择快递模板', { icon: 1, time: 2000 });
                 return;
             }
             if (order_sn_list.length <= 0) {
-                layer.msg('未选择订单', {icon: 1, time: 2000});
+                layer.msg('未选择订单', { icon: 1, time: 2000 });
                 return;
             }
             var express_numbers = [];//对应的快递单号
             var express_id = $($('input[name=express]:checked')[0]).attr('id').split('_')[1];//快递模板
 
-            if ($('#status').val() == 1){
+            if ($('#status').val() == 1) {
                 //待发货订单处理
                 $('input[name=user_checkbox]:checked').each(function () {
-                    if (express_id == 0){
+                    if (express_id == 0) {
                         $($(this).parent().parent().find('.express_number')[0]).val('本地配送');
                     }
                     var express_number = $($(this).parent().parent().find('.express_number')[0]).val();
                     if (express_number == '') {
-                        layer.msg($(this).parent().next().next().html() + ' 的订单未填写快递单号', {icon: 1, time: 2000});
+                        layer.msg($(this).parent().next().next().html() + ' 的订单未填写快递单号', { icon: 1, time: 2000 });
                         return false;
                     }
                     express_numbers.push(express_number);
                 })
             } else {
                 for (var o = 0; o < order_sn_list.length; o++) {
-                    if (express_id == 0){
+                    if (express_id == 0) {
                         $($('#' + order_sn_list[o]).parent().parent().find('.express_number')[0]).val('本地配送');
                     }
                     var express_number = $($('#' + order_sn_list[o]).parent().parent().find('.express_number')[0]).val();
                     if (express_number == '') {
-                        layer.msg('订单号为 ' + order_sn_list[o] + ' 的订单未填写快递单号', {icon: 1, time: 2000});
+                        layer.msg('订单号为 ' + order_sn_list[o] + ' 的订单未填写快递单号', { icon: 1, time: 2000 });
                         return;
                     }
                     express_numbers.push(express_number);
@@ -690,45 +646,49 @@ layui.define(function (exports) {
             for (var i = 0; i < a_o_len; i++) {
                 if (order_sn_list.indexOf(all_orders[i].order_sn) !== -1) {
                     if (all_orders[i].status !== '1') {
-                        layer.msg('订单号为 ' + all_orders[i].order_sn + ' 的订单不能发货', {icon: 1, time: 2000});
+                        layer.msg('订单号为 ' + all_orders[i].order_sn + ' 的订单不能发货', { icon: 1, time: 2000 });
                         return;
                     }
                 }
             }
-            var subData = {
-                order_sn: order_sn_list,
-                express_number: express_numbers,
-                electronics_id: express_id,
-                is_tuan: is_tuan_list
-            };
 
-            arr = {
-                method: 'merchantPrintsOrdersSend',
-                type: 'put',
-                data: subData,
-            };
-            var res = getAjaxReturnKey(arr);
-            if (res) {
-                //更新好物圈订单信息
-                for (var i = 0; i < order_sn_list.length; i++) {
-                    getAjaxReturnKey({method: 'shopCircleOrder/' + order_sn_list[i], type: 'put'});
-                }
-                layer.msg(res.message, {icon: 1, time: 2000}, function () {
-                    getList();
-                    if (total_count > pageLimit) {
-                        getPage();
+            layer.confirm('确定要发货么?', function (index) {
+                layer.close(index);
+                var subData = {
+                    order_sn: order_sn_list,
+                    express_number: express_numbers,
+                    electronics_id: express_id,
+                    is_tuan: is_tuan_list
+                };
+
+                arr = {
+                    method: 'merchantPrintsOrdersSend',
+                    type: 'put',
+                    data: subData,
+                };
+                var res = getAjaxReturnKey(arr);
+                if (res) {
+                    //更新好物圈订单信息
+                    for (var i = 0; i < order_sn_list.length; i++) {
+                        getAjaxReturnKey({ method: 'shopCircleOrder/' + order_sn_list[i], type: 'put' });
                     }
-                    order_sn_list = [];
-                    is_tuan_list = [];
-                });
-            }
+                    layer.msg(res.message, { icon: 1, time: 2000 }, function () {
+                        getList();
+                        if (total_count > pageLimit) {
+                            getPage();
+                        }
+                        order_sn_list = [];
+                        is_tuan_list = [];
+                    });
+                }
+            })
         });
 
         //点击展开或收起事件
         $(document).off('click', '.table_ul_top p span').on('click', '.table_ul_top p span', function () {
             //原背景颜色
             var bgcolor = $(this).parent('p').parent('.table_ul_top').parent('li').next().next().css('background-color')
-            if (!bgcolor){
+            if (!bgcolor) {
                 bgcolor = $(this).parent('p').parent('.table_ul_top').parent('li').prev().prev().css('background-color')
             }
             if ($(this).parent('p').parent('.table_ul_top').siblings('.table_ul_bottom').css('display') == 'none') {
@@ -753,7 +713,7 @@ layui.define(function (exports) {
         //点击展开中的复制地址事件
         $(document).off('click', '.copy_address').on('click', '.copy_address', function () {
             getCopy($(this).prev().val());
-            layer.msg('复制成功', {icon: 1, time: 2000});
+            layer.msg('复制成功', { icon: 1, time: 2000 });
         });
 
         //全选按钮点击事件 默认 先功能 后样式
@@ -763,28 +723,28 @@ layui.define(function (exports) {
                 $('.checkbox').each(function () {
                     order_sn_list.push($(this).attr('id'));
                     is_tuan_list.push($(this).attr('data-is_tuan'));
-                    if ($('#status').val() != 1){
+                    if ($('#status').val() != 1) {
                         user_id = $(this).parent().next().html()
-                        if (!stayorder_list.hasOwnProperty(user_id)){
+                        if (!stayorder_list.hasOwnProperty(user_id)) {
                             stayorder_list[user_id] = [];
                             express_type[user_id] = [];
                         }
                         stayorder_list[user_id].push($(this).attr('id'));
-                        if ($(this).attr('data-express_type') == 1 || $(this).attr('data-express_type') == 2){
+                        if ($(this).attr('data-express_type') == 1 || $(this).attr('data-express_type') == 2) {
                             express_type[user_id].push(1);
                         } else {
                             express_type[user_id].push(0);
                         }
                     }
                 })
-                if ($('#status').val() == 1){
+                if ($('#status').val() == 1) {
                     $('.user_checkbox').each(function () {
                         user_id = $(this).parent().next().html()
                         stayorder_list[user_id] = [];
                         express_type[user_id] = [];
                         $(this).parents('.table_ul_top').next().find('.checkbox').each(function () {
                             stayorder_list[user_id].push($(this).attr('id'));
-                            if ($(this).attr('data-express_type') == 1 || $(this).attr('data-express_type') == 2){
+                            if ($(this).attr('data-express_type') == 1 || $(this).attr('data-express_type') == 2) {
                                 express_type[user_id].push(1);
                             } else {
                                 express_type[user_id].push(0);
@@ -800,43 +760,56 @@ layui.define(function (exports) {
             }
             $('.checkbox').prop('checked', bool)
             $('.user_checkbox').prop('checked', bool)
-			if($('input[type=checkbox]:checked').length === 0){
-				$('.btns').each(function(){
-					$(this).addClass('layui-btn-disabled')
-				})
-			}
+            if ($('input[type=checkbox]:checked').length === 0) {
+                $('.btns').each(function () {
+                    $(this).addClass('layui-btn-disabled')
+                })
+            }
         })
 
         //待发货列表单选按钮点击事件
+        /**
+         * user_id 列表下标
+         */
         $(document).off('click', '.user_checkbox').on('click', '.user_checkbox', function () {
-            user_id = $(this).parent().next().html()
+            user_id = $(this).parent().next()[0].id
             var bool = $(this)[0].checked
             if (bool) {
-                stayorder_list[user_id] = [];
+                if (stayorder_list[user_id]) { //判断stayorder_list是否包含user_id
+                    stayorder_list[user_id] = [...stayorder_list[user_id]];
+                } else {
+                    stayorder_list[user_id] = [];
+                }
+                if (express_type[user_id]) {//判断express_type是否包含user_id
+                    express_type[user_id] = [...express_type[user_id]];
+                } else {
+                    express_type[user_id] = [];
+                }
                 express_type[user_id] = [];
                 $(this).parents('.table_ul_top').next().find('.checkbox').each(function () {
                     order_sn_list.push($(this).attr('id'));
                     is_tuan_list.push($(this).attr('data-is_tuan'));
                     stayorder_list[user_id].push($(this).attr('id'));
-                    if ($(this).attr('data-express_type') == 1 || $(this).attr('data-express_type') == 2){
+                    if ($(this).attr('data-express_type') == 1 || $(this).attr('data-express_type') == 2) {
                         express_type[user_id].push(1);
                     } else {
                         express_type[user_id].push(0);
                     }
                 })
+                console.log($(this), order_sn_list)
             } else {
                 $(this).parents('.table_ul_top').next().find('.checkbox').each(function () {
                     var _this_id = $(this).attr('id')
                     var _this_is_tuan = $(this).attr('data-is_tuan')
-                    order_sn_list.forEach(function (e,index) {
-                        if (e == _this_id){
-                            order_sn_list.splice(index,1)
-                            is_tuan_list.splice(index,1)
+                    order_sn_list.forEach(function (e, index) {
+                        if (e == _this_id) {
+                            order_sn_list.splice(index, 1)
+                            is_tuan_list.splice(index, 1)
                         }
                     })
-                    for(let i in stayorder_list){
+                    for (let i in stayorder_list) {
                         stayorder_list[i].forEach(function (v) {
-                            if (v == _this_id){
+                            if (v == _this_id) {
                                 delete stayorder_list[i]
                                 delete express_type[i]
                             }
@@ -845,8 +818,8 @@ layui.define(function (exports) {
                 })
             }
             $(this).parents('.table_ul_top').next().find('.checkbox').prop('checked', bool)
-            if($('input[type=checkbox]:checked').length === 0){
-                $('.btns').each(function(){
+            if ($('input[type=checkbox]:checked').length === 0) {
+                $('.btns').each(function () {
                     $(this).addClass('layui-btn-disabled')
                 })
             }
@@ -855,13 +828,14 @@ layui.define(function (exports) {
 
         //单选按钮点击事件
         $(document).off('click', '.checkbox').on('click', '.checkbox', function () {
+            console.log($(this))
             var bool = $(this)[0].checked
-            if ($('#status').val() == 1){
+            if ($('#status').val() == 1) {
                 user_id = $(this).parents('.table_ul_bottom').prev().find('.user_checkbox').parent().next().html()
             } else {
                 user_id = $(this).parent().next().html()
             }
-			if (bool) {
+            if (bool) {
                 order_sn_list.push($(this).attr('id'));
                 is_tuan_list.push($(this).attr('data-is_tuan'));
                 //判断是否所有都选中，如果所有选中，则全选按钮选中，否则，取消全选按钮
@@ -870,19 +844,17 @@ layui.define(function (exports) {
                 }
 
                 //待发货状态内部订单单选处理
-                if (!stayorder_list.hasOwnProperty(user_id)){
+                if (!stayorder_list.hasOwnProperty(user_id)) {
                     stayorder_list[user_id] = [];
                     express_type[user_id] = [];
                 }
                 stayorder_list[user_id].push($(this).attr('id'));
-                if ($(this).attr('data-express_type') == 1 || $(this).attr('data-express_type') == 2){
+                if ($(this).attr('data-express_type') == 1 || $(this).attr('data-express_type') == 2) {
                     express_type[user_id].push(1);
                 } else {
                     express_type[user_id].push(0);
                 }
-                if (stayorder_list[user_id].length == $(this).parents('.table_ul_bottom').find('.checkbox').length){
-                    $(this).parents('.table_ul_bottom').prev().find('.user_checkbox').prop('checked', true)
-                }
+                $(this).parents('.table_ul_bottom').prev().find('.user_checkbox').prop('checked', true)
             } else {
                 deleteSpecifiedElement(order_sn_list, $(this).attr('id'));
                 deleteSpecifiedElement(is_tuan_list, $(this).attr('data-is_tuan'));
@@ -890,19 +862,22 @@ layui.define(function (exports) {
 
                 //待发货状态内部订单单选处理
                 var _this_id = $(this).attr('id')
-                stayorder_list[user_id].forEach(function (e,index) {
-                    if (e == _this_id){
-                        stayorder_list[user_id].splice(index,1)
-                        express_type[user_id].splice(index,1)
+                stayorder_list[user_id].forEach(function (e, index) {
+                    if (e == _this_id) {
+                        stayorder_list[user_id].splice(index, 1)
+                        express_type[user_id].splice(index, 1)
                     }
                 })
-                $(this).parents('.table_ul_bottom').prev().find('.user_checkbox').prop('checked', false)
+                if (stayorder_list[user_id].length <= 0) {
+                    $(this).parents('.table_ul_bottom').prev().find('.user_checkbox').prop('checked', false)
+                }
             }
-			if($('input[type=checkbox]:checked').length === 0){
-				$('.btns').each(function(){
-					$(this).addClass('layui-btn-disabled')
-				})
-			}
+            console.log($(this), order_sn_list)
+            if ($('input[type=checkbox]:checked').length === 0) {
+                $('.btns').each(function () {
+                    $(this).addClass('layui-btn-disabled')
+                })
+            }
         })
         //点击图片打开预览
         $(document).off('click', '.imgClickEvent').on('click', '.imgClickEvent', function () {
@@ -913,7 +888,7 @@ layui.define(function (exports) {
 })
 
 //获取订单div
-function getOrderDiv(order) {
+function getOrderDiv(order, index) {
     var s_show = '';
     if (order.status === 0) {
         s_show = '';
@@ -941,6 +916,18 @@ function getOrderDiv(order) {
     } else {
         s_show = '类型错误';
     }
+
+    //添加用户选择的发货方式
+    var express_type = order.express_type;
+    var express_type_str = '';
+    if (express_type === '0') { //快递
+        express_type_str = '快递';
+    } else if (express_type === '1') { //自提
+        express_type_str = '自提';
+    } else if (express_type === '2') { //团长配送
+        express_type_str = '团长配送';
+    }
+
     //判断是否有子订单并获取第一个子订单的标题和图片
     var property1_name = '';
     var images = '';
@@ -972,15 +959,16 @@ function getOrderDiv(order) {
     }
     //拼接需要复制的地址
     var address = order.address
-    address =   address.substr(0,address.lastIndexOf('-'))
+    address = address.substr(0, address.lastIndexOf('-'))
     address = address.split('-').join('');
-    address = address == '' ? '无地址信息':address
+    address = address == '' ? '无地址信息' : address
     return '             <li>\n' +
-        '                    <div class="table_ul_top clearfix">\n' +
+        '                    <div class="table_ul_top clearfix top_parent_class">\n' +
         '                        <p><input id="' + order.order_sn + '" data-express_type="' + order.express_type + '" data-is_tuan="' + order.is_tuan + '" type="checkbox" class="checkbox"></p>\n' +
         '                        <p>' + order.user_id + '</p>\n' +
         '                        <p>' + order.name + '</p>\n' +
         '                        <p>' + order.phone + '</p>\n' +
+        '                        <p>' + express_type_str + '</p>\n' +
         '                        <p>' + address + '</p>\n' +
         '                        <p>' + s_show + '</p>\n' +
         '                        <p><input class="number express_number" type="text" value="' + express_number + '"></p>\n' +
@@ -1048,7 +1036,7 @@ function getOrderDiv(order) {
 
 
 //待发货订单div
-function getStayOrderDiv(order) {
+function getStayOrderDiv(order, index) {
     var s_show = '';
     if (order[0].status === 0) {
         s_show = '';
@@ -1106,6 +1094,16 @@ function getStayOrderDiv(order) {
     var number = '';
     var express_number = '';
 
+    var express_type = order[0].express_type;
+    var express_type_str = '';
+    if (express_type === '0') { //快递
+        express_type_str = '快递';
+    } else if (express_type === '1') { //自提
+        express_type_str = '自提';
+    } else if (express_type === '2') { //团长配送
+        express_type_str = '团长配送';
+    }
+
     //外层商品展示
     order_goods.forEach(function (e) {
         number += e.number + '<br/>';
@@ -1115,17 +1113,18 @@ function getStayOrderDiv(order) {
 
     //拼接需要复制的地址
     var address = order[0].address
-    address =   address.substr(0,address.lastIndexOf('-'))
+    address = address.substr(0, address.lastIndexOf('-'))
     address = address.split('-').join('');
-    address = address == '' ? '无地址信息':address
+    address = address == '' ? '无地址信息' : address
     var res_list = '';
 
-    res_list += '             <li>\n' +
+    res_list += '             <li class="top_parent_class">\n' +
         '                    <div class="table_ul_top clearfix">\n' +
         '                        <p><input type="checkbox" name="user_checkbox" class="user_checkbox"></p>\n' +
-        '                        <p>' + order[0].user_id + '</p>\n' +
+        '                        <p id=' + index + '>' + order[0].user_id + '</p>\n' +
         '                        <p>' + order[0].name + '</p>\n' +
         '                        <p>' + order[0].phone + '</p>\n' +
+        '                        <p>' + express_type_str + '</p>\n' +
         '                        <p>' + address + '</p>\n' +
         '                        <p>' + s_show + '</p>\n' +
         '                        <p><input class="number express_number" type="text" value="' + express_number + '"></p>\n' +
@@ -1162,7 +1161,7 @@ function getStayOrderDiv(order) {
         '                                <button class="btn2 copy_address">复制地址</button>\n' +
         '                            </li>\n';
 
-    for(var i = 0; i < order_len; i++){
+    for (var i = 0; i < order_len; i++) {
         var goods_list = order[i].order;
         var goods_list_len = order[i].order.length;
 
@@ -1191,7 +1190,7 @@ function getStayOrderDiv(order) {
             '                            </li>\n' +
             '                            <li>\n' +
             '                                <h3>宝贝：</h3>\n';
-        for(var j = 0; j < goods_list_len; j++){
+        for (var j = 0; j < goods_list_len; j++) {
             res_list += '<div class="li_div clearfix">\n' +
                 '               <img class="imgClickEvent" src="' + goods_list[j].pic_url + '" alt="">\n' +
                 '               <div class="li_div_right">\n' +
@@ -1211,4 +1210,110 @@ function getStayOrderDiv(order) {
     return res_list;
 }
 
-
+function togoodsnode (e){ //团长单商品节点
+    let arr = []
+    e.map((e, i) => {
+        if(i % 5 == 0){
+            arr.push([e, {},{},{},{}])
+        }else{
+            arr[arr.length - 1][i % 5] = e
+        }
+    })
+    arr = arr.map(i => {
+        return `<tr>${i.map(o => {
+            if(o.hasOwnProperty('name')){
+                return `<td style='width: 171px; text-align: center;'><div>${o.name}</div><div>${o.property1_name}${o.property2_name}*${o.num}</div></td>`
+            }else{
+                return `<td style='width: 171px; text-align: center;'><div></div><div></div></td>`
+            }
+        }).join('')}</tr>`
+    }).join('')
+    return arr
+}
+let express_type = {
+    0: '快递',
+    1: '自提',
+    2: '团长送货'
+}
+function toordernode(e){ //团长单订单节点
+    let arr = e.map(i => {
+        return `
+            <tr>
+                <td style='width: 100px; padding: 5px;'>
+                    <div>${i.name}</div>
+                    <div>${i.phone}</div>
+                </td>
+                <td style='width: 200px'>
+                    <div style='padding: 5px;'>${i.address}</div>
+                </td>
+                <td colspan='3'>
+                   ${i.goods.map((o, index) => {
+                      if(index == i.goods.length -1){
+                        return `
+                        <div>
+                          <div style='height: 100%; display: inline-table; width: 255px; padding: 5px;'>${o.name}</div>
+                          <div style='height: 100%; word-break: break-all; white-space: pre-wrap; display: inline-table; width: 50px; padding: 5px;'>${o.property1_name} ${o.property2_name}</div>
+                          <div style='height: 100%; display: inline-table; width: 30px; padding: 5px;'>${o.number}</div>
+                        </div>`
+                      }else{
+                        return `
+                        <div style='border-bottom: 1px solid #999;'>
+                          <div style='height: 100%; display: inline-table; width: 255px; padding: 5px;'>${o.name}</div>
+                          <div style='height: 100%; word-break: break-all; white-space: pre-wrap; display: inline-table; width: 50px; padding: 5px;'>${o.property1_name} ${o.property2_name}</div>
+                          <div style='height: 100%; display: inline-table; width: 30px; padding: 5px;'>${o.number}</div>
+                        </div>`
+                      }
+                      }).join('')}
+                </td>
+                <td style='width: 80px; padding: 5px;'>${i.remark}</td>
+                <td style='width: 60px; padding: 5px;'>${express_type[i.express_type]}</td>
+            </tr>
+        `
+    }).join('')
+    return arr
+}
+function tonodestr(e){ //团长单节点
+    let str = `<!--startprint--><div style='page-break-after: always; width: 860px; margin: 0 auto;'>
+    <header id="header">
+        <table style="border-bottom: 2px solid; border-color: #fff !important; width: 100%;">
+            <tr>
+                <td width="10%"></td>
+                <td width="80%" align="center" style="font-size:25px;">
+                    <span style='margin-right: 20px;'>小区:${e.area_name}</span>
+                    <span style='margin-right: 20px;'>姓名:${e.realname}</span>
+                    <span>电话:${e.phone}</span></td>
+                <td width="10%" style="text-align: right;"></td>
+            </tr>
+        </table>
+    </header>
+    <section id="section">
+        <table border="1" style='font-size: 10px; border-color: #fff !important;' cellspacing="0">
+            <tr>
+                <td colspan="5">商品统计</td>
+            </tr>
+            <tr>
+                ${togoodsnode(e.statistics_goods)}
+            </tr>
+        </table>
+    </section>
+    <footer id="footer">
+        <table style='font-size: 10px; border-color: #fff !important;' border="1" cellspacing="0">
+            <thead>
+                <tr>
+                    <td>会员信息</td>
+                    <td style="width: 180px;">用户地址</td>
+                    <td style="width: 270px;">商品名称</td>
+                    <td style='width: 60px'>规格</td>
+                    <td style='width: 40px'>数量</td>
+                    <td>备注留言</td>
+                    <td style='width: 60px;'>配送方式</td>
+                </tr>
+            </thead>
+            <tbody>
+                ${toordernode(e.order)}
+            </tbody>
+        </table>
+    </footer>
+</div><!--endprint-->`
+    return str
+}

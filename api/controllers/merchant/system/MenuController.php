@@ -18,8 +18,8 @@ class MenuController extends MerchantController
         return [
             'token' => [
                 'class' => 'yii\filters\MerchantFilter', //调用过滤器
-                'only' => ['single'], //指定控制器应用到哪些动作
-                'except' => ['test'], //指定控制器不应用到哪些动作
+               // 'only' => ['single'], //指定控制器应用到哪些动作
+                //'except' => ['test'], //指定控制器不应用到哪些动作
             ]
         ];
     }
@@ -94,22 +94,20 @@ class MenuController extends MerchantController
 
                 $groupModel = new GroupModel();
                 $group = $groupModel->find(['id' => $subUser['data']['group_ids']]);
-                // var_dump($group['data']['rules']);die();
                 unset($params['key']);
                 $params['limit'] = false;
                 $params['in'] = ['id', explode(",", $group['data']['rules'])];
-                $params['orderby'] = "sort asc";
+                $params['orderby'] = "id asc";
                 $params['pid'] = 0;
-                // var_dump($params);die();
                 $array = $model->do_select($params);
                 if ($array['status'] == 200) {
                     for ($i = 0; $i < count($array['data']); $i++) {
                         $params['pid'] = $array['data'][$i]['id'];
                         $sub = $model->do_select($params);
                         if ($sub['status'] == 200) {
-                            $array['data'][$i]['sub'] = $sub['data'];
+                            $array['data'][$i]['children'] = $sub['data'];
                         } else {
-                            $array['data'][$i]['sub'] = array();
+                            $array['data'][$i]['children'] = array();
                         }
                     }
                 }

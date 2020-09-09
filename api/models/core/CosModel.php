@@ -10,10 +10,13 @@ namespace app\models\core;
 
 use app\models\admin\system\SystemCosModel;
 use app\models\system\SystemPicServerModel;
+use OSS\Core\OssException;
+use OSS\OssClient;
 use Qcloud\Cos\Client;
 use Yii;
 
-require(Yii::getAlias('@vendor/tencentyun/cos-php-sdk-v5/cos-autoloader.php'));
+require_once(Yii::getAlias('@vendor/tencentyun/cos-php-sdk-v5/cos-autoloader.php'));
+require_once(Yii::getAlias('@vendor/oss-sdk/autoload.php'));
 
 header('Access-Control-Allow-Headers:Access-Token');
 header('Access-Control-Allow-Origin:*');
@@ -41,7 +44,7 @@ class CosModel {
     }
 
     /**
-     * 腾讯云  对象存储
+     * 对象存储
      * @param string $res  页面file标签input=file name='$name'
      * @return array
      */
@@ -49,34 +52,54 @@ class CosModel {
         if ($res) {
             $cos =  $this->cos();
             if($cos['status']!=200){
-                return result(500,'未配置cos信息');
+                return result(500,'未配置对象存储信息');
             }
-            $cosClient = new Client(array(
-                    'region' => $cos['data']['config']['region'],
-                    'credentials' => array(
-                        'appId' => $cos['data']['config']['appId'],
-                        'secretId' =>$cos['data']['config']['secretId'],
-                        'secretKey' => $cos['data']['config']['secretKey']
-                    ))
-            );
-            $url = substr($res, 10);
-            try {
-                $args = array(
-                    'Bucket' => $cos['data']['config']['Bucket'],
-                    'Key' => $url,
-                    'Body' => fopen(Yii::getAlias('@webroot/') . $res, 'rb'),
+            if ($cos['data']['type'] == 1){ //腾讯云
+                $cosClient = new Client(array(
+                        'region' => $cos['data']['config']['region'],
+                        'credentials' => array(
+                            'appId' => $cos['data']['config']['appId'],
+                            'secretId' =>$cos['data']['config']['secretId'],
+                            'secretKey' => $cos['data']['config']['secretKey']
+                        ))
                 );
-                $result = $this->object2array($cosClient->putObject($args));
-                $url =  $result['ObjectURL'];
-                return [
-                    'status' => '200',
-                    'data' => $url,
-                ];
-            } catch (\Exception $e) {
-                return [
-                    'status' => '500',
-                    'message' => $e->getMessage()
-                ];
+                $url = substr($res, 10);
+                try {
+                    $args = array(
+                        'Bucket' => $cos['data']['config']['Bucket'],
+                        'Key' => $url,
+                        'Body' => fopen(Yii::getAlias('@webroot/') . $res, 'rb'),
+                    );
+                    $result = $this->object2array($cosClient->putObject($args));
+                    $url =  $result['ObjectURL'];
+                    return [
+                        'status' => '200',
+                        'data' => $url,
+                    ];
+                } catch (\Exception $e) {
+                    return [
+                        'status' => '500',
+                        'message' => $e->getMessage()
+                    ];
+                }
+            } elseif ($cos['data']['type'] == 2){ //阿里云
+                try{
+                    $ossClient = new OssClient($cos['data']['config']['accessKeyId'],$cos['data']['config']['accessKeySecret'],$cos['data']['config']['endpoint']);
+                    $fileName = substr($res, 10);
+                    $result = $ossClient->uploadFile($cos['data']['config']['bucket'], $fileName, $res);
+                    $url = $result['oss-request-url'];
+                    return [
+                        'status' => '200',
+                        'data' => $url,
+                    ];
+                } catch(OssException $e) {
+                    return [
+                        'status' => '500',
+                        'message' => $e->getMessage()
+                    ];
+                }
+            } else {
+                return result(500,'类型有误');
             }
         }
     }
@@ -115,7 +138,6 @@ class CosModel {
 
     function cos(){
         $model = new SystemPicServerModel();
-        $where['type'] = 1; //1为腾讯云
         $where['status'] = 1;
         $cos  = $model->do_one($where);
         if ($cos['status'] == 200){

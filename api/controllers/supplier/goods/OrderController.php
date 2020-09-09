@@ -9,8 +9,10 @@ use app\models\admin\user\SystemAccessModel;
 use app\models\merchant\distribution\DistributionAccessModel;
 use app\models\merchant\partnerUser\PartnerUserModel;
 use app\models\merchant\system\OperationRecordModel;
+use app\models\merchant\user\MerchantModel;
 use app\models\shop\BalanceModel;
 use app\models\shop\GroupOrderModel;
+use app\models\shop\ShopUserModel;
 use app\models\shop\SubOrdersModel;
 use app\models\shop\UserModel;
 use app\models\system\SystemAreaModel;
@@ -435,7 +437,19 @@ class OrderController extends SupplierController
                     //添加操作记录
                     $operationRecordModel = new OperationRecordModel();
                     $operationRecordData['key'] = $params['`key`'];
-                    $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                    if (isset(yii::$app->session['sid'])) {
+                        $subModel = new \app\models\merchant\system\UserModel();
+                        $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                        if ($subInfo['status'] == 200){
+                            $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                        }
+                    } else {
+                        $merchantModle = new MerchantModel();
+                        $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                        if ($merchantInfo['status'] == 200) {
+                            $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                        }
+                    }
                     $operationRecordData['operation_type'] = '更新';
                     $operationRecordData['operation_id'] = $params['order_sn'];
                     $operationRecordData['module_name'] = '订单管理';
@@ -615,9 +629,14 @@ class OrderController extends SupplierController
                 unset(yii::$app->session['key']);
             }
             $params['merchant_id'] = yii::$app->session['uid'];
-            if (!isset($params['order_sn'])) {
-                return result(400, "缺少参数 order_sn");
+            if (!isset($params['id'])) {
+                return result(400, "缺少参数 id");
             }
+            $subOrderModel = new SubOrdersModel();
+            $subOrder = $subOrderModel->one(['id' => $params['id']]);
+            $params['order_sn'] = $subOrder['data']['order_group_sn'];
+            $id = $params['id'];
+            unset($params['id']);
             $data = $model->find($params);
 
             if ($data['status'] == 200) {
@@ -655,8 +674,11 @@ class OrderController extends SupplierController
             }
             $params['send_express_type'] = $sendExpressType;
             $array = $model->updateSend($params, $type);
+
+            $subOrderModel->do_update(['id' => $id], ['status' => 3]);
 //
             $orderModel = new OrderModel;
+
             $orderRs = $orderModel->find(['order_sn' => $params['order_sn']]);
 
             $shopUserModel = new \app\models\shop\UserModel();
@@ -695,6 +717,8 @@ class OrderController extends SupplierController
                 }
                 if (mb_strlen($orderRs['data']['goodsname'],'utf-8') > 20){
                     $goodsName = mb_substr($orderRs['data']['goodsname'],0,17,'utf-8') .'...'; //商品名超过20个汉字截断
+                }else{
+                    $goodsName = $orderRs['data']['goodsname'];
                 }
                 $accessParams = array(
                     'character_string1' => ['value'=>$params['order_sn']],  //订单号
@@ -822,24 +846,28 @@ class OrderController extends SupplierController
      * 订单退款，退货操作，1 仅退款 staus 同意，不同意  调用退款方法RefundMoney   2， 退款退货，同意or不同意    更新状态   3，卖家确认收货，调用退款方法RefundMoney
      *
      */
+    /**
+     * 订单退款，退货操作，1 仅退款 staus 同意，不同意  调用退款方法RefundMoney   2， 退款退货，同意or不同意    更新状态   3，卖家确认收货，调用退款方法RefundMoney
+     *
+     */
     public function actionRefund($id)
     {
         if (yii::$app->request->isPut) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
-//            $must = ['key'];
-//            $rs = $this->checkInput($must, $params);
-//            if ($rs != false) {
-//                return json_encode($rs, JSON_UNESCAPED_UNICODE);
-//            }
+            $params['key']  = 'ccvWPn';
+            $must = ['key'];
+            $rs = $this->checkInput($must, $params);
+            if ($rs != false) {
+                return json_encode($rs, JSON_UNESCAPED_UNICODE);
+            }
 
             //查询订单状态
             $data['id'] = $id;
             $data['merchant_id'] = yii::$app->session['uid'];
-            $data['`key`'] = yii::$app->session['key'];
             $model = new OrderModel();
-            $order = $model->find($data);
-
+            $subOrderModel = new SubOrdersModel();
+            $order = $subOrderModel->one(['id' => $id]);
             if ($order['status'] != 200) {
                 return result(500, "订单状态异常！");
             }
@@ -847,56 +875,95 @@ class OrderController extends SupplierController
             if ($order['data']['after_type'] == 2 && $order['data']['status'] == 5) {
                 //卖家确认退款  仅退款  同意退款
                 if ($params['status'] == 1) {
-                    $res = $this->RefundMoney($order['data']['order_sn'], yii::$app->session['key']);
+                    $res = $this->RefundMoney($order['data']['order_sn'], $params['key'], $order['data']['pay_money']);
                     if ($res['result_code'] == "SUCCESS") {
                         if (isset($res['result_msg'])) { //扫呗退款 直接修改订单状态
                             $data['status'] = 4;
-                            $data['order_sn'] = $order['data']['order_sn'];
+                            // $data['order_sn'] = $order['data']['order_sn'];
                             $data['refund'] = 'saobei';
                         }
+                        $data['status'] = 4;
                         $data['after_sale'] = 1;
-                        $array = $model->update($data);
-
-                        //退款成功处理分销预估佣金
-                        $userModel = new UserModel();
-                        $distributionModel = new DistributionAccessModel();
-                        $distributionWhere['order_sn'] = $order['data']['order_sn'];
-                        $distributionWhere['or'] = ['or',['=','type', 1],['=','type', 3]];
-                        $distributionWhere['limit'] = false;
-                        $distributionInfo = $distributionModel->do_select($distributionWhere);
-                        if($distributionInfo['status'] == 200){
-                            foreach ($distributionInfo['data'] as $k=>$v){
-                                $userInfo = $userModel->find(['id'=>$v['uid']]);
-                                if ($userInfo['status'] == 200){
-                                    //减去各自相应预估佣金
-                                    $userData['id'] = $v['uid'];
-                                    $userData['`key`'] = $v['key'];
-                                    $userData['commission'] = $userInfo['data']['commission'] - $v['money'];
-                                    $userModel->update($userData);
-                                    //添加佣金退款记录
-                                    $distributionAccessModel = new DistributionAccessModel();
-                                    $accessData = [];
-                                    $accessData['key'] = $v['key'];
-                                    $accessData['merchant_id'] = $v['merchant_id'];
-                                    $accessData['uid'] = $v['uid'];
-                                    $accessData['order_sn'] = $order['data']['order_sn'];
-                                    $accessData['money'] = -$v['money'];
-                                    $distributionAccessModel->do_add($accessData);
-                                }
-                            }
-                        }
+                        $array = $subOrderModel->do_update(['id' => $id], $data);
 
                         $balanceModel = new \app\models\shop\BalanceAccessModel();
-                        $balanceModel->do_update(['pay_sn' => $order['data']['order_sn']], ['status' => 2]);
+                        $balanceModel->do_update(['balance_sn' => $id], ['status' => 2]);
+
+                        $commission_money = $order['data']['commission_money'];
+                        $leader_money = $order['data']['leader_money'];
+                        $oredrGroupSn =  $order['data']['order_group_sn'];
+                        $sql = "update shop_order_group set commission = commission-{$commission_money},leader_money = leader_money -{$leader_money} where order_sn = '{$oredrGroupSn}'";
+                        Yii::$app->db->createCommand($sql)->execute();
+                        $this->actionRecalculate($oredrGroupSn);
+
+                        //订阅消息(退款通知)
+                        $userModel = new UserModel();
+                        $userInfo = $userModel->find(['id' => $order['data']['user_id']]);
+                        $subscribeTempModel = new SystemMerchantMiniSubscribeTemplateModel();
+                        $subscribeTempInfo = $subscribeTempModel->do_one(['template_purpose' => 'refund']);
+                        if ($subscribeTempInfo['status'] == 200) {
+                            $accessParams = array(
+                                'number1' => ['value' => $order['data']['order_sn']],  //订单号
+                                'date2' => ['value' => $order['data']['create_time']],  //订单时间
+                                'phrase3' => ['value' => '已退款'],    //退款状态
+                                'amount7' => ['value' => $order['data']['payment_money']],   //退款金额
+                                'thing15' => ['value' => '有问题可以随时联系商家客服哦！'],   //温馨提示
+                            );
+                            $subscribeTempAccessModel = new SystemMerchantMiniSubscribeTemplateAccessModel();
+                            $subscribeTempAccessData = array(
+                                'key' => $order['data']['key'],
+                                'merchant_id' => $order['data']['merchant_id'],
+                                'mini_open_id' => $userInfo['data']['mini_open_id'],
+                                'template_id' => $subscribeTempInfo['data']['template_id'],
+                                'number' => '0',
+                                'template_params' => json_encode($accessParams, JSON_UNESCAPED_UNICODE),
+                                'template_purpose' => 'refund',
+                                'page' => "/pages/orderItem/orderItem/orderItem?order_sn={$order['data']['order_sn']}",
+                                'status' => '-1',
+                            );
+                            $subscribeTempAccessModel->do_add($subscribeTempAccessData);
+                        } else {
+                            file_put_contents(Yii::getAlias('@webroot/') . '/log.text', date('Y-m-d H:i:s') . "退款通知_未查询到该订阅消息模板" . PHP_EOL, FILE_APPEND);
+                        }
+
                         return $array;
                     } else {
+                        //订阅消息(退款通知)
+                        $userModel = new UserModel();
+                        $userInfo = $userModel->find(['id' => $order['data']['user_id']]);
+                        $subscribeTempModel = new SystemMerchantMiniSubscribeTemplateModel();
+                        $subscribeTempInfo = $subscribeTempModel->do_one(['template_purpose' => 'refund']);
+                        if ($subscribeTempInfo['status'] == 200) {
+                            $accessParams = array(
+                                'number1' => ['value' => $order['data']['order_sn']],  //订单号
+                                'date2' => ['value' => $order['data']['create_time']],  //订单时间
+                                'phrase3' => ['value' => '退款失败'],    //退款状态
+                                'amount7' => ['value' => $order['data']['payment_money']],   //退款金额
+                                'thing15' => ['value' => '有问题可以随时联系商家客服哦！'],   //温馨提示
+                            );
+                            $subscribeTempAccessModel = new SystemMerchantMiniSubscribeTemplateAccessModel();
+                            $subscribeTempAccessData = array(
+                                'key' => $order['data']['key'],
+                                'merchant_id' => $order['data']['merchant_id'],
+                                'mini_open_id' => $userInfo['data']['mini_open_id'],
+                                'template_id' => $subscribeTempInfo['data']['template_id'],
+                                'number' => '0',
+                                'template_params' => json_encode($accessParams, JSON_UNESCAPED_UNICODE),
+                                'template_purpose' => 'refund',
+                                'page' => "/pages/orderItem/orderItem/orderItem?order_sn={$order['data']['order_sn']}",
+                                'status' => '-1',
+                            );
+                            $subscribeTempAccessModel->do_add($subscribeTempAccessData);
+                        } else {
+                            file_put_contents(Yii::getAlias('@webroot/') . '/log.text', date('Y-m-d H:i:s') . "退款通知_未查询到该订阅消息模板" . PHP_EOL, FILE_APPEND);
+                        }
                         return result(500, $res);
                     }
                 } else if ($params['status'] == 2) {
                     //不同意退款 更新订单状态,状态还原到 1 已付款
                     $data['after_sale'] = 2;
                     $data['status'] = 1;
-                    $array = $model->update($data);
+                    $array = $subOrderModel->do_update(['id' => $id], $data);
                     return $array;
                 } else {
                     return result(500, '请求失败');
@@ -908,7 +975,7 @@ class OrderController extends SupplierController
                         //获取卖家收货地址
                         $afterModel = new AfterInfoModel();
                         $da['merchant_id'] = yii::$app->session['uid'];
-                        $da['`key`'] = yii::$app->session['key'];
+                        $da['`key`'] = $params['key'];
                         $res = $afterModel->find($da);
                         if ($res['status'] != 200) {
                             return result(500, "请设置卖家收货信息");
@@ -918,59 +985,98 @@ class OrderController extends SupplierController
                         $data['after_addr'] = $res['data']['after_addr'];
                         $data['after_phone'] = $res['data']['after_phone'];
                         $data['status'] = 5;
-                        $array = $model->update($data);
+                        $array = $subOrderModel->do_update(['id' => $id], $data);
                         return $array;
                     } elseif ($params['status'] == 2) {
                         //不同意退款退货，更新订单状态,状态还原到 3 已发货
                         $data['after_sale'] = 2;
                         $data['after_admin_imgs'] = $params['after_admin_imgs'];
                         $data['status'] = 3;
-                        $array = $model->update($data);
+                        $array = $subOrderModel->do_update(['id' => $id], $data);
                         return $array;
                     } else {
                         return result(500, '请求失败');
                     }
                 } else if ($order['data']['after_sale'] == 1) {
                     //卖家确认退款
-                    $res = $this->RefundMoney($order['data']['order_sn'], yii::$app->session['key']);
+                    $res = $this->RefundMoney($order['data']['order_group_sn'], $params['key'], $order['data']['payment_money']);
+
                     if ($res['result_code'] == "SUCCESS") {
                         $data['after_sale'] = 1;
                         $data['status'] = 4;
-                        $array = $model->update($data);
-
-                        //退款成功处理分销预估佣金
-                        $userModel = new UserModel();
-                        $distributionModel = new DistributionAccessModel();
-                        $distributionWhere['order_sn'] = $order['data']['order_sn'];
-                        $distributionWhere['or'] = ['or',['=','type', 1],['=','type', 3]];
-                        $distributionWhere['limit'] = false;
-                        $distributionInfo = $distributionModel->do_select($distributionWhere);
-                        if($distributionInfo['status'] == 200){
-                            foreach ($distributionInfo['data'] as $k=>$v){
-                                $userInfo = $userModel->find(['id'=>$v['uid']]);
-                                if ($userInfo['status'] == 200){
-                                    //减去各自相应预估佣金
-                                    $userData['id'] = $v['uid'];
-                                    $userData['`key`'] = $v['key'];
-                                    $userData['commission'] = $userInfo['data']['commission'] - $v['money'];
-                                    $userModel->update($userData);
-                                    //添加佣金退款记录
-                                    $distributionAccessModel = new DistributionAccessModel();
-                                    $accessData = [];
-                                    $accessData['key'] = $v['key'];
-                                    $accessData['merchant_id'] = $v['merchant_id'];
-                                    $accessData['uid'] = $v['uid'];
-                                    $accessData['order_sn'] = $order['data']['order_sn'];
-                                    $accessData['money'] = -$v['money'];
-                                    $distributionAccessModel->do_add($accessData);
-                                }
-                            }
-                        }
+                        $array = $subOrderModel->do_update(['id' => $id], $data);
 
                         $balanceModel = new \app\models\shop\BalanceAccessModel();
-                        $balanceModel->do_update(['pay_sn' => $order['data']['order_sn']], ['status' => 2]);
+                        $balanceModel->do_update(['balance_sn' => $id], ['status' => 2]);
+
+                        $commission_money = $order['data']['commission_money'];
+                        $leader_money = $order['data']['leader_money'];
+                        $oredrGroupSn =  $order['data']['order_group_sn'];
+                        $sql = "update shop_order_group set commission = commission-{$commission_money},leader_money = leader_money -{$leader_money} where order_sn = '{$oredrGroupSn}'";
+                        Yii::$app->db->createCommand($sql)->execute();
+                        $this->actionRecalculate($oredrGroupSn);
+
+                        //订阅消息(退款通知)
+                        $userModel = new UserModel();
+                        $userInfo = $userModel->find(['id' => $order['data']['user_id']]);
+                        $subscribeTempModel = new SystemMerchantMiniSubscribeTemplateModel();
+                        $subscribeTempInfo = $subscribeTempModel->do_one(['template_purpose' => 'refund']);
+                        if ($subscribeTempInfo['status'] == 200) {
+                            $accessParams = array(
+                                'number1' => ['value' => $order['data']['order_sn']],  //订单号
+                                'date2' => ['value' => $order['data']['create_time']],  //订单时间
+                                'phrase3' => ['value' => '已退款'],    //退款状态
+                                'amount7' => ['value' => $order['data']['payment_money']],   //退款金额
+                                'thing15' => ['value' => '有问题可以随时联系商家客服哦！'],   //温馨提示
+                            );
+                            $subscribeTempAccessModel = new SystemMerchantMiniSubscribeTemplateAccessModel();
+                            $subscribeTempAccessData = array(
+                                'key' => $order['data']['key'],
+                                'merchant_id' => $order['data']['merchant_id'],
+                                'mini_open_id' => $userInfo['data']['mini_open_id'],
+                                'template_id' => $subscribeTempInfo['data']['template_id'],
+                                'number' => '0',
+                                'template_params' => json_encode($accessParams, JSON_UNESCAPED_UNICODE),
+                                'template_purpose' => 'refund',
+                                'page' => "/pages/orderItem/orderItem/orderItem?order_sn={$order['data']['order_sn']}",
+                                'status' => '-1',
+                            );
+                            $subscribeTempAccessModel->do_add($subscribeTempAccessData);
+                        } else {
+                            file_put_contents(Yii::getAlias('@webroot/') . '/log.text', date('Y-m-d H:i:s') . "退款通知_未查询到该订阅消息模板" . PHP_EOL, FILE_APPEND);
+                        }
+
                         return $array;
                     } else {
+                        //订阅消息(退款通知)
+                        $userModel = new UserModel();
+                        $userInfo = $userModel->find(['id' => $order['data']['user_id']]);
+                        $subscribeTempModel = new SystemMerchantMiniSubscribeTemplateModel();
+                        $subscribeTempInfo = $subscribeTempModel->do_one(['template_purpose' => 'refund']);
+                        if ($subscribeTempInfo['status'] == 200) {
+                            $accessParams = array(
+                                'number1' => ['value' => $order['data']['order_sn']],  //订单号
+                                'date2' => ['value' => $order['data']['create_time']],  //订单时间
+                                'phrase3' => ['value' => '退款失败'],    //退款状态
+                                'amount7' => ['value' => $order['data']['payment_money']],   //退款金额
+                                'thing15' => ['value' => '有问题可以随时联系商家客服哦！'],   //温馨提示
+                            );
+                            $subscribeTempAccessModel = new SystemMerchantMiniSubscribeTemplateAccessModel();
+                            $subscribeTempAccessData = array(
+                                'key' => $order['data']['key'],
+                                'merchant_id' => $order['data']['merchant_id'],
+                                'mini_open_id' => $userInfo['data']['mini_open_id'],
+                                'template_id' => $subscribeTempInfo['data']['template_id'],
+                                'number' => '0',
+                                'template_params' => json_encode($accessParams, JSON_UNESCAPED_UNICODE),
+                                'template_purpose' => 'refund',
+                                'page' => "/pages/orderItem/orderItem/orderItem?order_sn={$order['data']['order_sn']}",
+                                'status' => '-1',
+                            );
+                            $subscribeTempAccessModel->do_add($subscribeTempAccessData);
+                        } else {
+                            file_put_contents(Yii::getAlias('@webroot/') . '/log.text', date('Y-m-d H:i:s') . "退款通知_未查询到该订阅消息模板" . PHP_EOL, FILE_APPEND);
+                        }
                         return result(500, '请求失败');
                     }
                 } else {
@@ -993,65 +1099,78 @@ class OrderController extends SupplierController
         if (yii::$app->request->isPut) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
-//            $must = ['key'];
-//            $rs = $this->checkInput($must, $params);
-//            if ($rs != false) {
-//                return json_encode($rs, JSON_UNESCAPED_UNICODE);
-//            }
+            $params['key']  = 'ccvWPn';
+            $must = ['key'];
+            $rs = $this->checkInput($must, $params);
+            if ($rs != false) {
+                return json_encode($rs, JSON_UNESCAPED_UNICODE);
+            }
 
             //查询订单状态
             $data['id'] = $id;
             $data['merchant_id'] = yii::$app->session['uid'];
-            $data['`key`'] = yii::$app->session['key'];
+            $data['`key`'] = $params['key'];
             $model = new OrderModel();
-            $order = $model->find($data);
-            //  var_dump($order);die();
-            if ($order['status'] != 200) {
-                return result(500, "订单状态异常！");
+
+            $subOrderModel = new SubOrdersModel();
+            $subOrder = $subOrderModel->one(['id' => $id]);
+            if ($subOrder['status'] != 200) {
+                return result(500, "请求失败！");
             }
-            $res = $this->RefundMoney($order['data']['order_sn'], yii::$app->session['key']);
+            $res = $this->RefundMoney($subOrder['data']['order_group_sn'], $params['key'], $subOrder['data']['payment_money']);
+            $order = $model->find(['order_sn' => $subOrder['data']['order_group_sn']]);
             if ($res['result_code'] == "SUCCESS") {
                 $data['after_sale'] = 1;
                 $data['status'] = 9;
-                $array = $model->update($data);
-                $balanceModel = new BalanceModel();
-                $balanceModel->do_update(['order_sn' => $order['data']['order_sn']], ['status' => 2]);
+                $array = $subOrderModel->do_update(['id' => $id], $data);
 
-                if ($order['data']['status'] != 6 || $order['data']['status'] != 7){
-                    //退款成功处理分销预估佣金
-                    $userModel = new UserModel();
-                    $distributionModel = new DistributionAccessModel();
-                    $distributionWhere['order_sn'] = $order['data']['order_sn'];
-                    $distributionWhere['or'] = ['or',['=','type', 1],['=','type', 3]];
-                    $distributionWhere['limit'] = false;
-                    $distributionInfo = $distributionModel->do_select($distributionWhere);
-                    if($distributionInfo['status'] == 200){
-                        foreach ($distributionInfo['data'] as $k=>$v){
-                            $userInfo = $userModel->find(['id'=>$v['uid']]);
-                            if ($userInfo['status'] == 200){
-                                //减去各自相应预估佣金
-                                $userData['id'] = $v['uid'];
-                                $userData['`key`'] = $v['key'];
-                                $userData['commission'] = $userInfo['data']['commission'] - $v['money'];
-                                $userModel->update($userData);
-                                //添加佣金退款记录
-                                $distributionAccessModel = new DistributionAccessModel();
-                                $accessData = [];
-                                $accessData['key'] = $v['key'];
-                                $accessData['merchant_id'] = $v['merchant_id'];
-                                $accessData['uid'] = $v['uid'];
-                                $accessData['order_sn'] = $order['data']['order_sn'];
-                                $accessData['money'] = -$v['money'];
-                                $distributionAccessModel->do_add($accessData);
-                            }
-                        }
-                    }
+                if ($order['status'] != 200) {
+                    return result(500, "请求失败！");
                 }
 
-                if ($array['status'] == 200){
+                $balanceModel = new BalanceModel();
+                $balanceModel->do_update(['order_sn' => $order['data']['order_sn']], ['status' => 2]);
+                $commission_money = $subOrder['data']['commission_money'];
+                $leader_money = $subOrder['data']['leader_money'];
+                $oredrGroupSn =  $subOrder['data']['order_group_sn'];
+                $sql = "update shop_order_group set commission = commission-{$commission_money},leader_money = leader_money -{$leader_money} where order_sn = '{$oredrGroupSn}'";
+                Yii::$app->db->createCommand($sql)->execute();
+                $this->actionRecalculate($oredrGroupSn);
+
+                //订阅消息(退款通知)
+                $userModel = new UserModel();
+                $userInfo = $userModel->find(['id' => $order['data']['user_id']]);
+                $subscribeTempModel = new SystemMerchantMiniSubscribeTemplateModel();
+                $subscribeTempInfo = $subscribeTempModel->do_one(['template_purpose' => 'refund']);
+                if ($subscribeTempInfo['status'] == 200) {
+                    $accessParams = array(
+                        'number1' => ['value' => $order['data']['order_sn']],  //订单号
+                        'date2' => ['value' => $order['data']['create_time']],  //订单时间
+                        'phrase3' => ['value' => '已退款'],    //退款状态
+                        'amount7' => ['value' => $order['data']['payment_money']],   //退款金额
+                        'thing15' => ['value' => '有问题可以随时联系商家客服哦！'],   //温馨提示
+                    );
+                    $subscribeTempAccessModel = new SystemMerchantMiniSubscribeTemplateAccessModel();
+                    $subscribeTempAccessData = array(
+                        'key' => $order['data']['key'],
+                        'merchant_id' => $order['data']['merchant_id'],
+                        'mini_open_id' => $userInfo['data']['mini_open_id'],
+                        'template_id' => $subscribeTempInfo['data']['template_id'],
+                        'number' => '0',
+                        'template_params' => json_encode($accessParams, JSON_UNESCAPED_UNICODE),
+                        'template_purpose' => 'refund',
+                        'page' => "/pages/orderItem/orderItem/orderItem?order_sn={$order['data']['order_sn']}",
+                        'status' => '-1',
+                    );
+                    $subscribeTempAccessModel->do_add($subscribeTempAccessData);
+                } else {
+                    file_put_contents(Yii::getAlias('@webroot/') . '/log.text', date('Y-m-d H:i:s') . "退款通知_未查询到该订阅消息模板" . PHP_EOL, FILE_APPEND);
+                }
+
+                if ($array['status'] == 200) {
                     //添加操作记录
                     $operationRecordModel = new OperationRecordModel();
-                    $operationRecordData['key'] = yii::$app->session['key'];
+                    $operationRecordData['key'] = $params['key'];
                     $operationRecordData['merchant_id'] = yii::$app->session['uid'];
                     $operationRecordData['operation_type'] = '更新';
                     $operationRecordData['operation_id'] = $order['data']['order_sn'];
@@ -1060,6 +1179,35 @@ class OrderController extends SupplierController
                 }
                 return $array;
             } else {
+                //订阅消息(退款通知)
+                $userModel = new UserModel();
+                $userInfo = $userModel->find(['id' => $order['data']['user_id']]);
+                $subscribeTempModel = new SystemMerchantMiniSubscribeTemplateModel();
+                $subscribeTempInfo = $subscribeTempModel->do_one(['template_purpose' => 'refund']);
+                if ($subscribeTempInfo['status'] == 200) {
+                    $accessParams = array(
+                        'number1' => ['value' => $order['data']['order_sn']],  //订单号
+                        'date2' => ['value' => $order['data']['create_time']],  //订单时间
+                        'phrase3' => ['value' => '退款失败'],    //退款状态
+                        'amount7' => ['value' => $order['data']['payment_money']],   //退款金额
+                        'thing15' => ['value' => '有问题可以随时联系商家客服哦！'],   //温馨提示
+                    );
+                    $subscribeTempAccessModel = new SystemMerchantMiniSubscribeTemplateAccessModel();
+                    $subscribeTempAccessData = array(
+                        'key' => $order['data']['key'],
+                        'merchant_id' => $order['data']['merchant_id'],
+                        'mini_open_id' => $userInfo['data']['mini_open_id'],
+                        'template_id' => $subscribeTempInfo['data']['template_id'],
+                        'number' => '0',
+                        'template_params' => json_encode($accessParams, JSON_UNESCAPED_UNICODE),
+                        'template_purpose' => 'refund',
+                        'page' => "/pages/orderItem/orderItem/orderItem?order_sn={$order['data']['order_sn']}",
+                        'status' => '-1',
+                    );
+                    $subscribeTempAccessModel->do_add($subscribeTempAccessData);
+                } else {
+                    file_put_contents(Yii::getAlias('@webroot/') . '/log.text', date('Y-m-d H:i:s') . "退款通知_未查询到该订阅消息模板" . PHP_EOL, FILE_APPEND);
+                }
                 return result(500, $res);
             }
         } else {
@@ -1075,7 +1223,7 @@ class OrderController extends SupplierController
      * @throws Exception
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
      */
-    public function RefundMoney($order_sn, $key)
+    public function RefundMoney($order_sn, $key, $money = 0)
     {
 
         $params['order_sn'] = $order_sn;
@@ -1086,14 +1234,19 @@ class OrderController extends SupplierController
 
         $payModel = new PayModel();
 
-        $pays = $payModel->find(['order_id' => $order_sn]);
+        $pays = $payModel->find(['order_id' => $orderData['data']['transaction_order_sn']]);
 
         //获取商户微信配置
         if ($orderData['data']['order_type'] == 3) { //余额退款
             $userModel = new UserModel();
             $userInfo = $userModel->find(['id' => $orderData['data']['user_id']]);
             if ($userInfo['status'] == 200) {
-                $data['recharge_balance'] = bcadd($orderData['data']['payment_money'], $userInfo['data']['recharge_balance'], 2);
+                if ($money == 0) {
+                    $data['recharge_balance'] = bcadd($orderData['data']['payment_money'], $userInfo['data']['recharge_balance'], 2);
+                } else {
+                    $data['recharge_balance'] = $userInfo['data']['recharge_balance'] - $money;
+                }
+
                 $data['id'] = $orderData['data']['user_id'];
                 $data['`key`'] = $orderData['data']['key'];
                 $re_ = $userModel->update($data);
@@ -1103,22 +1256,38 @@ class OrderController extends SupplierController
                     $res = ['result_code' => 'FAIL'];
                 }
             }
-        } else{
+
+        } else {
             $config = $this->getSystemConfig($key, "miniprogrampay", 1);
             if ($config == false) {
                 return result(500, "未配置小程序信息");
             }
 
             if ($config['wx_pay_type'] == 1) {
-                $config['notify_url'] = "https://".$_SERVER['SERVER_NAME']."/api/web/index.php/pay/wechat/notifyreturn";
-                $config['cert_path'] = yii::getAlias('@webroot/') .$config['cert_path'];
-                $config['key_path'] = yii::getAlias('@webroot/') .$config['key_path'];
+
+                $config['notify_url'] = "https://" . $_SERVER['HTTP_HOST'] . "/api/web/index.php/pay/wechat/notifyreturn";
+                $config['cert_path'] = yii::getAlias('@webroot/') . $config['cert_path'];
+                $config['key_path'] = yii::getAlias('@webroot/') . $config['key_path'];
                 $app = Factory::payment($config);
                 // 参数分别为：微信订单号、商户退款单号、订单金额、退款金额、其他参数
-                if($pays['status']!=200){
-                    return result(500, "退款失败查询到微信支付订单号");
+                if ($pays['status'] != 200) {
+                    return ['result_code' => 'FAIL', 'result_msg' => '退款失败查询到微信支付订单号'];
                 }
-                $res = $app->refund->byTransactionId($pays['data']['transaction_id'], $params['order_sn'], $orderData['data']['payment_money'] * 100, $orderData['data']['payment_money'] * 100, ['refund_desc' => '商品退款']);
+                $number = intval($orderData['data']['payment_money'] * 1000) / 10;
+                if ($orderData['data']['is_advance'] == 1) {
+                    $advanceOrder = new AdvanceOrderModel();
+                    $advance = $advanceOrder->do_one(['order_sn' => $orderData['data']['order_sn']]);
+                    $res = $app->refund->byTransactionId($advance['data']['transaction_id'], $advance['data']['sale_order_sn'], $advance['data']['front_money'] * 100, $advance['data']['front_money'] * 100, ['refund_desc' => '商品退款']);
+                    $res = $app->refund->byTransactionId($pays['data']['transaction_id'], $advance['data']['order_sn'], $advance['data']['money'] * 100, $advance['data']['money'] * 100, ['refund_desc' => '商品退款']);
+                } else {
+                    if ($money == 0) {
+                        $res = $app->refund->byTransactionId($pays['data']['transaction_id'], $pays['data']['order_id'], $number, $number, ['refund_desc' => '商品退款']);
+                    } else {
+                        $res = $app->refund->byTransactionId($pays['data']['transaction_id'], $pays['data']['order_id'], intval($money * 1000) / 10, $number, ['refund_desc' => '商品退款']);
+                    }
+
+                }
+
             } else {
                 $mini_pay = new \tools\pay\refund\Refund();
                 $mini_pay->setPay_ver(Payx::PAY_VER);
@@ -1149,43 +1318,37 @@ class OrderController extends SupplierController
 
 
 
+//    public function actionTuan($order_sn) {
+//        $configModel = new \app\models\tuan\ConfigModel();
+//
+//        $con = $configModel->do_one(['merchant_id' => yii::$app->session['merchant_id'], 'key' => $params['key']]);
+//        if ($con['status'] == 200 && $con['data']['status'] == 1) {
+//            $model = new BalanceModel();
+//            $balance = $model->do_one(['order_sn' => $order_sn, 'merchant_id' => yii::$app->session['uid'], 'key' => $params['key']]);
+//            $userModel = new \app\models\shop\UserModel();
+//            $user = $userModel->find(['id' => $balance['data']['uid']]);
+//            $userModel->update(['balance' => $user['data']['balance'] + $balance['data']['money']]);
+//        }
+//    }
+
     public function actionRemark()
     {
         if (yii::$app->request->isPut) {
             $request = yii::$app->request; //获取 request 对象
             $params = $request->bodyParams; //获取body传参
-            $must = [ 'remark', 'order_sn'];
+            $must = ['key', 'remark','id'];
             $rs = $this->checkInput($must, $params);
             if ($rs != false) {
                 return json_encode($rs, JSON_UNESCAPED_UNICODE);
             }
-            $remark = $params['remark'];
-            $model = new OrderModel();
-            $res = $model->find($params);
-            if ($res['status'] == 200) {
-                $params['`key`'] = yii::$app->session['key'];
-                unset(yii::$app->session['key']);
-                $params['admin_remark'] = $remark;
-                unset($params['remark']);
-                $array = $model->update($params);
-                if ($array['status'] == 200){
-                    //添加操作记录
-                    $operationRecordModel = new OperationRecordModel();
-                    $operationRecordData['key'] = $params['`key`'];
-                    $operationRecordData['merchant_id'] = yii::$app->session['uid'];
-                    $operationRecordData['operation_type'] = '更新';
-                    $operationRecordData['operation_id'] = $params['order_sn'];
-                    $operationRecordData['module_name'] = '订单管理';
-                    $operationRecordModel->do_add($operationRecordData);
-                }
-                return $array;
-            } else {
-                return $res;
-            }
+            $model = new SubOrdersModel();
+            $array = $model->do_update(['id' => $params['id']], ['admin_remark' => $params['remark']]);
+            return $array;
         } else {
             return result(500, "请求方式错误");
         }
     }
+
 
     public function actionLeader()
     {
@@ -1521,5 +1684,31 @@ class OrderController extends SupplierController
         }
     }
 
-
+    //退款后重新计算分销佣金
+    public function actionRecalculate($order_sn)
+    {
+        $model = new DistributionAccessModel();
+        $userModel = new ShopUserModel();
+        $where['order_sn'] = $order_sn;
+        $where['limit'] = false;
+        $info = $model->do_select($where);
+        if ($info['status'] != 200) {
+            return result(500, "未查询到佣金记录");
+        }
+        foreach ($info['data'] as $k => $v) {
+            $userWhere['id'] = $v['uid'];
+            $userInfo = $userModel->do_one($userWhere);
+            if ($userInfo['status'] == 200) {
+                //减去各会员预估佣金
+                $userData['commission'] = $userInfo['data']['commission'] - $v['money'];
+                $userModel->do_update($userWhere, $userData);
+            }
+            //删除之前的佣金记录
+            $model->do_delete(['order_sn' => $order_sn]);
+        }
+        //将订单号放入redis重新计算
+        $dtbData['order_sn'] = $order_sn;
+        lpushRedis('distribution', $dtbData);
+        return result(200, "请求成功");
+    }
 }

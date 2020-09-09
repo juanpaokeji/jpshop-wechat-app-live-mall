@@ -445,6 +445,8 @@ function logistics($nu, $com, $receiverPhone = "18200000000", $senderPhone = "18
 //                    setConfig($nu, $data);
 //                    yii::$app->redis->expire($nu, 7200);
 //                }
+            }else{
+                $data['Traces'][0]['AcceptStation'] = '查询失败';
             }
         }
 
@@ -773,3 +775,20 @@ function lpushRedis($key, $value = "") {
     return $result;
 }
 
+//获取取货码
+function getPickUpCode($length = 6) {
+// 密码字符集，可任意添加你需要的字符
+    $chars = '1234567890';
+    $str = "";
+    for ($i = 0; $i < $length; $i++) {
+        $str .= $chars[mt_rand(0, strlen($chars) - 1)];
+    }
+    $key = 'pick_up_code-' . $str;
+    if (getConfig($key)){
+        getPickUpCode();
+    }else{
+        setConfig($key,$str,864000);
+    }
+    $str = getConfig($key);
+    return $str;
+}

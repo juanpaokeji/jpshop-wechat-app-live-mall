@@ -221,8 +221,8 @@ ETO;
             //发货单信息
             $buyerSql = "";
             $buyerSql .= "SELECT su.nickname as buyer_nickname";
-            $buyerSql .= ",suc.city as buyer_city,suc.area as buyer_area,suc.address";
-            $buyerSql .= ",sog.name,sog.phone,sog.order_sn,sog.payment_money,sog.remark,sog.express_type,sog.leader_uid";
+            $buyerSql .= ",suc.city as buyer_city,suc.area as buyer_area";
+            $buyerSql .= ",sog.name,sog.phone,sog.address,sog.order_sn,sog.payment_money,sog.remark,sog.express_type,sog.leader_uid,sog.estimated_service_time";
             $buyerSql .= ",so.name as goodsname,so.goods_id,CONCAT(so.property1_name,so.property2_name) as property,so.number,so.price";
             $buyerSql .= ",sg.code as goods_code,sg.label,sg.short_name";
             $buyerSql .= ",sp.pay_time";

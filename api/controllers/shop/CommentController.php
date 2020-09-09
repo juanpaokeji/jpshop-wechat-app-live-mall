@@ -2,6 +2,7 @@
 
 namespace app\controllers\shop;
 
+use app\models\shop\SubOrdersModel;
 use app\models\system\SystemPicServerModel;
 use yii;
 use yii\db\Exception;
@@ -52,7 +53,6 @@ class CommentController extends ShopController {
             $params = $request->get(); //获取地址栏参数
             $model = new CommentModel();
 
-            $params['shop_user_comment.`key`'] = $params['key'];
             unset($params['key']);
             $params['shop_user_comment.status'] = 1;
             $params['so.goods_id'] = $id;
@@ -137,9 +137,11 @@ class CommentController extends ShopController {
                     $orderData['id'] = $rs['id'];
                     $orderData['order_sn'] = $params['order_sn'];
                     $orderModel->update($orderData);
+                    $subOrderModel = new SubOrdersModel();
+                    $subOrderModel->do_update(['order_sn'=>$params['order_sn'],'status'=>2]);
                 }
             }
-            
+
             return $array;
         } else {
             return result(500, "请求方式错误");

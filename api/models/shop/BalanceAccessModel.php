@@ -41,7 +41,7 @@ class BalanceAccessModel extends CommonModel {
         if (empty($res)) {
             return result(204, '查询失败');
         } else {
-            return ['data' => $res['data'], 'count' => $res['count']];
+            return ['status' => 200, 'message' => '请求成功','data' => $res['data'], 'count' => $res['count']];
         }
     }
     /**

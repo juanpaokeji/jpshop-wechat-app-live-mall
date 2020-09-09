@@ -40,6 +40,7 @@ class ThemeController extends ShopController {
                 $res = yii::$app->params['theme'];
                 $res['navigation'] = json_decode(yii::$app->params['theme']['navigation'], true);
                 $res['copyright']['bottom_url'] = yii::$app->params['unit']['copyright']['pic_url'];
+                $res['copyright']['mini_name'] = '卷泡科技提供技术支持';
                 return result(200, "请求成功", $res);
             }
             if ($res['status'] == 200) {
@@ -56,9 +57,18 @@ class ThemeController extends ShopController {
             $array = $unitModel->findall($params);
             if ($array['status'] == 200) {
                 $res['data']['copyright'] = json_decode($array['data'][0]['config'], true);
+				if($res['data']['copyright']==="https://juanpao999-1255754174.cos.ap-guangzhou.myqcloud.com/ui/%E6%B0%B4%E5%8D%B0.png"){
+						$res['data']['copyright'] = array();
+						$res['data']['copyright']['bottom_url'] = 'https://juanpao999-1255754174.cos.ap-guangzhou.myqcloud.com/copyright2.png';
+						$res['data']['copyright']['mini_name'] = '卷泡科技提供技术支持';
+					
+				}
+				
             } else {
                 $res['data']['copyright']['bottom_url'] = yii::$app->params['unit']['copyright']['pic_url'];
+				$res['data']['copyright']['mini_name'] = '卷泡科技提供技术支持';
             }
+			
             return $res;
         } else {
             return result(500, "请求方式错误");

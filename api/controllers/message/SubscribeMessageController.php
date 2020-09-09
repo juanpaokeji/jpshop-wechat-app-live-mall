@@ -24,7 +24,7 @@ class SubscribeMessageController extends Controller
     {
 
         $model = new SystemMerchantMiniSubscribeTemplateAccessModel();
-        $message = $model->do_select(['status' => -1, 'limit' => 30]);
+        $message = $model->do_select(['status' => -1, 'limit' => 100]);
         if ($message['status'] != 200){
             return $message;
         }
@@ -36,7 +36,6 @@ class SubscribeMessageController extends Controller
 
         try{
             $miniProgram = Factory::miniProgram($config);
-//            $token = $miniProgram->access_token->getToken();
             $token = $miniProgram->access_token->getToken(true);// 强制重新从微信服务器获取 token
         }catch (\EasyWeChat\Kernel\Exceptions\Exception $exception){
             return result(500, "小程序信息错误");

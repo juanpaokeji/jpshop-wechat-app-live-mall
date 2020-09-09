@@ -14,9 +14,9 @@
     <h2>快递打印系统</h2>
     <div class="header_right clearfix">
 <!--        <img src="./print/images/1.png" alt="">-->
-        <select name="" id="" style="-moz-appearance:none;">
+        <!--<select name="" id="" style="-moz-appearance:none;">
             <option value=""></option>
-        </select>
+        </select>-->
         <span>-退出-</span>
     </div>
 </div>
@@ -56,6 +56,7 @@
                 <option value="2">订单编号</option>
                 <option value="3">姓名</option>
                 <option value="4">手机号</option>
+                <option value="5">团长ID</option>
             </select>
             <h4 style="width: 150px;padding: 0px;">
                 <input style="width: 100%;height: 30px;" name="type_value" id="type_value"/>
@@ -100,6 +101,7 @@
                 <p>用户编号</p>
                 <p>姓名</p>
                 <p>手机号</p>
+                <p>发货方式</p>
                 <p>收件地址</p>
                 <p>订单状态</p>
                 <p>快递单号</p>
@@ -120,7 +122,8 @@
         <button class="print_temp" data-engshilname="Invoice">打印发货单</button>
         <button class="print_temp" data-engshilname="purchasing_order">打印采购单</button>
         <button class="print_temp" data-engshilname="distribution_bill">打印配货单</button>
-        <button class="print_temp" data-engshilname="route_sheet">打印路线单</button>
+        <button class="print_temp" data-engshilname="leader_route">打印团长路线单</button>
+        <button class="print_temp" data-engshilname="warehouse_route">打印仓库路线单</button>
         <button class="print_express_order">打印快递单</button>
         <button class="deliver_goods">发 货</button>
     </div>

@@ -3,6 +3,7 @@
 namespace app\controllers\merchant\shop;
 
 use app\models\merchant\system\OperationRecordModel;
+use app\models\merchant\user\MerchantModel;
 use yii;
 use yii\db\Exception;
 use yii\web\MerchantController;
@@ -123,6 +124,8 @@ class SigninController extends MerchantController
 //            }
             if ($params['continuous'] == 1) {
                 $params['continuous_arr'] = json_encode($params['continuous_arr'], JSON_UNESCAPED_UNICODE);
+            } else {
+                $params['continuous'] = "";
             }
 
             $params['merchant_id'] = yii::$app->session['uid'];
@@ -131,7 +134,19 @@ class SigninController extends MerchantController
                 //添加操作记录
                 $operationRecordModel = new OperationRecordModel();
                 $operationRecordData['key'] = $params['`key`'];
-                $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                if (isset(yii::$app->session['sid'])) {
+                    $subModel = new \app\models\merchant\system\UserModel();
+                    $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                    if ($subInfo['status'] == 200){
+                        $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                    }
+                } else {
+                    $merchantModle = new MerchantModel();
+                    $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                    if ($merchantInfo['status'] == 200) {
+                        $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                    }
+                }
                 $operationRecordData['operation_type'] = '新增';
                 $operationRecordData['operation_id'] = $array['data'];
                 $operationRecordData['module_name'] = '签到';
@@ -214,7 +229,19 @@ class SigninController extends MerchantController
                     //添加操作记录
                     $operationRecordModel = new OperationRecordModel();
                     $operationRecordData['key'] = $params['`key`'];
-                    $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                    if (isset(yii::$app->session['sid'])) {
+                        $subModel = new \app\models\merchant\system\UserModel();
+                        $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                        if ($subInfo['status'] == 200){
+                            $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                        }
+                    } else {
+                        $merchantModle = new MerchantModel();
+                        $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                        if ($merchantInfo['status'] == 200) {
+                            $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                        }
+                    }
                     $operationRecordData['operation_type'] = '更新';
                     $operationRecordData['operation_id'] = $id;
                     $operationRecordData['module_name'] = '签到';
@@ -252,7 +279,19 @@ class SigninController extends MerchantController
                 //添加操作记录
                 $operationRecordModel = new OperationRecordModel();
                 $operationRecordData['key'] = $params['`key`'];
-                $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                if (isset(yii::$app->session['sid'])) {
+                    $subModel = new \app\models\merchant\system\UserModel();
+                    $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                    if ($subInfo['status'] == 200){
+                        $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                    }
+                } else {
+                    $merchantModle = new MerchantModel();
+                    $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                    if ($merchantInfo['status'] == 200) {
+                        $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                    }
+                }
                 $operationRecordData['operation_type'] = '删除';
                 $operationRecordData['operation_id'] = $id;
                 $operationRecordData['module_name'] = '签到';
@@ -364,7 +403,7 @@ class SigninController extends MerchantController
                 }
                 for ($i = 0; $i < count($user); $i++) {
 
-                    $number = $this->prize(yii::$app->session['uid'],$id,$user[$i]['user_id']);
+                    $number = $this->prize(yii::$app->session['uid'], $id, $user[$i]['user_id']);
                     $num[$i]['num'] = $number;
                     $num[$i]['user_id'] = $user[$i]['user_id'];
                 }
@@ -448,7 +487,7 @@ class SigninController extends MerchantController
                     }
                 }
                 for ($i = 0; $i < count($user); $i++) {
-                    $number = $this->prize(yii::$app->session['uid'],$id,$user[$i]['user_id']);
+                    $number = $this->prize(yii::$app->session['uid'], $id, $user[$i]['user_id']);
                     $num[$i]['num'] = $number;
                     $num[$i]['user_id'] = $user[$i]['user_id'];
                 }
@@ -469,7 +508,6 @@ class SigninController extends MerchantController
                     }
                 }
             }
-
 
 
             return $array;

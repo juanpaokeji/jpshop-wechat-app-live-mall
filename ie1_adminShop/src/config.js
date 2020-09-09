@@ -24,6 +24,7 @@ layui.define(['laytpl', 'layer', 'element', 'util'], function (exports) {
         , protocol_host: document.location.protocol + '//' + window.location.host + '/ie1_adminMerchant/#/'
         //自定义设置全局变量
         ,baseUrl: '//' + window.location.hostname + '/api/web/index.php' //服务器
+    // ,baseUrl: '//' + 'ceshi.juanpao.cn'+ '/api/web/index.php' //服务器
         , successMsg: {
             post: '新增成功',
             delete: '删除成功',

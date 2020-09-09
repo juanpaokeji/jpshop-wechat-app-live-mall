@@ -3,6 +3,7 @@
 namespace app\controllers\merchant\shop;
 
 use app\models\merchant\system\OperationRecordModel;
+use app\models\merchant\user\MerchantModel;
 use app\models\shop\GoodsAdvanceSaleModel;
 use app\models\shop\ShopGoodsModel;
 use yii;
@@ -95,9 +96,23 @@ class AdvanceSaleController extends MerchantController
             $array = $model->do_add($params);
             if ($array['status'] == 200) {
                 //添加操作记录
+                $sql = "update shop_goods set is_advance_sale =1 where id = {$params['goods_id']}";
+                Yii::$app->db->createCommand($sql)->execute();
                 $operationRecordModel = new OperationRecordModel();
                 $operationRecordData['key'] = $params['key'];
-                $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                if (isset(yii::$app->session['sid'])) {
+                    $subModel = new \app\models\merchant\system\UserModel();
+                    $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                    if ($subInfo['status'] == 200){
+                        $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                    }
+                } else {
+                    $merchantModle = new MerchantModel();
+                    $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                    if ($merchantInfo['status'] == 200) {
+                        $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                    }
+                }
                 $operationRecordData['operation_type'] = '新增';
                 $operationRecordData['operation_id'] = $array['data'];
                 $operationRecordData['module_name'] = 'banner';
@@ -141,10 +156,27 @@ class AdvanceSaleController extends MerchantController
 
             $array = $model->do_update($where, $params);
             if ($array['status'] == 200) {
+                if(isset($params['goods_id'])){
+                    $sql = "update shop_goods set is_advance_sale =1 where id = {$params['goods_id']}";
+                    Yii::$app->db->createCommand($sql)->execute();
+                }
+
                 //添加操作记录
                 $operationRecordModel = new OperationRecordModel();
                 $operationRecordData['key'] = $params['key'];
-                $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                if (isset(yii::$app->session['sid'])) {
+                    $subModel = new \app\models\merchant\system\UserModel();
+                    $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                    if ($subInfo['status'] == 200){
+                        $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                    }
+                } else {
+                    $merchantModle = new MerchantModel();
+                    $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                    if ($merchantInfo['status'] == 200) {
+                        $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                    }
+                }
                 $operationRecordData['operation_type'] = '更新';
                 $operationRecordData['operation_id'] = $id;
                 $operationRecordData['module_name'] = 'banner';
@@ -170,10 +202,25 @@ class AdvanceSaleController extends MerchantController
             }
             $array = $model->do_delete($params);
             if ($array['status'] == 200) {
+
+                $sql = "update shop_goods set is_advance_sale =0 where id = {$one['data']['goods_id']}";
+                Yii::$app->db->createCommand($sql)->execute();
+
                 //添加操作记录
                 $operationRecordModel = new OperationRecordModel();
-                $operationRecordData['key'] = $params['key'];
-                $operationRecordData['merchant_id'] = yii::$app->session['uid'];
+                if (isset(yii::$app->session['sid'])) {
+                    $subModel = new \app\models\merchant\system\UserModel();
+                    $subInfo = $subModel->find(['id'=>yii::$app->session['sid']]);
+                    if ($subInfo['status'] == 200){
+                        $operationRecordData['merchant_id'] = $subInfo['data']['username'];
+                    }
+                } else {
+                    $merchantModle = new MerchantModel();
+                    $merchantInfo = $merchantModle->find(['id'=>yii::$app->session['uid']]);
+                    if ($merchantInfo['status'] == 200) {
+                        $operationRecordData['merchant_id'] = $merchantInfo['data']['name'];
+                    }
+                }
                 $operationRecordData['operation_type'] = '删除';
                 $operationRecordData['operation_id'] = $id;
                 $operationRecordData['module_name'] = 'banner';
